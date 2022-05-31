@@ -1,0 +1,11 @@
+bookdown::bs4_book:
+  css: bs4_book.css
+  theme:
+    primary: "#3356CC"
+  repo: https://github.com/hdadvisors/rrh-framework
+# bookdown::pdf_book:
+#   includes:
+#     in_header: preamble.tex
+#   latex_engine: xelatex
+#   citation_package: natbib
+#   keep_tex: yes

@@ -1,0 +1,18 @@
+--- 
+title: "Richmond Regional Housing Framework Data Update"
+author: "HDAdvisors"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+documentclass: book
+# url: your book url like https://bookdown.org/yihui/bookdown
+# cover-image: path to the social sharing image like images/cover.jpg
+description: "Prepared by HDAdvisors for Chesterfield County."
+biblio-style: apalike
+csl: chicago-fullnote-bibliography.csl
+---
+
+# About {-}
+
+::: {.rmdcaution}
+This report is currently in development. It was last updated on **`r Sys.Date()`**.
+:::

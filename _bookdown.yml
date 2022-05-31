@@ -1,0 +1,31 @@
+book_filename: "rrh-framework-update"
+language:
+  label:
+    fig: "FIGURE "
+    TAB: "TABLE "
+  ui:
+    chapter_name: "Chapter "
+new_session: true
+before_chapter_script: "_common.R"
+delete_merged_file: true
+output_dir: "docs"
+
+rmd_files:
+
+- "index.Rmd"
+
+- "execsum.Rmd"
+
+- "part-1-1.Rmd"
+- "part-1-2.Rmd"
+- "part-1-3.Rmd"
+- "part-1-4.Rmd"
+
+- "part-2-1.Rmd"
+- "part-2-2.Rmd"
+- "part-2-3.Rmd"
+
+- "part-3-1.Rmd"
+- "part-3-2.Rmd"
+
+- "references.Rmd"
