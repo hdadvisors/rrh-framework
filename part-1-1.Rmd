@@ -1,6 +1,6 @@
 # (PART)Demographic and socioeconomic changes {.unnumbered}
 
-# Components of population change{#part-1-1}
+## Components of population change{#part-1-1}
 
 The Richmond region has continued to grow amid the COVID-19 pandemic. 
 
@@ -14,6 +14,8 @@ library(janitor)
 
 ```{r natural}
 
+# PEP does not have data available for 2020 and 2021 yet.
+
 region <- c(51036, 51041, 51075, 51085, 51087, 51127, 51145, 51760)
 
 
@@ -21,21 +23,54 @@ pep_change_raw <- get_estimates(
   geography = "county",
   state = "VA",
   variables = c("NATURALINC", "DOMESTICMIG", "INTERNATIONALMIG"),
-  year = 2019,
   time_series = TRUE
 )
 
-rr_pep_change <- pep_change_raw |> 
-  filter(GEOID == region)
+pep_change_clean <- pep_change_raw %>% 
+  mutate(year = # Translate date codes into years
+    case_when(
+      PERIOD == 1 ~ "2010",
+      PERIOD == 2 ~ "2011",
+      PERIOD == 3 ~ "2012",
+      PERIOD == 4 ~ "2013",
+      PERIOD == 5 ~ "2014",
+      PERIOD == 6 ~ "2015",
+      PERIOD == 7 ~ "2016",
+      PERIOD == 8 ~ "2017",
+      PERIOD == 9 ~ "2018",
+      PERIOD == 10 ~ "2019")) %>%
+  mutate(component = # Rename components of change
+    case_when(
+      variable == "NATURALINC" ~ "Natural increase",
+      variable == "DOMESTICMIG" ~ "Domestic migration",
+      variable == "INTERNATIONALMIG" ~ "International migration")) %>% 
+  select( # Simplify columns
+    GEOID,
+    year,
+    component,
+    value
+  )
+
+rr_nat_change <- pep_change_clean |> 
+  filter(GEOID %in% region) |> 
+  filter(component == "Natural increase")
+
+# Maybe manually add in 2020 and 2021?
 
 ```
 
 ```{r migration}
+
+rr_mig_change <- pep_change_clean |> 
+  filter(GEOID %in% region) |> 
+  filter(component != "Natural increase")
+
+# Maybe manually add in 2020 and 2021?
+
 
 ```
 
 ```{r pop-change}
 
 ```
-
 
