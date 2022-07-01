@@ -1,0 +1,83 @@
+# (PART)Housing supply and market changes {.unnumbered}
+
+## Homeownership characteristics{#part-2-1}
+
+Owner-occupied stock
+
+```{r oo-stock}
+
+
+```
+
+For-sale market
+
+```{r n-sales}
+
+# Pull in MLS data csv for each county from 2016 to 2022 by quarter?
+
+# Number of home sales
+
+
+```
+
+```{r sales-price}
+
+# Pull in MLS data csv for each county from 2016 to 2022 by quarter?
+
+# Median sales price by quarter
+
+
+```
+
+
+```{r dom}
+
+# Pull in MLS data csv for each county from 2016 to 2022 by quarter?
+
+# Average days on market by quarter
+
+```
+
+```{r supply}
+
+# Pull in MLS data csv for each county from 2016 to 2022 by quarter?
+
+# Months supply by quarter?
+
+
+```
+
+```{r starter-homes}
+
+
+```
+
+New construction versus re-sale
+
+```{r comp-price}
+
+
+```
+
+
+```{r comp-br}
+
+```
+
+```{r comp-sf}
+
+```
+
+
+Construction trends
+
+```{r sf-construction}
+
+```
+
+
+Homeownership rate
+
+```{r ho-rate}
+
+```

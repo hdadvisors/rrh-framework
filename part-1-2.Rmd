@@ -2,14 +2,239 @@
 
 ## Changes in household characteristics{#part-1-2}
 
-Household formation trends
+```{r setup}
 
+library(tidyverse)
+library(tidycensus)
+library(ggplot2)
+library(simplevis)
+library(tigris)
+
+va <- counties(state = "VA", year = 2020)
+
+rr <- c("51085", "51760", "51075", "51145", "51087", "51127", "51036", "51041")
+
+rr_va <- va |> 
+  subset(GEOID %in% rr)
+
+```
+
+Household formation trends
+```{r hh-formation}
+
+years <- 2010:2020
+
+b25007_vars <- load_variables(2020, "acs5") |> 
+  filter(str_sub(name, end = 6) %in% "B25007")
+
+b25007_raw <- map_dfr(years, function(yr){
+  b25007_pull <- get_acs(
+    geography = "county",
+    state = "VA",
+    table = "B25007",
+    year = yr,
+    survey = "acs5",
+    cache_table = TRUE
+  ) |> 
+    mutate(year = yr)
+})
+
+b25007_raw <- b25007_raw |> 
+  subset(GEOID %in% rr)
+
+b25007_vars_cleaned <- b25007_vars |> 
+  separate(label, into = c("est", "total", "tenure", "age"), sep = "!!") |> 
+  select(variable = name, tenure, age) |> 
+  drop_na() |> 
+  mutate(tenure = case_when(
+    tenure == "Owner occupied" ~ "Homeowner",
+    tenure == "Renter occupied" ~ "Renter"
+  ))
+
+b25007_data <- b25007_raw |> 
+  right_join(b25007_vars_cleaned, by = "variable") |> 
+  select(NAME, GEOID, year, tenure, age, estimate, moe) 
+
+
+```
 
 Household type and size
+```{r hhtype}
 
+years <- 2010:2020
+
+b11001_vars <- load_variables(2020, "acs5") |> 
+  filter(str_sub(name, end = 7) %in% "B11001_")
+
+b11001_raw <- map_dfr(years, function(yr){
+  b11001_pull <- get_acs(
+    geography = "county",
+    state = "VA",
+    table = "B11001",
+    year = yr,
+    survey = "acs5",
+    cache_table = TRUE
+  ) |> 
+    mutate(year = yr)
+})
+
+b11001_raw <- b11001_raw |> 
+  subset(GEOID %in% rr)
+
+b11001_vars_cleaned <- b11001_vars |> 
+  separate(label, into = c("est", "tot", "type", "relationship", "householder"), 
+           sep = "!!") |> 
+  select(variable = name, type, relationship, householder) |> 
+  mutate(
+    householder = case_when(
+      relationship == "Married-couple family" ~ relationship,
+      relationship == "Householder living alone" ~ relationship,
+      relationship == "Householder not living alone" ~ relationship,
+      TRUE ~ householder),
+    relationship = case_when(
+      relationship == "Householder living alone" ~ type,
+      relationship == "Householder not living alone" ~ type,
+      TRUE ~ relationship)
+    ) |> 
+  mutate(across(.fns = ~str_remove_all(.x, ":"))) |> 
+  drop_na()
+
+b11001_data <- b11001_raw |> 
+  right_join(b11001_vars_cleaned, by = "variable") |> 
+  select(NAME, GEOID, year, "hhtype" = householder, estimate, moe) 
+
+
+
+```
+
+
+```{r hh-size}
+
+years <- 2010:2020
+
+b25009_vars <- load_variables(2020, "acs5") |> 
+  filter(str_sub(name, end = 6) %in% "B25009")
+
+b25009_raw <- map_dfr(years, function(yr){
+  b25009_pull <- get_acs(
+    geography = "county",
+    state = "VA",
+    table = "B25009",
+    year = yr,
+    survey = "acs5",
+    cache_table = TRUE
+  ) |> 
+    mutate(year = yr)
+})
+
+b25009_raw <- b25009_raw |> 
+  subset(GEOID %in% rr)
+
+b25009_vars_cleaned <- b25009_vars |> 
+  separate(label, into = c("est", "total", "tenure", "size"), sep = "!!") |> 
+  select(variable = name, tenure, size) |> 
+  drop_na() |> 
+  mutate(tenure = case_when(
+    tenure == "Owner occupied:" ~ "Homeowner",
+    tenure == "Renter occupied:" ~ "Renter"
+  ))
+
+b25009_data <- b25009_raw |> 
+  right_join(b25009_vars_cleaned, by = "variable") |> 
+  select(NAME, GEOID, year, tenure, size, estimate, moe)
+
+```
 
 Households with children
+```{r hh-children}
+
+years <- 2010:2020
+
+b11005_vars <- load_variables(2020, "acs5") |> 
+  filter(str_sub(name, end = 6) %in% "B11005")
+
+b11005_raw <- map_dfr(years, function(yr){
+  b11005_pull <- get_acs(
+    geography = "county",
+    state = "VA",
+    table = "B11005",
+    year = yr,
+    survey = "acs5",
+    cache_table = TRUE
+  ) |> 
+    mutate(year = yr)
+})
+
+b11005_raw <- b11005_raw |> 
+  subset(GEOID %in% rr)
+
+b11005_vars_cleaned <- b11005_vars |> 
+  separate(label, into = c("est", "total", "children", "family", "type", "sex"), sep = "!!") |> 
+  select(variable = name, children, family, type, sex) |> 
+  mutate(sex = case_when(
+    type == "Married-couple family" ~ "Married-couple family",
+    type == "Male householder" ~ "Male householder",
+    type == "Female householder" ~ "Female householder",
+    TRUE ~ sex))
+
+b11005_vars_cleaned <- b11005_vars_cleaned |> 
+  select(variable, children, household = sex) |> 
+  drop_na() |> 
+  mutate(children = case_when(
+    children == "Households with one or more people under 18 years:" ~ "With child or children under 18",
+    children == "Households with no people under 18 years:" ~ "No child or children under 18"
+  ))
+
+b11005_data <- b11005_raw |> 
+  right_join(b11005_vars_cleaned, by = "variable") |> 
+  select(NAME, GEOID, year, household, children, estimate, moe)
+
+
+```
+
 
 
 Households with seniors
+```{r hh-seniors}
 
+
+years <- 2010:2020
+
+b11007_vars <- load_variables(2020, "acs5") |> 
+  filter(str_sub(name, end = 6) %in% "B11007")
+
+b11007_raw <- map_dfr(years, function(yr){
+  b11007_pull <- get_acs(
+    geography = "county",
+    state = "VA",
+    table = "B11007",
+    year = yr,
+    survey = "acs5",
+    cache_table = TRUE
+  ) |> 
+    mutate(year = yr)
+})
+
+b11007_raw <- b11007_raw |> 
+  subset(GEOID %in% rr)
+
+b11007_vars_cleaned <- b11007_vars |> 
+  separate(label, into = c("est", "total", "senior", "hhsize", "family"), sep = "!!") |> 
+  select(variable = name, senior, hhsize, family) |> 
+  mutate(family = case_when(
+    hhsize == "1-person household" ~ "Alone",
+    hhsize == "1-person households" ~ "Alone",
+    TRUE ~ family
+  )) |> 
+  drop_na() |> 
+  mutate(senior = case_when(
+    senior == "Households with one or more people 65 years and over:" ~ "Senior(s) present",
+    senior == "Households with no people 65 years and over:" ~ "No senior present"
+  )) |> 
+  mutate(across(.fns = ~str_remove_all(.x, ":")))
+
+b11007_data <- b11007_raw |> 
+  right_join(b11007_vars_cleaned, by = "variable") |> 
+  select(NAME, GEOID, year, senior, hhsize, family, estimate, moe)
+
+```

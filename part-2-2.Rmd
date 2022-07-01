@@ -1,0 +1,21 @@
+# (PART)Housing supply and market changes {.unnumbered}
+
+## Rental characteristics{#part-2-1}
+
+Renter-occupied stock
+
+```{r ro-stock}
+
+```
+
+Rental market
+
+```{r avg-rent}
+
+```
+
+```{r avg-rent-br}
+
+```
+
+```
