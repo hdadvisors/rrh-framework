@@ -1,0 +1,32 @@
+# (PART)Housing supply and market changes {.unnumbered}
+
+## Housing assistance{#part-2-3}
+
+Assisted income-restricted rental
+```{r nhpd}
+
+```
+
+
+```{r public-housing}
+
+```
+
+Housing Choice Vouchers
+```{r hcv}
+
+```
+
+Rent relief and mortgage relief
+```{r rmrp}
+
+```
+
+
+Affordable homeownership
+```{r aff-ho}
+
+```
+
+
+Changes in assisted housing since 2019

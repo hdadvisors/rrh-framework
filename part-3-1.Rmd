@@ -1,0 +1,33 @@
+# (PART)GAP ANALYSIS {.unnumbered}
+
+## Affordability of current housing stock {#part-3-1}
+
+Surplus/Gap 
+```{r gap}
+
+```
+
+Income versus affordability
+```{r renter-rent}
+
+# Compare renter income versus rental prices
+
+```
+
+```{r  renter-own}
+
+#Compare renter income versus home prices
+
+```
+
+```{r occupations}
+
+
+```
+
+Ratio
+```{r ratio}
+
+# Income of five most common job sectors/occupations versus rental and home prices
+
+```

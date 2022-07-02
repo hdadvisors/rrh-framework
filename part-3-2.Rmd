@@ -1,0 +1,53 @@
+# (PART)GAP ANALYSIS {.unnumbered}
+
+## Impact of housing costs on household budgets {#part-3-2}
+
+Cost burden
+```{r cb-income}
+
+
+```
+
+```{r cb-tenure}
+
+
+```
+
+```{r cb-hh}
+
+
+```
+
+Mortgage delinquency and foreclosure
+
+```{r mort-del}
+
+
+```
+
+
+Eviction filings and judgements
+```{r evictions}
+
+```
+
+Housing Resource Line
+```{r call-vol}
+
+```
+
+```{r call-topic}
+
+```
+
+
+Homelessness
+```{r pit}
+
+```
+
+
+```{r mkv}
+
+```
+

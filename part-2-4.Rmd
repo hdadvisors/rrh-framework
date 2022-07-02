@@ -1,0 +1,36 @@
+# (PART)Housing supply and market changes {.unnumbered}
+
+## Assessment of naturally-occurring affordable housing (NOAH){#part-2-4}
+
+```{r setup}
+
+library(tidyverse)
+library(simplevis)
+library(leaflet)
+library(htmlwidgets)
+library(ggplot2)
+library(janitor)
+
+# Utilize the same filters as the Chesterfield County Rental Market Analysis.
+
+# CoStar Filters for Properties: Multi-Family, Localities: Charles City, Chesterfield, Hanover, Henrico, Goochland, New Kent, Powhatan, Richmondy City; Construction status: Existing; Stars: 3; Rent type: Market; Max Year Built: 1999
+
+# Append data from MHCCV report for manufactured home communities.
+
+
+
+```
+
+```{r noah-map}
+
+
+```
+
+```{r noah-type}
+
+
+```
+
+```{r noah-rents}
+
+```
