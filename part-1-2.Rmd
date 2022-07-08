@@ -33,8 +33,7 @@ b25007_raw <- map_dfr(years, function(yr){
     state = "VA",
     table = "B25007",
     year = yr,
-    survey = "acs5",
-    cache_table = TRUE
+    survey = "acs5"
   ) |> 
     mutate(year = yr)
 })
@@ -72,8 +71,7 @@ b11001_raw <- map_dfr(years, function(yr){
     state = "VA",
     table = "B11001",
     year = yr,
-    survey = "acs5",
-    cache_table = TRUE
+    survey = "acs5"
   ) |> 
     mutate(year = yr)
 })
@@ -121,8 +119,7 @@ b25009_raw <- map_dfr(years, function(yr){
     state = "VA",
     table = "B25009",
     year = yr,
-    survey = "acs5",
-    cache_table = TRUE
+    survey = "acs5"
   ) |> 
     mutate(year = yr)
 })
@@ -159,8 +156,7 @@ b11005_raw <- map_dfr(years, function(yr){
     state = "VA",
     table = "B11005",
     year = yr,
-    survey = "acs5",
-    cache_table = TRUE
+    survey = "acs5"
   ) |> 
     mutate(year = yr)
 })
@@ -209,8 +205,7 @@ b11007_raw <- map_dfr(years, function(yr){
     state = "VA",
     table = "B11007",
     year = yr,
-    survey = "acs5",
-    cache_table = TRUE
+    survey = "acs5"
   ) |> 
     mutate(year = yr)
 })

@@ -2,9 +2,21 @@
 
 ## Rental characteristics{#part-2-2}
 
+```{r setup}
+
+library(tidyverse)
+library(tidycensus)
+library(janitor)
+
+```
+
 Renter-occupied stock
 
 ```{r ro-structure}
+
+renter_structure <- b25127_data |> 
+  filter(tenure == "Renter")
+
 
 ```
 
@@ -20,7 +32,32 @@ Rental market
 
 ```{r avg-rent}
 
+# Aggregated average market asking rent per unit for Chesterfield, Hanover, Henrico, and Richmond City.
+
+# CoStar Filters: Construction Status - Existing
+
+pha_rent <- read_csv("data/pha_avg_rent.csv")
+
 ```
+
+
+```{r avg-rent-submarket}
+
+# Disaggregate by Richmond CoStar Submarket
+
+# CoStar Filters: Construction Status - Existing
+
+# Added locality field manually
+
+rr_sub_rent <- read_csv("data/rr_submarket_data.csv") |> 
+  clean_names() |> 
+  separate(geography, into = c("region", "state", "submarket"), sep = " - ") |> 
+  select(period, locality, submarket, "rent" = market_asking_rent_unit, vacancy_rate)
+
+# Issue with above is that rents are not inflation-adjusted. May need to revist. I've requested from CoStar to allow for an inflation-adjusted average rent per unit pull, BUT who knows if they can add it.
+
+```
+
 
 ```{r avg-rent-br}
 
@@ -32,7 +69,10 @@ Rental market
 ```
 
 Rental vacancy
-```{r vacany}
+```{r vacancy}
+
+rr_sub_vacancy <- rr_sub_rent |> 
+  select(period, locality, submarket, vacancy_rate)
 
 ```
 

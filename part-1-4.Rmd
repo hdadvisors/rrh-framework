@@ -2,5 +2,88 @@
 
 ## Special populations{#part-1-4}
 
+```{r setup}
+
+library(tidyverse)
+library(tidycensus)
+library(ggplot2)
+library(simplevis)
+
+```
 
 
+```{r ind-living}
+
+# Table B18107 Sex by age by independent living difficulty
+
+years <- 2012:2020
+
+b18107_vars <- load_variables(2020, "acs5") |> 
+  filter(str_sub(name, end = 6) %in% "B18107")
+
+b18107_raw <- map_dfr(years, function(yr){
+  b10107_pull <- get_acs(
+    geography = "county",
+    state = "VA",
+    table = "B18107",
+    year = yr,
+    survey = "acs5"
+  ) |> 
+    mutate(year = yr)
+  })
+
+b18107_raw <- b18107_raw |> 
+  subset(GEOID %in% rr)
+
+b18107_vars_cleaned <- b18107_vars |> 
+  separate(label, into = c("est", "total", "sex", "age", "indliv"), sep = "!!") |> 
+  select(variable = name, sex , age, indliv) |> 
+  drop_na() |> 
+  mutate(across(.fns = ~str_remove_all(.x, ":")))
+
+b18107_data <- b18107_raw |> 
+  right_join(b18107_vars_cleaned, by = "variable") |> 
+  select(NAME, GEOID, year, sex, age, indliving)
+
+
+
+```
+
+```{r vets}
+
+# Table B21005 Age by veteran status by employment status for civilian population 18 to 64 years
+
+years <- 2010:2020
+
+b21005_vars <- load_variables(2020, "acs5") |> 
+  filter(str_sub(name, end = 6) %in% "B21005")
+
+b21005_raw <- map_dfr(years, function(yr){
+  b21005_pull <- get_acs(
+    geography = county,
+    state = "VA",
+    table = "B21005",
+    year = yr,
+    survey = "acs5"
+  ) |> 
+    mutate(year = yr)
+  })
+
+b21005_raw <- b21005_raw |> 
+  subset(GEOID %in% rr)
+
+b21005_vars_cleaned <- b21005_vars |> 
+  separate(label, into = c("est", "total", "age", "vet", "labor", "emp"), sep = "!!") |> 
+  select(variable = name, age, vet, labor, emp) |> 
+  mutate(emp = case_when(
+    labor == "Not in labor force" ~ "Not in labor force",
+    TRUE ~ emp
+  )) |> 
+  drop_na() |> 
+  mutate(across(.fns = ~str_remove_all(.x, ":")))
+
+b21005_data <- b21005_raw |> 
+  right_join(b21005_vars_cleaned, by = "variable") |> 
+  select(NAME, GEOID, year, vet, emp, estimate, moe)
+
+```

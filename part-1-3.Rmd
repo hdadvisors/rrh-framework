@@ -28,8 +28,7 @@ b25118_raw <- map_dfr(years, function(yr){
     state = "VA",
     table = "B25118",
     year = yr,
-    survey = "acs5", 
-    cache_table = TRUE
+    survey = "acs5"
   ) |> 
     mutate(year = yr)
   })
@@ -65,8 +64,7 @@ b25119_raw <- map_dfr(years, function(yr){
     state = "VA",
     table = "B25119",
     year = yr,
-    survey = "acs5",
-    cache_table = TRUE
+    survey = "acs5"
   ) %>%
     mutate(year = yr)
   })

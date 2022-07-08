@@ -14,7 +14,7 @@ library(janitor)
 
 ```{r natural}
 
-# PEP does not have data available for 2020 and 2021 yet.
+# PEP does not have data available for 2020 and 2021 yet. You would need to pull in the excel files in and append.
 
 region <- c(51036, 51041, 51075, 51085, 51087, 51127, 51145, 51760)
 

@@ -2,10 +2,60 @@
 
 ## Homeownership characteristics{#part-2-1}
 
+```{r setup}
+
+library(tidyverse)
+library(tidycensus)
+library(janitor)
+library(glue)
+library(stringi)
+library(zoo)
+library(lubridate)
+
+```
+
 Owner-occupied stock
 
-```{r oo-stock}
+```{r oo-structure}
 
+# Table B25127 Tenure by year structure built by units in structure
+
+years <- 2010:2020
+
+b25127_vars <- load_variables(2020, "acs5") |> 
+  filter(str_sub(name, end = 6) %in% "B25127")
+
+b25127_raw <- map_dfr(years, function(yr){
+  b25127_pull <- get_acs(
+    geography = "county",
+    state = "VA",
+    table = "B25127",
+    year = yr,
+    survey = "acs5"
+  ) |> 
+    mutate(year = yr)
+})
+
+b25127_raw <- b25127_raw |> 
+  subset(GEOID %in% rr)
+
+b25127_vars_cleaned <- b25127_vars |> 
+  separate(label, into = c("est", "total", "tenure", "yrbuilt", "structure"), sep = "!!") |> 
+  select(variable = name, tenure, yrbuilt, structure) |> 
+  drop_na() |> 
+  mutate(across(.fns = ~str_remove_all(.x, ":"))) |> 
+  mutate(tenure = case_when(
+    tenure == "Owner occupied" ~ "Homeowner",
+    tenure == "Renter occupied" ~ "Renter"
+  ))
+
+b25127_data <- b25127_raw |> 
+  right_join(b25127_vars_cleaned, by = "variable") |> 
+  select(NAME, GEOID, year, tenure, yrbuilt, structure)
+
+homeowner_structure <- b25127_data |> 
+  filter(tenure == "Homeowner")
+  
 
 ```
 
@@ -13,26 +63,104 @@ For-sale market
 
 ```{r n-sales}
 
-# Pull in MLS data csv for each county from 2016 to 2022 by quarter?
+# Pull in MLS data csv for each county from 2017 to 2022 by month for four major localities by month.
 
-# Number of home sales
+# CVR MLS Filter: Property type - Single Family, Condo/Town
+
+# Data Pull: Time Frame - Past 5 Years; Statistic = Sales, Number of; Group By - Month
+
+chesterfield_sales <- read_csv("data/chesterfield_num_sales.csv") |> 
+  clean_names() |> 
+  mutate(geography = "Chesterfield County")
+
+hanover_sales <- read_csv("data/hanover_num_sales.csv") |> 
+  clean_names() |> 
+  mutate(geography = "Hanover County")
+
+henrico_sales <- read_csv("data/henrico_num_sales.csv") |> 
+  clean_names() |> 
+  mutate(geography = "Henrico County")
+
+richmond_sales <- read_csv("data/richmond_num_sales.csv") |> 
+  clean_names() |> 
+  mutate(geography = "Richmond City")
+
+pha <- list(chesterfield_sales, hanover_sales, henrico_sales, richmond_sales)
+
+clean_data <- function(df){
+  df |> pivot_longer(cols = starts_with("sales"),
+    names_to = "label",
+    values_to = "sales",
+    values_drop_na = TRUE
+  ) |> 
+mutate(year = substr(label, 17,20))
+}
+
+pha_sales <- map_dfr(pha, clean_data) |> 
+  select(geography, year, month, sales)
+
+pha_sales$month <- match(pha_sales$month, month.abb)
+
+pha_sales <- pha_sales |> 
+  mutate(date = make_date(year, month))
+
 
 
 ```
 
 ```{r sales-price}
 
-# Pull in MLS data csv for each county from 2016 to 2022 by quarter?
+# Pull in MLS data csv for each county from 2017 to 2022 by month for four major localities by month.
 
-# Median sales price by quarter
+# CVR MLS Filter: Property type - Single Family, Condo/Town
+
+# Data Pull: Time Frame - Past 5 Years; Statistic = Sales Price, Median; Group By - Month
+
+# Median sales price by month
+
+chesterfield_price <- read_csv("data/chesterfield_med_sales.csv") |> 
+  clean_names() |> 
+  mutate(geography = "Chesterfield County")
+
+hanover_price <- read_csv("data/hanover_med_sales.csv") |> 
+  clean_names() |> 
+  mutate(geography = "Hanover County")
+
+henrico_price <- read_csv("data/henrico_med_sales.csv") |> 
+  clean_names() |> 
+  mutate(geography = "Henrico County")
+
+richmond_price <- read_csv("data/richmond_med_sales.csv") |> 
+  clean_names() |> 
+  mutate(geography = "Richmond City")
+
+pha_price <- list(chesterfield_price, hanover_price, henrico_price, richmond_price)
+
+clean_data <- function(df){
+  df |> pivot_longer(cols = starts_with("sale"),
+    names_to = "label",
+    values_to = "med_price",
+    values_drop_na = TRUE
+  ) |> 
+mutate(year = substr(label, 19,23))
+}
+
+pha_price <- map_dfr(pha_price, clean_data) |> 
+  select(geography, year, month, med_price)
+
+pha_price$month <- match(pha_price$month, month.abb)
+
+pha_price <- pha_price |> 
+  mutate(date = make_date(year, month)) |> 
+  mutate(med_price = parse_number(med_price))
+
 
 
 ```
 
-
 ```{r dom}
 
-# Pull in MLS data csv for each county from 2016 to 2022 by quarter?
+# Pull in MLS data csv for each county from 2017 to 2022 by quarter?
 
 # Average days on market by quarter
 
@@ -40,7 +168,7 @@ For-sale market
 
 ```{r supply}
 
-# Pull in MLS data csv for each county from 2016 to 2022 by quarter?
+# Pull in MLS data csv for each county from 2017 to 2022 by quarter?
 
 # Months supply by quarter?
 
@@ -56,9 +184,36 @@ New construction versus re-sale
 
 ```{r comp-price}
 
+newconstruction_price <- read_csv("data/pha_price_new.csv") |> 
+  clean_names() |> 
+  mutate(type = "New Construction")
+
+resale_price <- read_csv("data/pha_price_resale.csv") |> 
+  clean_names() |> 
+  mutate(type = "Resale")
+
+pha_comp <- list(newconstruction_price, resale_price)
+
+clean_data <- function(df){
+  df |> pivot_longer(cols = starts_with("sale"),
+    names_to = "label",
+    values_to = "med_price",
+    values_drop_na = TRUE
+  ) |> 
+mutate(year = substr(label, 19,23))
+}
+
+pha_comp <- map_dfr(pha_comp, clean_data) |> 
+  select(type, year, month, med_price)
+
+pha_comp$month <- match(pha_comp$month, month.abb)
+
+pha_price_comp <- pha_comp |> 
+  mutate(date = make_date(year, month)) |> 
+  mutate(med_price = parse_number(med_price))
+
 
 ```
-
 
 ```{r comp-br}
 
@@ -73,11 +228,95 @@ Construction trends
 
 ```{r sf-construction}
 
+years <- 2000:2020
+
+header_rows <- read_csv("https://www2.census.gov/econ/bps/County/co2020a.txt", 
+                        col_names = FALSE,
+                        n_max = 2)
+
+column_names <- header_rows %>%
+  select(X1:X18) %>%
+  t() %>%
+  as_tibble() %>%
+  mutate(group = rep(1:6, each = 3)) %>%
+  group_by(group) %>%
+  fill(V1, .direction = "updown") %>%
+  mutate(names = paste0(V1, ": ", V2)) %>%
+  pull(names)
+
+cbps_raw <- map_df(years, ~{
+  raw <- read_csv(glue("https://www2.census.gov/econ/bps/County/co{.x}a.txt"), skip = 2, 
+                    col_names = FALSE) %>%
+    select(X1:X18) %>%
+    set_names(column_names)
+  
+  raw
+  
+})
+
+cbps_data <- cbps_raw %>% 
+  mutate(year = `Survey: Date`,
+         GEOID = paste0(`FIPS: State`, `FIPS: County`)) %>%
+  select(`1-unit: Bldgs`:GEOID) %>%
+  subset(GEOID %in% rr) %>%
+  pivot_longer(`1-unit: Bldgs`:`5+ units: Value`,
+               names_to = "type",
+               values_to = "value") %>%
+  separate(type, into = c("Type", "col"), sep = ": ") %>%
+  pivot_wider(names_from = col,
+              values_from = value) %>%
+  rename_with(tolower, Type:Value) %>% 
+  select(GEOID, year, type:units)
+
+rr_cbps <- cbps_data |> 
+  right_join(rr_va, by = "GEOID") |> 
+  select(GEOID, NAME, year, type:units)
+
 ```
 
 
 Homeownership rate
 
 ```{r ho-rate}
+
+years <- 2010:2020
+
+b25003_vars <- load_variables(2020, "acs5") |> 
+  filter(str_sub(name, end = 7) %in% "B25003_")
+
+b25003_raw <- map_dfr(years, function(yr){
+   b25003_pull <- get_acs(
+    geography = "county",
+    state = "VA",
+    table = "B25003",
+    year = yr,
+    survey = "acs5"
+  ) |> 
+    mutate(year = yr)
+})
+
+b25003_raw <- b25003_raw |> 
+  subset(GEOID %in% rr)
+
+b25003_vars_cleaned <- b25003_vars |> 
+  separate(label, into = c("est", "total", "tenure"), sep = "!!") |> 
+  select(variable = name, tenure) |> 
+  mutate(across(.fns = ~str_replace_na(.x, "All households"))) |>  mutate(tenure = case_when(
+    tenure == "Owner occupied" ~ "Homeowner",
+    tenure == "Renter occupied" ~ "Renter",
+    TRUE ~ tenure
+  ))
+
+b25003_data <- b25003_raw |> 
+  right_join(b25003_vars_cleaned, by = "variable") |> 
+  select(NAME, GEOID, year, tenure, estimate)
+
+rr_homeownership <- b25003_data |> 
+  pivot_wider(
+    names_from = tenure,
+    values_from = estimate
+  ) |> 
+  mutate(ho_rate = (Homeowner/`All households`))
+
 
 ```
