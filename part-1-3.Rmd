@@ -49,6 +49,14 @@ b25118_data <- b25118_raw |>
   right_join(b25118_vars_cleaned, by = "variable") |> 
   select(NAME, year, tenure, income, estimate, moe)
 
+year_change = c(2010, 2020)
+
+b25118_pha <- b25118_data |> 
+  group_by(year, tenure, income) |> 
+  summarise(estimate = sum(estimate)) |> 
+  select(year, tenure, income, estimate) |> 
+  subset(year %in% year_change)
+
 ```
 
 ```{r med-income}
@@ -98,6 +106,99 @@ b25119_cpi <- b25119_data |>
   select(NAME, GEOID, year, tenure, dollars20, moe)
 
 ```
+
+```{r med-income-race}
+
+years <- 2010:2020
+
+b19013 <- paste0("B19013", LETTERS[2:9])
+
+b19013_defns <- load_variables(2020, "acs5") %>%
+  filter(str_sub(name, end = 7) %in% b19013) %>%
+  filter(str_detect(name, "PR") == FALSE)
+
+concept_to_race <- function(x) {
+  out <- x %>%
+    str_remove_all("MEDIAN HOUSEHOLD INCOME IN THE PAST 12 MONTHS \\(\\IN 2020 INFLATION-ADJUSTED DOLLARS\\)\\ \\(|\\)") %>%
+    str_to_title()
+}
+
+b19013_cleaned <- b19013_defns %>%
+  mutate(race = concept_to_race(concept)) %>%
+  separate(label, c("estimate", "medhhincome"), sep = "!!") %>%
+  select(variable = name, medhhincome, race) %>%
+  mutate(across(.fns = ~replace_na(.x, "All")),
+          across(.fns = ~str_remove_all(.x, ":")))
+
+b19013_raw <- map_dfr(b19013, function(tb) {
+  yearly_data <- map_dfr(years, function(yr) {
+    
+    acs_pull <- get_acs(
+      geography = "county",
+      table = tb,
+      year = yr,
+      state = "VA"
+    ) %>%
+    left_join(b19013_cleaned, by = "variable")
+    
+    acs_rearranged <- acs_pull %>%
+      mutate(year = yr) %>%
+      select(variable, year, NAME, GEOID, race, medhhincome,
+             estimate, moe)
+    
+    acs_rearranged
+  })
+  yearly_data
+})
+
+b19013_data <- b19013_raw |> 
+  subset(GEOID %in% rr) |> 
+  mutate(across(.fns = ~str_remove_all(.x, "Alone Householder")),
+         across(.fns = ~trimws(.x))) |> 
+  select(variable, year, NAME, GEOID, race, estimate, moe)
+
+cpi <- read_excel("data/CPI_U_RS.xlsx") |> 
+  rename(year = Year,
+         priceindex = Index) |> 
+  transform(year = as.numeric(year))
+
+b19013_data_clean <- b19013_data |> 
+  transform(year = as.numeric(year),
+            estimate = as.numeric(estimate))|> 
+  left_join(cpi, by = 'year')|> 
+  select(variable, year, NAME, GEOID, race, estimate, moe, priceindex) |> 
+  transform(dollars20 = ((381.2/priceindex)*estimate)) |> 
+  separate(NAME, into = c("locality", "state"), sep = ",") |> 
+  mutate(race = case_when(
+    race == "Black Or African American" ~ "Black",
+    race == "Two Or More Races Householder" ~ "Multiracial",
+    race == "White Alone, Not Hispanic Or Latino Householder" ~ "White, non-Hispanic",
+    race == "Hispanic Or Latino Householder" ~ "Hispanic or Latino",
+    TRUE ~ race
+  )) 
+
+race_values = c("White, non-Hispanic", "Black", "Asian", "Multiracial", "Hispanic or Latino")
+
+pha_values = c("Richmond city", "Henrico County", "Hanover County", "Chesterfield County")
+
+b19013_pha <- b19013_data_clean |> 
+  subset(race %in% race_values) |> 
+  subset(locality %in% pha_values)
+
+inc_race <- gg_line_col_facet(b19013_pha,
+            x_var = year,
+            y_var = dollars20,
+            col_var = race,
+            facet_var = locality
+) + labs(title = "Median household income by race and ethnicity",
+         x = "Year", y = "2020 inflation-adjusted dollars") +
+  scale_y_continuous(labels = scales::dollar_format())
+
+plotly:: ggplotly(inc_race) |> 
+  plotly_camera()
+
+```
+
 
 Wages
 ```{r wages}

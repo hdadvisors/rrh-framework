@@ -2,8 +2,61 @@
 
 ## Housing assistance{#part-2-3}
 
+```{r setup}
+
+library(tidygeocoder)
+library(leaflet)
+library(sf)
+library(sp)
+
+```
+
 Assisted income-restricted rental
 ```{r nhpd}
+
+nhpd <- read_csv("data/nhpd_va_subsidies_7_2022.csv") |> 
+  clean_names()
+
+nhpd_clean <- nhpd |> 
+  transform(fulladdress = paste(nhpd$street_address, nhpd$city, nhpd$state, nhpd$zip_code, sep= ", ")) |> 
+  select(subsidy_name, subsidy_status, subsidy_subname, start_date, end_date, assisted_units, property_name, fulladdress, owner_name, owner_type, target_population, city)
+
+localities <- c("CHARLES CITY", "CHESTER", "CHESTERFIELD", "GLEN ALLEN", "HENRICO", "HIGHLAND SPRINGS", "MIDLOTHIAN", "NORTH CHESTERFIELD", "Richmond", "RICHMOND", "RICHMOND CITY", "SANDSTON")
+
+nhpd_clean_rr <- nhpd_clean |> 
+  subset(city %in% localities)
+
+nhpd_coded <- nhpd_clean_rr |> 
+  geocode(address = fulladdress, 
+          method = 'geocodio',
+          full_results = TRUE,
+          unique_only = FALSE,
+          lat = Latitude, 
+          long = Longitude)
+
+nhpd_coded_rr <- nhpd_coded |> 
+  mutate(Latitude = case_when(
+    property_name == "NEW MANCHESTER FLATS IX" ~ 37.517602,
+    property_name == "KINGSRIDGE I" ~ 37.551666,
+    property_name == "GRAND OAKS SENIORS" ~ 37.353614,
+    property_name == "IRON BRIDGE ROAD" ~ 37.361812,
+    TRUE ~ Latitude)) |> 
+    mutate(Longitude = case_when(
+      property_name == "NEW MANCHESTER FLATS IX" ~ -77.432408,
+      property_name == "KINGSRIDGE I" ~ -77.375593,
+      property_name == "GRAND OAKS SENIORS" ~ -77.457398,
+      property_name == "IRON BRIDGE ROAD" ~ -77.495881,
+      TRUE ~ Longitude)) |> 
+  filter(property_name != "CHESAPEAKE REGIONAL APARTMENTS")
+
+nhpd_coded_rr <- nhpd_coded_rr |> 
+  st_as_sf(coords = c("Longitude", "Latitude"), crs=4326, remove = FALSE)
+
+
+leaflet(nhpd_coded_rr) |> 
+  addTiles() |> 
+  addCircleMarkers(
+  
 
 ```
 
