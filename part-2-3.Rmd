@@ -1,85 +1,132 @@
 # (PART)Housing supply and market changes {.unnumbered}
 
-## Housing assistance{#part-2-3}
+## Housing assistance {#part-2-3}
 
 ```{r setup}
 
+library(tidyverse)
 library(tidygeocoder)
 library(leaflet)
 library(sf)
 library(sp)
+library(janitor)
+library(viridis)
+library(htmlwidgets)
 
 ```
 
 Assisted income-restricted rental
+
+## Results {.tabset}
+
+### NHPD
+
 ```{r nhpd}
 
-nhpd <- read_csv("data/nhpd_va_subsidies_7_2022.csv") |> 
-  clean_names()
-
-nhpd_clean <- nhpd |> 
-  transform(fulladdress = paste(nhpd$street_address, nhpd$city, nhpd$state, nhpd$zip_code, sep= ", ")) |> 
-  select(subsidy_name, subsidy_status, subsidy_subname, start_date, end_date, assisted_units, property_name, fulladdress, owner_name, owner_type, target_population, city)
-
-localities <- c("CHARLES CITY", "CHESTER", "CHESTERFIELD", "GLEN ALLEN", "HENRICO", "HIGHLAND SPRINGS", "MIDLOTHIAN", "NORTH CHESTERFIELD", "Richmond", "RICHMOND", "RICHMOND CITY", "SANDSTON")
-
-nhpd_clean_rr <- nhpd_clean |> 
-  subset(city %in% localities)
-
-nhpd_coded <- nhpd_clean_rr |> 
-  geocode(address = fulladdress, 
-          method = 'geocodio',
-          full_results = TRUE,
-          unique_only = FALSE,
-          lat = Latitude, 
-          long = Longitude)
-
-nhpd_coded_rr <- nhpd_coded |> 
-  mutate(Latitude = case_when(
-    property_name == "NEW MANCHESTER FLATS IX" ~ 37.517602,
-    property_name == "KINGSRIDGE I" ~ 37.551666,
-    property_name == "GRAND OAKS SENIORS" ~ 37.353614,
-    property_name == "IRON BRIDGE ROAD" ~ 37.361812,
-    TRUE ~ Latitude)) |> 
-    mutate(Longitude = case_when(
-      property_name == "NEW MANCHESTER FLATS IX" ~ -77.432408,
-      property_name == "KINGSRIDGE I" ~ -77.375593,
-      property_name == "GRAND OAKS SENIORS" ~ -77.457398,
-      property_name == "IRON BRIDGE ROAD" ~ -77.495881,
-      TRUE ~ Longitude)) |> 
-  filter(property_name != "CHESAPEAKE REGIONAL APARTMENTS")
-
-nhpd_coded_rr <- nhpd_coded_rr |> 
-  st_as_sf(coords = c("Longitude", "Latitude"), crs=4326, remove = FALSE)
-
-
-leaflet(nhpd_coded_rr) |> 
-  addTiles() |> 
+# nhpd <- read_csv("data/nhpd_va_subsidies_7_2022.csv") |> 
+#   clean_names()
+# 
+# nhpd_clean <- nhpd |> 
+#   transform(fulladdress = paste(nhpd$street_address, nhpd$city, nhpd$state, nhpd$zip_code, sep= ", ")) |> 
+#   select(subsidy_name, subsidy_status, subsidy_subname, start_date, end_date, assisted_units, property_name, fulladdress, owner_name, owner_type, target_population, city)
+# 
+# localities <- c("CHARLES CITY", "CHESTER", "CHESTERFIELD", "GLEN ALLEN", "HENRICO", "HIGHLAND SPRINGS", "MIDLOTHIAN", "NORTH CHESTERFIELD", "Richmond", "RICHMOND", "RICHMOND CITY", "SANDSTON")
+# 
+# nhpd_clean_rr <- nhpd_clean |> 
+#   subset(city %in% localities)
+# 
+# nhpd_coded <- nhpd_clean_rr |> 
+#   geocode(address = fulladdress, 
+#           method = 'geocodio',
+#           full_results = TRUE,
+#           unique_only = FALSE,
+#           lat = Latitude, 
+#           long = Longitude)
+# 
+# nhpd_coded_rr <- nhpd_coded |> 
+#   mutate(Latitude = case_when(
+#     property_name == "NEW MANCHESTER FLATS IX" ~ 37.517602,
+#     property_name == "KINGSRIDGE I" ~ 37.551666,
+#     property_name == "GRAND OAKS SENIORS" ~ 37.353614,
+#     property_name == "IRON BRIDGE ROAD" ~ 37.361812,
+#     TRUE ~ Latitude)) |> 
+#     mutate(Longitude = case_when(
+#       property_name == "NEW MANCHESTER FLATS IX" ~ -77.432408,
+#       property_name == "KINGSRIDGE I" ~ -77.375593,
+#       property_name == "GRAND OAKS SENIORS" ~ -77.457398,
+#       property_name == "IRON BRIDGE ROAD" ~ -77.495881,
+#       TRUE ~ Longitude))
+# 
+# nhpd_coded_rr <- nhpd_coded_rr |> 
+#   st_as_sf(coords = c("Longitude", "Latitude"), crs=4326, remove = FALSE) |> 
+#   filter(subsidy_status != "Inactive")|> 
+#   filter(fulladdress != "PO BOX 8585, RICHMOND, VA, 23226")
+# 
+# subsidyPal <- colorFactor(viridis(8), nhpd_coded_rr$subsidy_name)
+# 
+nhpd_map <- leaflet(nhpd_coded_rr) |>
+  addTiles() |>
   addCircleMarkers(
+    radius =5,
+    color = ~subsidyPal(subsidy_name),
+    stroke = FALSE, fillOpacity = 0.5)
+
+# # saveWidget(nhpd_map, "maps/nhpd_map.html")
+# 
+# knitr::include_url("maps/nhpd_map.html", height = "500px")
+
+
   
 
 ```
 
-
 ```{r public-housing}
 
+
 ```
 
-Housing Choice Vouchers
+### Housing Choice Vouchers
+
 ```{r hcv}
 
+# Download HCV geojson from HUD - 7.28.22
+
+# HCV as a Percent of Renter Occupied Housing Units
+
+pha <- c("041", "760", "085", "087")
+
+hcv <- st_read("data/va_hcv_tract.geojson") |> 
+  clean_names() |> 
+  subset(county %in% pha)
+
+mapview::mapview(hcv, zcol= "hcv_public_pct")
+
+
+
 ```
 
-Rent relief and mortgage relief
+## Rent relief and mortgage relief
+
 ```{r rmrp}
 
-```
+# Email gabriella.vazquez@dhcd.virginia.gov for data on RRP - breakdown of households helped in Hanover, Henrico, and Richmond --- consider including other localities
 
+# Email Jessica about Chesterfield rent relief program.
+
+
+
+```
 
 Affordable homeownership
+
 ```{r aff-ho}
 
-```
+# MWCLT, BHC, project:HOMES, Southside, Habitat
 
+# Ask for number of units produced each year from 2019 to now
+
+# Average home price each year?
+
+```
 
 Changes in assisted housing since 2019

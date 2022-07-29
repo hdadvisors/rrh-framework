@@ -8,6 +8,8 @@ library(tidyverse)
 library(tidycensus)
 library(janitor)
 library(viridis)
+library(sf)
+library(sp)
 
 ```
 
@@ -37,8 +39,10 @@ Rental market
 
 # CoStar Filters: Construction Status - Existing
 
-pha_rent <- read_csv("data/pha_avg_rent.csv")
+# As of mid July 
 
+pha_rent <- read_csv("data/pha_avg_rent.csv") |> 
+  clean_names() 
 ```
 
 
@@ -62,9 +66,22 @@ rr_sub_rent <- read_csv("data/rr_submarket_data.csv") |>
 
 ```{r avg-rent-br}
 
+# Aggregated average market asking rent per unit for Chesterfield, Hanover, Henrico, and Richmond City.
+
+# CoStar Filters: Construction Status - Existing
+
+pha_rent_br <- read_csv("data/pha_rent_br.csv")
+
+
 ```
 
 ```{r rents-built}
+
+# Aggregated average market asking rent per unit for Chesterfield, Hanover, Henrico, and Richmond City.
+
+# CoStar Filters: Construction Status - Existing
+
+# Not easily done in CoStar; first filter at max year 1979; then do 1980 to 1999, then 2000 to 2009, then 2010 and beyond
 
 
 ```

@@ -63,7 +63,7 @@ For-sale market
 
 ```{r n-sales}
 
-# Pull in MLS data csv for each county from 2017 to 2022 by month for four major localities by month.
+# Pull in MLS data csv for each county from 2017 to 2022 by month for four major localities by month as of July 11, 2022.
 
 # CVR MLS Filter: Property type - Single Family, Condo/Town
 
@@ -168,11 +168,23 @@ pha_price <- pha_price |>
 
 ```{r supply}
 
-# Pull in MLS data csv for each county from 2017 to 2022 by quarter?
+# Pull in MLS data csv for just the region.
 
-# Months supply by quarter?
+# Months supply by quarter
 
+pha_supply <- read_csv("data/pha_mos_supply.csv")
 
+pha_supply <- pha_supply|> 
+  pivot_longer(cols = starts_with("Months"),
+    names_to = "label",
+    values_to = "months_sup",
+    values_drop_na = TRUE) |> 
+  mutate(year = substr(label, 21,24))
+
+pha_supply$Month <- match(pha_supply$Month, month.abb)
+
+pha_supply <- pha_supply |> 
+  mutate(date = make_date(year, Month))
 ```
 
 ```{r starter-homes}
@@ -217,9 +229,115 @@ pha_price_comp <- pha_comp |>
 
 ```{r comp-br}
 
+# New construction versus Resale by bedrooms - total sales 
+# 1-2 bedroom // 3-4 bedroom // 5 + bedroom
+# As of 7.27.22
+
+nc_2br <- read_csv("data/pha_nc_2br.csv") |> 
+  mutate(type = "New Construction") |> 
+  mutate(br = "1-2 bedroom")
+
+nc_4br <- read_csv("data/pha_nc_4br.csv") |> 
+  mutate(type = "New Construction")|> 
+  mutate(br = "3-4 bedroom")
+
+nc_5br <- read_csv("data/pha_nc_5br.csv") |> 
+  mutate(type = "New Construction")|> 
+  mutate(br = "5+ bedroom")
+
+re_2br <- read_csv("data/pha_re_2br.csv") |> 
+  mutate(type = "Resale")|> 
+  mutate(br = "1-2 bedroom")
+
+re_4br <- read_csv("data/pha_re_4br.csv") |> 
+  mutate(type = "Resale")|> 
+  mutate(br = "3-4 bedroom")
+
+re_5br <- read_csv("data/pha_re_5br.csv") |> 
+  mutate(type = "Resale")|> 
+  mutate(br = "5+ bedroom")
+
+
+pha_br <- list(nc_2br, nc_4br, nc_5br, re_2br, re_4br, re_5br)
+
+pha_br_clean <- function(df){
+  df |> pivot_longer(cols = starts_with("sales"),
+    names_to = "label",
+    values_to = "sales",
+    values_drop_na = TRUE
+  ) |> 
+mutate(year = substr(label, 17,21))
+}
+
+pha_br_comp <- map_dfr(pha_br, pha_br_clean ) |> 
+  select(type, br, year, Month, sales)
+
+pha_br_comp$Month <- match(pha_br_comp$Month, month.abb)
+
+pha_br_comp <- pha_br_comp |> 
+  mutate(date = make_date(year, Month))
+
+
+
 ```
 
 ```{r comp-sf}
+
+# New construction versus Resale by SF // Total sales
+# Less than 1000 SF // 1000-1999 SF // 2000-2999 SF / 3000 + SF
+# As of 7.27.22
+
+nc_999 <- read_csv("data/pha_nc_999sf.csv") |> 
+  mutate(type = "New Construction") |> 
+  mutate(sf = "Less than 1,000 SF")
+
+nc_1999 <- read_csv("data/pha_nc_1999sf.csv") |> 
+  mutate(type = "New Construction")|> 
+  mutate(sf = "1,000-1,999 SF")
+
+nc_2999 <- read_csv("data/pha_nc_2999sf.csv") |> 
+  mutate(type = "New Construction")|> 
+  mutate(sf = "2,000-2,999 SF")
+
+nc_3000 <- read_csv("data/pha_nc_3000sf.csv") |> 
+  mutate(type = "New Construction")|> 
+  mutate(sf = "3,000+ SF")
+
+re_999 <- read_csv("data/pha_nc_999sf.csv") |> 
+  mutate(type = "New Construction") |> 
+  mutate(sf = "Less than 1,000 SF")
+
+re_1999 <- read_csv("data/pha_nc_1999sf.csv") |> 
+  mutate(type = "New Construction")|> 
+  mutate(sf = "1,000-1,999 SF")
+
+re_2999 <- read_csv("data/pha_nc_2999sf.csv") |> 
+  mutate(type = "New Construction")|> 
+  mutate(sf = "2,000-2,999 SF")
+
+re_3000 <- read_csv("data/pha_nc_3000sf.csv") |> 
+  mutate(type = "New Construction")|> 
+  mutate(sf = "3,000+ SF")
+
+
+pha_sf <- list(nc_999, nc_1999, nc_2999, nc_3000, re_999, re_1999, re_2999, re_3000)
+
+pha_sf_clean <- function(df){
+  df |> pivot_longer(cols = starts_with("sales"),
+    names_to = "label",
+    values_to = "sales",
+    values_drop_na = TRUE
+  ) |> 
+mutate(year = substr(label, 17,21))
+}
+
+pha_sf_comp <- map_dfr(pha_sf, pha_sf_clean ) |> 
+  select(type, sf, year, Month, sales)
+
+pha_sf_comp$Month <- match(pha_sf_comp$Month, month.abb)
+
+pha_sf_comp <- pha_sf_comp |> 
+  mutate(date = make_date(year, Month))
 
 ```
 

@@ -19,7 +19,7 @@ Household incomes
 
 years <- 2010:2020
 
-b25118_vars <- load_variables(2010, "acs5") |> 
+b25118_vars <- load_variables(2020, "acs5") |> 
   filter(str_sub(name, end = 6) %in% "B25118")
 
 b25118_raw <- map_dfr(years, function(yr){
@@ -49,13 +49,17 @@ b25118_data <- b25118_raw |>
   right_join(b25118_vars_cleaned, by = "variable") |> 
   select(NAME, year, tenure, income, estimate, moe)
 
-year_change = c(2010, 2020)
+year_change = c(2010, 2016, 2020)
 
 b25118_pha <- b25118_data |> 
   group_by(year, tenure, income) |> 
   summarise(estimate = sum(estimate)) |> 
   select(year, tenure, income, estimate) |> 
-  subset(year %in% year_change)
+  subset(year %in% year_change) |> 
+  pivot_wider(
+    names_from = year,
+    values_from = estimate
+  )
 
 ```
 
@@ -103,7 +107,7 @@ cpi <- cpi |>
 b25119_cpi <- b25119_data |> 
     left_join(cpi, by = 'year') |> 
   transform(dollars20 = ((381.2/priceindex)*estimate)) |> 
-  select(NAME, GEOID, year, tenure, dollars20, moe)
+  select(NAME, GEOID, year, tenure, dollars20, cdollars = estimate, moe)
 
 ```
 

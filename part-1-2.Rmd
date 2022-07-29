@@ -12,6 +12,9 @@ library(tigris)
 
 va <- counties(state = "VA", year = 2020)
 
+
+# rr includes Charles City, Goochland, New Kent, and Powhatan.
+
 rr <- c("51085", "51760", "51075", "51145", "51087", "51127", "51036", "51041")
 
 rr_va <- va |> 
@@ -22,7 +25,7 @@ rr_va <- va |>
 Household formation trends
 ```{r hh-formation}
 
-years <- 2010:2020
+years <- 2016:2020
 
 b25007_vars <- load_variables(2020, "acs5") |> 
   filter(str_sub(name, end = 6) %in% "B25007")
@@ -46,13 +49,28 @@ b25007_vars_cleaned <- b25007_vars |>
   select(variable = name, tenure, age) |> 
   drop_na() |> 
   mutate(tenure = case_when(
-    tenure == "Owner occupied" ~ "Homeowner",
-    tenure == "Renter occupied" ~ "Renter"
+    tenure == "Owner occupied:" ~ "Homeowner",
+    tenure == "Renter occupied:" ~ "Renter"
   ))
 
 b25007_data <- b25007_raw |> 
   right_join(b25007_vars_cleaned, by = "variable") |> 
-  select(NAME, GEOID, year, tenure, age, estimate, moe) 
+  select(NAME, GEOID, year, tenure, age, estimate, moe)|> 
+  mutate(age = case_when(
+    age == "Householder 15 to 24 years" ~ "Under 25 years old",
+    age == "Householder 25 to 34 years" ~ "25 to 44 years old",
+    age == "Householder 35 to 44 years" ~ "25 to 44 years old",
+    age == "Householder 45 to 54 years" ~ "45 to 64 years old",
+    age == "Householder 55 to 59 years" ~ "45 to 64 years old",
+    age == "Householder 60 to 64 years" ~ "45 to 64 years old",
+    age == "Householder 65 to 74 years" ~ "65 years and over",
+    age == "Householder 75 to 84 years" ~ "65 years and over",
+    age == "Householder 85 years and over" ~ "65 years and over"
+  ))
+
+b25007_data_grp <- b25007_data |> 
+  group_by(NAME, year, tenure, age) |> 
+  summarise(estimate = sum(estimate))
 
 
 ```
@@ -60,7 +78,7 @@ b25007_data <- b25007_raw |>
 Household type and size
 ```{r hhtype}
 
-years <- 2010:2020
+years <- 2016:2020
 
 b11001_vars <- load_variables(2020, "acs5") |> 
   filter(str_sub(name, end = 7) %in% "B11001_")
@@ -108,7 +126,7 @@ b11001_data <- b11001_raw |>
 
 ```{r hh-size}
 
-years <- 2010:2020
+years <- 2016:2020
 
 b25009_vars <- load_variables(2020, "acs5") |> 
   filter(str_sub(name, end = 6) %in% "B25009")
@@ -145,7 +163,7 @@ b25009_data <- b25009_raw |>
 Households with children
 ```{r hh-children}
 
-years <- 2010:2020
+years <- 2016:2020
 
 b11005_vars <- load_variables(2020, "acs5") |> 
   filter(str_sub(name, end = 6) %in% "B11005")
@@ -194,7 +212,7 @@ Households with seniors
 ```{r hh-seniors}
 
 
-years <- 2010:2020
+years <- 2016:2020
 
 b11007_vars <- load_variables(2020, "acs5") |> 
   filter(str_sub(name, end = 6) %in% "B11007")

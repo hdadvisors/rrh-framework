@@ -10,18 +10,26 @@ library(leaflet)
 library(htmlwidgets)
 library(ggplot2)
 library(janitor)
+library(sf)
+library(sp)
 
-# Utilize the same filters as the Chesterfield County Rental Market Analysis.
+# Utilize the same filters as the Chesterfield County Rental Market Analysis. I've changed the star rating to two or less. 
 
-# CoStar Filters for Properties: Multi-Family, Localities: Charles City, Chesterfield, Hanover, Henrico, Goochland, New Kent, Powhatan, Richmondy City; Construction status: Existing; Stars: 3; Rent type: Market; Max Year Built: 1999
+# CoStar Filters for Properties: Multi-Family, Localities: Charles City, Chesterfield, Hanover, Henrico, Goochland, New Kent, Powhatan, Richmondy City; Construction status: Existing; Stars: 2 or less; Rent type: Market; Max Year Built: 1999
+
+# This returns a total of 478 properties.
+
+# There are about 80 properties that do not have a listed style. Some may be manufactured home parks.
 
 # Append data from MHCCV report for manufactured home communities.
-
-
 
 ```
 
 ```{r noah-map}
+
+noah <- read_csv("data/pha_noah_72822.csv") |> 
+  clean_names() |> 
+  st_as_sf(coords = c("longitude", "latitude"), crs=4326, remove=FALSE) 
 
 
 ```
@@ -29,8 +37,17 @@ library(janitor)
 ```{r noah-type}
 
 
+
+noah_type <- read_csv("data/pha_noah_72822.csv") |> 
+  clean_names() |> 
+  select(property_address, county_name, property_name, number_of_units, style, year_built)
+
+
 ```
 
 ```{r noah-rents}
+
+noah_rent <- read_csv("data/pha_noah_rent.csv")
+
 
 ```

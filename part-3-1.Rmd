@@ -2,8 +2,33 @@
 
 ## Affordability of current housing stock {#part-3-1}
 
+```{r setup}
+
+library(janitor)
+library(optiRum)
+
+```
+
 Surplus/Gap 
 ```{r gap}
+
+tb_18a <- read_csv("data/Table18A_2015to2018.csv")
+tb_18b <- read_csv("data/Table18B_2015to2018.csv")
+tb_18c <- read_csv("data/Table18C_2015to2018.csv")
+
+tb_18 <- rbind(tb_18a, tb_18b)
+
+colnames(tb_18)[16] <- "Cost"
+
+colnames(tb_18c)[16] <- "Cost"
+
+tb_18_combined <- rbind(tb_18, tb_18c) |> 
+  clean_names() |> 
+  filter(line_type == "Detail") |> 
+  select(county, fips, year, estimate, tenure, cost, household_income) |> 
+  group_by(county, fips, year, tenure, cost, household_income) |> 
+  summarise(estimate = sum(estimate))
+
 
 ```
 
@@ -12,11 +37,49 @@ Income versus affordability
 
 # Compare renter income versus rental prices
 
+renter_income <- b25119_cpi |> 
+  filter(tenure == "Renter")
+  
+
+pha_rent_annual <- read_csv("data/pha_rent_annual.csv") |> 
+  rename(year = period)
+
+rent_income <- renter_income |> 
+  left_join(pha_rent_annual, by = "year")
+
+rent_income <- rent_income |> 
+  mutate(affordable_rent = (cdollars/12)*.30) |> 
+  mutate(difference = rent_current - affordable_rent)
+
 ```
 
 ```{r  renter-own}
 
 #Compare renter income versus home prices
+
+renter_income <- b25119_cpi |> 
+  filter(tenure == "Renter")
+
+pha_sales_annual <- read_csv("data/pha_sales_annual.csv") |> 
+  clean_names() |> 
+  rename(year = primary_year, price = sale_price_median)
+
+int_annual <- read_csv("data/fredmac_int_annual.csv")
+
+downpayment <- 0.05 # 5% downpayment
+closingcosts <- 0.015 # 1.5% closing costs
+utilities <- 250 # Assume $250/month for utilities
+
+sale_income <- renter_income |> 
+  right_join(pha_sales_annual, by = "year") |> 
+  right_join(int_annual, by = "year") |> 
+  drop_na() |> 
+  mutate(price = parse_number(price)) |> 
+  mutate(principal = price - (price*downpayment)) |> 
+  mutate(loanamt = principal/(1-closingcosts)) |> 
+  mutate(mortgage = abs(PMT((annual_int/12), 360, loanamt)) + 250) |> 
+  mutate(inc_needed = ((mortgage*10)/2.8)*12)
+
 
 ```
 

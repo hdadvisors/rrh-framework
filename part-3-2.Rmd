@@ -9,6 +9,9 @@ library(httr)
 library(glue)
 library(readxl)
 library(janitor)
+library(ggplot2)
+library(simplevis)
+library(stats)
 
 years <- 2015:2018
 
@@ -94,7 +97,7 @@ walk(tables, function(table) {
     
   }) 
   
-  file_name <- glue("Table{table}_2012to2018.csv")
+  file_name <- glue("Table{table}_2015to2018.csv")
   
   message(glue("Writing file {file_name}..."))
   
@@ -102,15 +105,121 @@ walk(tables, function(table) {
   
 })
 
+# Consider adding script to remove the "data/050" file folder of zips and tables to create space.
+
+# file.remove()
+
+
 ```
+
 Cost burden
 ```{r cb-income}
 
+cb_7 <- read_csv("data/Table7_2015to2018.csv") |> 
+  clean_names() |> 
+  filter(line_type == "Detail") |> 
+  select(year, estimate, moe, county, fips, tenure, household_income, household_type, cost_burden) |> 
+  mutate(tenure = case_when(
+    tenure == "Owner occupied" ~ "Homeowner",
+    tenure == "Renter occupied" ~ "Renter"
+  )) |> 
+  mutate(household_income = case_when(
+    household_income == "household income is less than or equal to 30% of HAMFI" ~ "30% AMI or less",
+    household_income == "household income is greater than 30% but less than or equal to 50% of HAMFI" ~ "31 to 50% AMI",
+    household_income == "household income is greater than 50% but less than or equal to 80% of HAMFI" ~ "51 to 80% AMI",
+    household_income == "household income is greater than 80% but less than or equal to 100% of HAMFI" ~ "81 to 100% AMI", 
+    household_income == "household income is greater than 100% of HAMFI" ~ "101% AMI or greater"
+  )) |> 
+  mutate(household_type = case_when(
+    household_type == "household type is elderly family (2 persons, with either or both age 62 or over)" ~ "Elderly family",
+    household_type == "household type is small family (2 persons, neither person 62 years or over, or 3 or 4 persons)" ~ "Small family",
+    household_type == "household type is large family (5 or more persons)" ~ "Large family",
+    household_type == "household type is elderly non-family" ~ "Elderly non-family", 
+    household_type == "other household type (non-elderly non-family)" ~ "Non-elderly non-family"
+  ))  |> 
+  mutate(cost_burden = case_when(
+    cost_burden == "housing cost burden is less than or equal to 30%" ~ "Not cost-burdened", 
+    cost_burden == "housing cost burden is greater than 30% but less than or equal to 50%" ~ "Cost-burdened",
+    cost_burden == "housing cost burden is greater than 50%" ~ "Severely cost-burdened",
+    cost_burden == "housing cost burden not computed (household has no/negative income)" ~ "No or negative income"
+  )) |> 
+  mutate(cb_group = case_when(
+    cost_burden == "Cost-burdened" ~ "Cost-burdened",
+    cost_burden == "Severely cost-burdened" ~ "Cost-burdened",
+    cost_burden == "No or negative income" ~ "Cost-burdened",
+    TRUE ~ cost_burden
+  ))
+
+pha_localities <- c("Richmond city", "Chesterfield County", "Hanover County", "Henrico County")
+
+cb_7_pha <- cb_7 |> 
+  subset(county %in% pha_localities) |> 
+  group_by(year, household_income, cb_group) |> 
+  summarise(estimate = sum(estimate)) |> 
+  pivot_wider(
+    names_from = year,
+    values_from = estimate
+  ) |> 
+  clean_names() |> 
+  transform(difference = (x2018 - x2015))
+
+cb_income_pha <- cb_7_pha |> 
+  filter(cb_group == "Cost-burdened")
+  
+gg_bar_col(cb_income_pha,
+                 x_var = household_income,
+                 y_var = difference,
+                 col_var = household_income
+) +
+  scale_x_discrete(limits= c("30% AMI or less", "31 to 50% AMI", "51 to 80% AMI", "81 to 100% AMI", "101% AMI or greater")) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(title = "Cost burden from 2015 to 2018") +
+  theme(legend.position = "none")
+
+income_pha_perc <- cb_7 |> 
+  subset(county %in% pha_localities) |> 
+  group_by(year, county, household_income, cb_group) |>
+  summarise(estimate = sum(estimate))
+
+income_pha_perc <- income_pha_perc |> 
+  transform(percent = ave(estimate, year, county, FUN = prop.table))
+
+income_pha_perc_18 <- income_pha_perc |> 
+  filter(year == 2018)
+
+gg_bar_col(income_pha_perc_18,
+                 x_var = county,
+                 y_var = percent,
+                 col_var = cb_group,
+                 stack = TRUE)
 
 
 ```
 
 ```{r cb-tenure}
+
+cb_tenure_pha <- cb_7 |> 
+  subset(county %in% pha_localities) |> 
+  group_by(year, county, tenure, cb_group) |> 
+  summarise(estimate = sum(estimate)) |> 
+  pivot_wider(
+    names_from = year,
+    values_from = estimate
+  ) |> 
+  clean_names() |> 
+  transform(difference = (x2018 - x2015))
+
+cb_tenure_pha <- cb_tenure_pha |> 
+  filter(cb_group == "Cost-burdened")
+  
+gg_bar_col_facet(cb_tenure_pha,
+                 x_var = county,
+                 y_var = difference,
+                 col_var = tenure,
+                 facet_var = tenure
+) +
+  labs(title = "Cost burden from 2015 to 2018") +
+  theme(legend.position = "none") + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 
 ```

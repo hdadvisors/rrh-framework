@@ -14,7 +14,7 @@ library(janitor)
 
 ```{r natural}
 
-# PEP does not have data available for 2020 and 2021 yet through API. You would need to pull in the excel files in and append.
+# PEP does not have data available for 2020 and 2021. There is a gap between 2019 and 2021 because Census uses 2020 as a baseline. 
 
 region <- c(51036, 51041, 51075, 51085, 51087, 51127, 51145, 51760)
 
@@ -55,7 +55,14 @@ rr_nat_change <- pep_change_clean |>
   filter(GEOID %in% region) |> 
   filter(component == "Natural increase")
 
-# Maybe manually add in 2020 and 2021?
+# Maybe manually add in 2021. There will be a gap at 2020 though.
+
+#I've cleaned the 2021 csv and it can be found at the below:
+
+pep_2021 <- read_csv("data/co-est2021-comp-51.csv")
+
+
+#Create bar chart for each locality showing raw populati
 
 ```
 
@@ -65,7 +72,6 @@ rr_mig_change <- pep_change_clean |>
   filter(GEOID %in% region) |> 
   filter(component != "Natural increase")
 
-# Maybe manually add in 2020 and 2021?
 
 
 ```
