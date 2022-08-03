@@ -10,15 +10,24 @@ library(ggplot2)
 library(simplevis)
 library(tigris)
 
-va <- counties(state = "VA", year = 2020)
-
-
 # rr includes Charles City, Goochland, New Kent, and Powhatan.
 
 rr <- c("51085", "51760", "51075", "51145", "51087", "51127", "51036", "51041")
+pha <- c("51085", "51760", "51087", "51041")
+
+
+```
+
+
+```{r geography-setup}
+
+va <- counties(state = "VA", year = 2020)
 
 rr_va <- va |> 
   subset(GEOID %in% rr)
+
+pha_va <- va |> 
+  subset(GEOID %in% pha)
 
 ```
 
@@ -36,13 +45,14 @@ b25007_raw <- map_dfr(years, function(yr){
     state = "VA",
     table = "B25007",
     year = yr,
-    survey = "acs5"
+    survey = "acs5",
+    cache_table = TRUE
   ) |> 
     mutate(year = yr)
 })
 
 b25007_raw <- b25007_raw |> 
-  subset(GEOID %in% rr)
+  subset(GEOID %in% pha)
 
 b25007_vars_cleaned <- b25007_vars |> 
   separate(label, into = c("est", "total", "tenure", "age"), sep = "!!") |> 
@@ -70,7 +80,19 @@ b25007_data <- b25007_raw |>
 
 b25007_data_grp <- b25007_data |> 
   group_by(NAME, year, tenure, age) |> 
-  summarise(estimate = sum(estimate))
+  summarise(estimate = sum(estimate)) |> 
+  separate(NAME, into = c("locality", "state"), sep = ",") |> 
+  pivot_wider(names_from = year,
+              values_from = estimate) |> 
+  select(locality, tenure, age, `2016`, `2020`) |> 
+  transform(change = `2020` - `2016`)
+
+ggplot(b25007_data_grp,
+       aes(x = age, y = change, fill = tenure)) +
+  geom_bar(stat = "identity") +
+  scale_x_discrete(limits = c("Under 25 years old", "25 to 44 years old", "45 to 64 years old", "65 years and over")) +
+  scale_y_continuous()
+  facet_wrap(~locality)
 
 
 ```
@@ -89,13 +111,14 @@ b11001_raw <- map_dfr(years, function(yr){
     state = "VA",
     table = "B11001",
     year = yr,
-    survey = "acs5"
+    survey = "acs5",
+    cache_table = TRUE
   ) |> 
     mutate(year = yr)
 })
 
 b11001_raw <- b11001_raw |> 
-  subset(GEOID %in% rr)
+  subset(GEOID %in% pha)
 
 b11001_vars_cleaned <- b11001_vars |> 
   separate(label, into = c("est", "tot", "type", "relationship", "householder"), 
@@ -117,8 +140,26 @@ b11001_vars_cleaned <- b11001_vars |>
 
 b11001_data <- b11001_raw |> 
   right_join(b11001_vars_cleaned, by = "variable") |> 
-  select(NAME, GEOID, year, "hhtype" = householder, estimate, moe) 
+  select(NAME, GEOID, year, "hhtype" = householder, relationship, type, estimate) |> 
+  separate(NAME, into = c("locality", "state"), sep = ",") |> 
+  pivot_wider(names_from = year,
+              values_from = estimate) |> 
+  select(locality, hhtype, `2016`, `2020`) |> 
+  transform(change = `2020` - `2016`) |> 
+  group_by(locality, hhtype) |> 
+  summarise(change = sum(change))
 
+ggplot(b11001_data,
+       aes(x = hhtype,
+           y = change,
+           fill = hhtype)) +
+  geom_bar(stat = "identity") + 
+  facet_wrap(~locality) + 
+  labs(title = "Change in household type") +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
 
 
 ```
@@ -137,7 +178,8 @@ b25009_raw <- map_dfr(years, function(yr){
     state = "VA",
     table = "B25009",
     year = yr,
-    survey = "acs5"
+    survey = "acs5",
+    cache_table = TRUE
   ) |> 
     mutate(year = yr)
 })

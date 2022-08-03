@@ -7,9 +7,20 @@
 library(tidyverse)
 library(tidycensus)
 library(janitor)
-library(viridis)
+library(glue)
+library(stringi)
+library(zoo)
+library(lubridate)
+library(tigris)
+library(ggthemes)
 library(sf)
 library(sp)
+
+# rr includes Charles City, Goochland, New Kent, and Powhatan.
+
+rr <- c("51085", "51760", "51075", "51145", "51087", "51127", "51036", "51041")
+pha <- c("51085", "51760", "51087", "51041")
+
 
 ```
 
@@ -17,8 +28,41 @@ Renter-occupied stock
 
 ```{r ro-structure}
 
-renter_structure <- b25127_data |> 
-  filter(tenure == "Renter")
+ro_structure <- b25127_data |> 
+  filter(tenure == "Renter") |> 
+  select(NAME, GEOID, year, structure, estimate) |> 
+  group_by(NAME, GEOID, year, structure) |> 
+  summarise(estimate = sum(estimate)) |> 
+  pivot_wider(
+    names_from = year,
+    values_from = estimate
+  ) |> 
+  mutate(difference = `2020` - `2016`) |> 
+  separate(NAME, into = c("county", "state"), sep = ",") |> 
+  mutate(structure = case_when(
+    structure == "20 to 49" ~ "20 or more",
+    structure == "50 or more" ~ "20 or more",
+    TRUE ~ structure
+  ))
+
+rstructure_bar <- ggplot(ro_structure,
+       aes(x = reorder(structure, -difference), 
+           y = difference,
+           fill = structure)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~county) + 
+  labs(title = "Change in rental housing by structure type", subtitle = "From 2016 to 2020") +
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        legend.position = "right",
+        legend.justification = "top")
+
+
+plotly::ggplotly(rstructure_bar) |> 
+  plotly_camera()
+
 
 
 ```

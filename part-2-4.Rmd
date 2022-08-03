@@ -13,9 +13,9 @@ library(janitor)
 library(sf)
 library(sp)
 
-# Utilize the same filters as the Chesterfield County Rental Market Analysis. I've changed the star rating to two or less. 
+# Utilize the same filters as the Chesterfield County Rental Market Analysis. I've changed the star rating to two or less, which coincides with CoStar's analysis.
 
-# CoStar Filters for Properties: Multi-Family, Localities: Charles City, Chesterfield, Hanover, Henrico, Goochland, New Kent, Powhatan, Richmondy City; Construction status: Existing; Stars: 2 or less; Rent type: Market; Max Year Built: 1999
+# CoStar Filters for Properties: Multi-Family, Localities: Chesterfield, Hanover, Henrico,Richmondy City; Construction status: Existing; Stars: 2 or less; Rent type: Market; Max Year Built: 1999
 
 # This returns a total of 478 properties.
 

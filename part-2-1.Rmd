@@ -11,16 +11,25 @@ library(glue)
 library(stringi)
 library(zoo)
 library(lubridate)
+library(tigris)
+library(ggthemes)
+library(scales)
+
+# rr includes Charles City, Goochland, New Kent, and Powhatan.
+
+rr <- c("51085", "51760", "51075", "51145", "51087", "51127", "51036", "51041")
+pha <- c("51085", "51760", "51087", "51041")
 
 ```
 
-Owner-occupied stock
+### Homeownership housing stock
 
+The stock of homeowner housing has been growing across the region. From 2016 to 2020, owner-occupied housing has increased by 17,436 --- an increase of seven percent. Undoubtedly, much of that growth (93 percent) has occurred in the single-family home market, including detached and attached homes. The largest share of that single-family home growth has occurred in Chesterfield County, where there was a net gain of 7,184 single-family homeowners.
 ```{r oo-structure}
 
 # Table B25127 Tenure by year structure built by units in structure
 
-years <- 2010:2020
+years <- 2016:2020
 
 b25127_vars <- load_variables(2020, "acs5") |> 
   filter(str_sub(name, end = 6) %in% "B25127")
@@ -31,13 +40,14 @@ b25127_raw <- map_dfr(years, function(yr){
     state = "VA",
     table = "B25127",
     year = yr,
-    survey = "acs5"
+    survey = "acs5",
+    cache_table = TRUE
   ) |> 
     mutate(year = yr)
 })
 
 b25127_raw <- b25127_raw |> 
-  subset(GEOID %in% rr)
+  subset(GEOID %in% pha)
 
 b25127_vars_cleaned <- b25127_vars |> 
   separate(label, into = c("est", "total", "tenure", "yrbuilt", "structure"), sep = "!!") |> 
@@ -51,15 +61,156 @@ b25127_vars_cleaned <- b25127_vars |>
 
 b25127_data <- b25127_raw |> 
   right_join(b25127_vars_cleaned, by = "variable") |> 
-  select(NAME, GEOID, year, tenure, yrbuilt, structure)
+  select(NAME, GEOID, year, tenure, yrbuilt, structure, estimate)
 
-homeowner_structure <- b25127_data |> 
-  filter(tenure == "Homeowner")
+oo_structure <- b25127_data |> 
+  filter(tenure == "Homeowner") |> 
+  select(NAME, GEOID, year, structure, estimate) |> 
+  group_by(NAME, GEOID, year, structure) |> 
+  summarise(estimate = sum(estimate)) |> 
+  pivot_wider(
+    names_from = year,
+    values_from = estimate
+  ) |> 
+  mutate(difference = `2020` - `2016`) |> 
+  mutate(pchange = difference/`2016`) |> 
+  separate(NAME, into = c("county", "state"), sep = ",")  |> 
+  mutate(structure = case_when(
+    structure == "20 to 49" ~ "20 or more",
+    structure == "50 or more" ~ "20 or more",
+    TRUE ~ structure
+  ))
+
+structure_bar <- ggplot(oo_structure,
+       aes(x = reorder(structure, -difference), 
+           y = difference,
+           fill = structure)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~county) + 
+  labs(title = "Change in homeowner housing by structure type", subtitle = "From 2016 to 2020") +
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        legend.position = "right",
+        legend.justification = "top")
+
+plotly::ggplotly(structure_bar) |> 
+  plotly_camera()
+
+```
+
+The vast majority of homeowner housing in the region was constructed in the latter half of the 20th century. The amount of housing structured in the 2000s pales in comparison to the housing built between 1980 and 1999. With so much owner-occupied housing beyond twenty years of age, homeowners will increasingly need resources to maintain their homes, or brand new housing stock to move into.
+
+```{r oo-year-built}
+
+oo_yrblt <- b25127_data |> 
+  filter(tenure == "Homeowner") |> 
+  filter(year == 2020) |> 
+  select(NAME, GEOID, year, yrbuilt, estimate) |> 
+  group_by(NAME, GEOID, year, yrbuilt) |> 
+  summarise(estimate = sum(estimate)) |> 
+  mutate(yrbuilt = case_when(
+    yrbuilt == "Built 1940 to 1959" ~ "Built 1940 to 1979",
+    yrbuilt == "Built 1960 to 1979" ~ "Built 1940 to 1979",
+    TRUE ~ yrbuilt
+  )) |> 
+  separate(NAME, into = c("county", "state"), sep = ",") |> 
+  group_by(county, GEOID, year, yrbuilt) |> 
+  summarise(estimate = sum(estimate))
   
+yrblt <- ggplot(oo_yrblt,
+       aes(x = county,
+           y = estimate,
+           fill = county
+           )) + 
+  geom_bar(stat = "identity") +
+  facet_wrap(~yrbuilt) +
+  labs(title = "Owner-occupied housing by year built", subtitle = "Total housing units in 2020") +
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        legend.position = "right",
+        legend.justification = "top")
+
+plotly::ggplotly(yrblt) |> 
+  plotly_camera()
+
+```
+
+```{r oo-bedrooms}
+
+years <- 2016:2020
+
+b25042_vars <- load_variables(2020, "acs5") |> 
+  filter(str_sub(name, end = 6) %in% "B25042")
+
+b25042_raw <- map_dfr(years, function(yr) {
+  b25042_pull <- get_acs(
+    geography = "county",
+    state = "VA",
+    table = "B25042",
+    year = yr,
+    survey = "acs5",
+    cache_table = TRUE
+  ) |> 
+    mutate(year = yr)
+})
+
+b25042_raw <- b25042_raw |> 
+  subset(GEOID %in% pha)
+
+b25042_vars_cleaned <- b25042_vars |> 
+  separate(label, into = c("est", "total", "tenure", "br"), sep = "!!") |> 
+  select(variable = name, tenure, br) |> 
+  drop_na() |> 
+  mutate(across(.fns = ~str_remove_all(.x, ":"))) |> 
+  mutate(tenure = case_when(
+    tenure == "Owner occupied" ~ "Homeowner",
+    tenure == "Renter occupied" ~ "Renter"
+  ))
+
+b25042_data <- b25042_raw |> 
+  right_join(b25042_vars_cleaned, by = "variable") |> 
+  select(NAME, GEOID, year, tenure, br, estimate)
+
+oo_br <- b25042_data |> 
+  filter(tenure == "Homeowner") |> 
+  mutate(br = case_when(
+    br == "1 bedroom" ~ "1-2 bedrooms", 
+    br == "2 bedrooms" ~ "1-2 bedrooms",
+    br == "3 bedrooms" ~ "3-4 bedrooms",
+    br == "4 bedrooms" ~ "3-4 bedrooms",
+    TRUE ~ br
+  )) |> 
+  group_by(NAME, GEOID, year, br) |> 
+  summarise(estimate = sum(estimate)) |> 
+  mutate(percent = estimate/sum(estimate)) |> 
+  ungroup() |> 
+  separate(NAME, into = c("county", "state"), sep = ",") |> 
+  filter(year == 2020)
+
+br_bar <- ggplot(oo_br,
+       aes(x = county,
+           y = percent, 
+           fill = br)) +
+  geom_bar(position = "stack", stat = "identity") + 
+  scale_fill_discrete(breaks = c("No bedroom", "1-2 bedrooms", "3-4 bedrooms", "5 or more bedrooms")) +
+  labs(title = "Homeowner housing by bedrooms", fill = "Bedrooms") + 
+  scale_y_continuous(labels = scales::percent) +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank())
+
+plotly::ggplotly(br_bar) |> 
+  plotly_camera()
+
 
 ```
 
 For-sale market
+
+The supply of for-smale housing across the region has changed very
 
 ```{r n-sales}
 
@@ -102,11 +253,37 @@ pha_sales <- map_dfr(pha, clean_data) |>
 pha_sales$month <- match(pha_sales$month, month.abb)
 
 pha_sales <- pha_sales |> 
-  mutate(date = make_date(year, month))
+  mutate(date = make_date(year, month)) 
 
+n_sales <- ggplot(pha_sales,
+       aes(x = date, y = sales, fill = geography)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~geography) +
+  labs(title = "Home sales in the Richmond Region", subtitle = "Homes sales by quarter from 2017 to 2022", fill = "Locality")
 
+plotly::ggplotly(n_sales) |> 
+  plotly_camera()
 
 ```
+
+```{r avg-sales}
+
+avg_sales <- pha_sales |> 
+  group_by(year, geography) |> 
+  summarise(average = mean(sales))
+
+a_sales <- ggplot(avg_sales,
+       aes(x = year, y = average, fill = geography)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~geography) +
+  labs(title = "Average monthly home sales in the Richmond Region", colour = "Locality")
+
+plotly::ggplotly(a_sales) |> 
+  plotly_camera()
+
+```
+
+Median home prices have continued to climb in the Richmond Region --- reaching over \$300,000 in all four major localities. 
 
 ```{r sales-price}
 
@@ -154,7 +331,19 @@ pha_price <- pha_price |>
   mutate(date = make_date(year, month)) |> 
   mutate(med_price = parse_number(med_price))
 
+price_line <- ggplot(pha_price,
+       aes(x = date,
+           y = med_price,
+           colour = geography)) +
+  geom_line(stat = "identity") +
+  facet_wrap(~geography) +
+  scale_y_continuous(labels = dollar_format())
 
+plotly::ggplotly(price_line) |> 
+  plotly_camera()
+
+
+# CHESTERFIELD - $237,398 TO $380,000
 
 ```
 
@@ -185,6 +374,8 @@ pha_supply$Month <- match(pha_supply$Month, month.abb)
 
 pha_supply <- pha_supply |> 
   mutate(date = make_date(year, Month))
+
+
 ```
 
 ```{r starter-homes}
@@ -222,7 +413,16 @@ pha_comp$month <- match(pha_comp$month, month.abb)
 
 pha_price_comp <- pha_comp |> 
   mutate(date = make_date(year, month)) |> 
-  mutate(med_price = parse_number(med_price))
+  mutate(med_price = parse_number(med_price)) |> 
+  filter(year == "2020" | year == "2021" | year == "2022")
+
+ggplot(pha_price_comp,
+       aes(x = date, y = med_price, fill = type)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Sales price comparison: New Construction versus Resale", fill = "Construction Type") +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank()) +
+  scale_y_continuous(labels = dollar_format())
 
 
 ```
@@ -277,9 +477,17 @@ pha_br_comp$Month <- match(pha_br_comp$Month, month.abb)
 pha_br_comp <- pha_br_comp |> 
   mutate(date = make_date(year, Month))
 
+ggplot(pha_br_comp,
+       aes(x = date, y = sales, fill = br)) +
+  geom_bar(stat = "identity", position = "stack") +
+  facet_wrap(~type) +
+  labs(title = "Sales comparison by bedrooms: New Construction versus Resale", fill = "Construction Type") +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank())
 
 
 ```
+
 
 ```{r comp-sf}
 
@@ -303,20 +511,20 @@ nc_3000 <- read_csv("data/pha_nc_3000sf.csv") |>
   mutate(type = "New Construction")|> 
   mutate(sf = "3,000+ SF")
 
-re_999 <- read_csv("data/pha_nc_999sf.csv") |> 
-  mutate(type = "New Construction") |> 
+re_999 <- read_csv("data/pha_re_999sf.csv") |> 
+  mutate(type = "Resale") |> 
   mutate(sf = "Less than 1,000 SF")
 
-re_1999 <- read_csv("data/pha_nc_1999sf.csv") |> 
-  mutate(type = "New Construction")|> 
+re_1999 <- read_csv("data/pha_re_1999sf.csv") |> 
+  mutate(type = "Resale")|> 
   mutate(sf = "1,000-1,999 SF")
 
-re_2999 <- read_csv("data/pha_nc_2999sf.csv") |> 
-  mutate(type = "New Construction")|> 
+re_2999 <- read_csv("data/pha_re_2999sf.csv") |> 
+  mutate(type = "Resale")|> 
   mutate(sf = "2,000-2,999 SF")
 
-re_3000 <- read_csv("data/pha_nc_3000sf.csv") |> 
-  mutate(type = "New Construction")|> 
+re_3000 <- read_csv("data/pha_re_3000sf.csv") |> 
+  mutate(type = "Resale")|> 
   mutate(sf = "3,000+ SF")
 
 
@@ -337,7 +545,20 @@ pha_sf_comp <- map_dfr(pha_sf, pha_sf_clean ) |>
 pha_sf_comp$Month <- match(pha_sf_comp$Month, month.abb)
 
 pha_sf_comp <- pha_sf_comp |> 
-  mutate(date = make_date(year, Month))
+  mutate(date = make_date(year, Month)) |> 
+  group_by(year, type, sf) |> 
+  summarise(sales = sum(sales)) |> 
+  mutate(percent = sales/sum(sales))
+  
+
+ggplot(pha_sf_comp,
+       aes(x = year, y = percent, fill = factor(sf, levels = c("Less than 1,000 SF", "1,000-1,999 SF", "2,000-2,999 SF", "3,000+ SF")))) +
+  geom_bar(stat = "identity", position = "stack") +
+  facet_wrap(~type) +
+  labs(title = "Sales comparison by square footage: New Construction versus Resale", fill = "Construction Type") +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank())
+
 
 ```
 
@@ -390,6 +611,15 @@ rr_cbps <- cbps_data |>
   right_join(rr_va, by = "GEOID") |> 
   select(GEOID, NAME, year, type:units)
 
+pha_cbps <- rr_cbps |> 
+  subset(GEOID %in% pha) |> 
+  filter(type == "1-unit")
+
+ggplot(pha_cbps,
+       aes(x = year, y = units, colour = NAME)) +
+  geom_line(stat = "identity") +
+  facet_wrap(~NAME)
+
 ```
 
 
@@ -414,7 +644,7 @@ b25003_raw <- map_dfr(years, function(yr){
 })
 
 b25003_raw <- b25003_raw |> 
-  subset(GEOID %in% rr)
+  subset(GEOID %in% pha)
 
 b25003_vars_cleaned <- b25003_vars |> 
   separate(label, into = c("est", "total", "tenure"), sep = "!!") |> 
@@ -429,12 +659,110 @@ b25003_data <- b25003_raw |>
   right_join(b25003_vars_cleaned, by = "variable") |> 
   select(NAME, GEOID, year, tenure, estimate)
 
-rr_homeownership <- b25003_data |> 
+pha_homeownership <- b25003_data |> 
   pivot_wider(
     names_from = tenure,
     values_from = estimate
   ) |> 
-  mutate(ho_rate = (Homeowner/`All households`))
+  mutate(ho_rate = (Homeowner/`All households`))  |> 
+  separate(NAME, into = c("county", "state"), sep = ",")
 
+ggplot(pha_homeownership,
+       aes(x = year, y = ho_rate, colour = county)) +
+  geom_line(stat = "identity")
+
+```
+
+```{r ho-rate-race}
+
+years <- 2016:2020
+
+tables <- paste0("B25003", LETTERS[2:9])
+
+b25003_race_vars <- load_variables(2020, "acs5") %>%
+  filter(str_sub(name, end = 7) %in% tables) %>% 
+  filter(str_detect(name, "PR") == FALSE)
+
+concept_to_race <- function(x) {
+  out <- x %>%
+    str_remove_all("TENURE \\(|\\)") %>%
+    str_to_title() %>%
+    str_replace_all("And", "and") %>%
+    str_replace_all("Or", "or") %>%
+    str_remove_all(" Alone")
+  
+  out
+}
+
+b25003_race_clean <- b25003_race_vars %>%
+  mutate(race = concept_to_race(concept)) %>%
+  separate(label, into = c("est", "total", "tenure"), sep = "!!") %>% 
+  select(variable = name, race, tenure) %>% 
+  mutate(across(.fns = ~replace_na(.x, "All")),
+         across(.fns = ~str_remove_all(.x, ":")),
+         across(.fns = ~str_remove_all(.x, " --")),
+         across(.fns = ~str_replace_all(.x, "total", "All")),
+         across(.fns = ~str_replace_all(.x, "Tenure", "All")))
+
+b25003_race_raw <- map_dfr(tables, function(tb) {
+  yearly_data <- map_dfr(years, function(yr) {
+    
+    acs_pull <- get_acs(
+      geography = "county",
+      table = tb,
+      year = yr,
+      state = "VA",
+      cache_table = TRUE
+    ) %>%
+      left_join(b25003_race_clean, by = "variable")
+    
+    acs_rearranged <- acs_pull %>%
+      mutate(year = yr) %>%
+      select(variable, year, locality = NAME, fips = GEOID, race, tenure,
+             estimate, moe)
+    
+    acs_rearranged
+  })
+  yearly_data
+})
+
+b25003_race_raw <- b25003_race_raw |> 
+  subset(fips %in% pha)
+
+b25003_race_wide <- b25003_race_raw |>  
+  select(year, locality, fips, race, tenure, estimate) |> 
+  pivot_wider(names_from = tenure,
+              values_from = estimate) |> 
+  separate(locality, into = c("locality", "state"), sep = ",") |> 
+  mutate(race = case_when(
+    race == "Black or African American Householder" ~ "Black",
+    race == "American Indian and Alaska Native Householder" ~ "Another race",
+    race == "Asian Householder" ~ "Asian",
+    race == "Native Hawaiian and Other Pacific Islander Householder" ~ "Another race",
+    race == "Some Other Race Householder" ~ "Another race",
+    race == "Two or More Races Householder" ~ "Multiracial",
+    race == "White, Not Hispanic or Latino Householder" ~ "White, non-Hispanic",
+    race == "Hispanic or Latino Householder" ~ "Hispanic or Latino"
+  )) |> 
+  clean_names() |> 
+  group_by(year, locality, fips, race) |> 
+  summarise(all = sum(all),
+            owner_occupied = sum(owner_occupied),
+            renter_occupoed = sum(renter_occupied)) |> 
+  mutate(ho_rate = owner_occupied/all)
+
+ho_race <- ggplot(b25003_race_wide,
+       aes(x = year, 
+           y = ho_rate,
+           colour = race)) +
+  geom_line(stat = "identity") +
+  facet_wrap(~locality) +
+  scale_y_continuous(labels = percent_format()) +
+  labs(title = "Homeownership rate by race and ethnicity", colour = "Race or ethnicity") +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank())
+
+plotly::ggplotly(ho_race) |> 
+  plotly_camera()
 
 ```
