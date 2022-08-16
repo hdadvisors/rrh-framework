@@ -15,6 +15,7 @@ library(tigris)
 library(ggthemes)
 library(sf)
 library(sp)
+library(simplevis)
 
 # rr includes Charles City, Goochland, New Kent, and Powhatan.
 
@@ -25,6 +26,8 @@ pha <- c("51085", "51760", "51087", "51041")
 ```
 
 Renter-occupied stock
+
+While many renters across the region do live in multfamily buildings, 
 
 ```{r ro-structure}
 
@@ -45,8 +48,10 @@ ro_structure <- b25127_data |>
     TRUE ~ structure
   ))
 
+ro_structure$structure <- factor(ro_structure$structure, levels = c("1, detached  or attached", "2 to 4", "5 to 19", "20 or more", "Mobile home, boat, RV, van, etc."))
+
 rstructure_bar <- ggplot(ro_structure,
-       aes(x = reorder(structure, -difference), 
+       aes(x = structure, 
            y = difference,
            fill = structure)) +
   geom_bar(stat = "identity") +

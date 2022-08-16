@@ -12,6 +12,9 @@ library(ggplot2)
 library(janitor)
 library(sf)
 library(sp)
+library(viridis)
+library(plotly)
+library(scales)
 
 # Utilize the same filters as the Chesterfield County Rental Market Analysis. I've changed the star rating to two or less, which coincides with CoStar's analysis.
 
@@ -31,16 +34,51 @@ noah <- read_csv("data/pha_noah_72822.csv") |>
   clean_names() |> 
   st_as_sf(coords = c("longitude", "latitude"), crs=4326, remove=FALSE) 
 
+pha_names <- c("Richmond City", "Hanover", "Henrico", "Chesterfield")
+
+geo_colors <- setNames(viridis(4), nm = pha_names)
+
+pal <-colorFactor(palette = c("#440154FF", "#31688EFF","#35B779FF", "#FDE725FF"),
+                  levels = c("Richmond City", "Hanover", "Henrico", "Chesterfield"))
+  
+leaflet(noah) |> 
+  addProviderTiles(providers$OpenStreetMap.Mapnik) |>
+  addCircleMarkers(
+    radius = 5,
+    color = ~pal(county_name),
+    stroke = FALSE)
+```
+
+```{r noah-cnt, fig.cap="NOAH units by locality"}
+
+noah_cnt <- noah |> 
+  group_by(county_name) |> 
+  summarise(n = sum(number_of_units))
+
+noah_cnt_bar <- ggplot(noah_cnt,
+                       aes(x= reorder(county_name, -n),
+                           y=n,
+                           fill=county_name)) +
+  geom_bar(stat="identity") +
+  coord_flip() +
+  labs(title= "NOAH units by locality") +
+  theme(axis.title = element_blank(),
+        legend.position = "none") +
+  scale_fill_manual(values = geo_colors)
+
+ggplotly(noah_cnt_bar) |> 
+  plotly_camera()
+
+
 
 ```
 
 ```{r noah-type}
 
 
-
 noah_type <- read_csv("data/pha_noah_72822.csv") |> 
   clean_names() |> 
-  select(property_address, county_name, property_name, number_of_units, style, year_built)
+  select(property_address, county_name, property_name, number_of_units, style, year_built) 
 
 
 ```

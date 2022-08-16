@@ -14,6 +14,8 @@ library(lubridate)
 library(tigris)
 library(ggthemes)
 library(scales)
+library(plotly)
+library(simplevis)
 
 # rr includes Charles City, Goochland, New Kent, and Powhatan.
 
@@ -24,7 +26,7 @@ pha <- c("51085", "51760", "51087", "51041")
 
 ### Homeownership housing stock
 
-The stock of homeowner housing has been growing across the region. From 2016 to 2020, owner-occupied housing has increased by 17,436 --- an increase of seven percent. Undoubtedly, much of that growth (93 percent) has occurred in the single-family home market, including detached and attached homes. The largest share of that single-family home growth has occurred in Chesterfield County, where there was a net gain of 7,184 single-family homeowners.
+The stock of homeowner housing has been growing across the region. From 2016 to 2020, owner-occupied housing has increased by 17,436 --- an increase of seven percent. Unsurprisingly, much of that growth (93 percent) has occurred in the single-family home market, including detached and attached homes. The largest share of that single-family home growth has occurred in Chesterfield County, where there was a net gain of 7,184 single-family homeowners.
 ```{r oo-structure}
 
 # Table B25127 Tenure by year structure built by units in structure
@@ -87,7 +89,7 @@ structure_bar <- ggplot(oo_structure,
            fill = structure)) +
   geom_bar(stat = "identity") +
   facet_wrap(~county) + 
-  labs(title = "Change in homeowner housing by structure type", subtitle = "From 2016 to 2020") +
+  labs(title = "Change in homeowner housing by structure type", subtitle = "From 2016 to 2020", fill = "Structure type") +
   theme(axis.title.x = element_blank(), 
         axis.title.y = element_blank(),
         axis.text.x = element_blank(),
@@ -95,7 +97,7 @@ structure_bar <- ggplot(oo_structure,
         legend.position = "right",
         legend.justification = "top")
 
-plotly::ggplotly(structure_bar) |> 
+ggplotly(structure_bar) |> 
   plotly_camera()
 
 ```
@@ -189,7 +191,7 @@ oo_br <- b25042_data |>
   mutate(percent = estimate/sum(estimate)) |> 
   ungroup() |> 
   separate(NAME, into = c("county", "state"), sep = ",") |> 
-  filter(year == 2020)
+  filter(year == 2020 | year == 2016)
 
 br_bar <- ggplot(oo_br,
        aes(x = county,
@@ -200,7 +202,8 @@ br_bar <- ggplot(oo_br,
   labs(title = "Homeowner housing by bedrooms", fill = "Bedrooms") + 
   scale_y_continuous(labels = scales::percent) +
   theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank())
+        axis.title.y = element_blank()) +
+  facet_wrap(~year)
 
 plotly::ggplotly(br_bar) |> 
   plotly_camera()
@@ -210,7 +213,7 @@ plotly::ggplotly(br_bar) |>
 
 For-sale market
 
-The supply of for-smale housing across the region has changed very
+In all nearly all localities except for Chesterfield County, the average number of home sales has largely remained the same. Only in Chesterfield County was there a more than 10 percent increase in average monthly home sales between 2019 and 2021. In fact there was a 15 percent increase in home sales in Chesterfield County. 
 
 ```{r n-sales}
 
@@ -270,7 +273,8 @@ plotly::ggplotly(n_sales) |>
 
 avg_sales <- pha_sales |> 
   group_by(year, geography) |> 
-  summarise(average = mean(sales))
+  summarise(average = mean(sales)) |> 
+  filter(year != 2022)
 
 a_sales <- ggplot(avg_sales,
        aes(x = year, y = average, fill = geography)) +
@@ -385,6 +389,8 @@ pha_supply <- pha_supply |>
 
 New construction versus re-sale
 
+On average, there is a \$89,127 difference between new construction and resale sales price.
+
 ```{r comp-price}
 
 newconstruction_price <- read_csv("data/pha_price_new.csv") |> 
@@ -424,6 +430,14 @@ ggplot(pha_price_comp,
         axis.title.y = element_blank()) +
   scale_y_continuous(labels = dollar_format())
 
+# pha_price_comp_long <- pha_price_comp |> 
+#   pivot_wider(names_from = type,
+#               values_from = med_price) |> 
+#   clean_names() |> 
+#   mutate(difference = (new_construction-resale))
+# 
+# mean(pha_price_comp_long$difference)
+# 89127.67
 
 ```
 
@@ -475,12 +489,15 @@ pha_br_comp <- map_dfr(pha_br, pha_br_clean ) |>
 pha_br_comp$Month <- match(pha_br_comp$Month, month.abb)
 
 pha_br_comp <- pha_br_comp |> 
-  mutate(date = make_date(year, Month))
+  mutate(date = make_date(year, Month)) |> 
+  group_by(year, br, type) |> 
+  summarise(sales = sum(sales)) |> 
+  mutate(percent = sales/sum(sales))
 
 ggplot(pha_br_comp,
-       aes(x = date, y = sales, fill = br)) +
+       aes(x = year, y = percent, fill = type)) +
   geom_bar(stat = "identity", position = "stack") +
-  facet_wrap(~type) +
+  facet_wrap(~br) +
   labs(title = "Sales comparison by bedrooms: New Construction versus Resale", fill = "Construction Type") +
   theme(axis.title.x = element_blank(),
         axis.title.y = element_blank())
@@ -675,81 +692,85 @@ ggplot(pha_homeownership,
 
 ```{r ho-rate-race}
 
-years <- 2016:2020
+# years <- 2016:2020
+# 
+# tables <- paste0("B25003", LETTERS[2:9])
+# 
+# b25003_race_vars <- load_variables(2020, "acs5") %>%
+#   filter(str_sub(name, end = 7) %in% tables) %>% 
+#   filter(str_detect(name, "PR") == FALSE)
+# 
+# concept_to_race <- function(x) {
+#   out <- x %>%
+#     str_remove_all("TENURE \\(|\\)") %>%
+#     str_to_title() %>%
+#     str_replace_all("And", "and") %>%
+#     str_replace_all("Or", "or") %>%
+#     str_remove_all(" Alone")
+#   
+#   out
+# }
+# 
+# b25003_race_clean <- b25003_race_vars %>%
+#   mutate(race = concept_to_race(concept)) %>%
+#   separate(label, into = c("est", "total", "tenure"), sep = "!!") %>% 
+#   select(variable = name, race, tenure) %>% 
+#   mutate(across(.fns = ~replace_na(.x, "All")),
+#          across(.fns = ~str_remove_all(.x, ":")),
+#          across(.fns = ~str_remove_all(.x, " --")),
+#          across(.fns = ~str_replace_all(.x, "total", "All")),
+#          across(.fns = ~str_replace_all(.x, "Tenure", "All")))
+# 
+# b25003_race_raw <- map_dfr(tables, function(tb) {
+#   yearly_data <- map_dfr(years, function(yr) {
+#     
+#     acs_pull <- get_acs(
+#       geography = "county",
+#       table = tb,
+#       year = yr,
+#       state = "VA",
+#       cache_table = TRUE
+#     ) %>%
+#       left_join(b25003_race_clean, by = "variable")
+#     
+#     acs_rearranged <- acs_pull %>%
+#       mutate(year = yr) %>%
+#       select(variable, year, locality = NAME, fips = GEOID, race, tenure,
+#              estimate, moe)
+#     
+#     acs_rearranged
+#   })
+#   yearly_data
+# })
+# 
+# b25003_race_raw <- b25003_race_raw |> 
+#   subset(fips %in% pha)
+# 
+# b25003_race_wide <- b25003_race_raw |>  
+#   select(year, locality, fips, race, tenure, estimate) |> 
+#   pivot_wider(names_from = tenure,
+#               values_from = estimate) |> 
+#   separate(locality, into = c("locality", "state"), sep = ",") |> 
+#   mutate(race = case_when(
+#     race == "Black or African American Householder" ~ "Black",
+#     race == "American Indian and Alaska Native Householder" ~ "Another race",
+#     race == "Asian Householder" ~ "Asian",
+#     race == "Native Hawaiian and Other Pacific Islander Householder" ~ "Another race",
+#     race == "Some Other Race Householder" ~ "Another race",
+#     race == "Two or More Races Householder" ~ "Multiracial",
+#     race == "White, Not Hispanic or Latino Householder" ~ "White, non-Hispanic",
+#     race == "Hispanic or Latino Householder" ~ "Hispanic or Latino"
+#   )) |> 
+#   clean_names() |> 
+#   group_by(year, locality, fips, race) |> 
+#   summarise(all = sum(all),
+#             owner_occupied = sum(owner_occupied),
+#             renter_occupoed = sum(renter_occupied)) |> 
+#   mutate(ho_rate = owner_occupied/all)
+# 
+# write_rds(b25003_race_wide, "data/b25003_race_wide.rds")
 
-tables <- paste0("B25003", LETTERS[2:9])
-
-b25003_race_vars <- load_variables(2020, "acs5") %>%
-  filter(str_sub(name, end = 7) %in% tables) %>% 
-  filter(str_detect(name, "PR") == FALSE)
-
-concept_to_race <- function(x) {
-  out <- x %>%
-    str_remove_all("TENURE \\(|\\)") %>%
-    str_to_title() %>%
-    str_replace_all("And", "and") %>%
-    str_replace_all("Or", "or") %>%
-    str_remove_all(" Alone")
-  
-  out
-}
-
-b25003_race_clean <- b25003_race_vars %>%
-  mutate(race = concept_to_race(concept)) %>%
-  separate(label, into = c("est", "total", "tenure"), sep = "!!") %>% 
-  select(variable = name, race, tenure) %>% 
-  mutate(across(.fns = ~replace_na(.x, "All")),
-         across(.fns = ~str_remove_all(.x, ":")),
-         across(.fns = ~str_remove_all(.x, " --")),
-         across(.fns = ~str_replace_all(.x, "total", "All")),
-         across(.fns = ~str_replace_all(.x, "Tenure", "All")))
-
-b25003_race_raw <- map_dfr(tables, function(tb) {
-  yearly_data <- map_dfr(years, function(yr) {
-    
-    acs_pull <- get_acs(
-      geography = "county",
-      table = tb,
-      year = yr,
-      state = "VA",
-      cache_table = TRUE
-    ) %>%
-      left_join(b25003_race_clean, by = "variable")
-    
-    acs_rearranged <- acs_pull %>%
-      mutate(year = yr) %>%
-      select(variable, year, locality = NAME, fips = GEOID, race, tenure,
-             estimate, moe)
-    
-    acs_rearranged
-  })
-  yearly_data
-})
-
-b25003_race_raw <- b25003_race_raw |> 
-  subset(fips %in% pha)
-
-b25003_race_wide <- b25003_race_raw |>  
-  select(year, locality, fips, race, tenure, estimate) |> 
-  pivot_wider(names_from = tenure,
-              values_from = estimate) |> 
-  separate(locality, into = c("locality", "state"), sep = ",") |> 
-  mutate(race = case_when(
-    race == "Black or African American Householder" ~ "Black",
-    race == "American Indian and Alaska Native Householder" ~ "Another race",
-    race == "Asian Householder" ~ "Asian",
-    race == "Native Hawaiian and Other Pacific Islander Householder" ~ "Another race",
-    race == "Some Other Race Householder" ~ "Another race",
-    race == "Two or More Races Householder" ~ "Multiracial",
-    race == "White, Not Hispanic or Latino Householder" ~ "White, non-Hispanic",
-    race == "Hispanic or Latino Householder" ~ "Hispanic or Latino"
-  )) |> 
-  clean_names() |> 
-  group_by(year, locality, fips, race) |> 
-  summarise(all = sum(all),
-            owner_occupied = sum(owner_occupied),
-            renter_occupoed = sum(renter_occupied)) |> 
-  mutate(ho_rate = owner_occupied/all)
+b25003_race_wide <- read_rds("data/b25003_race_wide.rds")
 
 ho_race <- ggplot(b25003_race_wide,
        aes(x = year, 

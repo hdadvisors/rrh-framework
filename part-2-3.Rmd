@@ -113,6 +113,8 @@ mapview::mapview(hcv, zcol= "hcv_public_pct")
 
 # Email Jessica about Chesterfield rent relief program.
 
+rrp <- read_csv("data/rrp_data.csv")|> 
+  mutate(avgpayment = payments/spent)
 
 
 ```

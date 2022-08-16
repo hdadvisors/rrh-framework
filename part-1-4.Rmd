@@ -16,7 +16,7 @@ library(simplevis)
 
 # Table B18107 Sex by age by independent living difficulty
 
-years <- 2012:2020
+years <- 2016:2020
 
 b18107_vars <- load_variables(2020, "acs5") |> 
   filter(str_sub(name, end = 6) %in% "B18107")
@@ -27,7 +27,8 @@ b18107_raw <- map_dfr(years, function(yr){
     state = "VA",
     table = "B18107",
     year = yr,
-    survey = "acs5"
+    survey = "acs5",
+    cache_table = TRUE
   ) |> 
     mutate(year = yr)
   })
@@ -53,7 +54,7 @@ b18107_data <- b18107_raw |>
 
 # Table B21005 Age by veteran status by employment status for civilian population 18 to 64 years
 
-years <- 2010:2020
+years <- 2016:2020
 
 b21005_vars <- load_variables(2020, "acs5") |> 
   filter(str_sub(name, end = 6) %in% "B21005")

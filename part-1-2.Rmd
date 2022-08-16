@@ -9,12 +9,26 @@ library(tidycensus)
 library(ggplot2)
 library(simplevis)
 library(tigris)
+library(viridis)
 
 # rr includes Charles City, Goochland, New Kent, and Powhatan.
 
 rr <- c("51085", "51760", "51075", "51145", "51087", "51127", "51036", "51041")
+
 pha <- c("51085", "51760", "51087", "51041")
 
+# Set palette colors; may need to find a palette that better complements the PHA branding.
+
+pha_names <- c("Richmond city", "Hanover County", "Henrico County", "Chesterfield County")
+
+geo_colors <- setNames(viridis(4), nm = pha_names)
+
+pal <-colorFactor(palette = c("#440154FF", "#31688EFF","#35B779FF", "#FDE725FF"),
+                  levels = c("Richmond City", "Hanover", "Henrico", "Chesterfield"))
+
+tenure <- c("Homeowner", "Renter")
+
+tenure_colors <-setNames(viridis(2), nm = tenure)
 
 ```
 
@@ -34,22 +48,26 @@ pha_va <- va |>
 Household formation trends
 ```{r hh-formation}
 
-years <- 2016:2020
+# years <- 2016:2020
+# 
+# b25007_vars <- load_variables(2020, "acs5") |> 
+#   filter(str_sub(name, end = 6) %in% "B25007")
+# 
+# b25007_raw <- map_dfr(years, function(yr){
+#   b25007_pull <- get_acs(
+#     geography = "county",
+#     state = "VA",
+#     table = "B25007",
+#     year = yr,
+#     survey = "acs5",
+#     cache_table = TRUE
+#   ) |> 
+#     mutate(year = yr)
+# })
+# 
+# write_rds(b25007_raw, "data/b25007_raw.rds")
 
-b25007_vars <- load_variables(2020, "acs5") |> 
-  filter(str_sub(name, end = 6) %in% "B25007")
-
-b25007_raw <- map_dfr(years, function(yr){
-  b25007_pull <- get_acs(
-    geography = "county",
-    state = "VA",
-    table = "B25007",
-    year = yr,
-    survey = "acs5",
-    cache_table = TRUE
-  ) |> 
-    mutate(year = yr)
-})
+b25007_raw <- read_rds("data/b25007_raw.rds")
 
 b25007_raw <- b25007_raw |> 
   subset(GEOID %in% pha)
@@ -84,15 +102,19 @@ b25007_data_grp <- b25007_data |>
   separate(NAME, into = c("locality", "state"), sep = ",") |> 
   pivot_wider(names_from = year,
               values_from = estimate) |> 
-  select(locality, tenure, age, `2016`, `2020`) |> 
-  transform(change = `2020` - `2016`)
+  select(tenure, age, `2016`, `2020`) |> 
+  transform(change = `2020` - `2016`) |> 
+  group_by(tenure, age) |> 
+  summarise(change = sum(change))
 
 ggplot(b25007_data_grp,
        aes(x = age, y = change, fill = tenure)) +
-  geom_bar(stat = "identity") +
+  geom_bar(stat = "identity", position = "dodge") +
   scale_x_discrete(limits = c("Under 25 years old", "25 to 44 years old", "45 to 64 years old", "65 years and over")) +
-  scale_y_continuous()
-  facet_wrap(~locality)
+  scale_y_continuous(labels = number_format(big.mark = ",")) +
+  labs(title="Change in households by age and tenure: 2016 to 2020", fill="Tenure") +
+  theme(axis.title = element_blank()) +
+  scale_fill_manual(values = tenure_colors)
 
 
 ```
@@ -100,22 +122,26 @@ ggplot(b25007_data_grp,
 Household type and size
 ```{r hhtype}
 
-years <- 2016:2020
+# years <- 2016:2020
+# 
+# b11001_vars <- load_variables(2020, "acs5") |> 
+#   filter(str_sub(name, end = 7) %in% "B11001_")
+# 
+# b11001_raw <- map_dfr(years, function(yr){
+#   b11001_pull <- get_acs(
+#     geography = "county",
+#     state = "VA",
+#     table = "B11001",
+#     year = yr,
+#     survey = "acs5",
+#     cache_table = TRUE
+#   ) |> 
+#     mutate(year = yr)
+# })
+# 
+# write_rds(b11001_raw, "data/b11001_raw.rds")
 
-b11001_vars <- load_variables(2020, "acs5") |> 
-  filter(str_sub(name, end = 7) %in% "B11001_")
-
-b11001_raw <- map_dfr(years, function(yr){
-  b11001_pull <- get_acs(
-    geography = "county",
-    state = "VA",
-    table = "B11001",
-    year = yr,
-    survey = "acs5",
-    cache_table = TRUE
-  ) |> 
-    mutate(year = yr)
-})
+b11001_raw <- read_rds("data/b11001_raw.rds")
 
 b11001_raw <- b11001_raw |> 
   subset(GEOID %in% pha)
@@ -146,20 +172,25 @@ b11001_data <- b11001_raw |>
               values_from = estimate) |> 
   select(locality, hhtype, `2016`, `2020`) |> 
   transform(change = `2020` - `2016`) |> 
-  group_by(locality, hhtype) |> 
+  group_by(hhtype) |> 
   summarise(change = sum(change))
 
-ggplot(b11001_data,
-       aes(x = hhtype,
+hhtype_bar <- ggplot(b11001_data,
+       aes(x = reorder(hhtype, -change),
            y = change,
            fill = hhtype)) +
   geom_bar(stat = "identity") + 
-  facet_wrap(~locality) + 
-  labs(title = "Change in household type") +
+  labs(title = "Change in household type: 2016 to 2020") +
   theme(axis.title.x = element_blank(),
         axis.title.y = element_blank(),
-        axis.text.x = element_blank(),
-        axis.ticks.x = element_blank())
+        axis.ticks.x = element_blank(),
+        legend.position = "none",
+        plot.title = element_text(hjust = -1.8)) +
+  coord_flip() +
+  scale_y_continuous(labels = number_format(big.mark = ","))
+
+ggplotly(hhtype_bar) |> 
+  plotly_camera()
 
 
 ```
@@ -167,25 +198,29 @@ ggplot(b11001_data,
 
 ```{r hh-size}
 
-years <- 2016:2020
+# years <- 2016:2020
+# 
+# b25009_vars <- load_variables(2020, "acs5") |> 
+#   filter(str_sub(name, end = 6) %in% "B25009")
+# 
+# b25009_raw <- map_dfr(years, function(yr){
+#   b25009_pull <- get_acs(
+#     geography = "county",
+#     state = "VA",
+#     table = "B25009",
+#     year = yr,
+#     survey = "acs5",
+#     cache_table = TRUE
+#   ) |> 
+#     mutate(year = yr)
+# })
+# 
+# write_rds(b25009_raw, "data/b25009_raw.rds")
 
-b25009_vars <- load_variables(2020, "acs5") |> 
-  filter(str_sub(name, end = 6) %in% "B25009")
-
-b25009_raw <- map_dfr(years, function(yr){
-  b25009_pull <- get_acs(
-    geography = "county",
-    state = "VA",
-    table = "B25009",
-    year = yr,
-    survey = "acs5",
-    cache_table = TRUE
-  ) |> 
-    mutate(year = yr)
-})
+b25009_raw <- read_rds("data/b25009_raw.rds")
 
 b25009_raw <- b25009_raw |> 
-  subset(GEOID %in% rr)
+  subset(GEOID %in% pha)
 
 b25009_vars_cleaned <- b25009_vars |> 
   separate(label, into = c("est", "total", "tenure", "size"), sep = "!!") |> 
@@ -197,8 +232,39 @@ b25009_vars_cleaned <- b25009_vars |>
   ))
 
 b25009_data <- b25009_raw |> 
-  right_join(b25009_vars_cleaned, by = "variable") |> 
-  select(NAME, GEOID, year, tenure, size, estimate, moe)
+  right_join(b25009_vars_cleaned, by = "variable") |>
+  select(NAME, GEOID, year, tenure, size, estimate) |> 
+  separate(NAME, into = c("locality", "state"), sep = ",") |> 
+  mutate(size = case_when(
+    size == "1-person household" ~ size,
+    size == "2-person household" ~ size,
+    size == "3-person household" ~ size, 
+    TRUE ~ "4 or more person household"
+  )) |> 
+  group_by(year, tenure, size) |> 
+  summarise(estimate = sum(estimate)) |> 
+  pivot_wider(names_from = year, 
+              values_from = estimate) |> 
+  select(tenure, size, `2016`, `2020`) |> 
+  transform(change = `2020` - `2016`) |> 
+  group_by(tenure, size) |> 
+  summarise(change = sum(change))
+
+hhsize_bar <- ggplot(b25009_data,
+       aes(x = size,
+           y = change,
+           fill = tenure)) +
+  geom_bar(stat = "identity", position = "dodge") + 
+  labs(title = "Change in household size by tenure: 2016 to 2020") +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks.x = element_blank()) +
+  scale_y_continuous(labels = number_format(big.mark = ",")) +
+  coord_flip() +
+  scale_x_discrete(limits = rev)
+
+ggplotly(hhsize_bar) |> 
+  plotly_camera()
 
 ```
 
@@ -207,43 +273,81 @@ Households with children
 
 years <- 2016:2020
 
-b11005_vars <- load_variables(2020, "acs5") |> 
-  filter(str_sub(name, end = 6) %in% "B11005")
+b25115_vars <- load_variables(2020, "acs5") |>
+  filter(str_sub(name, end = 6) %in% "B25115")
 
-b11005_raw <- map_dfr(years, function(yr){
-  b11005_pull <- get_acs(
+b25115_raw <- map_dfr(years, function(yr){
+  b25115_pull <- get_acs(
     geography = "county",
     state = "VA",
-    table = "B11005",
+    table = "B25115",
     year = yr,
     survey = "acs5"
-  ) |> 
+  ) |>
     mutate(year = yr)
 })
 
-b11005_raw <- b11005_raw |> 
-  subset(GEOID %in% rr)
+write_rds(b25115_raw, "data/b25115_raw.rds")
 
-b11005_vars_cleaned <- b11005_vars |> 
-  separate(label, into = c("est", "total", "children", "family", "type", "sex"), sep = "!!") |> 
-  select(variable = name, children, family, type, sex) |> 
-  mutate(sex = case_when(
-    type == "Married-couple family" ~ "Married-couple family",
-    type == "Male householder" ~ "Male householder",
-    type == "Female householder" ~ "Female householder",
-    TRUE ~ sex))
+b25115_raw <- read_rds("data/b25115_raw.rds")
 
-b11005_vars_cleaned <- b11005_vars_cleaned |> 
-  select(variable, children, household = sex) |> 
-  drop_na() |> 
+b25115_raw <- b25115_raw |> 
+  subset(GEOID %in% pha)
+
+b25115_vars_cleaned <- b25115_vars |> 
+  separate(label, into = c("est", "total", "tenure", "family", "type", "rel", "children"), sep = "!!") |> 
+  select(variable = name, tenure, family, type, rel, children) |> 
+  mutate(tenure = case_when(
+    tenure == "Owner occupied:" ~ "Homeowner",
+    tenure == "Renter occupied:" ~ "Renter"
+  )) |> 
+  mutate(family = case_when(
+    family == "Family households:" ~ "Family household",
+    family == "Nonfamily households" ~ "Nonfamily household"
+  )) |> 
+  mutate(type = case_when(
+    type == "Married-couple family:" ~ "Married household",
+    rel == "Male householder, no spouse present:" ~ "Single male household",
+    rel == "Female householder, no spouse present:" ~ "Single female household", 
+    family == "Nonfamily household" ~ "Nonfamily household"
+  )) |> 
   mutate(children = case_when(
-    children == "Households with one or more people under 18 years:" ~ "With child or children under 18",
-    children == "Households with no people under 18 years:" ~ "No child or children under 18"
-  ))
+    rel == "With own children of the householder under 18 years" ~ "With children",
+    rel == "No own children of the householder under 18 years" ~ "No children",
+    children == "No own children of the householder under 18 years" ~ "No children",
+    children == "With own children of the householder under 18 years" ~ "With children",
+    family == "Nonfamily household" ~ "Nonfamily household" 
+  )) |> 
+  select(variable, tenure, family, type, children) |> 
+  drop_na()
+  
 
-b11005_data <- b11005_raw |> 
-  right_join(b11005_vars_cleaned, by = "variable") |> 
-  select(NAME, GEOID, year, household, children, estimate, moe)
+b25115_data <- b25115_raw |> 
+  right_join(b25115_vars_cleaned, by = "variable") |> 
+  select(NAME, GEOID, year, tenure, type, children, estimate) |> 
+  separate(NAME, into = c("locality", "state"), sep = ",") |> 
+  pivot_wider(names_from = year,
+              values_from = estimate) |> 
+  transform(change = `2020` - `2016`) |> 
+  select(tenure, type, children, change) |> 
+  group_by(tenure, children) |> 
+  summarise(change = sum(change))
+  
+child_bar <- ggplot(b25115_data,
+       aes(x = children,
+           y = change,
+           fill = tenure)) +
+  geom_bar(stat = "identity", position = "dodge") + 
+  labs(title = "Change in households with children by tenure: 2016 to 2020") +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks.x = element_blank()) +
+  scale_y_continuous(labels = number_format(big.mark = ",")) +
+  coord_flip() +
+  scale_x_discrete(limits = c("With children", "No children", "Nonfamily household"), rev)
+
+ggplotly(child_bar) |> 
+  plotly_camera()
 
 
 ```
@@ -253,25 +357,31 @@ b11005_data <- b11005_raw |>
 Households with seniors
 ```{r hh-seniors}
 
+# Table B11007: Households by Presence of People 65 Years and Over, Household Size and Household Type ??
 
-years <- 2016:2020
 
-b11007_vars <- load_variables(2020, "acs5") |> 
-  filter(str_sub(name, end = 6) %in% "B11007")
+# years <- 2016:2020
+# 
+# b11007_vars <- load_variables(2020, "acs5") |> 
+#   filter(str_sub(name, end = 6) %in% "B11007")
+# 
+# b11007_raw <- map_dfr(years, function(yr){
+#   b11007_pull <- get_acs(
+#     geography = "county",
+#     state = "VA",
+#     table = "B11007",
+#     year = yr,
+#     survey = "acs5"
+#   ) |> 
+#     mutate(year = yr)
+# })
+# 
+# write_rds(b11007_raw, "data/b11007_raw.rds") 
 
-b11007_raw <- map_dfr(years, function(yr){
-  b11007_pull <- get_acs(
-    geography = "county",
-    state = "VA",
-    table = "B11007",
-    year = yr,
-    survey = "acs5"
-  ) |> 
-    mutate(year = yr)
-})
+b11007_raw <- read_rds("data/b11007_raw.rds")
 
 b11007_raw <- b11007_raw |> 
-  subset(GEOID %in% rr)
+  subset(GEOID %in% pha)
 
 b11007_vars_cleaned <- b11007_vars |> 
   separate(label, into = c("est", "total", "senior", "hhsize", "family"), sep = "!!") |> 
@@ -290,6 +400,14 @@ b11007_vars_cleaned <- b11007_vars |>
 
 b11007_data <- b11007_raw |> 
   right_join(b11007_vars_cleaned, by = "variable") |> 
-  select(NAME, GEOID, year, senior, hhsize, family, estimate, moe)
+  select(NAME, GEOID, year, senior, hhsize, family, estimate) |> 
+  separate(NAME, into = c("locality", "state"), sep = ",") |> 
+  pivot_wider(names_from = year,
+              values_from = estimate) |> 
+  transform(change = `2020` - `2016`) |> 
+  select(tenure, type, children, change) |> 
+  group_by(tenure, children) |> 
+  summarise(change = sum(change))
+  
 
 ```
