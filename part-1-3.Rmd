@@ -13,6 +13,7 @@ library(lubridate)
 library(readxl)
 library(viridis)
 library(leaflet)
+library(scales)
 
 # rr includes Charles City, Goochland, New Kent, and Powhatan.
 
@@ -94,13 +95,17 @@ b25118_pha <- b25118_data |>
   subset(year %in% year_change)
 
 ggplot(b25118_pha, 
-       aes(x= income,
-           y=estimate,
-           fill=tenure)) +
+       aes(x = income,
+           y = estimate,
+           fill = tenure)) +
   geom_bar(stat = "identity", position = "dodge") +
-  facet_wrap(~year) +
+  facet_grid(tenure ~ year) +
   scale_x_discrete(limits = c("Less than $15,000","$15,000 to $24,999", "$25,000 to $49,999", "$50,000 to $74,999", "$75,000 to $99,999", "$100,000 to $149,999", "$150,000 or more")) +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 1))
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 1),
+        axis.title = element_blank(),
+        legend.position = "none") +
+  scale_y_continuous(labels = number_format(big.mark = ",")) +
+  labs(title = "Income distribution by tenure: 2016 to 2020")
 
 
 ```
@@ -150,7 +155,22 @@ cpi <- cpi |>
 b25119_cpi <- b25119_data |> 
     left_join(cpi, by = 'year') |> 
   transform(dollars20 = ((381.2/priceindex)*estimate)) |> 
-  select(NAME, GEOID, year, tenure, dollars20, cdollars = estimate, moe)
+  select(NAME, GEOID, year, tenure, dollars20, cdollars = estimate) |> 
+  separate(NAME, into = c("locality", "state"), sep = ",") |> 
+  filter(tenure != "All households") |> 
+  select(year, locality, tenure, dollars20)
+
+ggplot(b25119_cpi, 
+       aes(x = year,
+           y = dollars20,
+           color = locality)) +
+  geom_line(stat = "identity", size = 1) +
+  facet_wrap(~tenure) +
+  scale_color_manual(values = geo_colors) +
+  theme(axis.title = element_blank()) +
+  scale_y_continuous(labels = dollar_format()) +
+  labs(title = "Median houshold income by tenure and locality", color = "Locality")
+  
 
 ```
 
@@ -249,8 +269,70 @@ plotly:: ggplotly(inc_race) |>
   plotly_camera()
 
 ```
+```{r med-income-child}
 
+# Table B19125 Median Family Income by Presence of Own Children
 
+years <- 2016:2020
+
+b19125_vars <- load_variables(2020, "acs5") |> 
+  filter(str_sub(name, end = 6) %in% "B19125")
+
+b19202_vars <- load_variables(2020, "acs5") |> 
+  filter(str_sub(name, end = 6) %in% "B19202")
+
+b19125_raw <- map_dfr(years, function(yr){
+  b25119_pull <- get_acs(
+    geography = "county",
+    state = "VA",
+    table = "B19125",
+    year = yr,
+    survey = "acs5",
+    cache_table = TRUE
+  ) %>%
+    mutate(year = yr)
+  })
+
+b19125_raw <- b19125_raw |> 
+  subset(GEOID %in% pha)
+
+b19125_vars_cleaned <- b19125_vars |> 
+  separate(label, into = c("est", "total", "children"), sep = "!!") |>  
+  select(variable = name, children) |> 
+  mutate(children = case_when(
+    children == "With own children of the householder under 18 years" ~ "With children",
+    children == "No own children of the householder under 18 years" ~ "No children"
+  )) |> 
+  drop_na()
+
+b19125_data <- b19125_raw |> 
+  right_join(b19125_vars_cleaned, by = "variable") |> 
+  select(NAME, GEOID, year, children, estimate) 
+
+cpi <- read_excel("data/CPI_U_RS.xlsx")
+cpi <- cpi |> 
+  rename(year = Year,
+         priceindex = Index) |> 
+  transform(year = as.numeric(year))
+
+b19125_cpi <- b19125_data |> 
+    left_join(cpi, by = 'year') |> 
+  transform(dollars20 = ((381.2/priceindex)*estimate)) |> 
+  select(NAME, GEOID, year, children, dollars20, cdollars = estimate) |> 
+  separate(NAME, into = c("locality", "state"), sep = ",") |> 
+  select(year, locality, children, dollars20)
+
+ggplot(b19125_cpi, 
+       aes(x = year,
+           y = dollars20,
+           color = children)) +
+  geom_line(stat = "identity", size = 1) +
+  facet_wrap(~locality) +
+  theme(axis.title = element_blank()) +
+  scale_y_continuous(labels = dollar_format()) +
+  labs(title = "Median family income by children and locality", color = "Children")
+
+```
 Wages
 ```{r wages}
 

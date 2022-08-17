@@ -74,9 +74,74 @@ plotly::ggplotly(rstructure_bar) |>
 
 ```{r ro-year-built}
 
+ro_yrblt <- b25127_data |> 
+  filter(tenure == "Renter") |> 
+  filter(year == 2020) |> 
+  select(NAME, GEOID, year, yrbuilt, estimate) |> 
+  group_by(NAME, GEOID, year, yrbuilt) |> 
+  summarise(estimate = sum(estimate)) |> 
+  mutate(yrbuilt = case_when(
+    yrbuilt == "Built 1940 to 1959" ~ "Built 1940 to 1979",
+    yrbuilt == "Built 1960 to 1979" ~ "Built 1940 to 1979",
+    TRUE ~ yrbuilt
+  )) |> 
+  separate(NAME, into = c("county", "state"), sep = ",") |> 
+  group_by(county, GEOID, year, yrbuilt) |> 
+  summarise(estimate = sum(estimate))
+  
+ro_yrblt <- ggplot(ro_yrblt,
+       aes(x = yrbuilt,
+           y = estimate,
+           fill = yrbuilt
+           )) + 
+  geom_bar(stat = "identity") +
+  facet_wrap(~county) +
+  labs(title = "Renter-occupied housing by year built", subtitle = "Total housing units in 2020") +
+  theme(axis.title.x = element_blank(), 
+        axis.title.y = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        legend.position = "right",
+        legend.justification = "top")
+
+plotly::ggplotly(ro_yrblt) |> 
+  plotly_camera()
+
 ```
 
 ```{r ro-bedrooms}
+
+ro_br <- b25042_data |> 
+  filter(tenure == "Renter") |> 
+  mutate(br = case_when(
+    br == "1 bedroom" ~ "1-2 bedrooms", 
+    br == "2 bedrooms" ~ "1-2 bedrooms",
+    br == "3 bedrooms" ~ "3-4 bedrooms",
+    br == "4 bedrooms" ~ "3-4 bedrooms",
+    TRUE ~ br
+  )) |> 
+  group_by(NAME, GEOID, year, br) |> 
+  summarise(estimate = sum(estimate)) |> 
+  mutate(percent = estimate/sum(estimate)) |> 
+  ungroup() |> 
+  separate(NAME, into = c("county", "state"), sep = ",") |> 
+  filter(year == 2020 | year == 2016)
+
+ro_br_bar <- ggplot(ro_br,
+       aes(x = county,
+           y = percent, 
+           fill = br)) +
+  geom_bar(position = "stack", stat = "identity") + 
+  scale_fill_discrete(breaks = c("No bedroom", "1-2 bedrooms", "3-4 bedrooms", "5 or more bedrooms")) +
+  labs(title = "Homeowner housing by bedrooms", fill = "Bedrooms") + 
+  scale_y_continuous(labels = scales::percent) +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.text.x = element_text(angle = 90)) +
+  facet_wrap(~year)
+
+plotly::ggplotly(ro_br_bar) |> 
+  plotly_camera()
 
 ```
 
@@ -91,7 +156,29 @@ Rental market
 # As of mid July 
 
 pha_rent <- read_csv("data/pha_avg_rent.csv") |> 
-  clean_names() 
+  clean_names() |> 
+  mutate(period = as.Date(as.yearqtr(period, format = "%Y Q%q"), frac = 1)) |> 
+  pivot_longer(cols = 2:3,
+               names_to = "type",
+               values_to = "rent") |> 
+  mutate(type = case_when(
+    type == "rent_infl" ~ "Inflation-adjusted rent",
+    type == "rent_cur" ~ "Rent (Current dollars)"
+  ))
+
+avg_line <- ggplot(pha_rent,
+                   aes(x = period,
+                       y = rent,
+                       color = type)) + 
+  geom_line(stat = "identity", size = 1) +
+  scale_y_continuous(labels = dollar_format()) +
+  theme(axis.title = element_blank()) +
+  labs(title = "Average market asking rent", color = "Dollar value")
+  
+
+ggplotly(avg_line) |> 
+  plotly_camera()
+
 ```
 
 
@@ -106,9 +193,21 @@ pha_rent <- read_csv("data/pha_avg_rent.csv") |>
 rr_sub_rent <- read_csv("data/rr_submarket_data.csv") |> 
   clean_names() |> 
   separate(geography, into = c("region", "state", "submarket"), sep = " - ") |> 
-  select(period, locality, submarket, "rent" = market_asking_rent_unit, vacancy_rate)
+  select(period, locality, submarket, "rent" = market_asking_rent_unit, vacancy_rate) |> 
+  mutate(rent = parse_number(rent)) |> 
+  mutate(period = as.Date(as.yearqtr(period, format = "%Y Q%q"), frac = 1))
+
 
 # Issue with above is that rents are not inflation-adjusted. May need to revisit. I've requested from CoStar to allow for an inflation-adjusted average rent per unit pull, BUT who knows if they can add it.
+
+ggplot(rr_sub_rent,
+       aes(x = period,
+           y = rent, 
+           color = submarket)) +
+  geom_line(stat = "identity") + 
+  labs(title = "Average asking rent by submarket")
+  
+
 
 ```
 
@@ -119,8 +218,37 @@ rr_sub_rent <- read_csv("data/rr_submarket_data.csv") |>
 
 # CoStar Filters: Construction Status - Existing
 
-pha_rent_br <- read_csv("data/pha_rent_br.csv")
+# As of mid-JULY; inflation-adjusted
 
+pha_rent_br <- read_csv("data/pha_rent_br.csv") |> 
+  clean_names() |> 
+  mutate(period = case_when(
+    period == "2022 Q3 QTD" ~ "2022 Q3",
+    TRUE ~ period
+  )) |> 
+  mutate(period = as.Date(as.yearqtr(period, format = "%Y Q%q"), frac = 1)) |> 
+  pivot_longer(cols = 2:5,
+               names_to = "br",
+               values_to = "rent") |> 
+  mutate(br = case_when(
+    br == "studio" ~ "Studio",
+    br == "x1_bed" ~ "One bedroom",
+    br == "x2_beds" ~ "Two bedrooms",
+    br == "x3_beds" ~ "Three bedrooms"
+  ))
+  
+avg_brline <- ggplot(pha_rent_br,
+                     aes(x = period, 
+                         y = parse_number(rent),
+                         color = br)) +
+  geom_line(stat = "identity", size = 1) +
+  theme(axis.title = element_blank()) +
+  labs(title = "Average asking rent by bedrooms", color = "Bedrooms") +
+  scale_y_continuous(labels = dollar_format())
+
+
+ggplotly(avg_brline) |> 
+  plotly_camera()
 
 ```
 
@@ -130,8 +258,54 @@ pha_rent_br <- read_csv("data/pha_rent_br.csv")
 
 # CoStar Filters: Construction Status - Existing
 
-# Not easily done in CoStar; first filter at max year 1979; then do 1980 to 1999, then 2000 to 2009, then 2010 and beyond
+# Not easily done in CoStar; first filter at max year 1979; then do 1980 to 1999, then 2000 to 2009, then 2010 and beyond; inflation-adjusted
 
+
+rent_79 <- read_csv("data/pha_rent_79.csv") |> 
+  clean_names() |> 
+  mutate(built = "Pre-1980")
+
+rent_99 <- read_csv("data/pha_rent_99.csv") |> 
+  clean_names() |> 
+  mutate(built = "1980 to 1999")
+
+rent_09 <- read_csv("data/pha_rent_09.csv") |> 
+  clean_names() |> 
+  mutate(built = "2000 to 2009")
+
+rent_10 <- read_csv("data/pha_rent_10.csv") |> 
+  clean_names() |> 
+  mutate(built = "2010 and beyond")
+
+pha_built <- list(rent_79, rent_99, rent_09, rent_10)
+
+pha_built_clean <- function(df){
+  df |> 
+    mutate(period = case_when(
+    period == "2022 Q3 QTD" ~ "2022 Q3",
+    TRUE ~ period
+  )) |> 
+  mutate(period = as.Date(as.yearqtr(period, format = "%Y Q%q"), frac = 1)) |>  
+  mutate(rent = parse_number(current_search)) |> 
+  select(period, built, rent)
+}
+
+
+pha_built_rent <- map_dfr(pha_built, pha_built_clean) 
+
+pha_built_rent$built <- factor(pha_built_rent$built, levels = c("Pre-1980", "1980 to 1999", "2000 to 2009", "2010 and beyond"))
+
+rent_built <- ggplot(pha_built_rent,
+                     aes(x = period, 
+                         y = rent,
+                         color = built)) +
+  geom_line(stat = "identity", size = 1) +
+  labs(title = "Average asking rent by year built", color = "Year built") +
+  theme(axis.title = element_blank()) +
+  scale_y_continuous(labels = dollar_format())
+
+ggplotly(rent_built) |> 
+  plotly_camera()
 
 ```
 
@@ -139,7 +313,17 @@ Rental vacancy
 ```{r vacancy}
 
 rr_sub_vacancy <- rr_sub_rent |> 
-  select(period, locality, submarket, vacancy_rate)
+  select(period, locality, submarket, vacancy_rate) |> 
+  mutate(vacancy_rate = parse_number(vacancy_rate)/100)
+
+sub_vacancy <- ggplot(rr_sub_vacancy,
+                      aes(x = period,
+                          y = vacancy_rate,
+                          color = submarket)) +
+  geom_line(stat = "identity", size = 1)
+
+ggplotly(sub_vacancy) |> 
+  plotly_camera()
 
 ```
 

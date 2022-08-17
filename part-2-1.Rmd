@@ -22,6 +22,8 @@ library(simplevis)
 rr <- c("51085", "51760", "51075", "51145", "51087", "51127", "51036", "51041")
 pha <- c("51085", "51760", "51087", "51041")
 
+pha_names <- c("Richmond city", "Henrico County", "Hanover County", "Chesterfield County")
+
 ```
 
 ### Homeownership housing stock
@@ -122,12 +124,12 @@ oo_yrblt <- b25127_data |>
   summarise(estimate = sum(estimate))
   
 yrblt <- ggplot(oo_yrblt,
-       aes(x = county,
+       aes(x = yrbuilt,
            y = estimate,
-           fill = county
+           fill = yrbuilt
            )) + 
-  geom_bar(stat = "identity") +
-  facet_wrap(~yrbuilt) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~county) +
   labs(title = "Owner-occupied housing by year built", subtitle = "Total housing units in 2020") +
   theme(axis.title.x = element_blank(), 
         axis.title.y = element_blank(),
@@ -202,7 +204,8 @@ br_bar <- ggplot(oo_br,
   labs(title = "Homeowner housing by bedrooms", fill = "Bedrooms") + 
   scale_y_continuous(labels = scales::percent) +
   theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank()) +
+        axis.title.y = element_blank(),
+        axis.text.x = element_text(angle = 90)) +
   facet_wrap(~year)
 
 plotly::ggplotly(br_bar) |> 
@@ -211,7 +214,7 @@ plotly::ggplotly(br_bar) |>
 
 ```
 
-For-sale market
+### For-sale market
 
 In all nearly all localities except for Chesterfield County, the average number of home sales has largely remained the same. Only in Chesterfield County was there a more than 10 percent increase in average monthly home sales between 2019 and 2021. In fact there was a 15 percent increase in home sales in Chesterfield County. 
 
@@ -377,21 +380,51 @@ pha_supply <- pha_supply|>
 pha_supply$Month <- match(pha_supply$Month, month.abb)
 
 pha_supply <- pha_supply |> 
-  mutate(date = make_date(year, Month))
+  mutate(date = make_date(year, Month)) |> 
+  select(date, months_sup)
 
+supply_bar <- ggplot(pha_supply,
+                     aes(x = date, 
+                         y = months_sup)) +
+  geom_bar(stat = "identity", fill = "dark green") +
+  labs(title = "Months supply of for-sale housing by quarter") +
+  theme(axis.title = element_blank())
+
+ggplotly(supply_bar) |> 
+  plotly_camera()
 
 ```
+#### Starter homes
 
 ```{r starter-homes}
 
+# Utilizing data pulled by VAR for HB854; does not have data for 2022 
+
+st_homes <- read_csv("data/var_starterhomes.csv") |> 
+  subset(County_Name %in% pha_names) |> 
+  mutate(FY = as.character(FY))
+
+starter_share <- ggplot(st_homes, 
+         aes(x = FY,
+           y = starter_homes_pct,
+           fill = County_Name)) +
+  geom_bar(stat = "identity") + 
+  facet_wrap(~County_Name) +
+  scale_y_continuous(labels = percent_format())  +
+  theme(axis.title = element_blank(),
+        axis.text.x = element_text(angle = 90, vjust = .1, hjust = 1)) +
+  labs(title = "Share of starter homes sold", fill = "Locality")
+
+ggplotly(starter_share) |> 
+  plotly_camera()
 
 ```
 
-New construction versus re-sale
+#### New construction versus re-sale
 
 On average, there is a \$89,127 difference between new construction and resale sales price.
 
-```{r comp-price}
+```{r comp-price, fig.cap= "Sales price comparison: new construction versus resale"}
 
 newconstruction_price <- read_csv("data/pha_price_new.csv") |> 
   clean_names() |> 
@@ -425,10 +458,12 @@ pha_price_comp <- pha_comp |>
 ggplot(pha_price_comp,
        aes(x = date, y = med_price, fill = type)) +
   geom_bar(stat = "identity", position = "dodge") +
-  labs(title = "Sales price comparison: New Construction versus Resale", fill = "Construction Type") +
+  labs(title = "Sales price comparison: new construction versus resale", fill = "Construction Type") +
   theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank()) +
-  scale_y_continuous(labels = dollar_format())
+        axis.title.y = element_blank(),
+        legend.position = "none") +
+  scale_y_continuous(labels = dollar_format()) +
+  facet_grid(~type)
 
 # pha_price_comp_long <- pha_price_comp |> 
 #   pivot_wider(names_from = type,
@@ -500,7 +535,11 @@ ggplot(pha_br_comp,
   facet_wrap(~br) +
   labs(title = "Sales comparison by bedrooms: New Construction versus Resale", fill = "Construction Type") +
   theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank())
+        axis.title.y = element_blank(),
+        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.2),
+        axis.ticks.x = element_blank()) + 
+  scale_y_continuous(labels = percent_format())
+  
 
 
 ```
@@ -580,7 +619,7 @@ ggplot(pha_sf_comp,
 ```
 
 
-Construction trends
+### Construction trends
 
 ```{r sf-construction}
 
@@ -635,12 +674,15 @@ pha_cbps <- rr_cbps |>
 ggplot(pha_cbps,
        aes(x = year, y = units, colour = NAME)) +
   geom_line(stat = "identity") +
-  facet_wrap(~NAME)
+  facet_wrap(~NAME) +
+  theme(axis.title = element_blank(),
+        legend.position = "none") +
+  labs(title = "Single-family building permits")
 
 ```
 
 
-Homeownership rate
+### Homeownership rate
 
 ```{r ho-rate}
 
@@ -685,8 +727,86 @@ pha_homeownership <- b25003_data |>
   separate(NAME, into = c("county", "state"), sep = ",")
 
 ggplot(pha_homeownership,
-       aes(x = year, y = ho_rate, colour = county)) +
-  geom_line(stat = "identity")
+       aes(x = year, 
+           y = ho_rate, 
+           color = county)) +
+  geom_line(stat = "identity", size = 1) + 
+  scale_y_continuous(labels = percent_format()) +
+  labs(title = "Homeownership rate by locality: 2010 to 2020", color = "Locality") +
+  theme(axis.title = element_blank()) +
+  scale_x_continuous(breaks = c(2010, 2015, 2020))
+  
+
+```
+
+```{r ho-age}
+
+years <- 2016:2020
+
+b25007_vars <- load_variables(2020, "acs5") |> 
+  filter(str_sub(name, end = 6) %in% "B25007")
+
+b25007_raw <- map_dfr(years, function(yr){
+   b25007_pull <- get_acs(
+    geography = "county",
+    state = "VA",
+    table = "B25007",
+    year = yr,
+    survey = "acs5"
+  ) |> 
+    mutate(year = yr)
+})
+
+b25007_raw <- b25007_raw |> 
+  subset(GEOID %in% pha)
+
+b25007_vars_cleaned <- b25007_vars |> 
+  separate(label, into = c("est", "total", "tenure", "age"), sep = "!!") |> 
+  select(variable = name, tenure, age) |> 
+  mutate(across(.fns = ~str_remove_all(.x, ":")),
+         across(.fns = ~str_remove_all(.x,"Householder "))) |>  
+  mutate(tenure = case_when(
+    tenure == "Owner occupied" ~ "Homeowner",
+    tenure == "Renter occupied" ~ "Renter",
+    TRUE ~ tenure
+  )) |> 
+    drop_na()
+
+b25007_data <- b25007_raw |> 
+  right_join(b25007_vars_cleaned, by = "variable") |> 
+  select(NAME, GEOID, year, tenure, age, estimate) |> 
+  mutate(age = case_when(
+    age == "25 to 34 years" ~ "25 to 44 years",
+    age == "35 to 44 years" ~ "25 to 44 years",
+    age == "45 to 54 years" ~ "45 to 64 years",
+    age == "55 to 59 years" ~ "45 to 64 years",
+    age == "60 to 64 years" ~ "45 to 64 years",
+    age == "65 to 74 years" ~ "65 years and over",
+    age == "75 to 84 years" ~ "65 years and over",
+    age == "85 years and over" ~ "65 years and over",
+    TRUE ~ age
+  )) |> 
+  separate(NAME, into = c("locality", "state"), sep = ",")
+
+ho_age <- b25007_data |> 
+  group_by(year, tenure, age) |> 
+  summarise(estimate = sum(estimate)) |> 
+  pivot_wider(
+    names_from = tenure,
+    values_from = estimate
+  ) |> 
+  mutate(total = Homeowner + Renter) |> 
+  mutate(ho_rate = (Homeowner/total))
+
+ggplot(ho_age,
+       aes(x = year, 
+           y = ho_rate, 
+           color = age)) +
+  geom_line(stat = "identity") +
+  theme(axis.title = element_blank()) +
+  scale_y_continuous(labels = percent_format()) +
+  labs(title = "Homeownership rate by age", color = "Householder age")
+  
 
 ```
 
