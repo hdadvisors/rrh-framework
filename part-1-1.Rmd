@@ -1,8 +1,9 @@
-# (PART)Demographic and socioeconomic changes {.unnumbered}
+# (PART) Demographic and socioeconomic changes {.unnumbered}
 
-## Components of population change{#part-1-1}
+## Population changes {#part-1-1}
 
 ```{r setup}
+
 library(tidycensus)
 library(tidyverse)
 library(knitr)
@@ -13,10 +14,11 @@ library(scales)
 library(plotly)
 library(simplevis)
 library(gridExtra)
+library(viridisLite)
+library(leaflet)
 
 rr <- c("51085", "51760", "51075", "51145", "51087", "51127", "51036", "51041")
 pha <- c("51085", "51760", "51087", "51041")
-
 
 # Set palette colors; may need to find a palette that better complements the PHA branding.
 
@@ -29,7 +31,10 @@ pal <-colorFactor(palette = c("#440154FF", "#31688EFF","#35B779FF", "#FDE725FF")
 
 ```
 
-The Richmond region has continued to grow between 2016 and 2020 --- adding a net of 41,457 residents across the four major localities. The most populous locality, Chesterfield County, experienced a near eight percent increase in its population during this timeframe. 
+### Total population growth
+
+The Richmond region has continued to grow between 2016 and 2020---adding a net of 41,457 residents across the four major localities. The most populous locality, Chesterfield County, experienced a near eight percent increase in its population during this timeframe.
+
 ```{r total-pop}
 
 pep_total_raw <- get_estimates(
@@ -85,7 +90,9 @@ pep_total_clean <- pep_total_raw %>%
     counttype,
     value
   )
+
 # Prep total population counts from 2020 Census summary file
+
 census_clean <- census_raw %>% 
   mutate(year = "2020", # Add year and count type columns
          counttype = "Census population") %>%
@@ -95,7 +102,9 @@ census_clean <- census_raw %>%
     counttype,
     value
   )
+
 # Append 2020 Census counts to PEP time series
+
 population_data <- pep_total_clean %>% 
   bind_rows(census_clean, projections)
 
@@ -125,29 +134,33 @@ ggplot(pha_pop_compare,
            fill=NAMELSAD,
            label= percent(perchange))) +
   geom_bar(stat = "identity") +
-  geom_text(vjust= 1,
+  geom_text(vjust= 1.5,
             color="white",
-            size = 5,
+            size = 4,
             fontface="bold") +
   scale_y_continuous(labels = percent_format()) +
-  labs(title="Percent change in population: 2016 to 2020") +
+  labs(title="Percent change in population by locality",
+       subtitle="2016 to 2020",
+       caption="Sources: U.S. Census Bureau, Population Estimates Program.") +
   theme(axis.title = element_blank(),
+        panel.background = element_blank(),
+        axis.ticks.x = element_blank(),
         legend.position = "none") +
   scale_fill_manual(values = geo_colors)
   
-
 ```
-In recent years, nearly two thirds of growth could be attributed to migration - either domestic or international migration into the region. But between 2020 and 2021,that share increased to over three quarters --- reducing the portion of the population growing due to natural increase at only 13 percent.
 
-The region's growth continues to be incredibly driven by new people coming from other parts of the state and nation (64 percent of growth between 2020 and 2021). 
+### Components of population change
 
+In recent years, nearly two thirds of growth could be attributed to either domestic or international migration into the region. But between 2020 and 2021, that share increased to over three quarters---reducing the portion of the population growing due to natural increase to only 13 percent.
+
+The region's growth continues to be driven primarily by new people coming from other parts of the state and nation (64 percent of growth between 2020 and 2021).
 
 ```{r natural}
 
 # PEP does not have data available for 2020 and 2021. There is a gap between 2019 and 2021 because Census uses 2020 as a baseline. 
 
 region <- c(51036, 51041, 51075, 51085, 51087, 51127, 51145, 51760)
-
 
 pep_change_raw <- get_estimates(
   geography = "county",
@@ -187,7 +200,7 @@ rr_nat_change <- pep_change_clean |>
 
 # Maybe manually add in 2021. There will be a gap at 2020 though.
 
-#I've cleaned the 2021 csv and it can be found at the below:
+# I've cleaned the 2021 csv and it can be found at the below:
 
 pep_2021 <- read_csv("data/comp_chang_2021.csv") |> 
   pivot_longer(4:6,
@@ -211,24 +224,29 @@ comp_chg_summary <- comp_chg |>
   summarise(value = sum(value)) |> 
   mutate(year = as.numeric(year),
          percent = value/sum(value)) |> 
-  filter(year >= 2016)
+  filter(year >= 2016 & year != 2020) |> 
+  mutate(year = as.character(year))
 
-chg_bar<-ggplot(comp_chg_summary,
+ggplot(comp_chg_summary,
        aes(x=year,
            y=percent,
            fill=component)) + 
   geom_bar(stat="identity", position = "stack") +
-  labs(title="Components of population change") +
-  theme(axis.title = element_blank()) +
+  labs(title="Components of population change",
+       subtitle = "Share of regional population growth by source",
+       caption = "Note: Data not available for 2020.\nSource: U.S. Census Bureau, Population Estimates Program.") +
+  theme(axis.title = element_blank(),
+        panel.background = element_blank(),
+        axis.ticks.x = element_blank(),
+        legend.title = element_blank()) +
   scale_y_continuous(labels = percent_format()) +
   scale_fill_manual(values = viridis(3))
 
-ggplotly(chg_bar) |> 
-  simplevis::plotly_camera()
-
 ```
 
-Between 2020 and 2050, the region is expected to grow by nearly a third (29 percent) --- reaching 1,338,306 residents. 
+### Population projections
+
+Between 2020 and 2050, the region is expected to grow by nearly a third (29 percent)---reaching 1,338,306 residents.
 
 ```{r forecast}
 
@@ -244,24 +262,32 @@ forecasts <- population_data |>
   group_by(year, counttype) |> 
   summarise(value = sum(value))
 
-
-  
-forecast_bar <- ggplot(forecasts,
+ggplot(forecasts,
        aes(x=year,
            y= value,
-           fill=counttype)) +
+           fill=counttype,
+           label=label_comma()(value))) +
   geom_bar(stat="identity") +
+  geom_text(vjust= 1.5,
+            color="white",
+            size = 3,
+            fontface="bold") +
   scale_y_continuous(labels = number_format(big.mark = ",")) +
-  theme(axis.title = element_blank()) +
-  labs(title="Population projections:2020 to 2050", fill="Estimate type")
-
-ggplotly(forecast_bar) |> 
-  plotly_camera()
+  theme(axis.title = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.background = element_blank()) +
+  labs(title="Population projections",
+       subtitle="Regional population in 2020 and forecast to 2050",
+       fill="Estimate type",
+       caption="Source: University of Virginia Weldon Cooper Center for Public Service")
 
 # Difference between 2050 and 2020 is 302,780. 29 percent increase.
 
 ```
-Over the next 30 years, Chesterfield County will continue to lead growth across the region. By 2050, Chesterfield is expected to surpass half a million residents, growing by 38 percent from the 2020 Census estimates. Population growth trends will largely continue as they have with Hanover County experiencing the second greatest growth from their 2020 estimates (27 percent increase). Henrico County follows with a 26 percent increase (+88,565), while the City of Richmond will only increase by about a fifth (20 percent) over 30 years.
+
+Over the next 30 years, Chesterfield County will continue to lead growth across the region. By 2050, Chesterfield is expected to surpass half a million residents, growing by 38 percent from the 2020 Census estimates.
+
+Population growth trends will largely continue as they have with Hanover County experiencing the second greatest growth from their 2020 estimates (27 percent increase). Henrico County follows with a 26 percent increase (+88,565), while the City of Richmond will only increase by about a fifth (20 percent) over 30 years.
 
 ```{r forecasts-ind}
 
@@ -275,7 +301,7 @@ forecasts_ind <- population_data |>
   )) |> 
   filter(year == 2020 | year == 2030 | year == 2040 | year == 2050)
 
-forecast_bar_ind <- ggplot(forecasts_ind,
+ggplot(forecasts_ind,
        aes(x=year,
            y= value,
            fill=name)) +
@@ -283,12 +309,13 @@ forecast_bar_ind <- ggplot(forecasts_ind,
   facet_wrap(~name) +
   scale_y_continuous(labels = number_format(big.mark = ",")) +
   theme(axis.title = element_blank(),
-        legend.position = "none") +
-  labs(title="Population projections by locality: 2020 to 2050") +
+        legend.position = "none",
+        panel.background = element_blank(),
+        axis.ticks.x = element_blank()) +
+  labs(title="Population projections by locality",
+       subtitle="Local population in 2020 and forecast to 2050",
+       caption="Source: University of Virginia\nWeldon Cooper Center for Public Service") +
   scale_fill_manual(values = geo_colors)
-
-ggplotly(forecast_bar_ind) |> 
-  plotly_camera()
 
 # Chesterfield - 140,266 difference / 38 percent increase
 # Hanover - 30,134 difference / 27 percent increase
