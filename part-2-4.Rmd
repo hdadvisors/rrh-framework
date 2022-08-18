@@ -18,21 +18,27 @@ library(scales)
 
 # Utilize the same filters as the Chesterfield County Rental Market Analysis. I've changed the star rating to two or less, which coincides with CoStar's analysis.
 
-# CoStar Filters for Properties: Multi-Family, Localities: Chesterfield, Hanover, Henrico,Richmondy City; Construction status: Existing; Stars: 2 or less; Rent type: Market; Max Year Built: 1999
+# CoStar Filters for Properties: Multi-Family, Localities: Chesterfield, Hanover, Henrico,Richmond City; Construction status: Existing; Stars: 2 or less; Rent type: Market; Max Year Built: 1999; Building class: B, C, and Unclassified
 
-# This returns a total of 478 properties.
+# This returns a total of 479 properties as of 8.17.22
 
-# There are about 80 properties that do not have a listed style. Some may be manufactured home parks.
+# There are about 80 properties that do not have a listed style. Some may be manufactured home parks. Consider removing property_name == Sedgefield, Holiday Mobile Home Park
+
 
 # Append data from MHCCV report for manufactured home communities.
+
+pha <- c("51085", "51760", "51087", "51041")
 
 ```
 
 ```{r noah-map}
 
-noah <- read_csv("data/pha_noah_72822.csv") |> 
+
+
+noah <- read_csv("data/pha_noah_81722.csv") |> 
   clean_names() |> 
-  st_as_sf(coords = c("longitude", "latitude"), crs=4326, remove=FALSE) 
+  st_as_sf(coords = c("longitude", "latitude"), crs=4326, remove=FALSE) |> 
+  filter(property_name != "Sedgefield" | property_name != "Holidy Mobile Home Park")
 
 pha_names <- c("Richmond City", "Hanover", "Henrico", "Chesterfield")
 
@@ -41,12 +47,16 @@ geo_colors <- setNames(viridis(4), nm = pha_names)
 pal <-colorFactor(palette = c("#440154FF", "#31688EFF","#35B779FF", "#FDE725FF"),
                   levels = c("Richmond City", "Hanover", "Henrico", "Chesterfield"))
   
-leaflet(noah) |> 
+noah_map <- leaflet(noah) |> 
   addProviderTiles(providers$OpenStreetMap.Mapnik) |>
   addCircleMarkers(
     radius = 5,
     color = ~pal(county_name),
     stroke = FALSE)
+
+saveWidget(noah_map, "maps/noah_map.html")
+
+knitr::include_url("maps/noah_map.html")
 ```
 
 ```{r noah-cnt, fig.cap="NOAH units by locality"}
@@ -56,7 +66,7 @@ noah_cnt <- noah |>
   summarise(n = sum(number_of_units))
 
 noah_cnt_bar <- ggplot(noah_cnt,
-                       aes(x= reorder(county_name, -n),
+                       aes(x= reorder(county_name, n),
                            y=n,
                            fill=county_name)) +
   geom_bar(stat="identity") +
@@ -64,7 +74,8 @@ noah_cnt_bar <- ggplot(noah_cnt,
   labs(title= "NOAH units by locality") +
   theme(axis.title = element_blank(),
         legend.position = "none") +
-  scale_fill_manual(values = geo_colors)
+  scale_fill_manual(values = geo_colors) +
+  scale_y_continuous(labels = number_format(big.mark = ","))
 
 ggplotly(noah_cnt_bar) |> 
   plotly_camera()
@@ -85,7 +96,61 @@ noah_type <- read_csv("data/pha_noah_72822.csv") |>
 
 ```{r noah-rents}
 
-noah_rent <- read_csv("data/pha_noah_rent.csv")
+# Pulled at end of July; hesitant to re-pull because the data keeps changing on CoStar's side. 
 
+noah_rent <- read_csv("data/pha_noah_rent_81722.csv") 
+
+
+```
+
+## Manufactured Home Communities
+
+```{r mhc-map}
+
+# mhc <- st_read("https://services1.arcgis.com/Hp6G80Pky0om7QvQ/arcgis/rest/services/Mobile_Home_Parks/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
+
+# pha_mhc <- mhc |>  
+#   subset(COUNTYFIPS %in% pha)
+# 
+# write_rds(pha_mhc, "data/pha_mhc.rds")
+
+# pha_mhc <- read_rds("data/pha_mhc.rds") |> 
+#   filter(STATUS != "CLOSED")
+# 
+# mhc_map <- leaflet(pha_mhc) |> 
+#   addTiles() |> 
+#   addCircleMarkers(
+#     radius = 3
+#   )
+# 
+# saveWidget(mhc_map, "maps/mhc_map.html")
+
+knitr::include_url("map/mhc_map.html")
+
+```
+
+```{r mhc-cnt}
+
+mhccv <- read_csv("data/mhccv_data.csv") |> 
+  clean_names()
+
+names <- c("Chesterfield", "Hanover", "Henrico", "Richmond")
+
+mhc_cnt <- mhccv |> 
+  group_by(county) |> 
+  summarise(units = sum(units)) |> 
+  subset(county %in% names)
+
+mhc_bar <- ggplot(mhc_cnt,
+                  aes(x = reorder(county, units),
+                      y = units, 
+                      fill = county)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(title = "Manufactured home community units by locality", fill = "Locality") +
+  theme(axis.title = element_blank())
+
+ggplotly(mhc_bar) |> 
+  plotly_camera()
 
 ```

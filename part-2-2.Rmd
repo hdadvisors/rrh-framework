@@ -22,6 +22,7 @@ library(simplevis)
 rr <- c("51085", "51760", "51075", "51145", "51087", "51127", "51036", "51041")
 pha <- c("51085", "51760", "51087", "51041")
 
+pha_names_costar <- c("Richmond City", "Henrico County", "Hanover County", "Chesterfield County")
 
 ```
 
@@ -195,7 +196,8 @@ rr_sub_rent <- read_csv("data/rr_submarket_data.csv") |>
   separate(geography, into = c("region", "state", "submarket"), sep = " - ") |> 
   select(period, locality, submarket, "rent" = market_asking_rent_unit, vacancy_rate) |> 
   mutate(rent = parse_number(rent)) |> 
-  mutate(period = as.Date(as.yearqtr(period, format = "%Y Q%q"), frac = 1))
+  mutate(period = as.Date(as.yearqtr(period, format = "%Y Q%q"), frac = 1)) |> 
+  subset(locality %in% pha_names_costar)
 
 
 # Issue with above is that rents are not inflation-adjusted. May need to revisit. I've requested from CoStar to allow for an inflation-adjusted average rent per unit pull, BUT who knows if they can add it.
@@ -205,7 +207,8 @@ ggplot(rr_sub_rent,
            y = rent, 
            color = submarket)) +
   geom_line(stat = "identity") + 
-  labs(title = "Average asking rent by submarket")
+  labs(title = "Average asking rent by submarket") +
+  facet_wrap(~locality)
   
 
 
@@ -320,7 +323,8 @@ sub_vacancy <- ggplot(rr_sub_vacancy,
                       aes(x = period,
                           y = vacancy_rate,
                           color = submarket)) +
-  geom_line(stat = "identity", size = 1)
+  geom_line(stat = "identity", size = 1) +
+  facet_wrap(~locality)
 
 ggplotly(sub_vacancy) |> 
   plotly_camera()
@@ -331,16 +335,17 @@ Construction trends
 ```{r mf-permits}
 
 rr_cbps_mf <- rr_cbps |> 
-  filter(type == "5+ units")
+  filter(type == "5+ units") |> 
+  filter(NAME == "Henrico" | NAME == "Chesterfield" | NAME == "Richmond" | NAME == "Hanover")
 
-mf_permits <- gg_line_col(rr_cbps_mf,
-            x_var = year,
-            y_var = units,
-            col_var = NAME) + 
-  labs(title = "Multifamily (5+ units) building permits",
-       x = "Year", y = "Units") + 
-  scale_color_viridis(discrete = TRUE, option = "turbo")+
-  scale_fill_viridis(discrete = TRUE)
+
+mf_permits <- ggplot(rr_cbps_mf,
+                     aes(x = year, 
+                         y = units,
+                         fill = NAME)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Multifamily (5+ units) building permits") +
+  facet_wrap(~NAME)
   
 plotly::ggplotly(mf_permits) |> 
   plotly_camera()

@@ -1,0 +1,480 @@
+Property Address,County Name,State,Zip,Property Name,Building Status,Number Of Units,Style,Star Rating,Market Name,Year Built,Year Renovated,Building Park,Total Buildings,Zoning,Number Of Stories,$Price/Unit,Vacancy %,Avg Unit SF,Avg Asking/Unit,Avg Effective/Unit,Rent Type,Affordable Type,Market Segment,Building Class,Latitude,Longitude
+512 N 25th St,Richmond City,VA,23223-6536,,Existing,2,,2,Richmond,1910,,,1,R-63,2,265000,5.17,,,,Market,,,,37.5339850,-77.4169560
+715 Chimborazo Blvd,Richmond City,VA,23223,,Existing,4,Low-Rise,2,Richmond,1923,,,1,R-6,2,99750,5.17,,,,Market,,,,37.5305750,-77.4065810
+37 Labrook Dr,Richmond City,VA,23225,,Existing,18,Low-Rise,2,Richmond,1974,,,1,R-53,2,111111,3.27,,950,945,Market,,All,C,37.5060828,-77.5094272
+4870-4916 Warwick Rd,Richmond City,VA,23224,London Square Apartments,Existing,48,Garden,2,Richmond,1963,,,8,R-4,2,125000,2.08,860,762,759,Market,,All,C,37.4856420,-77.4794680
+20 N 20th St,Richmond City,VA,23223,Enders Building,Existing,11,Mid-Rise,2,Richmond,1849,2000,,,M1,4,,6.97,804,1089,1081,Market,,All,C,37.5324670,-77.4254330
+3309 1st Ave,Richmond City,VA,23222-3226,,Existing,4,Low-Rise,2,Richmond,1916,,,1,R-6,2,,21.83,,,,Market,,All,C,37.5745088,-77.4156933
+4-8 N 1st St,Richmond City,VA,23219,,Existing,9,Low-Rise,2,Richmond,1900,,,3,Multi,2,,,525,466,465,Market,,All,C,37.5429470,-77.4432940
+706 N 2nd St,Richmond City,VA,23219,,Existing,5,Low-Rise,2,Richmond,1994,,,3,B-3,2,,3.32,,,,Market,,All,C,37.5485740,-77.4366439
+2211 3rd Ave,Richmond City,VA,23222-4625,,Existing,2,Low-Rise,2,Richmond,1920,,,,R-6,2,,6.11,,,,Market,,All,,37.5622806,-77.4223125
+2711 3rd Ave,Richmond City,VA,23222-3913,,Existing,4,Low-Rise,2,Richmond,1915,,,1,R-6,2,,6.11,,,,Market,,All,C,37.5663760,-77.4191776
+412 N 3rd St,Richmond City,VA,23219-1706,Bliley's Garage Apartments,Existing,15,,2,Richmond,1930,,,1,B-4,2,,8.12,723,1133,1125,Market,,All,B,37.5454511,-77.4382720
+2209 4th Ave,Richmond City,VA,23222-4705,,Existing,4,Low-Rise,2,Richmond,1922,,,1,R-6,2,,6.11,1015,,,Market,,All,C,37.5615654,-77.4213409
+100 S 15th St,Richmond City,VA,23219-4273,Cobblestone Commons,Existing,38,Mid-Rise,2,Richmond,1880,2011,,1,M-1,4,,0.10,640,1222,1219,Market,,All,C,37.5336985,-77.4314936
+12-14 S 17th St,Richmond City,VA,23219,Jackson Warehouse / Pine Valley,Existing,52,Mid-Rise,2,Richmond,1900,,,1,B-5 CENTRA,6,,0.38,700,1019,1016,Market,,All,C,37.5331472,-77.4291186
+15 N 18th St,Richmond City,VA,23223-7163,Market Villas,Existing,31,,2,Richmond,1920,2009,,1,B-5,3,,5.16,,,,Market,,All,C,37.5333434,-77.4269541
+320 N 21st St,Richmond City,VA,23223,,Existing,3,,2,Richmond,1900,,,,M-1,1,,5.16,,,,Market,,,C,37.5340399,-77.4219929
+1211 N 22nd St,Richmond City,VA,23223,,Existing,4,,2,Richmond,1900,,,,R-6,2,,5.17,,,,Market,,All,C,37.5414780,-77.4134650
+515 N 24th St,Richmond City,VA,23223,,Existing,3,,2,Richmond,1908,,,,R-53,2,,5.16,,,,Market,,,C,37.5343760,-77.4172570
+308 W 24th St,Richmond City,VA,23225,Woodland Heights Apartments,Existing,16,Low-Rise,2,Richmond,1968,,,2,R-48,2,,4.00,,,,Market,,All,C,37.5191554,-77.4570767
+308 N 25 St,Richmond City,VA,23223,St. John's Commons,Existing,4,,2,Richmond,1900,,,,B-2,2,,5.17,,,,Market,,,C,37.5322040,-77.4186260
+314 N 25th St,Richmond City,VA,23223-7117,,Existing,11,,2,Richmond,1889,,,,B-2,2,,5.16,,,,Market,,,C,37.5323300,-77.4185300
+316 N 25th St,Richmond City,VA,23223,,Existing,7,,2,Richmond,1910,,,,B-2,2,,5.16,,,,Market,,,B,37.5323600,-77.4184200
+1005 N 25th St,Richmond City,VA,23223,,Existing,6,Low-Rise,2,Richmond,1966,,,1,UB,3,,5.16,,,,Market,,All,C,37.5378120,-77.4126140
+10 27th St,Richmond City,VA,23225,,Existing,22,Low-Rise,2,Richmond,1964,,,2,R-53,2,,4.00,1000,611,608,Market,,All,C,37.5137205,-77.4581153
+2-10 W 27th St,Richmond City,VA,23225,,Existing,20,Low-Rise,2,Richmond,1964,,,2,,2,,,600,570,568,Market,,All,C,37.5133910,-77.4579601
+614 N 28th St,Richmond City,VA,23223-6615,,Existing,4,Low-Rise,2,Richmond,1910,,,2,R-63,2,,0.12,914,,,Market,,All,C,37.5331460,-77.4132760
+1203-1205 N 28th St,Richmond City,VA,23223,,Existing,4,,2,Richmond,1910,,,,M-1,2,,5.17,,,,Market,,All,C,37.5376928,-77.4084455
+19 N 29th St,Richmond City,VA,23223,,Existing,6,Low-Rise,1,Richmond,1850,,,1,R-6,3,,5.16,,,,Market,,All,C,37.5274505,-77.4167480
+506 N 29th St,Richmond City,VA,23223,,Existing,4,,2,Richmond,1950,,,1,R-8,2,,5.17,522,,,Market,,All,C,37.5316385,-77.4133609
+507-509 N 30th St,Richmond City,VA,23223-7408,,Existing,6,Low-Rise,2,Richmond,1920,1988,,1,R-53,2,,5.16,,,,Market,,All,C,37.5308122,-77.4121366
+606 N 32nd St,Richmond City,VA,23223-7548,,Existing,4,Low-Rise,2,Richmond,1925,,,,R-63,,,5.17,,,,Market,,All,,37.5308400,-77.4098400
+1303 N 32nd St,Richmond City,VA,23223-6713,,Existing,4,Low-Rise,2,Richmond,1915,,,,R-6,2,,5.17,,,,Market,,,,37.5364700,-77.4038600
+1321 N 32nd St,Richmond City,VA,23223-6700,,Existing,4,,2,Richmond,1926,,,,R-6,2,,5.17,,,,Market,,,C,37.5369785,-77.4034004
+622 N 33rd St,Richmond City,VA,23223-7523,Church Hill Quad,Existing,4,Low-Rise,2,Richmond,1967,2018,,2,R-6,2,,5.17,,,,Market,,All,C,37.5306970,-77.4086400
+1113 N 33rd St,Richmond City,VA,23223,,Existing,8,Low-Rise,2,Richmond,1925,,,1,R-6,2,,5.16,,,,Market,,All,C,37.5343917,-77.4044759
+509 N 35th St,Richmond City,VA,23223,Glenwood Hill Townhomes,Existing,23,Low-Rise,2,Richmond,1965,2021,,2,R-8,2,,8.75,741,798,791,Market,,All,C,37.5280490,-77.4070603
+1207-1209 47th St,Richmond City,VA,23225,Parkway Apartments,Existing,18,Mid-Rise,2,Richmond,1940,,,1,R-5,3,,4.00,833,854,850,Market,,All,C,37.5193990,-77.4858900
+411-413 Adams St,Richmond City,VA,23220,,Existing,10,Low-Rise,2,Richmond,1900,,,1,RO-2,2,,3.32,,,,Market,,All,C,37.5473130,-77.4414770
+430 Airport Ct,Henrico,VA,23075-2168,Creek Wood Townhomes,Existing,100,Garden,2,Richmond,1974,,,12,R-5,2,,1.38,923,946,942,Market,,All,C,37.5397220,-77.3139630
+410 Alamosa Dr,Henrico,VA,23075-1206,,Existing,8,Garden,2,Richmond,1973,,,1,,2,,3.22,,,,Market,,All,C,37.5446600,-77.3428700
+5002 Alan Dr,Chesterfield,VA,23234,Oakwood Apartments,Existing,32,Garden,2,Richmond,1975,,,8,R-7,1,,3.76,,870,865,Market,,All,C,37.4536240,-77.4467650
+2507 Alcott Rd,Chesterfield,VA,23237,Huntwood Apartments,Existing,48,Single-Family Home,2,Richmond,1974,,,7,C-3,1,,3.76,550,800,796,Market,,All,C,37.4230320,-77.4366379
+8500 Aldeburgh Dr,Henrico,VA,23294,Chelsea Square,Existing,399,Garden,2,Richmond,1976,,,42,R5,2,,1.50,1251,1571,1565,Market,,All,C,37.6268830,-77.5579080
+7514 Ander Ct,Richmond City,VA,23225,Chippenham Townhomes,Existing,262,Garden,2,Richmond,1967,,,30,,2,,1.92,844,1186,1181,Market,,All,C,37.5360590,-77.5346880
+9111 N Arch Village Ct,Chesterfield,VA,23236,North Arch Village,Existing,128,Garden,2,Richmond,1973,,,8,R-7,2,,,952,1301,1298,Market,,All,C,37.4952631,-77.5682884
+1608 Bainbridge St,Richmond City,VA,23224-2052,,Existing,2,Low-Rise,2,Richmond,1925,,,1,R-63,2,,4.00,,,,Market,,All,C,37.5192138,-77.4486304
+2408 Bainbridge St,Richmond City,VA,23225-3936,Weisiger House Apartments,Existing,4,,2,Richmond,1765,,,1,R-6,,,22.53,900,1597,1581,Market,,,C,37.5163450,-77.4553450
+1400 W Bainbridge St,Richmond City,VA,23224,,Existing,4,Low-Rise,2,Richmond,1920,2007,,1,R-53,2,,22.66,950,981,971,Market,,All,C,37.5205449,-77.4464499
+2400 Barton Ave,Richmond City,VA,23222-4433,,Existing,18,Low-Rise,2,Richmond,1910,,,1,R-53,3,,6.11,,668,664,Market,,All,C,37.5643747,-77.4323204
+2401 Barton Ave,Richmond City,VA,23222,Barton Heights Apartments,Existing,14,Low-Rise,2,Richmond,1968,,,2,Commercial,2,,6.11,655,637,633,Market,,All,C,37.5642713,-77.4317208
+2416 Barton Ave,Richmond City,VA,23222-4432,,Existing,4,,2,Richmond,1925,,,4,R-53,,,6.11,,,,Market,,All,C,37.5651600,-77.4322700
+2418 Barton Ave,Richmond City,VA,23222-4431,,Existing,4,Garden,2,Richmond,1925,,,4,R-53,2,,6.11,,,,Market,,All,C,37.5653100,-77.4322600
+2419 Barton Ave,Richmond City,VA,23222,,Existing,6,Low-Rise,2,Richmond,1930,2020,,1,R-53,3,,0.38,,1057,1054,Market,,All,C,37.5654351,-77.4316766
+2420 Barton Ave,Richmond City,VA,23222-4430,,Existing,4,Garden,2,Richmond,1925,,,4,R-53,2,,6.11,,,,Market,,All,C,37.5654600,-77.4322600
+2602 Barton Ave,Richmond City,VA,23222-3721,,Existing,4,Low-Rise,2,Richmond,1924,,,1,R-6,2,,6.11,,,,Market,,All,C,37.5660200,-77.4321400
+2807 Barton Ave,Richmond City,VA,23222-3723,,Existing,4,Low-Rise,2,Richmond,1926,,,,R-6,2,,6.11,,,,Market,,All,,37.5689900,-77.4315199
+1807 Bath St,Richmond City,VA,23220,Ginter Park Apartment Portfolio,Existing,4,,2,Richmond,1972,,,,R-53,2,,,,,,Market,,,C,37.5612245,-77.4536082
+509-583 E Beal St,Henrico,VA,23075,Highland Woods Apartments,Existing,114,Garden,2,Richmond,1969,,,12,R5,2,,0.12,922,1023,1020,Market,,All,C,37.5396610,-77.3288973
+516-518 N Belmont Ave,Richmond City,VA,23221,,Existing,12,Low-Rise,2,Richmond,1924,,,1,R,3,,3.32,,765,761,Market,,All,C,37.5602734,-77.4761356
+6533 S Beulah Rd,Chesterfield,VA,23237-1070,,Existing,24,Low-Rise,2,Richmond,1965,,,3,A,2,,6.92,511,,,Market,,All,C,37.4340498,-77.4557458
+25 N Boulevard,Richmond City,VA,23220-4319,The Collection,Existing,9,Low-Rise,2,Richmond,1917,2016,,1,R-48,3,,9.44,1389,,,Market,,All,C,37.5535550,-77.4746666
+110 N Boulevard,Richmond City,VA,23220,The Collection,Existing,19,Low-Rise,2,Richmond,1925,,,1,R-48 MULTI,3,,55.96,,,,Market,,All,C,37.5543990,-77.4750455
+421 N Boulevard,Richmond City,VA,23220,,Existing,16,Mid-Rise,2,Richmond,1921,,Pierce Arrow Properties,2,R-48,4,,3.32,,,,Market,,All,C,37.5579507,-77.4723538
+705 N Boulevard,Richmond City,VA,23220,The Collection,Existing,12,Low-Rise,2,Richmond,1925,1981,,2,R-48,3,,,,,,Market,,All,C,37.5610490,-77.4706639
+706 N Boulevard,Richmond City,VA,23220-2637,The Collection,Existing,6,Low-Rise,2,Richmond,1919,,,1,R-48,3,,15.04,1500,1904,1885,Market,,All,C,37.5612080,-77.4713340
+711 N Boulevard,Richmond City,VA,23220-2634,The Collection,Existing,12,Low-Rise,2,Richmond,1925,,,1,R-48,3,,,793,1149,1146,Market,,All,C,37.5612290,-77.4705750
+801 N Boulevard,Richmond City,VA,23220-1949,The Collection,Existing,12,Low-Rise,2,Richmond,1925,,,1,R-48,3,,,,,,Market,,All,C,37.5615420,-77.4704130
+805 N Boulevard,Richmond City,VA,23220,The Collection of Historic Richmond,Existing,31,Garden,2,Richmond,1924,,805 North Blvd,22,R-48,3,,14.50,890,1417,1402,Market,,All,C,37.5616610,-77.4703270
+806 N Boulevard,Richmond City,VA,23220-1901,,Existing,12,Low-Rise,2,Richmond,1922,,,1,R-53,3,,3.32,,,,Market,,All,C,37.5621004,-77.4708517
+808 N Boulevard,Richmond City,VA,23220,The Collection,Existing,12,Low-Rise,2,Richmond,1922,,,1,R-48,3,,,875,1265,1262,Market,,All,C,37.5621941,-77.4708027
+811 N Boulevard,Richmond City,VA,23220,The Collection,Existing,12,Low-Rise,2,Richmond,1924,2010,,1,R-48,3,,,750,875,873,Market,,All,C,37.5617903,-77.4702632
+12 S Boulevard,Richmond City,VA,23220-5737,Homewood Apartments,Existing,6,Low-Rise,2,Richmond,1921,,,1,R-48,3,,3.33,1700,,,Market,,All,C,37.5522983,-77.4762255
+18 S Boulevard,Richmond City,VA,23220-5723,,Existing,6,,2,Richmond,1957,,,,R-48,2,,3.33,,658,654,Market,,,C,37.5520603,-77.4763501
+109 S Boulevard,Richmond City,VA,23220-5746,,Existing,12,Mid-Rise,2,Richmond,1920,,,1,R-48,3,,3.33,,,,Market,,All,,37.5510200,-77.4761100
+118 S Boulevard,Richmond City,VA,23220,,Existing,6,Low-Rise,2,Richmond,1957,,,1,R-48,2,,3.33,,,,Market,,All,C,37.5509220,-77.4769260
+120 S Boulevard,Richmond City,VA,23220,,Existing,6,Low-Rise,2,Richmond,1920,,,1,R-48,3,,3.33,,,,Market,,All,C,37.5507920,-77.4769890
+301 S Boulevard,Richmond City,VA,23220-5764,,Existing,6,Mid-Rise,2,Richmond,1924,,,1,R-48,3,,3.33,,,,Market,,All,,37.5497600,-77.4767800
+715-719 Bowe St,Richmond City,VA,23220,,Existing,4,,2,Richmond,1916,,,,R-53,3,,3.33,,,,Market,,All,C,37.5549430,-77.4539010
+913-917 Bowe St,Richmond City,VA,23220,,Existing,6,Low-Rise,2,Richmond,1910,,,1,R-53,2,,3.33,,,,Market,,All,C,37.5561899,-77.4528265
+312 E Broad St,Richmond City,VA,23219-1765,Broadway Apartments,Existing,29,Mid-Rise,2,Richmond,1940,2020,,1,MU,4,,0.14,1054,1628,1623,Market,,All,C,37.5439438,-77.4385816
+2105 E Broad St,Richmond City,VA,23223,,Existing,2,,2,Richmond,1879,,,,R-02,2,,47.86,,,,Market,,All,C,37.5335548,-77.4222566
+2315 E Broad St,Richmond City,VA,23223,,Existing,3,,1,Richmond,1850,,,,R/O2,2,,5.16,,,,Market,,,C,37.5321930,-77.4201010
+3601 E Broad St,Richmond City,VA,23223,,Existing,4,,2,Richmond,1880,,,,R-53,2,,5.17,,,,Market,,,C,37.5253724,-77.4085278
+10-14 W Broad St,Richmond City,VA,23220-4213,The Simon Cycle Building,Existing,14,Low-Rise,1,Richmond,1917,,,1,B-4,3,,35.83,728,1237,1225,Market,,All,C,37.5461561,-77.4421053
+406 W Broad St,Richmond City,VA,23220,,Existing,8,,2,Richmond,1920,2010,,1,B-4,3,,3.32,,,,Market,,,C,37.5481260,-77.4454350
+824-826 W Broad St,Richmond City,VA,23220-3807,824-826 West Broad,Existing,11,Low-Rise,2,Richmond,1900,,,1,B-4,2,,,580,1159,1156,Market,,All,C,37.5503553,-77.4491985
+900-924 W Broad St,Richmond City,VA,23220-0016,900-924 West Broad,Existing,6,Low-Rise,2,Richmond,1906,,,1,B-4,2,,,731,1203,1199,Market,,All,C,37.5504870,-77.4494160
+2047-2049 W Broad St,Richmond City,VA,23220,,Existing,9,,2,Richmond,1913,,,1,B-3,3,,3.32,,,,Market,,,C,37.5575070,-77.4624020
+2830 Broad Rock Blvd,Richmond City,VA,23224,Rock Creek,Existing,120,Garden,2,Richmond,1970,,,10,R-48,3,,1.67,794,829,826,Market,,All,C,37.4793530,-77.4815440
+316 Brook Rd,Richmond City,VA,23220,,Existing,3,Low-Rise,2,Richmond,1900,,,1,B-4,3,,3.32,,,,Market,,All,C,37.5468760,-77.4426770
+603 Brook Rd,Richmond City,VA,23220-3223,EcoFlats/Brook Alley Apartments,Existing,2,Low-Rise,2,Richmond,1938,2008,,1,B-2,2,,3.33,,,,Market,,All,C,37.5512000,-77.4431990
+607 Brook Rd,Richmond City,VA,23220,EcoFlats/Brook Alley Apartments,Existing,2,Low-Rise,2,Richmond,1938,2008,,1,B-2,1,,3.33,,,,Market,,All,B,37.5512790,-77.4432610
+611 Brook Rd,Richmond City,VA,23220,EcoFlats/Brook Alley Apartments,Existing,4,Low-Rise,2,Richmond,1938,2008,,1,B-2,2,,3.33,,,,Market,,All,C,37.5513600,-77.4433280
+1501-1503 Brook Rd,Richmond City,VA,23220,,Existing,8,Low-Rise,2,Richmond,1920,,,1,M-1,2,,96.72,,,,Market,,All,C,37.5563848,-77.4443612
+812 Brook Hill Rd,Henrico,VA,23227,Ashley Terrace Apartments,Existing,176,Garden,2,Richmond,1963,,,6,R-5,3,,5.11,951,965,965,Market,,All,C,37.6077900,-77.4457000
+401 E Brookland Park Blvd,Richmond City,VA,23222-3050,,Existing,26,Low-Rise,2,Richmond,1967,2013,,2,R-48,2,,,538,640,638,Market,,All,C,37.5708080,-77.4279360
+804 E Brookland Park Blvd,Richmond City,VA,23222-3015,,Existing,2,,2,Richmond,1957,,,,R-5,1,,6.12,752,,,Market,,All,,37.5706100,-77.4226499
+231 Camelot Cir,Henrico,VA,23229-5438,Camelot Townhomes,Existing,112,Garden,2,Richmond,1969,,,6,R5,2,,1.79,967,1051,1047,Market,,All,C,37.6052710,-77.5737600
+1232 Careybrook Dr,Henrico,VA,23238-5016,Landmark at Tuckahoe,Existing,333,Garden,2,Richmond,1972,,,12,R6,2,,5.11,803,1349,1349,Market,,All,C,37.5982220,-77.6163800
+1700 Carlisle Ave,Richmond City,VA,23231,The Carlisle,Existing,32,Garden,2,Richmond,1965,,,4,R-48,2,,7.67,900,736,730,Market,,All,C,37.5171300,-77.3946770
+104 E Cary St,Richmond City,VA,23219,,Existing,3,Low-Rise,1,Richmond,1915,,,1,B-3,3,,3.32,,,,Market,,,C,37.5416830,-77.4438930
+1716 E Cary St,Richmond City,VA,23223-6936,The Tracks at Shockoe Crossing,Existing,43,Mid-Rise,2,Richmond,1915,2013,,1,B-5,5,,0.15,568,1123,1120,Market,,All,C,37.5325870,-77.4287960
+1112-1114 W Cary St,Richmond City,VA,23220,,Existing,6,Low-Rise,2,Richmond,1900,,,2,R-63; Multi-Family,2,,3.33,,,,Market,,All,C,37.5447400,-77.4563700
+1529 W Cary St,Richmond City,VA,23220,,Existing,6,Low-Rise,2,Richmond,1900,,,1,R-7,3,,,1500,,,Market,,Corporate,C,37.5460600,-77.4611900
+1601 W Cary St,Richmond City,VA,23220,,Existing,4,Low-Rise,2,Richmond,1920,,,2,R-7,3,,3.32,,,,Market,,All,C,37.5461352,-77.4614956
+1603 W Cary St,Richmond City,VA,23220-5307,,Existing,3,Low-Rise,2,Richmond,1900,2000,,1,,2,,3.32,,,,Market,,All,,37.5460940,-77.4615070
+1615 W Cary St,Richmond City,VA,23220-5307,,Existing,2,,2,Richmond,1900,,,,R-7,,,3.33,,,,Market,,All,C,37.5462423,-77.4618166
+1617 W Cary St,Richmond City,VA,23220-5307,,Existing,2,,2,Richmond,1900,,,1,R-7,,,3.33,,,,Market,,All,C,37.5462649,-77.4618910
+2806 W Cary St,Richmond City,VA,23221,Fan Apartments,Existing,12,Low-Rise,2,Richmond,1923,,,1,B-3,3,,6.25,750,954,947,Market,,All,C,37.5519392,-77.4767465
+2231 Chalfont Dr,Richmond City,VA,23224-6313,Townhouses of Chesterfield II,Existing,265,Garden,2,Richmond,1968,,,18,MULTIPLE,2,,1.98,1100,1037,1033,Market,,All,C,37.4911176,-77.4661903
+3401 Chalfont Dr,Richmond City,VA,23224-6352,,Existing,7,Low-Rise,2,Richmond,1971,,,1,R-48,2,,4.00,,,,Market,,,C,37.4902400,-77.4626600
+2717 Chamberlayne Ave,Richmond City,VA,23222,,Existing,8,Low-Rise,2,Richmond,1925,,,1,B-2,2,,6.11,,,,Market,,All,B,37.5688553,-77.4441966
+2907-2927 Chamberlayne Ave,Richmond City,VA,23222,Gate Oaks Apartments,Existing,62,Garden,2,Richmond,1947,2001,,11,RO-2,3,,,826,703,702,Market,,All,C,37.5710690,-77.4442700
+2910 Chamberlayne Ave,Richmond City,VA,23222,,Existing,14,Low-Rise,2,Richmond,1960,,,1,R-02,2,,6.11,750,,,Market,,All,C,37.5703290,-77.4454470
+2920 Chamberlayne Ave,Richmond City,VA,23222-3562,,Existing,4,Garden,2,Richmond,1916,,,1,R-02,3,,6.11,,,,Market,,All,C,37.5713730,-77.4456253
+3012 Chamberlayne Ave,Richmond City,VA,23227,Sherwood Apartments,Existing,18,Low-Rise,2,Richmond,1964,,,1,R-48,2,,6.11,,,,Market,,All,C,37.5741975,-77.4461244
+3201 Chamberlayne Ave,Richmond City,VA,23227,Oxford Square Apartments,Existing,20,Low-Rise,2,Richmond,1995,,,2,R-48,2,,3.18,875,562,559,Market,,All,C,37.5756451,-77.4452887
+3207 Chamberlayne Ave,Richmond City,VA,23227-4811,Bloom Apartments,Existing,690,Garden,2,Richmond,1961,2018,,36,R-48,3,,4.19,777,1063,1057,Market,,All,C,37.5770714,-77.4455480
+3510 Chamberlayne Ave,Richmond City,VA,23227,Tudor Hall Townhomes,Existing,20,Townhome,2,Richmond,1969,,,2,R-48,2,,,1120,742,740,Market,,All,C,37.5813100,-77.4471830
+3609-B Chamberlayne Ave,Richmond City,VA,23227,Red Oak Apartments,Existing,498,Garden,2,Richmond,1972,,,15,R-48,2,,3.01,683,709,706,Market,,All,C,37.5830720,-77.4466607
+3618 Chamberlayne Ave,Richmond City,VA,23227-4568,Camelot Apartments,Existing,20,Low-Rise,2,Richmond,1963,,,1,R-48,2,,6.11,725,593,589,Market,,All,C,37.5842470,-77.4478290
+3806 Chamberlayne Ave,Richmond City,VA,23227,,Existing,8,Low-Rise,2,Richmond,1925,,,1,R-48,2,,6.11,,,,Market,,All,C,37.5858355,-77.4479371
+3807 Chamberlayne Ave,Richmond City,VA,23227,Cedarwood Apartments,Existing,20,Low-Rise,2,Richmond,1973,,,1,R-48,3,,3.67,900,387,385,Market,,All,B,37.5857340,-77.4468090
+3809 Chamberlayne Ave,Richmond City,VA,23227,Estratbrook North,Existing,20,Low-Rise,2,Richmond,1971,,,1,R-48,2,,,850,625,623,Market,,All,C,37.5860420,-77.4468890
+3810 Chamberlayne Ave,Richmond City,VA,23227-4117,Ginter Park Apartments,Existing,18,Low-Rise,2,Richmond,1944,,,1,R-48,3,,,,,,Market,,All,C,37.5862751,-77.4482771
+4217 Chamberlayne Ave,Richmond City,VA,23227-5038,,Existing,6,Low-Rise,2,Richmond,1947,,,1,R-48,2,,6.11,,,,Market,,All,C,37.5929548,-77.4483706
+4218 Chamberlayne Ave,Richmond City,VA,23227-5047,Northside Apartments,Existing,10,Low-Rise,2,Richmond,1965,2006,,2,R-48,2,,6.11,,,,Market,,All,C,37.5931228,-77.4494262
+4219 Chamberlayne Ave,Richmond City,VA,23227,,Existing,6,Low-Rise,2,Richmond,1948,,,1,R-48,2,,,833,,,Market,,All,C,37.5931265,-77.4484015
+4306 Chamberlayne Ave,Richmond City,VA,23227,,Existing,8,Low-Rise,2,Richmond,1932,2000,,1,R-48,2,,6.11,,,,Market,,All,C,37.5951900,-77.4495300
+4828 Chamberlayne Ave,Richmond City,VA,23227-3439,,Existing,6,Garden,2,Richmond,1965,,,8,R-6,2,,,918,857,855,Market,,All,C,37.5993060,-77.4502210
+4832 Chamberlayne Ave,Richmond City,VA,23227,,Existing,4,Low-Rise,2,Richmond,1930,2019,,1,R-6,,,6.11,,,,Market,,All,,37.5994255,-77.4503475
+4901-4905 Chamberlayne Ave,Richmond City,VA,23227,,Existing,12,Low-Rise,2,Richmond,1965,,,1,R-48,2,,6.11,849,672,667,Market,,All,C,37.6000600,-77.4494200
+4904 Chamberlayne Ave,Richmond City,VA,23227,,Existing,12,Low-Rise,2,Richmond,1962,,,1,R-6,2,,6.11,,,,Market,,All,C,37.6000417,-77.4503665
+4907 Chamberlayne Ave,Richmond City,VA,23227-3432,,Existing,4,Low-Rise,2,Richmond,1946,,,1,R-48,2,,,900,,,Market,,All,C,37.6004779,-77.4495663
+4911 Chamberlayne Ave,Richmond City,VA,23227,10-Unit Northside Portfolio,Existing,4,Garden,2,Richmond,1920,,,3,R-48,2,,6.11,,,,Market,,All,C,37.6008400,-77.4496600
+4913 Chamberlayne Ave,Richmond City,VA,23227-3435,,Existing,4,Low-Rise,2,Richmond,1946,,,1,R-48,2,,6.11,,,,Market,,All,C,37.6010429,-77.4495747
+2200 Chateau Dr,Richmond City,VA,23224,Timbercreek Apartments,Existing,160,Garden,2,Richmond,1969,2006,,20,MULTIPLE,2,,,776,975,973,Market,,All,C,37.4815442,-77.4997326
+12051 Chestertowne Rd,Chesterfield,VA,23831,Chester Townhomes,Existing,152,Garden,2,Richmond,1969,,,18,R7,2,,0.39,874,1260,1256,Market,,All,C,37.3560510,-77.4478040
+713 Chimborazo Blvd,Richmond City,VA,23223-7647,,Existing,4,,2,Richmond,1923,,,,R-6,2,,5.17,,,,Market,,,C,37.5304371,-77.4067269
+9 E Clay St,Richmond City,VA,23220,SANCTUARY CONDOMINIUM,Existing,8,Low-Rise,2,Richmond,1965,,,1,R-6,3,,3.32,,,,Market,,All,C,37.5469670,-77.4401173
+2902 E Clay St,Richmond City,VA,23223,,Existing,2,Single-Family Home,2,Richmond,1890,2012,,1,R-53,2,,5.16,1389,1425,1416,Market,,All,C,37.5312500,-77.4132003
+100-104 W Clay St,Richmond City,VA,23220,,Existing,16,Low-Rise,2,Richmond,1925,,,2,B-3,2,,3.32,,,,Market,,All,C,37.5481680,-77.4411360
+1401 Coalter St,Richmond City,VA,23223-4225,,Existing,20,Garden,2,Richmond,1967,,,5,R-53,1,,5.16,750,,,Market,,All,C,37.5456925,-77.4201229
+5201-5223 Collindale Rd,Chesterfield,VA,23234,Collindale Apartments,Existing,20,Garden,2,Richmond,1964,1990,,6,R7,2,,3.76,950,807,803,Market,,All,B,37.4525867,-77.4445528
+1500 Concord Ave,Chesterfield,VA,23834-3059,Concord Apartments,Existing,32,Low-Rise,2,Richmond,1985,,,1,R4,2,,,1000,778,776,Market,,All,C,37.2546040,-77.4159060
+2153 Cool Ln,Henrico,VA,23223-4174,Townsend Square Townhomes,Existing,89,Low-Rise,2,Richmond,1968,,,3,R6,2,,0.14,1148,922,920,Market,,All,C,37.5519280,-77.4058160
+4109 Corbin St,Richmond City,VA,23222-1115,,Existing,2,,2,Richmond,1910,,,1,R-5,,,6.12,,,,Market,,All,C,37.5897006,-77.4409708
+3212 Cutshaw Ave,Richmond City,VA,23230-5024,Hardwicke House,Existing,34,Low-Rise,2,Richmond,1961,,,1,B-3,3,,9.97,647,1405,1392,Market,,All,C,37.5659582,-77.4756614
+3329 Cutshaw Ave,Richmond City,VA,23230-5019,,Existing,12,Low-Rise,2,Richmond,1958,,,1,R-48,3,,0.01,560,763,763,Market,,All,C,37.5664751,-77.4774720
+3336 Cutshaw Ave,Richmond City,VA,23230,,Existing,6,Low-Rise,2,Richmond,1969,,,3,R-02,1,,3.33,,,,Market,,All,C,37.5668420,-77.4772057
+201-205 N Davis Ave,Richmond City,VA,23220-4001,,Existing,6,Low-Rise,2,Richmond,1919,,,3,R-6,2,,3.33,,,,Market,,All,B,37.5541451,-77.4702603
+603-605 N Davis Ave,Richmond City,VA,23220,,Existing,12,Low-Rise,2,Richmond,1914,,,1,R-6,3,,3.32,,,,Market,,All,C,37.5576634,-77.4678015
+1221 Decatur St,Richmond City,VA,23224-3913,Hazlewood Apartments,Existing,7,Low-Rise,2,Richmond,1921,,,1,Multi,3,,4.00,1200,,,Market,,All,C,37.5198270,-77.4440940
+3421 Delaware Ave,Richmond City,VA,23222-2912,3421 Delaware Ave.,Existing,2,,2,Richmond,1923,,,,R-6 Two Family Converted,2,,6.12,720,,,Market,,,,37.5782700,-77.4187100
+1302 Devers Rd,Henrico,VA,23226-2866,Landmark at Tuckahoe,Existing,18,Low-Rise,2,Richmond,1967,2014,,3,R5,2,,2.98,825,912,907,Market,,All,C,37.5889149,-77.5167439
+106 N Dooley Ave,Richmond City,VA,23221,,Existing,6,Low-Rise,2,Richmond,1925,,,2,R-6,3,,3.33,,,,Market,,All,C,37.5573334,-77.4823297
+206-208 Dove St,Richmond City,VA,23222,,Existing,4,,2,Richmond,1964,,,,R-6,,,6.11,,,,Market,,,C,37.5634695,-77.4301261
+411-419 Duval St,Richmond City,VA,23220,,Existing,14,Low-Rise,2,Richmond,1971,,,2,,2,,3.32,,,,Market,,All,C,37.5512971,-77.4425366
+3801 Elfstone Ln,Henrico,VA,23223,Saddlewood Apartments,Existing,161,Garden,2,Richmond,1987,,,12,R5,1,,0.15,732,1039,1036,Market,,All,C,37.5792746,-77.3916474
+6424 Elkhardt Rd,Richmond City,VA,23225-7819,Kingswood Cove,Existing,45,Garden,2,Richmond,1976,,,4,MULTIPLE,2,,4.00,700,651,647,Market,,All,C,37.4816872,-77.5109946
+3018 Ellwood Ave,Richmond City,VA,23221-3044,,Existing,8,Low-Rise,2,Richmond,1925,,,1,R-48,,,3.32,,,,Market,,All,C,37.5541128,-77.4789900
+3206-3212 Ellwood Ave,Richmond City,VA,23221,,Existing,16,Low-Rise,2,Richmond,1961,,,3,R-48,2,,3.32,,660,657,Market,,All,C,37.5554696,-77.4823204
+7240 Elm Tree Ter,Hanover,VA,23111,Windmill Way Apartments,Existing,50,Garden,2,Richmond,1987,1998,,12,R5,3,,0.13,815,1228,1225,Market,,All,B,37.6029017,-77.3811595
+5618 Eunice Dr,Henrico,VA,23228,London Towne,Existing,683,Garden,2,Richmond,1976,,,50,R-5,2,,14.21,912,1454,1439,Market,,All,C,37.6350270,-77.5243990
+2027 Fairfield Ave,Richmond City,VA,23223,Bradford Manor Apartments,Existing,56,Garden,2,Richmond,1970,,,5,R-53,2,,,784,985,983,Market,,All,C,37.5479965,-77.4101650
+1104 Floyd Ave,Richmond City,VA,23220-4830,,Existing,2,Low-Rise,2,Richmond,1920,2010,,1,R-6,2,,3.33,,,,Market,,All,C,37.5474900,-77.4555599
+2327 Floyd Ave,Richmond City,VA,23220-4464,,Existing,6,Low-Rise,2,Richmond,1918,,,1,R-6,3,,3.33,,,,Market,,All,,37.5518730,-77.4701080
+3526-3528 Floyd Ave,Richmond City,VA,23221,,Existing,4,,2,Richmond,1936,,,,R-53,2,,3.33,,,,Market,,,C,37.5581590,-77.4864560
+3532-3538 Floyd Ave,Richmond City,VA,23221,,Existing,14,Garden,2,Richmond,1953,,,4,R-48,2,,,498,,,Market,,All,C,37.5582940,-77.4868400
+2513 Ford Ave,Richmond City,VA,23223-3817,,Existing,1,Single-Family Home,2,Richmond,1988,,,1,R-6,1,,5.16,768,,,Market,,All,C,37.5496096,-77.4158340
+3900 Forest Hill Ave,Richmond City,VA,23225,The Park at Forest Hill,Existing,81,Garden,2,Richmond,1978,,,4,R-53,3,,2.50,679,930,926,Market,,All,C,37.5157439,-77.4743965
+4012 Forest Hill Ave,Richmond City,VA,23225,,Existing,18,Low-Rise,2,Richmond,1970,,,1,R-53,2,,4.00,,,,Market,,All,C,37.5164112,-77.4755683
+4060 Forest Hill Ave,Richmond City,VA,23225,Forest Hill Park,Existing,16,Low-Rise,2,Richmond,1964,,,1,R-53,2,,6.74,700,877,871,Market,,All,C,37.5172916,-77.4771145
+4509 Forest Hill Ave,Richmond City,VA,23225-3271,Parkside Apartments,Existing,16,Low-Rise,2,Richmond,1975,,,3,R-4,2,,4.00,,1519,1510,Market,,All,C,37.5205052,-77.4826137
+4521-4525 Forest Hill Ave,Richmond City,VA,23225-3275,Forest Hill Avenue Apartments,Existing,34,Low-Rise,2,Richmond,1940,,,2,R-4,3,,4.00,800,973,967,Market,,All,C,37.5208120,-77.4831700
+111 N Foushee St,Richmond City,VA,23220,,Existing,6,Low-Rise,2,Richmond,1925,,,1,B4,3,,3.33,712,,,Market,,All,C,37.5443088,-77.4429656
+7515 Foxhall Ln,Henrico,VA,23228,Fox Rest,Existing,231,Garden,2,Richmond,1969,,,21,R5,3,,2.16,915,1097,1093,Market,,All,C,37.6180500,-77.5065410
+1106 Franklin St,Richmond City,VA,23220,,Existing,30,Low-Rise,2,Richmond,1927,,,1,R-6,3,,,1000,,,Market,,All,C,37.5516080,-77.4557630
+2 E Franklin St,Richmond City,VA,23219-2139,,Existing,8,Low-Rise,2,Richmond,1886,,,1,R-03,3,,3.32,,,,Market,,All,C,37.5441110,-77.4431750
+210 E Franklin St,Richmond City,VA,23219,The Mews,Existing,3,,2,Richmond,1928,,,,B-4,2,,3.32,,,,Market,,,C,37.5427360,-77.4410920
+2101 E Franklin St,Richmond City,VA,23223-7044,,Existing,6,Low-Rise,2,Richmond,1900,2021,,1,B-5,2,,5.16,,,,Market,,All,C,37.5318967,-77.4240590
+2501 E Franklin St,Richmond City,VA,23223,,Existing,8,Low-Rise,2,Richmond,1910,,,1,M-1,2,,96.53,,,,Market,,All,C,37.5295450,-77.4203870
+3005-3007 E Franklin St,Richmond City,VA,23223,,Existing,8,Low-Rise,2,Richmond,1964,,,1,R-6,2,,5.16,,,,Market,,All,C,37.5267050,-77.4157690
+18 W Franklin St,Richmond City,VA,23220,,Existing,1,,2,Richmond,1915,,,1,R-3,3,2100000,3.32,,,,Market,,,C,37.5445350,-77.4441160
+200 W Franklin St,Richmond City,VA,23220,200 W. Franklin Street,Existing,4,,2,Richmond,1880,,,,R-3,3,,3.33,,,,Market,,,C,37.5453190,-77.4452220
+500 W Franklin St,Richmond City,VA,23220,Logan House Apartments,Existing,7,Low-Rise,2,Richmond,1880,,,2,R-03,3,,3.32,,,,Market,,All,C,37.5467611,-77.4478440
+1108 W Franklin St,Richmond City,VA,23220,Ambassador,Existing,36,Low-Rise,2,Richmond,1925,,,1,R-6,3,,14.00,742,969,961,Market,,All,C,37.5517370,-77.4559770
+1206 W Franklin St,Richmond City,VA,23220,,Existing,30,Low-Rise,2,Richmond,1925,,,1,R-6,3,,,450,850,850,Market,,All,C,37.5518990,-77.4560760
+1207 W Franklin St,Richmond City,VA,23220,,Existing,24,Low-Rise,2,Richmond,1925,,,1,R-6,3,,,538,912,911,Market,,All,C,37.5516920,-77.4571360
+1208 W Franklin St,Richmond City,VA,23220,,Existing,6,Low-Rise,2,Richmond,1923,,,2,R-6,2,,3.33,,,,Market,,All,C,37.5519421,-77.4562767
+1214 W Franklin St,Richmond City,VA,23220,,Existing,24,Low-Rise,2,Richmond,1925,,,1,R-6,3,,,,,,Market,,All,C,37.5521832,-77.4565450
+3204 W Franklin St,Richmond City,VA,23221,,Existing,12,Low-Rise,2,Richmond,1923,,,1,R-6,3,,3.32,,,,Market,,All,C,37.5631062,-77.4769858
+9302 Gallant Dr,Henrico,VA,23229,Nottingham Green Apartments,Existing,516,Garden,2,Richmond,1964,,,124,R5,2,,0.00,800,950,948,Market,,All,C,37.6064710,-77.5735700
+435 German School Rd,Richmond City,VA,23225,Aden Park & Glenway Green,Existing,538,Garden,2,Richmond,1966,2017,,64,R-43,2,,4.16,876,1152,1146,Market,,All,C,37.5101570,-77.5051770
+5194 Gerwyn Cir,Henrico,VA,23150-1968,Gerwyn Manor Apartments,Existing,229,Garden,2,Richmond,1972,,,27,R5,2,,0.03,994,1197,1194,Market,,All,C,37.5167108,-77.3427878
+405-409 Gilmer St,Richmond City,VA,23220,,Existing,6,Low-Rise,2,Richmond,1900,,,1,,2,,3.33,,,,Market,,All,C,37.5507528,-77.4474764
+5601 Goldthread Ln,Henrico,VA,23228,Amber Ridge Apartments,Existing,115,Garden,2,Richmond,1985,2004,,15,R-5,1,,1.74,513,1266,1264,Market,,All,C,37.6326783,-77.5215539
+313-319 Goshen St,Richmond City,VA,23220-3812,,Existing,4,,2,Richmond,1900,,,,M-1,2,,3.33,,1383,1376,Market,,,B,37.5506372,-77.4489194
+13-17 E Grace St,Richmond City,VA,23219,,Existing,12,Low-Rise,2,Richmond,1858,1996,,1,B-4,3,,6.07,750,821,815,Market,,All,C,37.5441580,-77.4421880
+306 E Grace St,Richmond City,VA,23219,,Existing,11,Low-Rise,2,Richmond,1928,,,1,B-4,3,,18.47,867,1317,1305,Market,,All,C,37.5431468,-77.4395435
+420 E Grace St,Richmond City,VA,23219,,Existing,8,Low-Rise,1,Richmond,1923,,,1,B-4,2,,10.43,518,1117,1106,Market,,All,C,37.5423835,-77.4383401
+1813-1815 E Grace St,Richmond City,VA,23223,,Existing,4,,2,Richmond,1818,,,1,B-5,2,,5.17,,,,Market,,All,C,37.5340600,-77.4253397
+419 W Grace St,Richmond City,VA,23220,,Existing,9,Low-Rise,2,Richmond,1919,,,1,B-4,3,,3.32,,,,Market,,All,C,37.5470890,-77.4470560
+501-507 W Grace St,Richmond City,VA,23220,,Existing,15,Low-Rise,2,Richmond,1900,,,1,B-4,3,,3.32,,,,Market,,All,C,37.5473183,-77.4473765
+905 W Grace St,Richmond City,VA,23220,,Existing,4,,2,Richmond,1915,,,,B-4,,,3.33,,,,Market,,,C,37.5498847,-77.4520217
+1107 W Grace St,Richmond City,VA,23220,,Existing,12,Low-Rise,2,Richmond,1919,,,1,R-73,3,,3.32,,,,Market,,All,C,37.5520040,-77.4553210
+1109 W Grace St,Richmond City,VA,23220,Ryland Court,Existing,18,Low-Rise,2,Richmond,1919,,,1,R-73,3,,3.32,,,,Market,,All,C,37.5520800,-77.4555670
+1121 W Grace St,Richmond City,VA,23220,,Existing,12,Low-Rise,2,Richmond,1919,,,1,R-73,3,,,1000,,,Market,,All,C,37.5524210,-77.4559730
+1123-1127 W Grace St,Richmond City,VA,23220,Hampton Park Apartments,Existing,30,Low-Rise,2,Richmond,1919,,,3,R-73,3,,,710,1154,1151,Market,,All,C,37.5526760,-77.4563470
+1128 W Grace St,Richmond City,VA,23220,,Existing,19,Low-Rise,2,Richmond,1919,,,1,R-73,3,,3.32,750,,,Market,,All,C,37.5529200,-77.4556140
+1140 W Grace St,Richmond City,VA,23220,Boatwright,Existing,19,Low-Rise,2,Richmond,1926,,,1,R-73,3,,3.32,,,,Market,,All,C,37.5532600,-77.4562100
+1611 W Grace St,Richmond City,VA,23220-2102,,Existing,2,Low-Rise,2,Richmond,1910,,,1,R-48,3,,3.33,4591,,,Market,,All,C,37.5533700,-77.4575300
+1623 W Grace St,Richmond City,VA,23220-2125,,Existing,3,Low-Rise,1,Richmond,1910,,,1,R-48,2,,,,,,Market,,All,C,37.5535900,-77.4578400
+1628 W Grace St,Richmond City,VA,23220,,Existing,2,Low-Rise,2,Richmond,1915,,,1,R-48,2,,3.33,2999,,,Market,,All,C,37.5542600,-77.4578799
+1629 W Grace St,Richmond City,VA,23220,,Existing,4,Mid-Rise,2,Richmond,1907,,,1,R-4,3,,3.33,,,,Market,,All,B,37.5537670,-77.4580710
+1830 W Grace St,Richmond City,VA,23220-2105,,Existing,2,Mid-Rise,2,Richmond,1915,,,1,R-48,2,,3.32,1706,,,Market,,,,37.5557600,-77.4605300
+1844 W Grace St,Richmond City,VA,23220,,Existing,6,Low-Rise,2,Richmond,1910,,,1,R-48,2,,33.50,832,,,Market,,All,B,37.5561278,-77.4609790
+2026 W Grace St,Richmond City,VA,23220,,Existing,29,Mid-Rise,1,Richmond,1908,1960,,1,R48,4,,3.32,,,,Market,,All,C,37.5566185,-77.4620368
+2516 W Grace St,Richmond City,VA,23220,,Existing,12,Low-Rise,2,Richmond,1923,,,2,R-48,3,,,759,,,Market,,All,C,37.5599076,-77.4676042
+2700 W Grace St,Richmond City,VA,23220,,Existing,5,Low-Rise,2,Richmond,1910,,,1,R-48,2,,3.32,,,,Market,,All,C,37.5607870,-77.4688000
+2710 W Grace St,Richmond City,VA,23220,,Existing,12,Low-Rise,2,Richmond,1919,,,1,R-48,3,,3.32,,,,Market,,All,C,37.5610250,-77.4692560
+2714-2716 W Grace St,Richmond City,VA,23220-1913,The Collection,Existing,12,Low-Rise,2,Richmond,1925,1981,,1,R-48,3,,,,,,Market,,All,C,37.5610467,-77.4694414
+2720 W Grace St,Richmond City,VA,23220,,Existing,12,Low-Rise,2,Richmond,1925,,,1,R-48,3,,3.32,,,,Market,,All,C,37.5611671,-77.4696568
+2726 W Grace St,Richmond City,VA,23220,The Collection,Existing,12,Low-Rise,2,Richmond,1919,,,1,R-48,3,,6.57,875,961,953,Market,,All,C,37.5613590,-77.4699140
+2730 W Grace St,Richmond City,VA,23220,The Collection,Existing,12,Low-Rise,2,Richmond,1919,,,1,R-48,3,,,676,883,881,Market,,All,C,37.5614670,-77.4700170
+2734 W Grace St,Richmond City,VA,23220,The Collection,Existing,12,Low-Rise,2,Richmond,1924,,,1,R-48,3,,,676,1132,1129,Market,,All,C,37.5615210,-77.4701730
+3015 W Grace St,Richmond City,VA,23221-1446,,Existing,7,Low-Rise,2,Richmond,1960,,,1,R-6,2,,3.32,941,,,Market,,All,C,37.5632324,-77.4741592
+6621 W Grace St,Henrico,VA,23226-2837,,Existing,2,,2,Richmond,1972,,,1,R3,2,,5.15,1000,,,Market,,All,C,37.5927425,-77.5235371
+1304 W Graham Rd,Richmond City,VA,23220-1437,The Birches,Existing,98,Garden,2,Richmond,1956,,,11,R-53,2,,2.04,710,956,952,Market,,All,C,37.5641870,-77.4521720
+2665 Granite Hill Cir,Richmond City,VA,23225,Forest Ridge,Existing,135,Garden,2,Richmond,1974,,,9,R-48,2,,2.22,719,879,875,Market,,All,C,37.5359110,-77.5207730
+6540 Greenbank Rd,Richmond City,VA,23225-7612,The Residences at Brookside,Existing,646,Garden,2,Richmond,1970,,,23,,2,,2.94,851,1222,1216,Market,,All,C,37.4850140,-77.5133416
+1005 Grove Ave,Richmond City,VA,23220,1005 Grove Ave @ VCU,Existing,36,Low-Rise,2,Richmond,1937,,,1,R-53,3,,0.22,661,976,974,Market,,All,C,37.5481427,-77.4545678
+1113 Grove Ave,Richmond City,VA,23220,,Existing,6,Low-Rise,2,Richmond,1910,,,1,R-6,3,,3.33,,,,Market,,All,B,37.5483542,-77.4559809
+1400 Grove Ave,Richmond City,VA,23220,,Existing,10,Low-Rise,2,Richmond,1881,,,1,R-6,3,,3.32,,,,Market,,All,C,37.5492170,-77.4573170
+1617 Grove Ave,Richmond City,VA,23220,,Existing,7,Low-Rise,2,Richmond,1910,,,1,R-6,3,,3.32,810,,,Market,,All,C,37.5500500,-77.4602700
+2101 Grove Ave,Richmond City,VA,23220,Elmo Apartments,Existing,9,Low-Rise,2,Richmond,1929,,,1,R-6,3,,3.32,498,,,Market,,All,C,37.5516822,-77.4661084
+2121 Grove Ave,Richmond City,VA,23220-4561,,Existing,4,Low-Rise,2,Richmond,1910,,,1,R-6,2,,0.01,,,,Market,,All,C,37.5520070,-77.4669541
+2221 Grove Ave,Richmond City,VA,23220-4438,Whitworth House Apartments,Existing,4,Low-Rise,2,Richmond,1835,,,1,R-6,2,,22.53,650,1749,1732,Market,,,C,37.5523300,-77.4681240
+2602-2606 Grove Ave,Richmond City,VA,23220-4344,Fan Apartment Complex,Existing,21,Low-Rise,2,Richmond,1962,,,1,R-48,2,,3.32,,,,Market,,All,C,37.5545105,-77.4723130
+2606 Grove Ave,Richmond City,VA,23220,,Existing,21,Low-Rise,2,Richmond,1910,,,1,R-6,3,,,,,,Market,,All,C,37.5544943,-77.4724759
+3301 Grove Ave,Richmond City,VA,23221,,Existing,12,Low-Rise,2,Richmond,1925,,Grove Manor,2,R-6,3,,,875,808,806,Market,,All,C,37.5575505,-77.4822449
+3400 Grove Ave,Richmond City,VA,23221,,Existing,6,Low-Rise,2,Richmond,1927,,,2,R-6,3,,3.33,,,,Market,,All,C,37.5582627,-77.4829056
+3524-3526 Grove Ave,Richmond City,VA,23221,,Existing,17,Low-Rise,2,Richmond,1958,,,2,R-48,2,,,678,,,Market,,All,C,37.5593350,-77.4857410
+3528-3550 Grove Ave,Richmond City,VA,23221-2216,,Existing,16,Low-Rise,2,Richmond,1958,,,2,R-6,2,,3.32,,,,Market,,All,C,37.5594643,-77.4860455
+3545-3547 Grove Ave,Richmond City,VA,23221,,Existing,4,,2,Richmond,1931,,,,R-53,2,,3.33,,,,Market,,,C,37.5590600,-77.4866330
+3549-3551 Grove Ave,Richmond City,VA,23221,,Existing,4,,2,Richmond,1957,,,,R-48,2,,3.33,,,,Market,,All,C,37.5591174,-77.4867981
+3553-3555 Grove Ave,Richmond City,VA,23221,,Existing,4,Low-Rise,2,Richmond,1935,,,1,R-53,2,,3.33,,,,Market,,All,C,37.5591730,-77.4869470
+4209 Grove Ave,Richmond City,VA,23221,,Existing,6,Low-Rise,2,Richmond,1930,,,2,R-5,3,,3.14,2272,963,959,Market,,All,C,37.5629220,-77.4950010
+4209-4213 Grove Ave,Richmond City,VA,23221,,Existing,12,Low-Rise,2,Richmond,1930,,,2,Commercial,3,,6.59,783,969,961,Market,,All,C,37.5630820,-77.4953300
+4309 Grove Ave,Richmond City,VA,23221,,Existing,12,Low-Rise,2,Richmond,1930,,,1,R-5,3,,3.14,934,,,Market,,All,C,37.5634116,-77.4960492
+4412 Grove Ave,Richmond City,VA,23221,,Existing,12,Low-Rise,2,Richmond,1930,,,1,R-53,3,,,875,,,Market,,All,C,37.5646529,-77.4972628
+4500 Grove Ave,Richmond City,VA,23221,,Existing,18,Low-Rise,2,Richmond,1962,,,1,R-53,3,,3.14,750,825,821,Market,,All,C,37.5650977,-77.4979010
+4518 Grove Ave,Richmond City,VA,23221,,Existing,12,Low-Rise,2,Richmond,1930,,,1,R-53,3,,3.14,,,,Market,,All,C,37.5653300,-77.4987335
+4524 Grove Ave,Richmond City,VA,23221,West Grove Condominium,Existing,12,Low-Rise,2,Richmond,1930,,,1,R-53,3,,3.14,,,,Market,,All,C,37.5655783,-77.4991537
+3850 Guilder Ln,Richmond City,VA,23234-2051,Townhouses of Chesterfield,Existing,116,Garden,2,Richmond,1968,,,18,R-43,2,,,994,941,939,Market,,All,C,37.4753070,-77.4674090
+907-L N Hamilton St,Richmond City,VA,23221,Kent Road Village,Existing,88,Garden,2,Richmond,1943,,,13,R-02,2,,0.29,797,1415,1411,Market,,All,C,37.5655686,-77.4847764
+2330 Hampstead Ave,Henrico,VA,23230-2352,Crestwood at Libbie,Existing,97,Garden,2,Richmond,1962,,,10,R5,2,,0.34,658,1221,1217,Market,,All,C,37.5952360,-77.5066760
+410 Hancock St,Richmond City,VA,23220-3832,The Stables,Existing,21,Low-Rise,2,Richmond,1950,,,1,R-7,2,,,759,1218,1215,Market,,All,C,37.5527562,-77.4502152
+1723 Hanover Ave,Richmond City,VA,23220,,Existing,5,,2,Richmond,1920,,,,R-6,,,3.32,,,,Market,,,C,37.5513628,-77.4614106
+2601 Hanover Ave,Richmond City,VA,23220,,Existing,3,,2,Richmond,1921,,,,R-53,2,,3.32,,,,Market,,All,C,37.5550695,-77.4715980
+3125 Hanover Ave,Richmond City,VA,23221,,Existing,12,Low-Rise,2,Richmond,1925,,,2,R-6,3,,3.32,,,,Market,,All,C,37.5576560,-77.4786926
+3226-3228 Hanover Ave,Richmond City,VA,23221-2823,,Existing,4,Low-Rise,2,Richmond,1957,,,2,R-6,2,,3.33,1100,,,Market,,All,C,37.5585627,-77.4803022
+703 N Harrison St,Richmond City,VA,23220,,Existing,11,Low-Rise,2,Richmond,1920,,,1,,2,,3.32,,,,Market,,All,C,37.5529101,-77.4509195
+3812 Hermitage Rd,Richmond City,VA,23227,,Existing,11,Low-Rise,2,Richmond,1974,,,2,R-4,2,,6.11,,,,Market,,All,B,37.5857910,-77.4636382
+2812 Hilliard Rd,Henrico,VA,23228,Hilliard Road Apartments,Existing,213,Garden,2,Richmond,1949,,,39,R5,2,,1.88,716,1351,1346,Market,,All,C,37.6152900,-77.4869780
+2835 Hilliard Rd,Henrico,VA,23228,Old Bridge Apartments,Existing,222,Garden,2,Richmond,1969,,,14,,2,,0.00,1020,1450,1447,Market,,All,C,37.6130990,-77.4858190
+2675 Hungary Spring Rd,Henrico,VA,23294-6329,Williamsburg Park,Existing,202,Garden,2,Richmond,1966,,,26,R5,2,,0.31,919,1408,1404,Market,,All,C,37.6209730,-77.5292290
+2914 Idlewood Ave,Richmond City,VA,23221-3545,,Existing,6,Low-Rise,2,Richmond,1924,,,1,R-53,3,,1.66,1100,,,Market,,All,C,37.5501900,-77.4797000
+2918 Idlewood Ave,Richmond City,VA,23221-3546,,Existing,6,Low-Rise,2,Richmond,1980,,,1,R-53,3,,3.33,900,,,Market,,All,C,37.5502703,-77.4798755
+1701 Irondale Rd,Chesterfield,VA,23235-3766,Summit at Bon Air,Existing,296,Garden,2,Richmond,1975,2017,,37,R7,2,,4.74,1018,1579,1569,Market,,All,C,37.5166060,-77.6127270
+7 E Jackson St,Richmond City,VA,23220,,Existing,8,Low-Rise,2,Richmond,1920,,,1,,2,,3.32,1155,1561,1554,Market,,All,C,37.5490374,-77.4382553
+101 W Jackson St,Richmond City,VA,23220,,Existing,4,Low-Rise,2,Richmond,1958,2007,,1,R-63,2,,3.33,,,,Market,,All,C,37.5500755,-77.4400558
+103 W Jackson St,Richmond City,VA,23220,,Existing,1,,2,Richmond,1865,,,1,R-53,2,,3.32,,,,Market,,,C,37.5501840,-77.4402190
+2908 Jefferson Davis Hwy,Richmond City,VA,23234,The 2908 Apts.,Existing,36,Low-Rise,2,Richmond,1968,,,1,B-3,2,,36.25,828,719,711,Market,,All,C,37.4840417,-77.4456824
+3115 Jefferson Davis Hwy,Richmond City,VA,23234,,Existing,9,Low-Rise,2,Richmond,1959,,,1,B-3,2,,4.00,,,,Market,,All,C,37.4808019,-77.4441140
+3601 Jefferson Davis Hwy,Richmond City,VA,23234,Summer Hill Apartments,Existing,16,Low-Rise,2,Richmond,1968,,,1,B-3,2,,4.00,,,,Market,,All,C,37.4749702,-77.4434682
+16415 Jefferson Davis Hwy,Chesterfield,VA,23834-5378,,Existing,12,Garden,2,Richmond,1940,,,6,A,3,,3.76,,,,Market,,All,C,37.2965010,-77.4092710
+201-283 E Jerald St,Henrico,VA,23075,Highlands Woods,Existing,42,Low-Rise,2,Richmond,1972,,,1,R5,2,,0.04,1128,1054,1051,Market,,All,C,37.5387296,-77.3309714
+2602-2608 Kensington Ave,Richmond City,VA,23220,Virginia Apartments,Existing,24,Low-Rise,2,Richmond,1946,,,1,R-48,3,,,1000,994,991,Market,,All,C,37.5575512,-77.4703120
+2700-2704 Kensington Ave,Richmond City,VA,23220,,Existing,18,Low-Rise,2,Richmond,1947,,,1,R-48,3,,3.67,498,,,Market,,All,C,37.5582695,-77.4714741
+2701 Kensington Ave,Richmond City,VA,23220,Mulberry Apartments,Existing,3,,2,Richmond,1915,,,,R-48,3,,3.32,,,,Market,,All,C,37.5577018,-77.4716351
+2707 Kensington Ave,Richmond City,VA,23220,Wellington Apartments,Existing,3,,2,Richmond,1917,,,,R-53,3,,3.32,,,,Market,,All,C,37.5578529,-77.4718880
+3425 Kensington Ave,Richmond City,VA,23221,,Existing,33,Low-Rise,2,Richmond,1959,,,1,R-48,3,,4.48,,,,Market,,All,C,37.5615795,-77.4826770
+3503 Kensington Ave,Richmond City,VA,23221-2141,Kensington Place,Existing,106,Garden,2,Richmond,1947,,,19,R-53,3,,2.11,950,1394,1388,Market,,All,C,37.5618640,-77.4832870
+3733 King And Queen Dr,Henrico,VA,23223,Saddlewood Townhomes,Existing,76,Garden,2,Richmond,1975,,,8,R5,2,,0.14,975,1040,1037,Market,,All,C,37.5736020,-77.3813750
+3500 Kings Dr,Henrico,VA,23231,Honeybrook Apartments,Existing,128,Garden,2,Richmond,1985,,,13,R5,3,,0.78,932,1159,1159,Market,,All,C,37.5284850,-77.3652520
+204 Kings Arms St,Hanover,VA,23005,Ashland Towne Square Apartments,Existing,218,Garden,2,Richmond,1973,,,30,R-5,2,,0.00,891,1232,1229,Market,,All,C,37.7649720,-77.4692540
+11 N Laburnum Ave,Henrico,VA,23223-5701,Pointe at River City,Existing,1184,Garden,2,Richmond,1974,,,295,R5,2,,6.09,784,1209,1201,Market,,All,C,37.5505403,-77.3702003
+11800 Lake Falls Dr,Chesterfield,VA,23831,Waterside at Ironbridge,Existing,265,Garden,2,Richmond,1987,,,22,R7,3,,2.38,893,1469,1463,Market,,All,C,37.3572442,-77.4906285
+10267 Lakeridge Square Ct,Hanover,VA,23005,LakeRidge Square Apartments,Existing,156,Garden,2,Richmond,1987,,,13,R5,3,,2.10,1022,1648,1641,Market,,All,C,37.6898193,-77.4571594
+1900 Lakeview Ave,Richmond City,VA,23220,,Existing,4,,2,Richmond,1960,,,,R-5,2,,3.33,,,,Market,,,C,37.5432135,-77.4677748
+2000 Lamb Ave,Richmond City,VA,23222-5027,Northside Apartment Complex,Existing,8,Low-Rise,1,Richmond,1969,,,2,R-53,2,,6.11,,,,Market,,All,C,37.5602181,-77.4315855
+3005 Lancers Blvd,Chesterfield,VA,23224,Amber Leaves Apartments,Existing,67,Garden,2,Richmond,1973,,,9,R7,2,,0.27,750,895,893,Market,,All,C,37.4675151,-77.5188814
+2908 E Leigh St,Richmond City,VA,23223-7415,,Existing,2,Low-Rise,2,Richmond,1900,,,1,R-63,2,,5.17,,,,Market,,All,C,37.5319459,-77.4123159
+2910 E Leigh St,Richmond City,VA,23223,,Existing,2,,2,Richmond,1900,,,1,R-63,,,,,,,Market,,All,C,37.5319265,-77.4122642
+1500 W Leigh St,Richmond City,VA,23220,,Existing,8,Low-Rise,2,Richmond,1905,,,2,R-7,2,,3.32,,,,Market,,All,C,37.5567390,-77.4526671
+3304 Light St,Chesterfield,VA,23803-2412,,Existing,1,Single-Family Home,2,Richmond,1920,,,1,,1,,3.36,1159,,,Market,,All,C,37.2339200,-77.4225700
+3306 Light St,Chesterfield,VA,23803-2412,,Existing,1,,2,Richmond,1920,2002,,1,,,,3.36,,,,Market,,All,B,37.2339640,-77.4228400
+205 N Lombardy St,Richmond City,VA,23220,,Existing,6,Low-Rise,2,Richmond,1905,,,1,R-53,2,,15.57,1100,1457,1448,Market,,All,C,37.5502595,-77.4591375
+208 N Lombardy St,Richmond City,VA,23220,,Existing,12,Low-Rise,2,Richmond,1917,,,1,R-6,3,,,950,,,Market,,All,C,37.5502279,-77.4596748
+106-108 S Lombardy St,Richmond City,VA,23220-5321,,Existing,2,Townhome,2,Richmond,1900,,,1,R-7,,,3.33,840,,,Market,,All,C,37.5459183,-77.4615143
+2503 Lynhaven Ave,Richmond City,VA,23234-1243,Lynnhaven Apartments,Existing,26,Low-Rise,2,Richmond,1965,,,2,R-53,2,,3.54,773,606,603,Market,,All,C,37.4875721,-77.4417108
+4022 Macarthur Ave,Richmond City,VA,23227-4060,MacArthur Apartments,Existing,36,Low-Rise,2,Richmond,1964,,,1,B-1,2,,,450,511,510,Market,,All,C,37.5892553,-77.4585946
+4032 Macarthur Ave,Richmond City,VA,23227-4061,,Existing,6,Low-Rise,2,Richmond,1964,,,1,B-1,2,,,,,,Market,,All,C,37.5900142,-77.4585936
+1600 Magnolia St,Richmond City,VA,23222-4034,,Existing,18,Low-Rise,2,Richmond,1961,,,3,R-6,2,,2.57,700,369,367,Market,,,C,37.5642878,-77.4177933
+4 E Main St,Richmond City,VA,23219,,Existing,7,Low-Rise,2,Richmond,1836,,,1,B-3,3,,3.32,,,,Market,,All,C,37.5430600,-77.4439650
+8-10 E Main St,Richmond City,VA,23219-2110,,Existing,6,Low-Rise,2,Richmond,1910,,,1,B-3,3,,3.33,,,,Market,,All,C,37.5430150,-77.4437960
+12 E Main St,Richmond City,VA,23219,,Existing,9,Mid-Rise,2,Richmond,1837,,,,B-3,4,,3.32,,869,865,Market,,,C,37.5429810,-77.4436540
+15-17 W Main St,Richmond City,VA,23220-5623,,Existing,1,Low-Rise,1,Richmond,1910,,,1,B-3,2,,3.32,,,,Market,,All,C,37.5433314,-77.4452220
+19-21 W Main St,Richmond City,VA,23220,,Existing,5,Low-Rise,1,Richmond,1910,,,1,B-3,2,,3.32,,,,Market,,All,C,37.5433890,-77.4453030
+1330 W Main St,Richmond City,VA,23220,,Existing,3,,2,Richmond,1900,,,,,2,,3.32,,,,Market,,All,C,37.5467600,-77.4582300
+1827 W Main St,Richmond City,VA,23220,,Existing,2,,2,Richmond,1900,2008,,,UB,2,,3.33,,,,Market,,All,C,37.5485450,-77.4644860
+1829 W Main St,Richmond City,VA,23220,,Existing,3,,2,Richmond,1900,,,,B-3,2,,3.32,,,,Market,,All,C,37.5485317,-77.4646125
+2522-2524 W Main St,Richmond City,VA,23220,,Existing,5,,2,Richmond,1911,,,,,2,,3.32,,,,Market,,,C,37.5519253,-77.4728156
+2530 Marina Dr,Chesterfield,VA,23234-5139,Falling Creek,Existing,348,Garden,2,Richmond,1964,2017,,31,RMF,2,,6.03,568,867,861,Market,,All,C,37.4378792,-77.4393993
+7-7/12 W Marshall St,Richmond City,VA,23220-3927,,Existing,4,,2,Richmond,1900,,,,B-4,2,,3.33,,,,Market,,,C,37.5465380,-77.4415810
+20-24 W Marshall St,Richmond City,VA,23220-3928,Marshall Adams Apartments,Existing,11,Low-Rise,2,Richmond,1900,,,1,RO-2,2,,3.32,1020,2000,1990,Market,,All,C,37.5471169,-77.4417373
+3018-3022 W Marshall St,Richmond City,VA,23230,,Existing,20,Garden,2,Richmond,1923,,,5,M-1,2,,3.32,,,,Market,,All,C,37.5659650,-77.4725770
+3502 Maryland Ave,Richmond City,VA,23222-2933,,Existing,2,,2,Richmond,1987,,,1,R-6,1,,6.12,,,,Market,,All,C,37.5785700,-77.4178779
+3117 Meadowbridge Rd,Richmond City,VA,23222-3140,,Existing,14,,2,Richmond,1979,,,,R-02,2,,6.11,,,,Market,,All,C,37.5740489,-77.4205563
+3501 Meadowdale Blvd,Chesterfield,VA,23234,Crystal Lakes,Existing,716,Garden,2,Richmond,1967,2020,,95,R7,2,,4.19,944,918,912,Market,,All,C,37.4369790,-77.4587570
+1000-1016 Melrose Ave,Richmond City,VA,23227,,Existing,16,Low-Rise,2,Richmond,1963,,,1,R-48,2,,6.11,,,,Market,,All,B,37.5798473,-77.4471588
+3202-3206 Midlothian Tpke,Richmond City,VA,23224-1869,Forest Square Apartments,Existing,42,Low-Rise,2,Richmond,1964,2016,,3,R-53,3,,,715,925,923,Market,,All,C,37.5109856,-77.4678332
+200 Minor St,Richmond City,VA,23222-5030,200 Minor Street Quad,Existing,4,Low-Rise,2,Richmond,1920,,,1,R-6,2,,6.11,,,,Market,,All,C,37.5594300,-77.4312900
+1630 Monument Ave,Richmond City,VA,23220,,Existing,18,Low-Rise,2,Richmond,1925,,,1,R-6,3,,3.32,,1108,1102,Market,,All,C,37.5536710,-77.4588959
+1810 Monument Ave,Richmond City,VA,23220,,Existing,5,Low-Rise,2,Richmond,1925,1960,,1,R-6,3,,3.32,,,,Market,,All,C,37.5545312,-77.4605223
+1831 Monument Ave,Richmond City,VA,23220,,Existing,6,Low-Rise,2,Richmond,1908,,,1,R-6,3,,3.33,,,,Market,,All,C,37.5544530,-77.4618290
+2012 Monument Ave,Richmond City,VA,23220,,Existing,5,Low-Rise,2,Richmond,1910,,,1,R-6,3,,3.32,,,,Market,,All,C,37.5557495,-77.4625672
+2015 Monument Ave,Richmond City,VA,23220,,Existing,4,,2,Richmond,1925,,,,R6,3,,3.33,,,,Market,,,C,37.5552830,-77.4631770
+2018 Monument Ave,Richmond City,VA,23220,,Existing,3,,2,Richmond,1910,,,,R-6,3,,3.32,,,,Market,,All,C,37.5559435,-77.4627721
+2215 Monument Ave,Richmond City,VA,23220,,Existing,9,Low-Rise,2,Richmond,1924,,,1,R-6,3,,3.32,,,,Market,,All,B,37.5563490,-77.4650600
+2217 Monument Ave,Richmond City,VA,23220,,Existing,3,,2,Richmond,1912,,,,R-6,2,,3.32,,,,Market,,All,C,37.5564620,-77.4651430
+2225 Monument Ave,Richmond City,VA,23220,,Existing,4,Low-Rise,2,Richmond,1915,,,1,R-6,2,,3.33,,,,Market,,All,C,37.5565710,-77.4654210
+2231-2233 Monument Ave,Richmond City,VA,23220,,Existing,7,Low-Rise,2,Richmond,1910,,,2,R-6,3,,3.32,,,,Market,,All,C,37.5567060,-77.4657150
+2600 Monument Ave,Richmond City,VA,23220,,Existing,3,,2,Richmond,1915,,,,R-6,3,,3.32,,,,Market,,All,C,37.5593753,-77.4685100
+2602-2606 Monument Ave,Richmond City,VA,23220,Countess Court Apartments,Existing,9,Low-Rise,2,Richmond,1922,,,1,R-6,3,,9.68,1850,2135,2114,Market,,All,C,37.5595333,-77.4685840
+2805 Monument Ave,Richmond City,VA,23221-1737,,Existing,3,Low-Rise,2,Richmond,1919,,,,R-48,3,,3.32,,,,Market,,All,B,37.5606843,-77.4722012
+2810 Monument Ave,Richmond City,VA,23221,The Collection,Existing,6,Low-Rise,2,Richmond,1918,,,1,R-48,3,,,1560,1600,1596,Market,,All,C,37.5612722,-77.4717908
+2822 Monument Ave,Richmond City,VA,23221,,Existing,3,Low-Rise,2,Richmond,1924,,,1,multi-family,3,,3.32,1532,1257,1251,Market,,All,C,37.5615532,-77.4723458
+2824 Monument Ave,Richmond City,VA,23221-1760,,Existing,3,,2,Richmond,1924,,,,R-48,3,,3.32,,,,Market,,,B,37.5616493,-77.4723969
+2903 Monument Ave,Richmond City,VA,23221-1738,The Collection,Existing,7,Low-Rise,2,Richmond,1915,,,1,R-48,3,,,1490,1791,1786,Market,,All,C,37.5608551,-77.4726386
+3004 Monument Ave,Richmond City,VA,23221,,Existing,12,Low-Rise,2,Richmond,1921,2018,,1,R-48,3,,3.32,825,,,Market,,All,B,37.5627500,-77.4742699
+3019 Monument Ave,Richmond City,VA,23221-1466,,Existing,7,Low-Rise,2,Richmond,1960,,,1,R-48,2,,,,,,Market,,All,C,37.5618854,-77.4743514
+3021 Monument Ave,Richmond City,VA,23221,,Existing,2,,2,Richmond,1922,,,,R-53,2,,3.33,,,,Market,,All,B,37.5619794,-77.4744628
+3025 Monument Ave,Richmond City,VA,23221,3025 Monument Avenue,Existing,18,Low-Rise,2,Richmond,1954,,,1,R-53,2,,3.32,,,,Market,,All,C,37.5620773,-77.4746635
+3115 Monument Ave,Richmond City,VA,23221,Lord Fairfax,Existing,36,Low-Rise,2,Richmond,1923,,,1,R-6,3,,3.14,875,872,870,Market,,All,B,37.5627620,-77.4756483
+3600 Monument Ave,Richmond City,VA,23230,,Existing,12,Low-Rise,2,Richmond,1927,,,1,R-02,3,,,875,,,Market,,All,C,37.5664125,-77.4803137
+4402 Monument Ave,Richmond City,VA,23230-3825,,Existing,2,Single-Family Home,2,Richmond,1923,,,1,R-5,,,3.14,1723,,,Market,,All,,37.5724049,-77.4904779
+8 N Mulberry St,Richmond City,VA,23220,,Existing,3,,2,Richmond,1914,,,,R-6,2,,3.32,,,,Market,,All,C,37.5529466,-77.4744478
+301 N Mulberry St,Richmond City,VA,23220-4029,,Existing,6,Low-Rise,2,Richmond,1917,,,,R-48,3,,3.33,,,,Market,,All,,37.5560800,-77.4721999
+3105 N St,Richmond City,VA,23223,,Existing,14,Low-Rise,2,Richmond,1961,,,1,R-6,2,,5.16,,,,Market,,All,C,37.5322071,-77.4090438
+306 N Nansemond St,Richmond City,VA,23221,,Existing,2,Low-Rise,2,Richmond,1958,,River City,1,R-48,2,,3.33,,,,Market,,All,C,37.5603270,-77.4840260
+311 N Nansemond St,Richmond City,VA,23221,,Existing,8,Low-Rise,2,Richmond,1956,,,1,R-6,2,,3.32,,,,Market,,All,C,37.5601364,-77.4835945
+606 N Nansemond St,Richmond City,VA,23221,,Existing,6,Low-Rise,2,Richmond,1919,,,2,R-48,3,,,985,,,Market,,All,C,37.5631108,-77.4822904
+610 N Nansemond St,Richmond City,VA,23221,,Existing,6,Low-Rise,2,Richmond,1919,,,2,R-48,3,,3.33,,,,Market,,All,C,37.5632295,-77.4821611
+700 N Nansemond St,Richmond City,VA,23221,,Existing,6,Low-Rise,2,Richmond,1958,,,1,R-48,2,,15.37,875,966,960,Market,,All,C,37.5636700,-77.4818920
+1209-1267 Nelson St,Richmond City,VA,23231-3663,Wynwood Apartments,Existing,120,Garden,2,Richmond,1975,,,12,R-5,2,,8.71,750,905,897,Market,,All,C,37.5119321,-77.4017594
+2202 North Ave,Richmond City,VA,23222,,Existing,2,Low-Rise,2,Richmond,1890,,,,R-6,2,,6.12,,,,Market,,All,C,37.5628116,-77.4334957
+3214 North Ave,Richmond City,VA,23222-2649,,Existing,2,Low-Rise,2,Richmond,1923,2016,,1,R-6,2,,6.12,1144,,,Market,,All,,37.5758200,-77.4327900
+4301 North Ave,Richmond City,VA,23222-1000,North Avenue Apartments,Existing,28,Low-Rise,2,Richmond,1963,,,2,R-48,2,,2.09,550,660,657,Market,,All,C,37.5874555,-77.4430917
+3212-3220 O St,Richmond City,VA,23223,,Existing,20,Garden,2,Richmond,1925,,,5,R-6,2,,13.02,700,686,679,Market,,All,C,37.5327330,-77.4067125
+129 S Oak Ave,Henrico,VA,23075,Bellsun Apartments,Existing,62,Garden,2,Richmond,1974,,,6,R5,2,,1.73,990,858,855,Market,,All,C,37.5401100,-77.3265260
+4904 Old Brook Rd,Richmond City,VA,23227,George Arthur Apartments,Existing,18,Low-Rise,2,Richmond,1948,,,3,R-48,3,,6.11,,,,Market,,All,C,37.5999332,-77.4490806
+4912-4916 Old Brook Rd,Richmond City,VA,23227,,Existing,14,Low-Rise,2,Richmond,1974,,,1,R-48,1,,6.11,,531,527,Market,,All,C,37.6007920,-77.4492369
+800 Ordway Ave,Richmond City,VA,23222,,Existing,12,Low-Rise,2,Richmond,1978,,,1,R-6,2,,6.11,,,,Market,,Senior,C,37.5873579,-77.4444032
+2700 P St,Richmond City,VA,23223,,Existing,2,Low-Rise,2,Richmond,1910,,,1,R-53,2,,5.17,,,,Market,,All,C,37.5366440,-77.4108340
+2603-2611 Park Ave,Richmond City,VA,23220,2611 Park Ave,Existing,30,Low-Rise,2,Richmond,1945,,,1,R-48,3,,,862,,,Market,,All,C,37.5582230,-77.4702140
+2904 Park Ave,Richmond City,VA,23221,,Existing,6,Low-Rise,2,Richmond,1917,,,1,R-48,2,,,1050,643,641,Market,,All,C,37.5605179,-77.4730245
+3402 Park Ave,Richmond City,VA,23221,,Existing,5,Low-Rise,2,Richmond,1927,,,1,R-5,3,,3.32,,,,Market,,All,C,37.5630420,-77.4807820
+3404 Park Ave,Richmond City,VA,23221,,Existing,12,Low-Rise,2,Richmond,1927,,Pierce Arrow Properties,1,R-48,3,,,1000,,,Market,,All,C,37.5631353,-77.4809717
+3406 Park Ave,Richmond City,VA,23221,,Existing,6,Low-Rise,2,Richmond,1925,,,1,R-48,3,,3.33,,,,Market,,All,C,37.5632289,-77.4811319
+3408 Park Ave,Richmond City,VA,23221-1547,The Collection,Existing,12,Low-Rise,2,Richmond,1925,,,1,R-48,3,,,,,,Market,,All,C,37.5633337,-77.4812852
+3412 Park Ave,Richmond City,VA,23221,,Existing,12,Low-Rise,2,Richmond,1932,,,1,R-53,3,,7.62,800,1074,1068,Market,,All,C,37.5634393,-77.4816140
+3509 Park Ave,Richmond City,VA,23221-1539,Museum District Investment Opportunity,Existing,4,Low-Rise,2,Richmond,1958,2021,,1,R-48,2,,0.21,640,,,Market,,All,C,37.5633400,-77.4825300
+3514 Park Ave,Richmond City,VA,23221,,Existing,15,Low-Rise,2,Richmond,1958,,,1,R-53,2,,3.32,,,,Market,,All,C,37.5639648,-77.4824623
+2104 Parkwood Ave,Richmond City,VA,23220-5206,2104-2106 Parkwood Avenue,Existing,4,Low-Rise,2,Richmond,1925,,,1,R-7,2,,3.33,,,,Market,,,B,37.5480544,-77.4683484
+3110 Patterson Ave,Richmond City,VA,23221,Pocahontas Apartments,Existing,6,Low-Rise,2,Richmond,1930,1996,,1,MF,3,,3.32,919,726,723,Market,,All,C,37.5608920,-77.4763690
+8527-8541 Patterson Ave,Henrico,VA,23229,Landmark at Patterson,Existing,32,Low-Rise,2,Richmond,1961,,,1,R5,2,,,757,1151,1148,Market,,All,C,37.5940754,-77.5644196
+9001 Patterson Ave,Henrico,VA,23229,Landmark at Patterson,Existing,158,Garden,2,Richmond,1967,,,19,R5,2,,4.08,961,1634,1625,Market,,All,C,37.5948850,-77.5773760
+9010 Patterson Ave,Henrico,VA,23229-6177,Landmark at Gayton,Existing,308,Garden,2,Richmond,1962,,,4,R5,2,,0.00,781,1339,1336,Market,,All,C,37.5955960,-77.5772080
+9014 Patterson Ave,Henrico,VA,23229,Landmark at Gayton,Existing,32,Low-Rise,2,Richmond,1964,,,1,R5,2,,0.09,832,1184,1181,Market,,All,C,37.5957430,-77.5793780
+9016 Patterson Ave,Henrico,VA,23229,Landmark at Gayton,Existing,307,Garden,2,Richmond,1969,,,8,R5,2,,0.14,781,1556,1551,Market,,All,C,37.5959650,-77.5801860
+9101 Patterson Ave,Henrico,VA,23229,Landmark at Patterson,Existing,40,Garden,2,Richmond,1967,,,27,R5,2,,32.75,819,1582,1566,Market,,All,C,37.5949974,-77.5783464
+9101 Patterson Ave,Henrico,VA,23229-6103,Landmark at Patterson,Existing,8,Low-Rise,2,Richmond,1962,,,1,R5,2,,0.12,,,,Market,,All,C,37.5949970,-77.5784515
+1518 Perry St,Richmond City,VA,23224-2060,,Existing,2,Low-Rise,2,Richmond,1915,,,1,R-63,2,,4.00,,,,Market,,All,C,37.5211531,-77.4499262
+6300 Pewter Ave,Chesterfield,VA,23224,Chesterfield Flats,Existing,278,Garden,2,Richmond,1975,2006,,27,R7,3,,5.12,895,1206,1198,Market,,All,C,37.4658015,-77.5107295
+783 Pleasant St,Henrico,VA,23075,VIVIANA HALL,Existing,2,,2,Richmond,1973,,,,RTH,2,,3.22,,,,Market,,,C,37.5420540,-77.3435510
+1-5 S Plum St,Richmond City,VA,23220,,Existing,3,,2,Richmond,1900,,,,,2,,3.32,,,,Market,,All,B,37.5464730,-77.4597252
+101 Poe St,Richmond City,VA,23222-5037,101 Poe St,Existing,47,Low-Rise,2,Richmond,1968,,,3,R-53,2,,2.58,900,685,682,Market,,All,C,37.5597349,-77.4319437
+1600-1612 Pollock St,Richmond City,VA,23222-4138,,Existing,6,Garden,2,Richmond,1976,,,,R-6,2,,6.11,916,761,756,Market,,All,C,37.5716705,-77.4117355
+705 Pool Rd,Chesterfield,VA,23236,Aston Ridge,Existing,229,Garden,2,Richmond,1975,2016,,24,R7,2,,7.86,929,1378,1366,Market,,All,B,37.5041728,-77.5900471
+1009-1011 Porter St,Richmond City,VA,23224-2239,,Existing,4,Low-Rise,2,Richmond,1925,,,2,R-53,2,,4.00,1100,881,876,Market,,All,C,37.5236788,-77.4446542
+1926 Princess Anne Ave,Richmond City,VA,23223-7246,,Existing,2,Single-Family Home,2,Richmond,1900,,,1,R-63,2,,5.17,1984,,,Market,,All,C,37.5364073,-77.4213724
+8800 Queensmere Pl,Henrico,VA,23294,Legacy at Mayland,Existing,576,Garden,2,Richmond,1973,2007,,72,R5,2,,0.62,985,1534,1530,Market,,All,C,37.6262640,-77.5527790
+209 E Read St,Henrico,VA,23075-1724,,Existing,1,Low-Rise,2,Richmond,1937,,,1,R4,2,,3.22,,,,Market,,All,C,37.5428562,-77.3281581
+5403 Remuda Dr,Chesterfield,VA,23234-4470,Remuda Crossing,Existing,86,Garden,2,Richmond,1958,,,5,R7,2,,0.36,880,925,923,Market,,All,C,37.4496538,-77.4434580
+3508 E Richmond Rd,Richmond City,VA,23223-6803,The Villas of Oakwood,Existing,319,Garden,2,Richmond,1968,,,19,R-53,2,,1.04,787,1016,1012,Market,,All,C,37.5327620,-77.3951100
+20900 Riverterrace Rd,Chesterfield,VA,23803-1834,River Road Terrace,Existing,128,Garden,2,Richmond,1973,,,16,R7,2,,6.37,950,1299,1290,Market,,All,C,37.2370347,-77.4335841
+7 N Robinson St,Richmond City,VA,23220-4400,,Existing,2,,2,Richmond,1910,,,,R-6,2,,3.32,1100,,,Market,,,B,37.5524130,-77.4726240
+803-809 N Robinson St,Richmond City,VA,23220-1915,The Collection,Existing,4,Low-Rise,2,Richmond,1949,,,1,R-48,2,,,971,1383,1380,Market,,All,C,37.5601040,-77.4674420
+206 Roseneath Rd,Richmond City,VA,23221,,Existing,9,Low-Rise,2,Richmond,1927,,,2,R-6,3,,3.32,,,,Market,,All,C,37.5584718,-77.4828047
+1112 Roseneath Rd,Richmond City,VA,23230,,Existing,12,Low-Rise,2,Richmond,1929,,,1,R-48,3,,3.32,,,,Market,,All,C,37.5676379,-77.4776836
+11 S Rowland St,Richmond City,VA,23220,,Existing,2,,1,Richmond,1900,,,,B-3,2,,3.33,,,,Market,,,C,37.5489710,-77.4672430
+10 Shawn Ct,Henrico,VA,23075,Cedarwood Manor,Existing,152,Garden,2,Richmond,1979,,,15,R5,2,,0.04,856,908,905,Market,,All,C,37.5317940,-77.3130360
+9522 Shepton Dr,Henrico,VA,23294,Westbury Apartments,Existing,158,Garden,2,Richmond,1978,,,10,R5,2,,1.90,889,1202,1197,Market,,All,C,37.6481471,-77.5589145
+7277-8111 Signal Hill Apartment Dr,Hanover,VA,23111,Signal Hill Apartments,Existing,68,Garden,2,Richmond,1966,,,7,R5,2,,,910,1215,1212,Market,,All,C,37.6055220,-77.3778060
+411 Smith St,Richmond City,VA,23220,,Existing,6,Low-Rise,2,Richmond,1900,,,1,R-53,2,,3.33,,,,Market,,,C,37.5498770,-77.4458720
+1200 Southwood Pky,Richmond City,VA,23224-3139,Southwood,Existing,1286,Garden,2,Richmond,1960,,,63,R-48,2,,0.01,809,858,858,Market,,All,C,37.4958870,-77.4796691
+19 N Stafford Ave,Richmond City,VA,23220-4452,,Existing,12,Low-Rise,2,Richmond,1920,,,2,R-6,3,,3.32,,,,Market,,All,C,37.5515700,-77.4702700
+304 N Stafford Ave,Richmond City,VA,23220,,Existing,2,,2,Richmond,1915,,,,R-6,,,3.33,,,,Market,,,C,37.5548834,-77.4688998
+101 N Stafford St,Richmond City,VA,23220-4454,,Existing,12,Low-Rise,2,Richmond,1914,,,1,R-6,3,,3.32,,,,Market,,All,C,37.5525157,-77.4696970
+6925 Starview Ct,Chesterfield,VA,23225,Cloverleaf Lake Townhouse Apartments,Existing,210,Garden,2,Richmond,1972,,,20,R7,2,,2.86,1061,1435,1428,Market,,All,C,37.4902050,-77.5225480
+1201-1253 Stoneycreek Dr,Henrico,VA,23238-5023,Landmark at Tuckahoe,Existing,332,Garden,2,Richmond,1970,,,8,R5,2,,0.67,825,1365,1361,Market,,All,C,37.5989300,-77.6161502
+6100 Strathmore Rd,Chesterfield,VA,23234,Parkway Gardens,Existing,44,Garden,2,Richmond,1965,,,11,,1,,3.76,675,636,633,Market,,All,C,37.4417441,-77.4503715
+2424 Stuart Ave,Richmond City,VA,23220,,Existing,6,Low-Rise,2,Richmond,1914,,,1,R-6,2,,,792,948,946,Market,,All,B,37.5560761,-77.4692736
+2621 Stuart Ave,Richmond City,VA,23220,Pierce Arrow Properties,Existing,38,Low-Rise,2,Richmond,1920,,Pierce Arrow Properties,1,R-6,3,,2.47,736,1054,1050,Market,,All,C,37.5564320,-77.4719890
+3200 Stuart Ave,Richmond City,VA,23221-2348,,Existing,6,Low-Rise,2,Richmond,1923,,,1,R-6,3,,3.33,850,,,Market,,All,B,37.5592680,-77.4783745
+3224 Stuart Ave,Richmond City,VA,23221-2362,The Collection,Existing,12,Low-Rise,2,Richmond,1926,,,2,R-6,3,,3.32,,,,Market,,All,C,37.5597580,-77.4793980
+3228 Stuart Ave,Richmond City,VA,23221,The Collection,Existing,12,Low-Rise,2,Richmond,1926,,,2,R-6,3,,3.32,,,,Market,,All,C,37.5598510,-77.4796240
+3420 Stuart Ave,Richmond City,VA,23221-2313,,Existing,4,Low-Rise,2,Richmond,1952,,,2,R-6,,,3.33,,,,Market,,All,,37.5607700,-77.4826000
+9712 Tartuffe Dr,Henrico,VA,23238,Gayton Pointe Townhomes,Existing,253,Garden,2,Richmond,1973,2007,,15,R5,2,,2.55,1061,1756,1748,Market,,All,C,37.6022610,-77.5917690
+101 Tempsford Ln,Richmond City,VA,23226,,Existing,10,Low-Rise,2,Richmond,1940,,,1,R-1,3,,3.14,,,,Market,,All,C,37.5664493,-77.5198303
+1821 Thomas St,Richmond City,VA,23220-1715,Ginter Park Apartment Portfolio,Existing,4,,2,Richmond,1963,,,,R-53,1,,,,,,Market,,,C,37.5616365,-77.4529064
+8802-8832 Three Chopt Rd,Henrico,VA,23229,Three Chopt West Apartments,Existing,290,Garden,2,Richmond,1960,,,18,R5,3,,3.25,1050,1484,1477,Market,,All,C,37.6035020,-77.5583140
+9250-9574 Three Chopt Rd,Henrico,VA,23229-4047,Landmark at Gayton,Existing,96,Garden,2,Richmond,1964,,,7,R5,2,,2.33,808,1430,1424,Market,,All,C,37.6148076,-77.5670020
+2576 Three Willows Ct,Henrico,VA,23294,Three Willows,Existing,136,Garden,2,Richmond,1971,,,4,R5,2,,0.00,1182,1527,1523,Market,,All,C,37.6242300,-77.5318460
+4100 Townhouse Rd,Henrico,VA,23228,Staples Mill Townhomes,Existing,437,Garden,2,Richmond,1958,,,27,R-5,2,,5.95,842,1217,1208,Market,,All,C,37.6068040,-77.4968440
+2517 E Tremont Ct,Richmond City,VA,23225-1952,Stratford Hills and Bethany Springs,Existing,430,Garden,2,Richmond,1966,,,55,R-48,2,,5.12,998,1358,1358,Market,,All,C,37.5345750,-77.5365940
+2212 Venable St,Richmond City,VA,23223,,Existing,6,Low-Rise,2,Richmond,1968,,,1,R-53,2,,5.16,,,,Market,,All,C,37.5385334,-77.4172243
+102 Water Oak Ln,Hanover,VA,23005,Sedgefield,Existing,262,,2,Richmond,1984,,,,PMH,1,,0.91,,,,Market,,,C,37.7531162,-77.4690325
+202 Welford St,Richmond City,VA,23222,,Existing,4,,2,Richmond,1920,,,,R-6,,,6.11,1261,887,881,Market,,All,C,37.5587028,-77.4311750
+204 Welford St,Richmond City,VA,23222,,Existing,4,,2,Richmond,1920,,,1,R-6,,,6.11,,,,Market,,All,C,37.5586950,-77.4310130
+1531-1539 West Ave,Richmond City,VA,23220,,Existing,12,Mid-Rise,2,Richmond,1915,,,,R-6,4,,3.32,,,,Market,,All,C,37.5514376,-77.4582428
+402 Westover Hills Blvd,Richmond City,VA,23225-6345,404 Rivertowne,Existing,523,Garden,2,Richmond,1963,,,23,R-53,3,,12.14,770,1107,1096,Market,,All,C,37.5122400,-77.4899330
+600 Westover Hills Blvd,Richmond City,VA,23225-4557,Westover Hills,Existing,37,Garden,2,Richmond,1967,,,4,R-4,2,,,760,802,800,Market,,All,C,37.5141230,-77.4901820
+603-A Westover Hills Blvd,Richmond City,VA,23225-4520,Ashton Square,Existing,410,Garden,2,Richmond,1964,2001,,31,R-53,3,,10.00,828,1152,1152,Market,,All,C,37.5140080,-77.4888350
+5852 Westower Dr,Richmond City,VA,23225-2709,The Residences of Westover Hills,Existing,258,Garden,2,Richmond,1974,,,15,R-43,2,,4.68,800,1307,1300,Market,,All,C,37.5254036,-77.5046900
+5314 Whetstone Rd,Chesterfield,VA,23234,Meadowbrook Apartments,Existing,493,Garden,2,Richmond,1973,,,54,,2,,3.09,1057,1470,1463,Market,,All,C,37.4517210,-77.4580230
+1808 Williamsburg Rd,Richmond City,VA,23231,,Existing,16,Low-Rise,2,Richmond,1975,,,1,R-02,2,,5.16,,,,Market,,All,C,37.5160763,-77.3918409
+1822 Williamsburg Rd,Richmond City,VA,23231,,Existing,12,Low-Rise,2,Richmond,1969,,,1,R-02,2,,5.16,,,,Market,,All,C,37.5166881,-77.3904826
+2201-2231 Williamsburg Rd,Richmond City,VA,23231,,Existing,16,Low-Rise,2,Richmond,1970,,,2,R-02,2,,5.16,,,,Market,,All,C,37.5171240,-77.3877870
+2202 Williamsburg Rd,Richmond City,VA,23231,,Existing,6,Low-Rise,2,Richmond,1965,,,1,R-02,2,,,900,,,Market,,All,C,37.5176560,-77.3880850
+319 Winston St,Henrico,VA,23222-2109,Victory at Edgewood,Existing,145,Townhome,2,Richmond,1971,,,7,R6,2,,6.30,784,1387,1377,Market,,All,C,37.5834225,-77.4270227
+12 E 12th St,Richmond City,VA,23224-3905,,Existing,2,Low-Rise,2,Richmond,1860,,,1,39,2,,4.00,,,,Market,,All,C,37.5206000,-77.4434900
+905 N 20th St,Richmond City,VA,23223-5166,,Existing,4,Low-Rise,2,Richmond,1958,,,1,R-63,2,,5.17,850,,,Market,,All,C,37.5396833,-77.4178737
+15 E 33rd St,Richmond City,VA,23224-1800,,Existing,5,Low-Rise,2,Richmond,1925,1973,,1,R-5,2,,4.00,,,,Market,,All,C,37.5104768,-77.4683350
+1816 Bath St,Richmond City,VA,23220-1717,,Existing,8,,2,Richmond,1969,,,1,R-53,,,6.11,,,,Market,,All,C,37.5618762,-77.4537910
+1101 Bevridge Rd,Henrico,VA,23226-3043,Landmark at Gayton,Existing,6,,2,Richmond,1958,,,,R3,2,,15.13,,1130,1119,Market,,All,C,37.5888426,-77.5202474
+22 S Boulevard,Richmond City,VA,23220-5791,,Existing,16,Mid-Rise,2,Richmond,1921,,Pierce Arrow Properties,1,R-48,4,,3.32,,,,Market,,All,C,37.5518400,-77.4764351
+3517 Briel St,Richmond City,VA,23223,,Existing,12,,2,Richmond,1966,,,1,R-53,2,,5.16,,,,Market,,All,B,37.5316689,-77.3962885
+1407-1411 E Cary St,Richmond City,VA,23219-4247,Europa Apartments,Existing,19,Low-Rise,2,Richmond,1910,,,1,B-5,,,3.32,963,,,Market,,All,C,37.5341685,-77.4321295
+316 Chimborazo Blvd,Richmond City,VA,23223-7525,,Existing,2,,2,Richmond,1922,1980,,1,R-63,2,,5.17,1830,,,Market,,All,C,37.5273097,-77.4103226
+3101 Danzler Cir,Chesterfield,VA,23224,,Existing,18,Garden,2,Richmond,1969,,,9,R7,2,,3.76,,,,Market,,All,C,37.4665308,-77.5154124
+2504 Floyd Ave,Richmond City,VA,23220-4482,,Existing,2,Low-Rise,2,Richmond,1910,,,1,R-6,2,,3.33,1050,,,Market,,All,C,37.5528430,-77.4715044
+1836 Grace,Richmond City,VA,23220-2105,,Existing,1,,2,Richmond,1910,,,,,,,3.32,,,,Market,,All,,37.5559479,-77.4606574
+1650 W Grace St,Richmond City,VA,23220,,Existing,4,Low-Rise,2,Richmond,1915,,,1,R-48,3,,3.33,,,,Market,,All,C,37.5547676,-77.4587249
+1411 Grove Ave,Richmond City,VA,23220-4649,The Ritz,Existing,33,Low-Rise,2,Richmond,1928,,,1,R-6,3,,,739,1053,1050,Market,,All,C,37.5487148,-77.4579568
+9701 Jefferson Davis Hwy,Chesterfield,VA,23237-4666,Holiday Mobile Home Park,Existing,140,,2,Richmond,1967,,,,MH1,1,,3.76,498,,,Market,,All,C,37.3937053,-77.4259763
+1002 Keller Rd,Henrico,VA,23229-6367,,Existing,2,Low-Rise,2,Richmond,1962,,,1,R5,2,,5.15,,,,Market,,All,C,37.5946288,-77.5728685
+3201 Lady Marian Ln,Chesterfield,VA,23113,,Existing,1,Low-Rise,2,Richmond,1989,,,1,R40,2,,4.09,4139,,,Market,,All,C,37.5379157,-77.6108209
+1911 Lakeview Ave,Richmond City,VA,23220,Lakeview Place,Existing,36,Low-Rise,2,Richmond,1966,,,2,R-5,2,,3.32,661,778,774,Market,,All,C,37.5428104,-77.4679926
+2310 Lamb Ave,Richmond City,VA,23222-4410,,Existing,1,Single-Family Home,2,Richmond,1980,,,1,,3,,6.11,,,,Market,,All,C,37.5638688,-77.4311520
+3612 Lawson St,Richmond City,VA,23224-1860,,Existing,1,Single-Family Home,2,Richmond,1987,,,1,R-5,1,,4.00,,,,Market,,All,C,37.5054000,-77.4697100
+1603 W Main St,Richmond City,VA,23220-4632,,Existing,1,,2,Richmond,1970,,,1,,2,,3.32,,,,Market,,All,C,37.5473744,-77.4612469
+306 W Marshall St,Richmond City,VA,23220-3934,,Existing,2,Low-Rise,2,Richmond,1848,,,1,R6,3,,3.33,,,,Market,,,C,37.5483546,-77.4438993
+4001 Midlothian Tpke,Richmond City,VA,23224-1325,,Existing,1,,2,Richmond,1979,,,1,R-4,,,4.00,,,,Market,,All,B,37.5098400,-77.4785700
+2112 Monteiro Ave,Richmond City,VA,23222,Barton Mansion,Existing,17,Low-Rise,2,Richmond,1890,2020,,1,R-6,3,,6.11,1000,,,Market,,All,C,37.5619500,-77.4305300
+2005 Monument Ave,Richmond City,VA,23220-2736,,Existing,19,,2,Richmond,1930,,,,R-6,,,3.32,,,,Market,,,C,37.5549500,-77.4627900
+2025 Monument Ave,Richmond City,VA,23220-2740,The Straus,Existing,8,,2,Richmond,1922,1960,,,R-6,2,,3.33,,,,Market,,All,C,37.5554860,-77.4636563
+2816 Monument Ave,Richmond City,VA,23221-1751,,Existing,14,Low-Rise,2,Richmond,1920,,,1,R-48,,,3.32,500,,,Market,,All,C,37.5614332,-77.4720443
+2702 P St,Richmond City,VA,23223-6532,,Existing,2,Low-Rise,2,Richmond,1920,,,1,R-63,2,,5.17,,,,Market,,All,C,37.5366502,-77.4109085
+3145 Parkdale Rd,Chesterfield,VA,23234-6357,,Existing,12,Low-Rise,2,Richmond,1956,,,3,R7,1,,3.76,,,,Market,,All,B,37.4379419,-77.4518733
+2102 Phaup St,Richmond City,VA,23223,,Existing,26,,2,Richmond,1970,,,2,R-53,2,,5.16,,,,Market,,All,C,37.5510064,-77.4070180
+3012-3026 Q St,Richmond City,VA,23223-6750,,Existing,12,,2,Richmond,1900,,,8,R-6,,,5.16,,,,Market,,All,C,37.5355400,-77.4071100
+11-15 S Randolph St,Richmond City,VA,23220,,Existing,6,Low-Rise,2,Richmond,1980,,,1,R-63,1,,3.33,,,,Market,,All,C,37.5455855,-77.4582327
+5400 Remuda Dr,Chesterfield,VA,23234,,Existing,26,,2,Richmond,1963,,,,R7,2,,3.76,,,,Market,,All,C,37.4495076,-77.4440923
+4183 Richmond Hwy,Richmond City,VA,23234-2757,Oak Tree Apartments,Existing,40,Garden,2,Richmond,1970,,,9,R-48,1,,4.00,,,,Market,,All,C,37.4694608,-77.4424721
+905 Roseneath Rd,Richmond City,VA,23221-1336,,Existing,11,,2,Richmond,1927,,,,R-6,,,3.32,,,,Market,,,C,37.5656700,-77.4784500
+104 Shockoe Slip,Richmond City,VA,23219-4131,Bowers Building,Existing,15,Mid-Rise,2,Richmond,1880,1977,,1,B5,5,,3.32,900,1230,1224,Market,,All,C,37.5351062,-77.4342676

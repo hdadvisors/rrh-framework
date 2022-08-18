@@ -13,10 +13,12 @@ library(ggplot2)
 library(simplevis)
 library(stats)
 library(lubridate)
+library(scales)
+library(plotly)
 
 ```
 
-```{r chas}
+```{r chas, eval=FALSE}
 # years <- 2015:2018
 # 
 # sumlev <- "050"
@@ -116,8 +118,79 @@ library(lubridate)
 
 ```
 
-Cost burden
-```{r cb-income}
+### Cost burden
+
+The share of cost-burdened households has been decreasing across the region from 2015 to 2018. In nearly every locality, the share of cost-burdened households has decreased by three percentage points. This seems surprising given the growing affordability challenges experienced by the region's residents.
+
+
+```{r cb-locality, fig.cap= Share of cost-burdened households by locality. Source: Comprehensive Housing Affordability Strategy (CHAS)."}
+
+income_pha_perc <- cb_7 |> 
+  subset(county %in% pha_localities) |> 
+  group_by(year, county, household_income, cb_group) |>
+  summarise(estimate = sum(estimate))
+
+income_pha_perc <- income_pha_perc |> 
+  transform(percent = ave(estimate, year, county, FUN = prop.table))
+
+income_pha_perc_18 <- income_pha_perc |> 
+  filter(year == 2018 | year == 2015) |> 
+  select(year,county, household_income, cb_group, estimate) |> 
+  group_by(year, county, cb_group) |> 
+  summarise(estimate = sum(estimate)) |> 
+  transform(percent = ave(estimate, year, county, FUN = prop.table))
+
+cb_share <- ggplot(income_pha_perc_18,
+       aes(x = county,
+           y = percent,
+           fill = forcats::fct_rev(cb_group))) +
+  facet_wrap(~year) +
+  geom_bar(stat = "identity", position = "stack") +
+  scale_y_continuous(labels = percent_format()) +
+  theme(axis.title = element_blank(),
+        axis.text.x = element_text(angle= 90, hjust = 1, vjust = 1)) +
+  labs(title = "Share of cost-burdened households by locality", fill = "Cost burden") +
+  scale_fill_manual(values = c("grey", "red"))
+
+ggplotly(cb_share) |> 
+  plotly_camera()
+
+```
+
+```{r cb-tenure, fig.cap="Change in housing cost burden by tenure. Source: Comprehensive Housing Affordability Strategy (CHAS)."}
+
+cb_tenure_pha <- cb_7 |> 
+  subset(county %in% pha_localities) |> 
+  group_by(year, county, tenure, cb_group) |> 
+  summarise(estimate = sum(estimate)) |>
+  pivot_wider(
+    names_from = year,
+    values_from = estimate
+  ) |> 
+  clean_names() |> 
+  transform(difference = (x2018 - x2015))
+
+
+cb_tenure_pha <- cb_tenure_pha |> 
+  filter(cb_group == "Cost-burdened")
+
+cb_tenure_bar <- ggplot(cb_tenure_pha,
+       aes(x = county,
+           y = difference,
+           fill = tenure)) +
+  geom_bar(stat = "identity") + 
+  facet_wrap(~tenure) +
+  labs(title = "Change in housing cost burden by tenure: 2015 to 2018") +
+  theme(legend.position = "none",
+        axis.title = element_blank()) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 1))
+
+ggplotly(cb_tenure_bar) |> 
+  plotly_camera()
+
+```
+
+```{r cb-income, fig.cap="Change in housing cost burden by AMI. Source: Comprehensive Housing Affordability Strategy (CHAS)."}
 
 cb_7 <- read_csv("data/Table7_2015to2018.csv") |> 
   clean_names() |> 
@@ -169,70 +242,27 @@ cb_7_pha <- cb_7 |>
 
 cb_income_pha <- cb_7_pha |> 
   filter(cb_group == "Cost-burdened")
+
+ggplot(cb_income_pha,
+       aes(x = household_income,
+           y = difference,
+           fill = household_income)) +
+  geom_bar(stat = "identity") +
+  scale_y_continuous(labels = number_format(big.mark = ",")) +
+  theme(axis.title = element_blank(),
+        axis.text.x = element_text(angle = 90, hjust = 1, vjust =1)) +
+  scale_x_discrete(limits= c("30% AMI or less", "31 to 50% AMI", "51 to 80% AMI", "81 to 100% AMI", "101% AMI or greater")) +
+  scale_fill_discrete(limits= c("30% AMI or less", "31 to 50% AMI", "51 to 80% AMI", "81 to 100% AMI", "101% AMI or greater")) +
+  labs(title = "Change in housing cost burden by AMI: 2015 to 2018", fill = "AMI")
   
-gg_bar_col(cb_income_pha,
-                 x_var = household_income,
-                 y_var = difference,
-                 col_var = household_income
-) +
-  scale_x_discrete(limits= c("30% AMI or less", "31 to 50% AMI", "51 to 80% AMI", "81 to 100% AMI", "101% AMI or greater")) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  labs(title = "Cost burden from 2015 to 2018") +
-  theme(legend.position = "none")
 
 ```
 
-```{r cb-locality, fig.cap= "Percent cost-burdened by locality}
-
-income_pha_perc <- cb_7 |> 
-  subset(county %in% pha_localities) |> 
-  group_by(year, county, household_income, cb_group) |>
-  summarise(estimate = sum(estimate))
-
-income_pha_perc <- income_pha_perc |> 
-  transform(percent = ave(estimate, year, county, FUN = prop.table))
-
-income_pha_perc_18 <- income_pha_perc |> 
-  filter(year == 2018)
-
-ggplot(income_pha_perc_18,
-       aes(x = county,
-           y = percent,
-           fill = cb_group)) +
-  geom_bar(stat = "identity", position = "stack")
 
 
-```
-
-```{r cb-tenure}
-
-cb_tenure_pha <- cb_7 |> 
-  subset(county %in% pha_localities) |> 
-  group_by(year, county, tenure, cb_group) |> 
-  summarise(estimate = sum(estimate)) |> 
-  pivot_wider(
-    names_from = year,
-    values_from = estimate
-  ) |> 
-  clean_names() |> 
-  transform(difference = (x2018 - x2015))
-
-cb_tenure_pha <- cb_tenure_pha |> 
-  filter(cb_group == "Cost-burdened")
-  
-gg_bar_col_facet(cb_tenure_pha,
-                 x_var = county,
-                 y_var = difference,
-                 col_var = tenure,
-                 facet_var = tenure
-) +
-  labs(title = "Cost burden from 2015 to 2018") +
-  theme(legend.position = "none") + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 
-```
-
-```{r cb-hh}
+```{r cb-hh, fig.cap="Change in housing cost burden by household type. Source: Comprehensive Housing Affordability Strategy (CHAS)."}
 
 cb_hh_pha <- cb_7 |> 
   subset(county %in% pha_localities) |> 
@@ -246,21 +276,23 @@ cb_hh_pha <- cb_7 |>
   transform(difference = (x2018 - x2015)) |> 
   filter(cb_group == "Cost-burdened")
 
-gg_bar_col_facet(cb_hh_pha,
-             x_var = household_type,
-                 y_var = difference,
-                 facet_var = county,
-             col_var = household_type) +
-  labs(title = "Cost burden from 2015 to 2018") +
-  theme(legend.position = "right") + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+ggplot(cb_hh_pha,
+       aes(x = household_type,
+           y = difference,
+           fill = household_type)) +
+  geom_bar(stat = "identity") + 
+  facet_wrap(~county) +
+  labs(title = "Change in housing cost burden by housing type: 2015 to 2018") +
+  theme(legend.position = "none",
+        axis.title = element_blank(),
+        axis.text.x = element_text(angle = 90, hjust = 1))
 
 
 ```
 
-Mortgage delinquency and foreclosure
+### Mortgage delinquency and foreclosure
 
-```{r mort-del}
+```{r mort-del, fig.cap="Mortgage delinquency rate by locality. Source: Consumer Financial Protection Bureau (CFPB)."}
 
 pha_localities <- c("Richmond city", "Chesterfield County", "Hanover County", "Henrico County")
 
@@ -272,22 +304,63 @@ mort_del <- read_csv("data/mortgage_del.csv") |>
   )|> 
   mutate(period = ym(period)) |> 
   filter(State == "VA") |> 
-  subset(Name %in% pha_localities)
+  subset(Name %in% pha_localities) |> 
+  mutate(estimate = estimate/100)
+
+ggplot(mort_del,
+       aes(x = period,
+           y = estimate,
+           color = Name)) +
+  geom_line(stat = "identity", size = 1) +
+  facet_wrap(~Name) +
+  scale_y_continuous(labels = percent_format()) +
+  theme(axis.title = element_blank()) +
+  labs(title = "Mortgage delinquency rate by locality: 2008 through 2021", color = "Locality")
 
 
 ```
 
+### Eviction filings and judgements
+```{r evictions, fig.cap="Evictions and filings by locality. Source: RVA Eviction Lab"}
 
-Eviction filings and judgements
-```{r evictions}
+evictions <- read_csv("data/evictions_17_22.csv") |> 
+  pivot_longer(3:128,
+               names_to = "data",
+               values_to = "value") |> 
+  mutate(type = case_when(
+    str_detect(data, "Filings") ~ "Filings",
+    str_detect(data,"Evictions") ~ "Evictions"
+  )) |> 
+  mutate(date = str_sub(data, -7, -1)) |> 
+  mutate(date = ym(date))
+
+ggplot(evictions,
+       aes(x = date,
+           y = value,
+           fill = type)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~Jurisdiction) +
+  theme(axis.title = element_blank()) +
+  scale_y_continuous(labels = number_format(big.mark = ",")) +
+  labs(title = "Evictions and filings by locality: 2017 through Q3 2022", fill = "Action")
+  
 
 ```
 
-Housing Resource Line
-```{r call-vol}
+### Housing Resource Line
+```{r call-vol, fig.cap="PHA Housing Resource Line call volume. Source: Partnership for Housing Affordability."}
 
 call_vol <- read_csv("data/hrl_vol.csv") |> 
   mutate(date = ym(date))
+
+call_vol_bar <- ggplot(call_vol,
+       aes(x = date,
+           y = volume)) +
+  geom_bar(stat = "identity", fill = "red") +
+  labs(title = "PHA Housing Resource Line call volume") +
+  theme(axis.title = element_blank())
+
+call_vol_bar
 
 ```
 
@@ -295,10 +368,23 @@ call_vol <- read_csv("data/hrl_vol.csv") |>
 
 call_top <- read_csv("data/hrl_need.csv")
 
+call_top_bar <- ggplot(call_top,
+       aes(x = reorder(need, vol), 
+           y = vol,
+           fill = need)) +
+  geom_bar(stat = "identity") + 
+  theme(axis.title = element_blank(),
+        legend.position = "none") +
+  scale_y_continuous(labels = number_format(big.mark = ",")) +
+  labs(title = "PHA Housing Resource Line call volume by topic") +
+  coord_flip()
+
+call_top_bar
+
 ```
 
 
-Homelessness
+### Homelessness
 ```{r pit}
 
 years <- as.character(2007:2021)
@@ -339,15 +425,46 @@ full_set_longer <- full_set %>%
     values_to = "value"
   )
 
-full_set_longer <- full_set_longer |> 
-  filter(str_detect(co_c_name, "Richmond")) |> 
-  filter(str_detect(category, "overall"))
+rva_coc <- full_set_longer |> 
+  filter(co_c_number == "VA-500") |> 
+  filter(str_detect(category, "overall_homeless"))
+
+rva_pit <- rva_coc |> 
+  filter(category == "overall_homeless")
+
+rva_pit_bar <- ggplot(rva_pit,
+       aes(x = year,
+           y = value)) +
+  geom_bar(stat = "identity", fill = "dark green") +
+  labs(title = "Richmond Continuum-of-Care Point-in-Time count") +
+  theme(axis.title = element_blank()) +
+  scale_y_continuous(labels = number_format(big.mark = ","))
+
+rva_pit_bar
 
 
 ```
 
 
 ```{r mkv}
+
+div <- c(21, 42, 43, 123)
+
+mkv <- read_csv("data/mkv.csv") |> 
+  subset(Division %in% div)
+
+mkv_bar <- ggplot(mkv,
+       aes(x = year,
+           y = students,
+           fill = Name)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~Name) +
+  labs(title = "Enrolled students experiencing homelessness by school year", fill = "School division") +
+  theme(axis.title = element_blank(),
+        legend.position = "none") +
+  scale_y_continuous(labels = number_format(big.mark = ","))
+
+mkv_bar
 
 ```
 

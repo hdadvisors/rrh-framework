@@ -22,7 +22,7 @@ library(simplevis)
 rr <- c("51085", "51760", "51075", "51145", "51087", "51127", "51036", "51041")
 pha <- c("51085", "51760", "51087", "51041")
 
-pha_names <- c("Richmond city", "Henrico County", "Hanover County", "Chesterfield County")
+pha_names <- c("Richmond City", "Henrico County", "Hanover County", "Chesterfield County")
 
 ```
 

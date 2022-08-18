@@ -4050,15 +4050,875 @@ function asArray(value) {
 
 },{}]},{},[13]);
 </script>
+<script>(function (root, factory) {
+	if (typeof define === 'function' && define.amd) {
+		// AMD. Register as an anonymous module.
+		define(['leaflet'], factory);
+	} else if (typeof modules === 'object' && module.exports) {
+		// define a Common JS module that relies on 'leaflet'
+		module.exports = factory(require('leaflet'));
+	} else {
+		// Assume Leaflet is loaded into global object L already
+		factory(L);
+	}
+}(this, function (L) {
+	'use strict';
+
+	L.TileLayer.Provider = L.TileLayer.extend({
+		initialize: function (arg, options) {
+			var providers = L.TileLayer.Provider.providers;
+
+			var parts = arg.split('.');
+
+			var providerName = parts[0];
+			var variantName = parts[1];
+
+			if (!providers[providerName]) {
+				throw 'No such provider (' + providerName + ')';
+			}
+
+			var provider = {
+				url: providers[providerName].url,
+				options: providers[providerName].options
+			};
+
+			// overwrite values in provider from variant.
+			if (variantName && 'variants' in providers[providerName]) {
+				if (!(variantName in providers[providerName].variants)) {
+					throw 'No such variant of ' + providerName + ' (' + variantName + ')';
+				}
+				var variant = providers[providerName].variants[variantName];
+				var variantOptions;
+				if (typeof variant === 'string') {
+					variantOptions = {
+						variant: variant
+					};
+				} else {
+					variantOptions = variant.options;
+				}
+				provider = {
+					url: variant.url || provider.url,
+					options: L.Util.extend({}, provider.options, variantOptions)
+				};
+			}
+
+			// replace attribution placeholders with their values from toplevel provider attribution,
+			// recursively
+			var attributionReplacer = function (attr) {
+				if (attr.indexOf('{attribution.') === -1) {
+					return attr;
+				}
+				return attr.replace(/\{attribution.(\w*)\}/g,
+					function (match, attributionName) {
+						return attributionReplacer(providers[attributionName].options.attribution);
+					}
+				);
+			};
+			provider.options.attribution = attributionReplacer(provider.options.attribution);
+
+			// Compute final options combining provider options with any user overrides
+			var layerOpts = L.Util.extend({}, provider.options, options);
+			L.TileLayer.prototype.initialize.call(this, provider.url, layerOpts);
+		}
+	});
+
+	/**
+	 * Definition of providers.
+	 * see http://leafletjs.com/reference.html#tilelayer for options in the options map.
+	 */
+
+	L.TileLayer.Provider.providers = {
+		OpenStreetMap: {
+			url: '//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+			options: {
+				maxZoom: 19,
+				attribution:
+					'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+			},
+			variants: {
+				Mapnik: {},
+				DE: {
+					url: '//{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png',
+					options: {
+						maxZoom: 18
+					}
+				},
+				CH: {
+					url: '//tile.osm.ch/switzerland/{z}/{x}/{y}.png',
+					options: {
+						maxZoom: 18,
+						bounds: [[45, 5], [48, 11]]
+					}
+				},
+				France: {
+					url: '//{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
+					options: {
+						maxZoom: 20,
+						attribution: '&copy; Openstreetmap France | {attribution.OpenStreetMap}'
+					}
+				},
+				HOT: {
+					url: '//{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
+					options: {
+						attribution:
+							'{attribution.OpenStreetMap}, ' +
+							'Tiles style by <a href="https://www.hotosm.org/" target="_blank">Humanitarian OpenStreetMap Team</a> ' +
+							'hosted by <a href="https://openstreetmap.fr/" target="_blank">OpenStreetMap France</a>'
+					}
+				},
+				BZH: {
+					url: '//tile.openstreetmap.bzh/br/{z}/{x}/{y}.png',
+					options: {
+						attribution: '{attribution.OpenStreetMap}, Tiles courtesy of <a href="http://www.openstreetmap.bzh/" target="_blank">Breton OpenStreetMap Team</a>',
+						bounds: [[46.2, -5.5], [50, 0.7]]
+					}
+				}
+			}
+		},
+		OpenSeaMap: {
+			url: '//tiles.openseamap.org/seamark/{z}/{x}/{y}.png',
+			options: {
+				attribution: 'Map data: &copy; <a href="http://www.openseamap.org">OpenSeaMap</a> contributors'
+			}
+		},
+		OpenPtMap: {
+			url: 'http://openptmap.org/tiles/{z}/{x}/{y}.png',
+			options: {
+				maxZoom: 17,
+				attribution: 'Map data: &copy; <a href="http://www.openptmap.org">OpenPtMap</a> contributors'
+			}
+		},
+		OpenTopoMap: {
+			url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+			options: {
+				maxZoom: 17,
+				attribution: 'Map data: {attribution.OpenStreetMap}, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+			}
+		},
+		OpenRailwayMap: {
+			url: 'https://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png',
+			options: {
+				maxZoom: 19,
+				attribution: 'Map data: {attribution.OpenStreetMap} | Map style: &copy; <a href="https://www.OpenRailwayMap.org">OpenRailwayMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+			}
+		},
+		OpenFireMap: {
+			url: 'http://openfiremap.org/hytiles/{z}/{x}/{y}.png',
+			options: {
+				maxZoom: 19,
+				attribution: 'Map data: {attribution.OpenStreetMap} | Map style: &copy; <a href="http://www.openfiremap.org">OpenFireMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+			}
+		},
+		SafeCast: {
+			url: '//s3.amazonaws.com/te512.safecast.org/{z}/{x}/{y}.png',
+			options: {
+				maxZoom: 16,
+				attribution: 'Map data: {attribution.OpenStreetMap} | Map style: &copy; <a href="https://blog.safecast.org/about/">SafeCast</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+			}
+		},
+		Thunderforest: {
+			url: 'https://{s}.tile.thunderforest.com/{variant}/{z}/{x}/{y}.png?apikey={apikey}',
+			options: {
+				attribution:
+					'&copy; <a href="http://www.thunderforest.com/">Thunderforest</a>, {attribution.OpenStreetMap}',
+				variant: 'cycle',
+				apikey: '<insert your api key here>',
+				maxZoom: 22
+			},
+			variants: {
+				OpenCycleMap: 'cycle',
+				Transport: {
+					options: {
+						variant: 'transport'
+					}
+				},
+				TransportDark: {
+					options: {
+						variant: 'transport-dark'
+					}
+				},
+				SpinalMap: {
+					options: {
+						variant: 'spinal-map'
+					}
+				},
+				Landscape: 'landscape',
+				Outdoors: 'outdoors',
+				Pioneer: 'pioneer',
+				MobileAtlas: 'mobile-atlas',
+				Neighbourhood: 'neighbourhood'
+			}
+		},
+		OpenMapSurfer: {
+			url: 'https://maps.heigit.org/openmapsurfer/tiles/{variant}/webmercator/{z}/{x}/{y}.png',
+			options: {
+				maxZoom: 19,
+				variant: 'roads',
+				attribution: 'Imagery from <a href="http://giscience.uni-hd.de/">GIScience Research Group @ University of Heidelberg</a> | Map data '
+			},
+			variants: {
+				Roads: {
+					options: {
+						variant: 'roads',
+						attribution: '{attribution.OpenMapSurfer}{attribution.OpenStreetMap}'
+					}
+				},
+				Hybrid: {
+					options: {
+						variant: 'hybrid',
+						attribution: '{attribution.OpenMapSurfer}{attribution.OpenStreetMap}'
+					}
+				},
+				AdminBounds: {
+					options: {
+						variant: 'adminb',
+						maxZoom: 18,
+						attribution: '{attribution.OpenMapSurfer}{attribution.OpenStreetMap}'
+					}
+				},
+				ContourLines: {
+					options: {
+						variant: 'asterc',
+						maxZoom: 18,
+						minZoom: 13,
+						attribution: '{attribution.OpenMapSurfer} <a href="https://lpdaac.usgs.gov/products/aster_policies">ASTER GDEM</a>'
+					}
+				},
+				Hillshade: {
+					options: {
+						variant: 'asterh',
+						maxZoom: 18,
+						attribution: '{attribution.OpenMapSurfer} <a href="https://lpdaac.usgs.gov/products/aster_policies">ASTER GDEM</a>, <a href="http://srtm.csi.cgiar.org/">SRTM</a>'
+					}
+				},
+				ElementsAtRisk: {
+					options: {
+						variant: 'elements_at_risk',
+						attribution: '{attribution.OpenMapSurfer}{attribution.OpenStreetMap}'
+					}
+				}
+			}
+		},
+		Hydda: {
+			url: '//{s}.tile.openstreetmap.se/hydda/{variant}/{z}/{x}/{y}.png',
+			options: {
+				maxZoom: 18,
+				variant: 'full',
+				attribution: 'Tiles courtesy of <a href="http://openstreetmap.se/" target="_blank">OpenStreetMap Sweden</a> &mdash; Map data {attribution.OpenStreetMap}'
+			},
+			variants: {
+				Full: 'full',
+				Base: 'base',
+				RoadsAndLabels: 'roads_and_labels'
+			}
+		},
+		MapBox: {
+			url: 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}{r}.png?access_token={accessToken}',
+			options: {
+				attribution:
+					'<a href="https://www.mapbox.com/about/maps/" target="_blank">&copy; Mapbox</a> ' +
+					'{attribution.OpenStreetMap} ' +
+					'<a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a>',
+				subdomains: 'abcd',
+				id: 'mapbox.streets',
+				accessToken: '<insert your access token here>',
+			}
+		},
+		Stamen: {
+			url: '//stamen-tiles-{s}.a.ssl.fastly.net/{variant}/{z}/{x}/{y}{r}.{ext}',
+			options: {
+				attribution:
+					'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ' +
+					'<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; ' +
+					'Map data {attribution.OpenStreetMap}',
+				subdomains: 'abcd',
+				minZoom: 0,
+				maxZoom: 20,
+				variant: 'toner',
+				ext: 'png'
+			},
+			variants: {
+				Toner: 'toner',
+				TonerBackground: 'toner-background',
+				TonerHybrid: 'toner-hybrid',
+				TonerLines: 'toner-lines',
+				TonerLabels: 'toner-labels',
+				TonerLite: 'toner-lite',
+				Watercolor: {
+					url: '//stamen-tiles-{s}.a.ssl.fastly.net/{variant}/{z}/{x}/{y}.{ext}',
+					options: {
+						variant: 'watercolor',
+						ext: 'jpg',
+						minZoom: 1,
+						maxZoom: 16
+					}
+				},
+				Terrain: {
+					options: {
+						variant: 'terrain',
+						minZoom: 0,
+						maxZoom: 18
+					}
+				},
+				TerrainBackground: {
+					options: {
+						variant: 'terrain-background',
+						minZoom: 0,
+						maxZoom: 18
+					}
+				},
+				TerrainLabels: {
+					options: {
+						variant: 'terrain-labels',
+						minZoom: 0,
+						maxZoom: 18
+					}
+				},
+				TopOSMRelief: {
+					url: '//stamen-tiles-{s}.a.ssl.fastly.net/{variant}/{z}/{x}/{y}.{ext}',
+					options: {
+						variant: 'toposm-color-relief',
+						ext: 'jpg',
+						bounds: [[22, -132], [51, -56]]
+					}
+				},
+				TopOSMFeatures: {
+					options: {
+						variant: 'toposm-features',
+						bounds: [[22, -132], [51, -56]],
+						opacity: 0.9
+					}
+				}
+			}
+		},
+		TomTom: {
+			url: 'https://{s}.api.tomtom.com/map/1/tile/{variant}/{style}/{z}/{x}/{y}.{ext}?key={apikey}',
+			options: {
+				variant: 'basic',
+				maxZoom: 22,
+				attribution:
+					'<a href="https://tomtom.com" target="_blank">&copy;  1992 - ' + new Date().getFullYear() + ' TomTom.</a> ',
+				subdomains: 'abcd',
+				style: 'main',
+				ext: 'png',
+				apikey: '<insert your API key here>',
+			},
+			variants: {
+				Basic: 'basic',
+				Hybrid: 'hybrid',
+				Labels: 'labels'
+			}
+		},
+		Esri: {
+			url: '//server.arcgisonline.com/ArcGIS/rest/services/{variant}/MapServer/tile/{z}/{y}/{x}',
+			options: {
+				variant: 'World_Street_Map',
+				attribution: 'Tiles &copy; Esri'
+			},
+			variants: {
+				WorldStreetMap: {
+					options: {
+						attribution:
+							'{attribution.Esri} &mdash; ' +
+							'Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
+					}
+				},
+				DeLorme: {
+					options: {
+						variant: 'Specialty/DeLorme_World_Base_Map',
+						minZoom: 1,
+						maxZoom: 11,
+						attribution: '{attribution.Esri} &mdash; Copyright: &copy;2012 DeLorme'
+					}
+				},
+				WorldTopoMap: {
+					options: {
+						variant: 'World_Topo_Map',
+						attribution:
+							'{attribution.Esri} &mdash; ' +
+							'Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
+					}
+				},
+				WorldImagery: {
+					options: {
+						variant: 'World_Imagery',
+						attribution:
+							'{attribution.Esri} &mdash; ' +
+							'Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+					}
+				},
+				WorldTerrain: {
+					options: {
+						variant: 'World_Terrain_Base',
+						maxZoom: 13,
+						attribution:
+							'{attribution.Esri} &mdash; ' +
+							'Source: USGS, Esri, TANA, DeLorme, and NPS'
+					}
+				},
+				WorldShadedRelief: {
+					options: {
+						variant: 'World_Shaded_Relief',
+						maxZoom: 13,
+						attribution: '{attribution.Esri} &mdash; Source: Esri'
+					}
+				},
+				WorldPhysical: {
+					options: {
+						variant: 'World_Physical_Map',
+						maxZoom: 8,
+						attribution: '{attribution.Esri} &mdash; Source: US National Park Service'
+					}
+				},
+				OceanBasemap: {
+					options: {
+						variant: 'Ocean_Basemap',
+						maxZoom: 13,
+						attribution: '{attribution.Esri} &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri'
+					}
+				},
+				NatGeoWorldMap: {
+					options: {
+						variant: 'NatGeo_World_Map',
+						maxZoom: 16,
+						attribution: '{attribution.Esri} &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC'
+					}
+				},
+				WorldGrayCanvas: {
+					options: {
+						variant: 'Canvas/World_Light_Gray_Base',
+						maxZoom: 16,
+						attribution: '{attribution.Esri} &mdash; Esri, DeLorme, NAVTEQ'
+					}
+				}
+			}
+		},
+		OpenWeatherMap: {
+			url: 'http://{s}.tile.openweathermap.org/map/{variant}/{z}/{x}/{y}.png?appid={apiKey}',
+			options: {
+				maxZoom: 19,
+				attribution: 'Map data &copy; <a href="http://openweathermap.org">OpenWeatherMap</a>',
+				apiKey:'<insert your api key here>',
+				opacity: 0.5
+			},
+			variants: {
+				Clouds: 'clouds',
+				CloudsClassic: 'clouds_cls',
+				Precipitation: 'precipitation',
+				PrecipitationClassic: 'precipitation_cls',
+				Rain: 'rain',
+				RainClassic: 'rain_cls',
+				Pressure: 'pressure',
+				PressureContour: 'pressure_cntr',
+				Wind: 'wind',
+				Temperature: 'temp',
+				Snow: 'snow'
+			}
+		},
+		HERE: {
+			/*
+			 * HERE maps, formerly Nokia maps.
+			 * These basemaps are free, but you need an API key. Please sign up at
+			 * https://developer.here.com/plans
+			 */
+			url:
+				'https://{s}.{base}.maps.api.here.com/maptile/2.1/' +
+				'{type}/{mapID}/{variant}/{z}/{x}/{y}/{size}/{format}?' +
+				'app_id={app_id}&app_code={app_code}&lg={language}',
+			options: {
+				attribution:
+					'Map &copy; 1987-' + new Date().getFullYear() + ' <a href="http://developer.here.com">HERE</a>',
+				subdomains: '1234',
+				mapID: 'newest',
+				'app_id': '<insert your app_id here>',
+				'app_code': '<insert your app_code here>',
+				base: 'base',
+				variant: 'normal.day',
+				maxZoom: 20,
+				type: 'maptile',
+				language: 'eng',
+				format: 'png8',
+				size: '256'
+			},
+			variants: {
+				normalDay: 'normal.day',
+				normalDayCustom: 'normal.day.custom',
+				normalDayGrey: 'normal.day.grey',
+				normalDayMobile: 'normal.day.mobile',
+				normalDayGreyMobile: 'normal.day.grey.mobile',
+				normalDayTransit: 'normal.day.transit',
+				normalDayTransitMobile: 'normal.day.transit.mobile',
+				normalDayTraffic: {
+					options: {
+						variant: 'normal.traffic.day',
+						base: 'traffic',
+						type: 'traffictile'
+					}
+				},
+				normalNight: 'normal.night',
+				normalNightMobile: 'normal.night.mobile',
+				normalNightGrey: 'normal.night.grey',
+				normalNightGreyMobile: 'normal.night.grey.mobile',
+				normalNightTransit: 'normal.night.transit',
+				normalNightTransitMobile: 'normal.night.transit.mobile',
+				reducedDay: 'reduced.day',
+				reducedNight: 'reduced.night',
+				basicMap: {
+					options: {
+						type: 'basetile'
+					}
+				},
+				mapLabels: {
+					options: {
+						type: 'labeltile',
+						format: 'png'
+					}
+				},
+				trafficFlow: {
+					options: {
+						base: 'traffic',
+						type: 'flowtile'
+					}
+				},
+				carnavDayGrey: 'carnav.day.grey',
+				hybridDay: {
+					options: {
+						base: 'aerial',
+						variant: 'hybrid.day'
+					}
+				},
+				hybridDayMobile: {
+					options: {
+						base: 'aerial',
+						variant: 'hybrid.day.mobile'
+					}
+				},
+				hybridDayTransit: {
+					options: {
+						base: 'aerial',
+						variant: 'hybrid.day.transit'
+					}
+				},
+				hybridDayGrey: {
+					options: {
+						base: 'aerial',
+						variant: 'hybrid.grey.day'
+					}
+				},
+				hybridDayTraffic: {
+					options: {
+						variant: 'hybrid.traffic.day',
+						base: 'traffic',
+						type: 'traffictile'
+					}
+				},
+				pedestrianDay: 'pedestrian.day',
+				pedestrianNight: 'pedestrian.night',
+				satelliteDay: {
+					options: {
+						base: 'aerial',
+						variant: 'satellite.day'
+					}
+				},
+				terrainDay: {
+					options: {
+						base: 'aerial',
+						variant: 'terrain.day'
+					}
+				},
+				terrainDayMobile: {
+					options: {
+						base: 'aerial',
+						variant: 'terrain.day.mobile'
+					}
+				}
+			}
+		},
+		FreeMapSK: {
+			url: 'http://t{s}.freemap.sk/T/{z}/{x}/{y}.jpeg',
+			options: {
+				minZoom: 8,
+				maxZoom: 16,
+				subdomains: '1234',
+				bounds: [[47.204642, 15.996093], [49.830896, 22.576904]],
+				attribution:
+					'{attribution.OpenStreetMap}, vizualization CC-By-SA 2.0 <a href="http://freemap.sk">Freemap.sk</a>'
+			}
+		},
+		MtbMap: {
+			url: 'http://tile.mtbmap.cz/mtbmap_tiles/{z}/{x}/{y}.png',
+			options: {
+				attribution:
+					'{attribution.OpenStreetMap} &amp; USGS'
+			}
+		},
+		CartoDB: {
+			url: 'https://{s}.basemaps.cartocdn.com/{variant}/{z}/{x}/{y}{r}.png',
+			options: {
+				attribution: '{attribution.OpenStreetMap} &copy; <a href="https://carto.com/attributions">CARTO</a>',
+				subdomains: 'abcd',
+				maxZoom: 19,
+				variant: 'light_all'
+			},
+			variants: {
+				Positron: 'light_all',
+				PositronNoLabels: 'light_nolabels',
+				PositronOnlyLabels: 'light_only_labels',
+				DarkMatter: 'dark_all',
+				DarkMatterNoLabels: 'dark_nolabels',
+				DarkMatterOnlyLabels: 'dark_only_labels',
+				Voyager: 'rastertiles/voyager',
+				VoyagerNoLabels: 'rastertiles/voyager_nolabels',
+				VoyagerOnlyLabels: 'rastertiles/voyager_only_labels',
+				VoyagerLabelsUnder: 'rastertiles/voyager_labels_under'
+			}
+		},
+		HikeBike: {
+			url: 'https://tiles.wmflabs.org/{variant}/{z}/{x}/{y}.png',
+			options: {
+				maxZoom: 19,
+				attribution: '{attribution.OpenStreetMap}',
+				variant: 'hikebike'
+			},
+			variants: {
+				HikeBike: {},
+				HillShading: {
+					options: {
+						maxZoom: 15,
+						variant: 'hillshading'
+					}
+				}
+			}
+		},
+		BasemapAT: {
+			url: '//maps{s}.wien.gv.at/basemap/{variant}/normal/google3857/{z}/{y}/{x}.{format}',
+			options: {
+				maxZoom: 19,
+				attribution: 'Datenquelle: <a href="https://www.basemap.at">basemap.at</a>',
+				subdomains: ['', '1', '2', '3', '4'],
+				format: 'png',
+				bounds: [[46.358770, 8.782379], [49.037872, 17.189532]],
+				variant: 'geolandbasemap'
+			},
+			variants: {
+				basemap: {
+					options: {
+						maxZoom: 20, // currently only in Vienna
+						variant: 'geolandbasemap'
+					}
+				},
+				grau: 'bmapgrau',
+				overlay: 'bmapoverlay',
+				highdpi: {
+					options: {
+						variant: 'bmaphidpi',
+						format: 'jpeg'
+					}
+				},
+				orthofoto: {
+					options: {
+						maxZoom: 20, // currently only in Vienna
+						variant: 'bmaporthofoto30cm',
+						format: 'jpeg'
+					}
+				}
+			}
+		},
+		nlmaps: {
+			url: '//geodata.nationaalgeoregister.nl/tiles/service/wmts/{variant}/EPSG:3857/{z}/{x}/{y}.png',
+			options: {
+				minZoom: 6,
+				maxZoom: 19,
+				bounds: [[50.5, 3.25], [54, 7.6]],
+				attribution: 'Kaartgegevens &copy; <a href="kadaster.nl">Kadaster</a>'
+			},
+			variants: {
+				'standaard': 'brtachtergrondkaart',
+				'pastel': 'brtachtergrondkaartpastel',
+				'grijs': 'brtachtergrondkaartgrijs',
+				'luchtfoto': {
+					'url': '//geodata.nationaalgeoregister.nl/luchtfoto/rgb/wmts/1.0.0/2016_ortho25/EPSG:3857/{z}/{x}/{y}.png',
+				}
+			}
+		},
+		NASAGIBS: {
+			url: 'https://map1.vis.earthdata.nasa.gov/wmts-webmerc/{variant}/default/{time}/{tilematrixset}{maxZoom}/{z}/{y}/{x}.{format}',
+			options: {
+				attribution:
+					'Imagery provided by services from the Global Imagery Browse Services (GIBS), operated by the NASA/GSFC/Earth Science Data and Information System ' +
+					'(<a href="https://earthdata.nasa.gov">ESDIS</a>) with funding provided by NASA/HQ.',
+				bounds: [[-85.0511287776, -179.999999975], [85.0511287776, 179.999999975]],
+				minZoom: 1,
+				maxZoom: 9,
+				format: 'jpg',
+				time: '',
+				tilematrixset: 'GoogleMapsCompatible_Level'
+			},
+			variants: {
+				ModisTerraTrueColorCR: 'MODIS_Terra_CorrectedReflectance_TrueColor',
+				ModisTerraBands367CR: 'MODIS_Terra_CorrectedReflectance_Bands367',
+				ViirsEarthAtNight2012: {
+					options: {
+						variant: 'VIIRS_CityLights_2012',
+						maxZoom: 8
+					}
+				},
+				ModisTerraLSTDay: {
+					options: {
+						variant: 'MODIS_Terra_Land_Surface_Temp_Day',
+						format: 'png',
+						maxZoom: 7,
+						opacity: 0.75
+					}
+				},
+				ModisTerraSnowCover: {
+					options: {
+						variant: 'MODIS_Terra_Snow_Cover',
+						format: 'png',
+						maxZoom: 8,
+						opacity: 0.75
+					}
+				},
+				ModisTerraAOD: {
+					options: {
+						variant: 'MODIS_Terra_Aerosol',
+						format: 'png',
+						maxZoom: 6,
+						opacity: 0.75
+					}
+				},
+				ModisTerraChlorophyll: {
+					options: {
+						variant: 'MODIS_Terra_Chlorophyll_A',
+						format: 'png',
+						maxZoom: 7,
+						opacity: 0.75
+					}
+				}
+			}
+		},
+		NLS: {
+			// NLS maps are copyright National library of Scotland.
+			// http://maps.nls.uk/projects/api/index.html
+			// Please contact NLS for anything other than non-commercial low volume usage
+			//
+			// Map sources: Ordnance Survey 1:1m to 1:63K, 1920s-1940s
+			//   z0-9  - 1:1m
+			//  z10-11 - quarter inch (1:253440)
+			//  z12-18 - one inch (1:63360)
+			url: '//nls-{s}.tileserver.com/nls/{z}/{x}/{y}.jpg',
+			options: {
+				attribution: '<a href="http://geo.nls.uk/maps/">National Library of Scotland Historic Maps</a>',
+				bounds: [[49.6, -12], [61.7, 3]],
+				minZoom: 1,
+				maxZoom: 18,
+				subdomains: '0123',
+			}
+		},
+		JusticeMap: {
+			// Justice Map (http://www.justicemap.org/)
+			// Visualize race and income data for your community, county and country.
+			// Includes tools for data journalists, bloggers and community activists.
+			url: 'http://www.justicemap.org/tile/{size}/{variant}/{z}/{x}/{y}.png',
+			options: {
+				attribution: '<a href="http://www.justicemap.org/terms.php">Justice Map</a>',
+				// one of 'county', 'tract', 'block'
+				size: 'county',
+				// Bounds for USA, including Alaska and Hawaii
+				bounds: [[14, -180], [72, -56]]
+			},
+			variants: {
+				income: 'income',
+				americanIndian: 'indian',
+				asian: 'asian',
+				black: 'black',
+				hispanic: 'hispanic',
+				multi: 'multi',
+				nonWhite: 'nonwhite',
+				white: 'white',
+				plurality: 'plural'
+			}
+		},
+		Wikimedia: {
+			url: 'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png',
+			options: {
+				attribution: '<a href="https://wikimediafoundation.org/wiki/Maps_Terms_of_Use">Wikimedia</a>',
+				minZoom: 1,
+				maxZoom: 19
+			}
+		},
+		GeoportailFrance: {
+			url: 'https://wxs.ign.fr/{apikey}/geoportail/wmts?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&STYLE={style}&TILEMATRIXSET=PM&FORMAT={format}&LAYER={variant}&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}',
+			options: {
+				attribution: '<a target="_blank" href="https://www.geoportail.gouv.fr/">Geoportail France</a>',
+				bounds: [[-75, -180], [81, 180]],
+				minZoom: 2,
+				maxZoom: 18,
+				// Get your own geoportail apikey here : http://professionnels.ign.fr/ign/contrats/
+				// NB : 'choisirgeoportail' is a demonstration key that comes with no guarantee
+				apikey: 'choisirgeoportail',
+				format: 'image/jpeg',
+				style : 'normal',
+				variant: 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD'
+			},
+			variants: {
+				parcels: {
+					options : {
+						variant: 'CADASTRALPARCELS.PARCELS',
+						maxZoom: 20,
+						style : 'bdparcellaire',
+						format: 'image/png'
+					}
+				},
+				ignMaps: 'GEOGRAPHICALGRIDSYSTEMS.MAPS',
+				maps: 'GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN-EXPRESS.STANDARD',
+				orthos: {
+					options: {
+						maxZoom: 19,
+						variant: 'ORTHOIMAGERY.ORTHOPHOTOS'
+					}
+				}
+			}
+		},
+		OneMapSG: {
+			url: '//maps-{s}.onemap.sg/v3/{variant}/{z}/{x}/{y}.png',
+			options: {
+				variant: 'Default',
+				minZoom: 11,
+				maxZoom: 18,
+				bounds: [[1.56073, 104.11475], [1.16, 103.502]],
+				attribution: '<img src="https://docs.onemap.sg/maps/images/oneMap64-01.png" style="height:20px;width:20px;"/> New OneMap | Map data &copy; contributors, <a href="http://SLA.gov.sg">Singapore Land Authority</a>'
+			},
+			variants: {
+				Default: 'Default',
+				Night: 'Night',
+				Original: 'Original',
+				Grey: 'Grey',
+				LandLot: 'LandLot'
+			}
+		}
+	};
+
+	L.tileLayer.provider = function (provider, options) {
+		return new L.TileLayer.Provider(provider, options);
+	};
+
+	return L;
+}));
+</script>
+<script>LeafletWidget.methods.addProviderTiles = function(provider, layerId, group, options) {
+  this.layerManager.addLayer(L.tileLayer.provider(provider, options), "tile", layerId, group);
+};
+</script>
 
 </head>
 <body style="background-color: white;">
 <div id="htmlwidget_container">
-<div id="htmlwidget-bebfe97536013a02fd73" class="leaflet html-widget" style="width:100%;height:400px;">
+<div id="htmlwidget-6fa83ec352c9ab75372f" class="leaflet html-widget" style="width:100%;height:400px;">
 
 </div>
 </div>
-<script type="application/json" data-for="htmlwidget-bebfe97536013a02fd73">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"https://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addCircleMarkers","args":[[37.500685,37.540214,37.301677,37.515302,37.310377,37.491672,37.527661,37.763042,37.762317,37.374194,37.358895,37.311313,37.356203,37.537967,37.434692,37.434692,37.443725,37.453795,37.453795,37.522595,37.5183,37.521448,37.551354,37.551054,37.55336,37.519916,37.56967,37.538099,37.545903,37.507383,37.5229,37.520677,37.519405,37.543763,37.549805,37.511037,37.5372,37.538112,37.533337,37.547567,37.547841,37.548719,37.620068,37.560027,37.527661,37.518226,37.463638,37.46676,37.575035,37.572587,37.525703,37.52346,37.476959,37.524475,37.6067,37.49987,37.609078,37.522079,37.534105,37.583327,37.505636,37.517602,37.535947,37.530555,37.536495,37.516912,37.538525,37.551666,37.592033,37.55336,37.543828,37.515024,37.762567,37.649856,37.651514,37.607133,37.547975,37.547992,37.47983,37.629759,37.472544,37.578836,37.582488,37.582355,37.50845,37.503044,37.503044,37.543367,37.59962,37.514672,37.511037,37.553564,37.548697,37.611802,37.546068,37.556647,37.548745,37.541472,37.524475,37.547077,37.563088,37.56301,37.590618,37.619794,37.521198,37.488782,37.553117,37.374381,37.762023,37.763621,37.353614,37.353418,37.361812,37.377574,37.676218,37.665461,37.599216,37.598983,37.594311,37.466243,37.435904,37.513302,37.44824,37.424551,37.42393,37.423208,37.571754,37.509675,37.548315,37.548135,37.542776,37.512827,37.552997,37.548554,37.49231,37.549142,37.543573,37.542829,37.542829,37.546139,37.474806,37.501478,37.583195,37.512675,37.511135,37.524096,37.525433,37.52126,37.488782,37.611951,37.481693,37.548359,37.614354,37.500232,37.499115,37.630478,37.631182,37.535333,37.551972,37.622699,37.514672,37.501224,37.499802,37.510465,37.516275,37.552997,37.53937,37.543573,37.50776,37.511135,37.518859,37.539984,37.553564,37.552997,37.524344,37.762825,37.522569,37.524131,37.532004,37.621169,37.586672,37.585838,37.552373,37.547419,37.554571,37.5187,37.367178,37.301677,37.420714,37.429632,37.649856,37.652145,37.538637,37.594514,37.453877,37.436117,37.477852,37.5183,37.551354,37.515302,37.551054,37.56967,37.600298,37.501659,37.544702,37.5229,37.543763,37.511037,37.533943,37.479961,37.583897,37.585674,37.589625,37.458235,37.448351,37.49987,37.49987,37.482227,37.526126,37.505636,37.632217,37.632217,37.540154,37.499802,37.762026,37.516912,37.521459,37.507383,37.553564,37.532004,37.619204,37.521667,37.600298,37.544702,37.524678,37.505636,37.632217,37.5229,37.497787,37.559424,37.56967,37.560027,37.488782,37.499115,37.519727,37.540392,37.537874,37.519513,37.559424,37.548366,37.47983,37.510675,37.547165,37.488782,37.488782,37.521198,37.512761,37.488782,37.50776,37.619204,37.762058,37.561618,37.561681,37.506153,37.513186,37.564888,37.551354,37.611139,37.464845,37.549365],[-77.468001,-77.462023,-77.600389,-77.514008,-77.426086,-77.660126,-77.419392,-77.469325,-77.467624,-77.161072,-77.446032,-77.428727,-77.491852,-77.317129,-77.589832,-77.589832,-77.445608,-77.489098,-77.489098,-77.443405,-77.51241,-77.443087,-77.454123,-77.358351,-77.45061,-77.443852,-77.419026,-77.408133,-77.421697,-77.39177,-77.399578,-77.447088,-77.446272,-77.412751,-77.460535,-77.392948,-77.467624,-77.422217,-77.428768,-77.443612,-77.467882,-77.467785,-77.63816,-77.466427,-77.419392,-77.441046,-77.461437,-77.488033,-77.390149,-77.478226,-77.361885,-77.365559,-77.485636,-77.346053,-77.460594,-77.501031,-77.443016,-77.505104,-77.415241,-77.44086,-77.516345,-77.432408,-77.536398,-77.404911,-77.412539,-77.275616,-77.416302,-77.375593,-77.447882,-77.45061,-77.401133,-77.443571,-77.467848,-77.470539,-77.495454,-77.458283,-77.438747,-77.341354,-77.439469,-77.56144,-77.483734,-77.445884,-77.428667,-77.427884,-77.480154,-77.461097,-77.461097,-77.453973,-77.368153,-77.524245,-77.392948,-77.431236,-77.342339,-77.634863,-77.342899,-77.4252,-77.408581,-77.464331,-77.346053,-77.437575,-77.42641,-77.425239,-77.446401,-77.507364,-77.296434,-77.493251,-77.450951,-77.160012,-77.469083,-77.470316,-77.457398,-77.457039,-77.495881,-77.500815,-77.590756,-77.462334,-77.3689,-77.355679,-77.368634,-77.675564,-77.590299,-77.684255,-77.491445,-77.441617,-77.439656,-77.439995,-77.47883,-77.391631,-77.466541,-77.467065,-77.43885,-77.475015,-77.430834,-77.466375,-77.441598,-77.395975,-77.459699,-77.380168,-77.380168,-77.341799,-77.48401,-77.462208,-77.428815,-77.483635,-77.484485,-77.347457,-77.349702,-77.365297,-77.493251,-77.441852,-77.502922,-77.344449,-77.460258,-77.392375,-77.509445,-77.522243,-77.522182,-77.432253,-77.438219,-77.344449,-77.524245,-77.394604,-77.44603,-77.391819,-77.392963,-77.430834,-77.524012,-77.459699,-77.479078,-77.484485,-77.516846,-77.459942,-77.431236,-77.430834,-77.441323,-77.468553,-77.436882,-77.452587,-77.394312,-77.462139,-77.439275,-77.440516,-77.438386,-77.421545,-77.414464,-77.440735,-77.442125,-77.600389,-77.581106,-77.530873,-77.470539,-77.493498,-77.316086,-77.367324,-77.613718,-77.586339,-77.573369,-77.51241,-77.454123,-77.514008,-77.358351,-77.419026,-77.587471,-77.393619,-77.420098,-77.399578,-77.412751,-77.392948,-77.473443,-77.439043,-77.429241,-77.432409,-77.446745,-77.500992,-77.477052,-77.501031,-77.501031,-77.502039,-77.509606,-77.516345,-77.460521,-77.460521,-77.401594,-77.44603,-77.468077,-77.275616,-77.511904,-77.39177,-77.431236,-77.394312,-77.508091,-77.442732,-77.587471,-77.420098,-77.442161,-77.516345,-77.460521,-77.399578,-77.593367,-77.423698,-77.419026,-77.466427,-77.493251,-77.509445,-77.349517,-77.415935,-77.408339,-77.446014,-77.423698,-77.467669,-77.439469,-77.4599,-77.437868,-77.493251,-77.493251,-77.296434,-77.44301,-77.493251,-77.479078,-77.508091,-77.468078,-77.427325,-77.42623,-77.432729,-77.446315,-77.421884,-77.454123,-77.634119,-77.461196,-77.435854],5,null,null,{"interactive":true,"className":"","stroke":false,"color":["#365C8D","#365C8D","#9FDA3A","#9FDA3A","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#1FA187","#1FA187","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#46337E","#46337E","#46337E","#46337E","#FDE725","#FDE725","#FDE725","#1FA187","#1FA187","#1FA187","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#277F8E","#277F8E","#4AC16D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#365C8D","#365C8D","#365C8D","#365C8D","#46337E","#365C8D","#365C8D","#365C8D","#1FA187","#1FA187","#1FA187","#1FA187","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#440154","#440154","#4AC16D","#4AC16D","#440154","#440154","#46337E","#46337E","#FDE725","#440154","#46337E","#46337E","#46337E","#46337E","#46337E","#FDE725","#FDE725","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#365C8D","#365C8D","#FDE725","#46337E","#4AC16D","#1FA187","#1FA187","#1FA187","#1FA187","#1FA187","#46337E","#46337E","#FDE725","#FDE725"],"weight":5,"opacity":0.5,"fill":true,"fillColor":["#365C8D","#365C8D","#9FDA3A","#9FDA3A","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#1FA187","#1FA187","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#46337E","#46337E","#46337E","#46337E","#FDE725","#FDE725","#FDE725","#1FA187","#1FA187","#1FA187","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#277F8E","#277F8E","#4AC16D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#365C8D","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#365C8D","#365C8D","#365C8D","#365C8D","#46337E","#365C8D","#365C8D","#365C8D","#1FA187","#1FA187","#1FA187","#1FA187","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#FDE725","#440154","#440154","#4AC16D","#4AC16D","#440154","#440154","#46337E","#46337E","#FDE725","#440154","#46337E","#46337E","#46337E","#46337E","#46337E","#FDE725","#FDE725","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#365C8D","#365C8D","#FDE725","#46337E","#4AC16D","#1FA187","#1FA187","#1FA187","#1FA187","#1FA187","#46337E","#46337E","#FDE725","#FDE725"],"fillOpacity":0.5},null,null,null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[37.301677,37.763621],"lng":[-77.684255,-77.160012]}},"evals":[],"jsHooks":[]}</script>
-<script type="application/htmlwidget-sizing" data-for="htmlwidget-bebfe97536013a02fd73">{"viewer":{"width":"100%","height":400,"padding":0,"fill":true},"browser":{"width":"100%","height":400,"padding":0,"fill":true}}</script>
+<script type="application/json" data-for="htmlwidget-6fa83ec352c9ab75372f">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addProviderTiles","args":["OpenStreetMap.Mapnik",null,null,{"errorTileUrl":"","noWrap":false,"detectRetina":false}]},{"method":"addCircleMarkers","args":[[37.485642,37.532467,37.5454511,37.5336985,37.5331472,37.5333434,37.5191554,37.532204,37.530697,37.528049,37.519399,37.539722,37.453624,37.423032,37.626883,37.536059,37.4952631,37.516345,37.5642713,37.5612245,37.539661,37.553555,37.554399,37.561049,37.561208,37.561229,37.561542,37.561661,37.5621941,37.5617903,37.5522983,37.5439438,37.5461561,37.5503553,37.550487,37.479353,37.5512,37.551279,37.55136,37.60779,37.605271,37.598222,37.51713,37.532587,37.5519392,37.4911176,37.571069,37.5741975,37.5756451,37.5770714,37.58131,37.583072,37.584247,37.585734,37.586042,37.5862751,37.5931228,37.60084,37.4815442,37.356051,37.546967,37.4525867,37.254604,37.551928,37.5659582,37.519827,37.57827,37.5889149,37.5792746,37.4816872,37.6029017,37.635027,37.5479965,37.5157439,37.5172916,37.5205052,37.520812,37.61805,37.542736,37.545319,37.5467611,37.551737,37.606471,37.510157,37.5167108,37.6326783,37.55208,37.552676,37.55326,37.5610467,37.561359,37.561467,37.561521,37.564187,37.535911,37.485014,37.5481427,37.5516822,37.55233,37.5545105,37.5655783,37.475307,37.5655686,37.595236,37.5527562,37.61529,37.613099,37.620973,37.516606,37.4840417,37.4749702,37.5387296,37.5575512,37.5577018,37.5578529,37.561864,37.573602,37.528485,37.764972,37.5505403,37.3572442,37.6898193,37.5602181,37.4675151,37.4875721,37.5892553,37.4378792,37.5471169,37.436979,37.5109856,37.55943,37.5595333,37.5612722,37.5608551,37.5620773,37.562762,37.5119321,37.5874555,37.54011,37.5999332,37.558223,37.5633337,37.56334,37.5480544,37.560892,37.5940754,37.594885,37.595596,37.595743,37.595965,37.5949974,37.594997,37.4658015,37.542054,37.5597349,37.5041728,37.626264,37.4496538,37.532762,37.2370347,37.560104,37.531794,37.6481471,37.605522,37.495887,37.490205,37.59893,37.4417441,37.556432,37.559758,37.559851,37.602261,37.5616365,37.603502,37.6148076,37.62423,37.606804,37.534575,37.7531162,37.51224,37.514123,37.514008,37.5254036,37.451721,37.5834225,37.5888426,37.5341685,37.5487148,37.3937053,37.5428104,37.56195,37.555486,37.4694608,37.5351062],[-77.479468,-77.425433,-77.438272,-77.4314936,-77.4291186,-77.4269541,-77.4570767,-77.418626,-77.40864,-77.4070603,-77.48589,-77.313963,-77.446765,-77.4366379,-77.557908,-77.534688,-77.5682884,-77.455345,-77.4317208,-77.4536082,-77.3288973,-77.4746666,-77.4750455,-77.4706639,-77.471334,-77.470575,-77.470413,-77.470327,-77.4708027,-77.4702632,-77.4762255,-77.4385816,-77.4421053,-77.4491985,-77.449416,-77.481544,-77.443199,-77.443261,-77.443328,-77.4457,-77.57376,-77.61638,-77.394677,-77.428796,-77.4767465,-77.4661903,-77.44427,-77.4461244,-77.4452887,-77.445548,-77.447183,-77.4466607,-77.447829,-77.446809,-77.446889,-77.4482771,-77.4494262,-77.44966,-77.4997326,-77.447804,-77.4401173,-77.4445528,-77.415906,-77.405816,-77.4756614,-77.444094,-77.41871,-77.5167439,-77.3916474,-77.5109946,-77.3811595,-77.524399,-77.410165,-77.4743965,-77.4771145,-77.4826137,-77.48317,-77.506541,-77.441092,-77.445222,-77.447844,-77.455977,-77.57357,-77.505177,-77.3427878,-77.5215539,-77.455567,-77.456347,-77.45621,-77.4694414,-77.469914,-77.470017,-77.470173,-77.452172,-77.520773,-77.5133416,-77.4545678,-77.4661084,-77.468124,-77.472313,-77.4991537,-77.467409,-77.4847764,-77.506676,-77.4502152,-77.486978,-77.485819,-77.529229,-77.612727,-77.4456824,-77.4434682,-77.3309714,-77.470312,-77.4716351,-77.471888,-77.483287,-77.381375,-77.365252,-77.469254,-77.3702003,-77.4906285,-77.4571594,-77.4315855,-77.5188814,-77.4417108,-77.4585946,-77.4393993,-77.4417373,-77.458757,-77.4678332,-77.43129,-77.468584,-77.4717908,-77.4726386,-77.4746635,-77.4756483,-77.4017594,-77.4430917,-77.326526,-77.4490806,-77.470214,-77.4812852,-77.48253,-77.4683484,-77.476369,-77.5644196,-77.577376,-77.577208,-77.579378,-77.580186,-77.5783464,-77.5784515,-77.5107295,-77.343551,-77.4319437,-77.5900471,-77.552779,-77.443458,-77.39511,-77.4335841,-77.467442,-77.313036,-77.5589145,-77.377806,-77.4796691,-77.522548,-77.6161502,-77.4503715,-77.471989,-77.479398,-77.479624,-77.591769,-77.4529064,-77.558314,-77.567002,-77.531846,-77.496844,-77.536594,-77.4690325,-77.489933,-77.490182,-77.488835,-77.50469,-77.458023,-77.4270227,-77.5202474,-77.4321295,-77.4579568,-77.4259763,-77.4679926,-77.43053,-77.4636563,-77.4424721,-77.4342676],5,null,null,{"interactive":true,"className":"","stroke":false,"color":["#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#35B779","#FDE725","#FDE725","#35B779","#440154","#FDE725","#440154","#440154","#440154","#35B779","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#35B779","#35B779","#35B779","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#FDE725","#440154","#FDE725","#FDE725","#35B779","#440154","#440154","#440154","#35B779","#35B779","#440154","#31688E","#35B779","#440154","#440154","#440154","#440154","#440154","#35B779","#440154","#440154","#440154","#440154","#35B779","#440154","#35B779","#35B779","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#35B779","#440154","#35B779","#35B779","#35B779","#FDE725","#440154","#440154","#35B779","#440154","#440154","#440154","#440154","#35B779","#35B779","#31688E","#35B779","#FDE725","#31688E","#440154","#FDE725","#440154","#440154","#FDE725","#440154","#FDE725","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#35B779","#440154","#440154","#440154","#440154","#440154","#440154","#35B779","#35B779","#35B779","#35B779","#35B779","#35B779","#35B779","#FDE725","#35B779","#440154","#FDE725","#35B779","#FDE725","#440154","#FDE725","#440154","#35B779","#35B779","#31688E","#440154","#FDE725","#35B779","#FDE725","#440154","#440154","#440154","#35B779","#440154","#35B779","#35B779","#35B779","#35B779","#440154","#31688E","#440154","#440154","#440154","#440154","#FDE725","#35B779","#35B779","#440154","#440154","#FDE725","#440154","#440154","#440154","#440154","#440154"],"weight":5,"opacity":0.5,"fill":true,"fillColor":["#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#35B779","#FDE725","#FDE725","#35B779","#440154","#FDE725","#440154","#440154","#440154","#35B779","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#35B779","#35B779","#35B779","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#FDE725","#440154","#FDE725","#FDE725","#35B779","#440154","#440154","#440154","#35B779","#35B779","#440154","#31688E","#35B779","#440154","#440154","#440154","#440154","#440154","#35B779","#440154","#440154","#440154","#440154","#35B779","#440154","#35B779","#35B779","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#35B779","#440154","#35B779","#35B779","#35B779","#FDE725","#440154","#440154","#35B779","#440154","#440154","#440154","#440154","#35B779","#35B779","#31688E","#35B779","#FDE725","#31688E","#440154","#FDE725","#440154","#440154","#FDE725","#440154","#FDE725","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#440154","#35B779","#440154","#440154","#440154","#440154","#440154","#440154","#35B779","#35B779","#35B779","#35B779","#35B779","#35B779","#35B779","#FDE725","#35B779","#440154","#FDE725","#35B779","#FDE725","#440154","#FDE725","#440154","#35B779","#35B779","#31688E","#440154","#FDE725","#35B779","#FDE725","#440154","#440154","#440154","#35B779","#440154","#35B779","#35B779","#35B779","#35B779","#440154","#31688E","#440154","#440154","#440154","#440154","#FDE725","#35B779","#35B779","#440154","#440154","#FDE725","#440154","#440154","#440154","#440154","#440154"],"fillOpacity":0.2},null,null,null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[37.2370347,37.764972],"lng":[-77.61638,-77.313036]}},"evals":[],"jsHooks":[]}</script>
+<script type="application/htmlwidget-sizing" data-for="htmlwidget-6fa83ec352c9ab75372f">{"viewer":{"width":"100%","height":400,"padding":0,"fill":true},"browser":{"width":"100%","height":400,"padding":0,"fill":true}}</script>
 </body>
 </html>
