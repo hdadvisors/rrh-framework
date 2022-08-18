@@ -1,6 +1,4 @@
-# (PART)Demographic and socioeconomic changes {.unnumbered}
-
-## Changes in household characteristics{#part-1-2}
+# Household characteristics {#part-1-2}
 
 ```{r setup}
 
@@ -32,7 +30,6 @@ tenure_colors <-setNames(viridis(2), nm = tenure)
 
 ```
 
-
 ```{r geography-setup}
 
 va <- counties(state = "VA", year = 2020)
@@ -43,16 +40,104 @@ rr_va <- va |>
 pha_va <- va |> 
   subset(GEOID %in% pha)
 
+years <- 2016:2020
+
 ```
 
-Household formation trends
-```{r hh-formation}
+## Household formation
+
+According to Census estimates, the region gained more than 15,000 households from 2016 to 2020. This growth was driven entirely by new homeowners (17,436). Renter households, instead, saw much slower increases from 2016 to 2019; from 2019 to 2020, the estimated number of renters dropped more than 2,000 for a net loss of 609 over the full period.
+
+::: rmdwarning
+This anomalous data should be treated with caution. Lower American Community Survey response rates during COVID-19 were most common among lower-income and lower-educated households most likely to rent. Across the Richmond region, overall ACS response rates declined nearly 10 percent from the 2015-2019 to 2016-2020 collection period.
+:::
+
+```{r hh-form-data}
+
+# b25003_vars <- load_variables(2020, "acs5") |> 
+#   filter(str_sub(name, end = 6) %in% "B25003") |> 
+#   filter(str_length(name) < 11)
+# 
+# b25003_raw <- map_dfr(years, function(yr){
+#   b25003_pull <- get_acs(
+#     geography = "county",
+#     state = "VA",
+#     table = "B25003",
+#     year = yr,
+#     survey = "acs5",
+#     cache_table = TRUE
+#   ) |> 
+#     mutate(year = yr)
+# })
+# 
+# b25003_raw <- b25003_raw |> 
+#   subset(GEOID %in% pha)
+# 
+# b25003_vars_cleaned <- b25003_vars |> 
+#   separate(label, into = c("est", "total", "tenure"), sep = "!!") |> 
+#   select(variable = name, tenure) |> 
+#   drop_na() |> 
+#   mutate(tenure = case_when(
+#     tenure == "Owner occupied" ~ "Homeowner",
+#     tenure == "Renter occupied" ~ "Renter"
+#   ))
+# 
+# b25003_data <- b25003_raw |> 
+#   right_join(b25003_vars_cleaned, by = "variable") |> 
+#   select(NAME, GEOID, year, tenure, estimate, moe) |> 
+#   mutate(NAME = str_remove_all(NAME, ", Virginia")) |> 
+#   group_by(year, tenure) |> 
+#   summarise(estimate = sum(estimate)) |> 
+#   group_by(tenure) |> 
+#   mutate(diff = estimate - lag(estimate)) |> 
+#   drop_na() |> 
+#   mutate(run_diff = cumsum(diff))
+# 
+# write_rds(b25003_data, "data/b25003_data.rds")
+
+```
+
+```{r hh-form-plot}
+
+b25003_data <- read_rds("data/b25003_data.rds")
+
+ggplot(b25003_data,
+       aes(x=year,
+           y=run_diff,
+           fill=tenure)) +
+  geom_col() +
+  facet_wrap(~tenure) +
+  labs(title="Net change in households by tenure",
+       subtitle="2016 to 2020",
+       caption="Source: U.S. Census Bureau, American Community Survey, Table B25003.",
+       fill="Tenure") +
+  scale_y_continuous(labels = label_comma()) +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = "none",
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
+# Homeowner change = 17,436
+# Renter change = -609
+
+```
+
+## Households by age
+
+The single largest growing cohort of households across the region are homeowners 65 years and over. Thanks in large part to youngest baby boomers aging into retirement, this group increased by more than 12,500. Younger homeowners saw much smaller gains.
+
+Among renters, most growth occurred in senior householders. The significant decrease of renter households under 25 (more than 2,500) should be treated with caution, as this population likely had much lower ACS response rates during COVID-19.
+
+```{r hh-age-data}
 
 # years <- 2016:2020
 # 
-# b25007_vars <- load_variables(2020, "acs5") |> 
+# b25007_vars <- load_variables(2020, "acs5") |>
 #   filter(str_sub(name, end = 6) %in% "B25007")
-# 
+#
 # b25007_raw <- map_dfr(years, function(yr){
 #   b25007_pull <- get_acs(
 #     geography = "county",
@@ -66,61 +151,82 @@ Household formation trends
 # })
 # 
 # write_rds(b25007_raw, "data/b25007_raw.rds")
-
-b25007_raw <- read_rds("data/b25007_raw.rds")
-
-b25007_raw <- b25007_raw |> 
-  subset(GEOID %in% pha)
-
-b25007_vars_cleaned <- b25007_vars |> 
-  separate(label, into = c("est", "total", "tenure", "age"), sep = "!!") |> 
-  select(variable = name, tenure, age) |> 
-  drop_na() |> 
-  mutate(tenure = case_when(
-    tenure == "Owner occupied:" ~ "Homeowner",
-    tenure == "Renter occupied:" ~ "Renter"
-  ))
-
-b25007_data <- b25007_raw |> 
-  right_join(b25007_vars_cleaned, by = "variable") |> 
-  select(NAME, GEOID, year, tenure, age, estimate, moe)|> 
-  mutate(age = case_when(
-    age == "Householder 15 to 24 years" ~ "Under 25 years old",
-    age == "Householder 25 to 34 years" ~ "25 to 44 years old",
-    age == "Householder 35 to 44 years" ~ "25 to 44 years old",
-    age == "Householder 45 to 54 years" ~ "45 to 64 years old",
-    age == "Householder 55 to 59 years" ~ "45 to 64 years old",
-    age == "Householder 60 to 64 years" ~ "45 to 64 years old",
-    age == "Householder 65 to 74 years" ~ "65 years and over",
-    age == "Householder 75 to 84 years" ~ "65 years and over",
-    age == "Householder 85 years and over" ~ "65 years and over"
-  ))
-
-b25007_data_grp <- b25007_data |> 
-  group_by(NAME, year, tenure, age) |> 
-  summarise(estimate = sum(estimate)) |> 
-  separate(NAME, into = c("locality", "state"), sep = ",") |> 
-  pivot_wider(names_from = year,
-              values_from = estimate) |> 
-  select(tenure, age, `2016`, `2020`) |> 
-  transform(change = `2020` - `2016`) |> 
-  group_by(tenure, age) |> 
-  summarise(change = sum(change))
-
-ggplot(b25007_data_grp,
-       aes(x = age, y = change, fill = tenure)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  scale_x_discrete(limits = c("Under 25 years old", "25 to 44 years old", "45 to 64 years old", "65 years and over")) +
-  scale_y_continuous(labels = number_format(big.mark = ",")) +
-  labs(title="Change in households by age and tenure: 2016 to 2020", fill="Tenure") +
-  theme(axis.title = element_blank()) +
-  scale_fill_manual(values = tenure_colors)
-
+# 
+# b25007_raw <- read_rds("data/b25007_raw.rds")
+# 
+# b25007_raw <- b25007_raw |> 
+#   subset(GEOID %in% pha)
+# 
+# b25007_vars_cleaned <- b25007_vars |> 
+#   separate(label, into = c("est", "total", "tenure", "age"), sep = "!!") |> 
+#   select(variable = name, tenure, age) |> 
+#   drop_na() |> 
+#   mutate(tenure = case_when(
+#     tenure == "Owner occupied:" ~ "Homeowner",
+#     tenure == "Renter occupied:" ~ "Renter"
+#   ))
+# 
+# b25007_data <- b25007_raw |> 
+#   right_join(b25007_vars_cleaned, by = "variable") |> 
+#   select(NAME, GEOID, year, tenure, age, estimate, moe)|> 
+#   mutate(age = case_when(
+#     age == "Householder 15 to 24 years" ~ "Under 25 years old",
+#     age == "Householder 25 to 34 years" ~ "25 to 44 years old",
+#     age == "Householder 35 to 44 years" ~ "25 to 44 years old",
+#     age == "Householder 45 to 54 years" ~ "45 to 64 years old",
+#     age == "Householder 55 to 59 years" ~ "45 to 64 years old",
+#     age == "Householder 60 to 64 years" ~ "45 to 64 years old",
+#     age == "Householder 65 to 74 years" ~ "65 years and over",
+#     age == "Householder 75 to 84 years" ~ "65 years and over",
+#     age == "Householder 85 years and over" ~ "65 years and over"
+#   ))
+# 
+# b25007_data_grp <- b25007_data |> 
+#   group_by(NAME, year, tenure, age) |> 
+#   summarise(estimate = sum(estimate)) |> 
+#   separate(NAME, into = c("locality", "state"), sep = ",") |> 
+#   pivot_wider(names_from = year,
+#               values_from = estimate) |> 
+#   select(tenure, age, `2016`, `2020`) |> 
+#   transform(change = `2020` - `2016`) |> 
+#   group_by(tenure, age) |> 
+#   summarise(change = sum(change)) |> 
+#   mutate(age = fct_relevel(age, "Under 25 years old"))
+# 
+# write_rds(b25007_data_grp, "data/b25007_data_grp.rds")
 
 ```
 
-Household type and size
-```{r hhtype}
+```{r hh-age-plot}
+
+b25007_data_grp <- read_rds("data/b25007_data_grp.rds")
+
+ggplot(b25007_data_grp,
+       aes(y = change, x =tenure, fill = tenure)) +
+  geom_col(position = "dodge") +
+  facet_wrap(~age, nrow = 1) +
+  scale_y_continuous(labels = label_comma(),
+                     breaks = c(-2500,0,2500,5000,7500,10000,12500)) +
+  labs(title="Change in households by age and tenure",
+       subtitle="2016 to 2020",
+       fill="Tenure",
+       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25007.") +
+  theme(axis.title = element_blank(),
+        axis.text.x = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.ticks = element_blank()) +
+  scale_fill_manual(values = tenure_colors)
+
+```
+
+## Household type
+
+Married-couple families continued to be the dominant household type in the region, growing by 9,625 from 2016 to 2020. Living alone also become more common, likely the result of seniors increasingly living on their own. Households headed by single females were the only type to decline; however, this could potentially be attributed to lower ACS response rates among those households during COVID-19.
+
+```{r hh-type-data}
 
 # years <- 2016:2020
 # 
@@ -139,62 +245,67 @@ Household type and size
 #     mutate(year = yr)
 # })
 # 
-# write_rds(b11001_raw, "data/b11001_raw.rds")
-
-b11001_raw <- read_rds("data/b11001_raw.rds")
-
-b11001_raw <- b11001_raw |> 
-  subset(GEOID %in% pha)
-
-b11001_vars_cleaned <- b11001_vars |> 
-  separate(label, into = c("est", "tot", "type", "relationship", "householder"), 
-           sep = "!!") |> 
-  select(variable = name, type, relationship, householder) |> 
-  mutate(
-    householder = case_when(
-      relationship == "Married-couple family" ~ relationship,
-      relationship == "Householder living alone" ~ relationship,
-      relationship == "Householder not living alone" ~ relationship,
-      TRUE ~ householder),
-    relationship = case_when(
-      relationship == "Householder living alone" ~ type,
-      relationship == "Householder not living alone" ~ type,
-      TRUE ~ relationship)
-    ) |> 
-  mutate(across(.fns = ~str_remove_all(.x, ":"))) |> 
-  drop_na()
-
-b11001_data <- b11001_raw |> 
-  right_join(b11001_vars_cleaned, by = "variable") |> 
-  select(NAME, GEOID, year, "hhtype" = householder, relationship, type, estimate) |> 
-  separate(NAME, into = c("locality", "state"), sep = ",") |> 
-  pivot_wider(names_from = year,
-              values_from = estimate) |> 
-  select(locality, hhtype, `2016`, `2020`) |> 
-  transform(change = `2020` - `2016`) |> 
-  group_by(hhtype) |> 
-  summarise(change = sum(change))
-
-hhtype_bar <- ggplot(b11001_data,
-       aes(x = reorder(hhtype, -change),
-           y = change,
-           fill = hhtype)) +
-  geom_bar(stat = "identity") + 
-  labs(title = "Change in household type: 2016 to 2020") +
-  theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank(),
-        axis.ticks.x = element_blank(),
-        legend.position = "none",
-        plot.title = element_text(hjust = -1.8)) +
-  coord_flip() +
-  scale_y_continuous(labels = number_format(big.mark = ","))
-
-ggplotly(hhtype_bar) |> 
-  plotly_camera()
-
+# 
+# b11001_raw <- b11001_raw |> 
+#   subset(GEOID %in% pha)
+# 
+# b11001_vars_cleaned <- b11001_vars |> 
+#   separate(label, into = c("est", "tot", "type", "relationship", "householder"), 
+#            sep = "!!") |> 
+#   select(variable = name, type, relationship, householder) |> 
+#   mutate(
+#     householder = case_when(
+#       relationship == "Married-couple family" ~ relationship,
+#       relationship == "Householder living alone" ~ relationship,
+#       relationship == "Householder not living alone" ~ relationship,
+#       TRUE ~ householder),
+#     relationship = case_when(
+#       relationship == "Householder living alone" ~ type,
+#       relationship == "Householder not living alone" ~ type,
+#       TRUE ~ relationship)
+#     ) |> 
+#   mutate(across(.fns = ~str_remove_all(.x, ":"))) |> 
+#   drop_na()
+# 
+# b11001_data <- b11001_raw |> 
+#   right_join(b11001_vars_cleaned, by = "variable") |> 
+#   select(NAME, GEOID, year, "hhtype" = householder, relationship, type, estimate) |> 
+#   separate(NAME, into = c("locality", "state"), sep = ",") |> 
+#   pivot_wider(names_from = year,
+#               values_from = estimate) |> 
+#   select(locality, hhtype, `2016`, `2020`) |> 
+#   transform(change = `2020` - `2016`) |> 
+#   group_by(hhtype) |> 
+#   summarise(change = sum(change))
+#
+# write_rds(b11001_data, "data/b11001_data.rds")
 
 ```
 
+```{r hh-type-plot}
+
+b11001_data <- read_rds("data/b11001_data.rds")
+
+ggplot(b11001_data,
+       aes(x = reorder(hhtype, -change),
+           y = change,
+           fill = hhtype)) +
+  geom_col() + 
+  labs(title = "Change in household type",
+       subtitle = "2016 to 2020",
+       caption = "Source: U.S. Census Bureau, American Community Survey, Table B11001.") +
+  theme(panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = "none") +
+  scale_y_continuous(labels = label_comma()) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 16))
+
+```
+
+## Household size
 
 ```{r hh-size}
 
@@ -268,7 +379,8 @@ ggplotly(hhsize_bar) |>
 
 ```
 
-Households with children
+## Households with children
+
 ```{r hh-children}
 
 years <- 2016:2020
@@ -352,9 +464,8 @@ ggplotly(child_bar) |>
 
 ```
 
+## Households with seniors
 
-
-Households with seniors
 ```{r hh-seniors}
 
 # Table B11007: Households by Presence of People 65 Years and Over, Household Size and Household Type ??
