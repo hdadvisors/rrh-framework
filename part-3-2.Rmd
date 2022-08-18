@@ -118,34 +118,74 @@ library(plotly)
 
 ```
 
-### Cost burden
+## Cost burden
 
-The share of cost-burdened households has been decreasing across the region from 2015 to 2018. In nearly every locality, the share of cost-burdened households has decreased by three percentage points. This seems surprising given the growing affordability challenges experienced by the region's residents.
+The share of cost-burdened households has been decreasing across the region from 2015 to 2018. In nearly every locality, the share of cost-burdened households has decreased by at least three percentage points --- with Hanover County experiencing a five percentage point decrease in cost-burdened households. This seems surprising given the growing affordability challenges experienced by the region's residents. 
 
+```{r chas-data}
+
+# cb_7 <- read_csv("data/Table7_2015to2018.csv") |> 
+#   clean_names() |> 
+#   filter(line_type == "Detail") |> 
+#   select(year, estimate, moe, county, fips, tenure, household_income, household_type, cost_burden) |> 
+#   mutate(tenure = case_when(
+#     tenure == "Owner occupied" ~ "Homeowner",
+#     tenure == "Renter occupied" ~ "Renter"
+#   )) |> 
+#   mutate(household_income = case_when(
+#     household_income == "household income is less than or equal to 30% of HAMFI" ~ "30% AMI or less",
+#     household_income == "household income is greater than 30% but less than or equal to 50% of HAMFI" ~ "31 to 50% AMI",
+#     household_income == "household income is greater than 50% but less than or equal to 80% of HAMFI" ~ "51 to 80% AMI",
+#     household_income == "household income is greater than 80% but less than or equal to 100% of HAMFI" ~ "81 to 100% AMI", 
+#     household_income == "household income is greater than 100% of HAMFI" ~ "101% AMI or greater"
+#   )) |> 
+#   mutate(household_type = case_when(
+#     household_type == "household type is elderly family (2 persons, with either or both age 62 or over)" ~ "Elderly family",
+#     household_type == "household type is small family (2 persons, neither person 62 years or over, or 3 or 4 persons)" ~ "Small family",
+#     household_type == "household type is large family (5 or more persons)" ~ "Large family",
+#     household_type == "household type is elderly non-family" ~ "Elderly non-family", 
+#     household_type == "other household type (non-elderly non-family)" ~ "Non-elderly non-family"
+#   ))  |> 
+#   mutate(cost_burden = case_when(
+#     cost_burden == "housing cost burden is less than or equal to 30%" ~ "Not cost-burdened", 
+#     cost_burden == "housing cost burden is greater than 30% but less than or equal to 50%" ~ "Cost-burdened",
+#     cost_burden == "housing cost burden is greater than 50%" ~ "Severely cost-burdened",
+#     cost_burden == "housing cost burden not computed (household has no/negative income)" ~ "No or negative income"
+#   )) |> 
+#   mutate(cb_group = case_when(
+#     cost_burden == "Cost-burdened" ~ "Cost-burdened",
+#     cost_burden == "Severely cost-burdened" ~ "Cost-burdened",
+#     cost_burden == "No or negative income" ~ "Cost-burdened",
+#     TRUE ~ cost_burden
+#   ))
+# 
+# write_rds(cb_7, "data/cb_7.rds")
+
+
+
+pha_localities <- c("Richmond city", "Chesterfield County", "Hanover County", "Henrico County")
+
+```
 
 ```{r cb-locality, fig.cap= Share of cost-burdened households by locality. Source: Comprehensive Housing Affordability Strategy (CHAS)."}
 
+cb_7 <- read_rds("data/cb_7.rds")
+
 income_pha_perc <- cb_7 |> 
   subset(county %in% pha_localities) |> 
-  group_by(year, county, household_income, cb_group) |>
+  group_by(year, county, cb_group) |>
   summarise(estimate = sum(estimate))
 
 income_pha_perc <- income_pha_perc |> 
-  transform(percent = ave(estimate, year, county, FUN = prop.table))
+  transform(percent = ave(estimate, year, county, FUN = prop.table)) |> 
+  filter(year == 2015 | year == 2018)
 
-income_pha_perc_18 <- income_pha_perc |> 
-  filter(year == 2018 | year == 2015) |> 
-  select(year,county, household_income, cb_group, estimate) |> 
-  group_by(year, county, cb_group) |> 
-  summarise(estimate = sum(estimate)) |> 
-  transform(percent = ave(estimate, year, county, FUN = prop.table))
-
-cb_share <- ggplot(income_pha_perc_18,
+cb_share <- ggplot(income_pha_perc,
        aes(x = county,
            y = percent,
            fill = forcats::fct_rev(cb_group))) +
-  facet_wrap(~year) +
-  geom_bar(stat = "identity", position = "stack") +
+  facet_grid(~year) +
+  geom_col(position = "stack") +
   scale_y_continuous(labels = percent_format()) +
   theme(axis.title = element_blank(),
         axis.text.x = element_text(angle= 90, hjust = 1, vjust = 1)) +
@@ -156,6 +196,7 @@ ggplotly(cb_share) |>
   plotly_camera()
 
 ```
+Most of the decreases in cost burden have been among homeowners across the region. In 2018, there were nearly 8,000 fewer cost-burdened homeowners across the four major localities. Although Chesterfield County saw an increase in 222 cost-burdened renter households, there was an decrease of 1,850 cost-burdened renters across the three other localities.
 
 ```{r cb-tenure, fig.cap="Change in housing cost burden by tenure. Source: Comprehensive Housing Affordability Strategy (CHAS)."}
 
@@ -189,45 +230,9 @@ ggplotly(cb_tenure_bar) |>
   plotly_camera()
 
 ```
+In 2018, there were 6,139 fewer 30% AMI households experiencing cost-burdened than there were in 2015. Other income groups also saw decreases in cost burden, although not as substantial. But the 51-to 80% AMI group saw an increase of 836 households experiencing cost burden.
 
 ```{r cb-income, fig.cap="Change in housing cost burden by AMI. Source: Comprehensive Housing Affordability Strategy (CHAS)."}
-
-cb_7 <- read_csv("data/Table7_2015to2018.csv") |> 
-  clean_names() |> 
-  filter(line_type == "Detail") |> 
-  select(year, estimate, moe, county, fips, tenure, household_income, household_type, cost_burden) |> 
-  mutate(tenure = case_when(
-    tenure == "Owner occupied" ~ "Homeowner",
-    tenure == "Renter occupied" ~ "Renter"
-  )) |> 
-  mutate(household_income = case_when(
-    household_income == "household income is less than or equal to 30% of HAMFI" ~ "30% AMI or less",
-    household_income == "household income is greater than 30% but less than or equal to 50% of HAMFI" ~ "31 to 50% AMI",
-    household_income == "household income is greater than 50% but less than or equal to 80% of HAMFI" ~ "51 to 80% AMI",
-    household_income == "household income is greater than 80% but less than or equal to 100% of HAMFI" ~ "81 to 100% AMI", 
-    household_income == "household income is greater than 100% of HAMFI" ~ "101% AMI or greater"
-  )) |> 
-  mutate(household_type = case_when(
-    household_type == "household type is elderly family (2 persons, with either or both age 62 or over)" ~ "Elderly family",
-    household_type == "household type is small family (2 persons, neither person 62 years or over, or 3 or 4 persons)" ~ "Small family",
-    household_type == "household type is large family (5 or more persons)" ~ "Large family",
-    household_type == "household type is elderly non-family" ~ "Elderly non-family", 
-    household_type == "other household type (non-elderly non-family)" ~ "Non-elderly non-family"
-  ))  |> 
-  mutate(cost_burden = case_when(
-    cost_burden == "housing cost burden is less than or equal to 30%" ~ "Not cost-burdened", 
-    cost_burden == "housing cost burden is greater than 30% but less than or equal to 50%" ~ "Cost-burdened",
-    cost_burden == "housing cost burden is greater than 50%" ~ "Severely cost-burdened",
-    cost_burden == "housing cost burden not computed (household has no/negative income)" ~ "No or negative income"
-  )) |> 
-  mutate(cb_group = case_when(
-    cost_burden == "Cost-burdened" ~ "Cost-burdened",
-    cost_burden == "Severely cost-burdened" ~ "Cost-burdened",
-    cost_burden == "No or negative income" ~ "Cost-burdened",
-    TRUE ~ cost_burden
-  ))
-
-pha_localities <- c("Richmond city", "Chesterfield County", "Hanover County", "Henrico County")
 
 cb_7_pha <- cb_7 |> 
   subset(county %in% pha_localities) |> 
@@ -243,7 +248,7 @@ cb_7_pha <- cb_7 |>
 cb_income_pha <- cb_7_pha |> 
   filter(cb_group == "Cost-burdened")
 
-ggplot(cb_income_pha,
+cb_income_bar <- ggplot(cb_income_pha,
        aes(x = household_income,
            y = difference,
            fill = household_income)) +
@@ -254,13 +259,13 @@ ggplot(cb_income_pha,
   scale_x_discrete(limits= c("30% AMI or less", "31 to 50% AMI", "51 to 80% AMI", "81 to 100% AMI", "101% AMI or greater")) +
   scale_fill_discrete(limits= c("30% AMI or less", "31 to 50% AMI", "51 to 80% AMI", "81 to 100% AMI", "101% AMI or greater")) +
   labs(title = "Change in housing cost burden by AMI: 2015 to 2018", fill = "AMI")
+
+ggplotly(cb_income_bar) |> 
+  plotly_camera()
   
 
 ```
-
-
-
-
+While small families and non-elderly, non-family household saw decreases in cost burden across all four localities, there were significant differences among other household types. There was little decrease in large family housing cost burden in every locality except for Chesterfield County, where there was an increase of 174 households with cost burden. Elderly households saw varying changes in housing cost burden, with the highest increases being in Chesterfield County and Richmond city. Henrico County saw decreases in the number of elderly families experiencing cost burden (-115), but a substantial increase in the number of cost-burdened elderly non-family households (i.e. seniors living alone) (+885) --- the highest increase among all localities.
 
 ```{r cb-hh, fig.cap="Change in housing cost burden by household type. Source: Comprehensive Housing Affordability Strategy (CHAS)."}
 
@@ -276,21 +281,30 @@ cb_hh_pha <- cb_7 |>
   transform(difference = (x2018 - x2015)) |> 
   filter(cb_group == "Cost-burdened")
 
-ggplot(cb_hh_pha,
+cb_hh_bar <- ggplot(cb_hh_pha,
        aes(x = household_type,
            y = difference,
            fill = household_type)) +
   geom_bar(stat = "identity") + 
   facet_wrap(~county) +
-  labs(title = "Change in housing cost burden by housing type: 2015 to 2018") +
+  labs(title = "Change in housing cost burden by household type: 2015 to 2018") +
   theme(legend.position = "none",
         axis.title = element_blank(),
         axis.text.x = element_text(angle = 90, hjust = 1))
 
+ggplotly(cb_hh_bar) |> 
+  plotly_camera()
+
 
 ```
+The causes of the decrease in cost-burdened households across the region is difficult determine with available data. Data is unable to determine if cost-burdened households are simply moving away from the region or if they are no longer experiencing cost burden. Other data metrics may be more appropriate in measuring the impacts of housing costs on households --- including the residual income approach or the National Low Income Housing Coalition's Housing Wage --- but they may not help quantify the number of households impacted by housing costs.
 
-### Mortgage delinquency and foreclosure
+## Mortgage delinquency and foreclosure
+
+Since the Great Recession, mortgage delinquency of 90 days or more has been on a steady decline across the region --- reaching decade's low rates throughout much of 2020 and 2021. Pandemic mortgage relief measures laid out in the CARES Act led to a significant forbearance program, wherein homeowners with federally-backed mortgages could enter into forbearance for a year. The decrease in delinquency can be greatly attributed to these measures which stipulated that loans in forbearance would not be reported as delinquent.
+
+According to some researchers, this program also led to loans in delinquency prior to the pandemic entering into forbearance as well.^[[(Haughwout, Lee, Scally, and van der Klaauw, 2020)](https://libertystreeteconomics.newyorkfed.org/2020/11/following-borrowers-through-forbearance/)] Interestingly, Hanover County saw a spike in mortgage delinquency during 2018, but has since declined to the lowest rate (0.2%) among all localities as of December 2021.
+
 
 ```{r mort-del, fig.cap="Mortgage delinquency rate by locality. Source: Consumer Financial Protection Bureau (CFPB)."}
 
@@ -305,9 +319,9 @@ mort_del <- read_csv("data/mortgage_del.csv") |>
   mutate(period = ym(period)) |> 
   filter(State == "VA") |> 
   subset(Name %in% pha_localities) |> 
-  mutate(estimate = estimate/100)
+  mutate(estimate = (estimate/100))
 
-ggplot(mort_del,
+mort_del_line <- ggplot(mort_del,
        aes(x = period,
            y = estimate,
            color = Name)) +
@@ -317,10 +331,19 @@ ggplot(mort_del,
   theme(axis.title = element_blank()) +
   labs(title = "Mortgage delinquency rate by locality: 2008 through 2021", color = "Locality")
 
+ggplotly(mort_del_line) |> 
+  plotly_camera()
+
 
 ```
+With the moratorium on residential foreclosures having come to an end on June 30, 2022, the region may see increasing mortgage delinquency rates in the coming years.
 
-### Eviction filings and judgements
+## Eviction filings and judgements
+
+Richmond's elevation to national prominence due to its eviction rate spurred state-level responses to address the eviction crisis across the Commonwealth. From 2017 to 2019, the region saw small declines in the number of eviction filings. The City of Richmond saw a 14 percent decrease in average annual filings, while eviction judgements only decreased by 8 percent. 
+
+The eviction landscape changed dramatically during the COVID-19 pandemic when the Centers for Disease Control imposed a nationwide federal moratorium on residential evictions in September 2020. In Virginia, Governor Northam requested from the state's Supreme Court a stay on evictions preceding the nationwide moratorium several times. 
+
 ```{r evictions, fig.cap="Evictions and filings by locality. Source: RVA Eviction Lab"}
 
 evictions <- read_csv("data/evictions_17_22.csv") |> 
@@ -332,22 +355,49 @@ evictions <- read_csv("data/evictions_17_22.csv") |>
     str_detect(data,"Evictions") ~ "Evictions"
   )) |> 
   mutate(date = str_sub(data, -7, -1)) |> 
-  mutate(date = ym(date))
+  mutate(date = ym(date)) |> 
+  mutate(year = year(date))
 
 ggplot(evictions,
        aes(x = date,
            y = value,
            fill = type)) +
-  geom_bar(stat = "identity", position = "dodge") +
+  geom_col(position = "dodge") +
   facet_wrap(~Jurisdiction) +
   theme(axis.title = element_blank()) +
   scale_y_continuous(labels = number_format(big.mark = ",")) +
   labs(title = "Evictions and filings by locality: 2017 through Q3 2022", fill = "Action")
-  
 
 ```
 
-### Housing Resource Line
+These measures led to dramatic decreases in both the number of filings and eviction judgements across the region. However, the eviction moratorium's official end on June 30, 2022, brings about concerns among advocates and service providers over a potential wave of evictions and homelessness in the coming months.
+
+In spite of the moratorium, eviction filings and judgements still occurred throughout much oif the pandemic. Although no where near 
+
+```{r evict-avg, fig.cap="Average annual evictions and filings by locality. Source: RVA Eviction Lab"}
+
+eviction_avg <- evictions |> 
+  group_by(Jurisdiction, year, type) |> 
+  summarise(avg = mean(value))
+
+evict_avg_bar <- ggplot(eviction_avg,
+       aes(x = year,
+           y = avg,
+           fill = type)) +
+  geom_col(position = "dodge") +
+  facet_wrap(~Jurisdiction) +
+  labs(title = "Average annual evictions and filings by locality", fill = "Action") +
+  scale_y_continuous(labels = number_format(big.mark = ",")) +
+  theme(axis.title = element_blank()) +
+  scale_x_discrete(limits = c(2017, 2018, 2019, 2020, 2021, 2022))
+
+ggplotly(evict_avg_bar) |> 
+  plotly_camera()
+
+
+```
+
+## Housing Resource Line
 ```{r call-vol, fig.cap="PHA Housing Resource Line call volume. Source: Partnership for Housing Affordability."}
 
 call_vol <- read_csv("data/hrl_vol.csv") |> 
@@ -384,7 +434,7 @@ call_top_bar
 ```
 
 
-### Homelessness
+## Homelessness
 ```{r pit}
 
 years <- as.character(2007:2021)
