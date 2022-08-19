@@ -30,10 +30,15 @@ library(scales)
 pha <- c("51085", "51760", "51087", "51041")
 
 ```
+## Naturally-occurring affordable housing
 
-```{r noah-map}
+Not all affordable housing is supported by public subsidy. In fact, a large share of affordable housing is privately-owned and receives no government assistance. Widely referred to as naturally occurring affordable housing (NOAH), or market-affordable housing, these properties are a growing concern for communities facing housing affordability challenges.
 
+The preservation of NOAH properties has been a growing strategy to support affordable housing in communities as the ability to quickly develop new units has been stifled by labor shortages, rising land prices, and supply chain issues. NOAH is at great risk of being lost because it often requires greater investment to maintain and more likely to be redeveloped---in turn contributing to a loss of affordable housing units.
 
+NOAH properties are located all across the region, especially in the City of Richmond and along the borders of the city and counties, where older multifamily properties exist.
+
+```{r noah-map, fig.cap="Map of NOAH properties in region. Source: CoStar Group, Inc.}
 
 noah <- read_csv("data/pha_noah_81722.csv") |> 
   clean_names() |> 
@@ -42,19 +47,19 @@ noah <- read_csv("data/pha_noah_81722.csv") |>
 
 pha_names <- c("Richmond City", "Hanover", "Henrico", "Chesterfield")
 
-geo_colors <- setNames(viridis(4), nm = pha_names)
-
-pal <-colorFactor(palette = c("#440154FF", "#31688EFF","#35B779FF", "#FDE725FF"),
-                  levels = c("Richmond City", "Hanover", "Henrico", "Chesterfield"))
-  
-noah_map <- leaflet(noah) |> 
-  addProviderTiles(providers$OpenStreetMap.Mapnik) |>
-  addCircleMarkers(
-    radius = 5,
-    color = ~pal(county_name),
-    stroke = FALSE)
-
-saveWidget(noah_map, "maps/noah_map.html")
+# geo_colors <- setNames(viridis(4), nm = pha_names)
+# 
+# pal <-colorFactor(palette = c("#440154FF", "#31688EFF","#35B779FF", "#FDE725FF"),
+#                   levels = c("Richmond City", "Hanover", "Henrico", "Chesterfield"))
+#   
+# noah_map <- leaflet(noah) |> 
+#   addProviderTiles(providers$OpenStreetMap.Mapnik) |>
+#   addCircleMarkers(
+#     radius = 5,
+#     color = ~pal(county_name),
+#     stroke = FALSE)
+# 
+# saveWidget(noah_map, "maps/noah_map.html")
 
 knitr::include_url("maps/noah_map.html")
 ```

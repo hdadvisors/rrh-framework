@@ -370,9 +370,9 @@ ggplot(evictions,
 
 ```
 
-These measures led to dramatic decreases in both the number of filings and eviction judgements across the region. However, the eviction moratorium's official end on June 30, 2022, brings about concerns among advocates and service providers over a potential wave of evictions and homelessness in the coming months.
+These measures led to dramatic decreases in both the number of filings and eviction judgements across the region. However, the eviction moratorium's official end in Virginia on June 30, 2022, brings about concerns among advocates and service providers over a potential wave of evictions and homelessness in the coming months.
 
-In spite of the moratorium, eviction filings and judgements still occurred throughout much oif the pandemic. Although no where near 
+In spite of the moratorium, eviction filings and judgements still occurred throughout much of the pandemic. 
 
 ```{r evict-avg, fig.cap="Average annual evictions and filings by locality. Source: RVA Eviction Lab"}
 
@@ -396,8 +396,14 @@ ggplotly(evict_avg_bar) |>
 
 
 ```
+Eviction filings should continue to be monitored over the coming months. The RVA Eviction Lab has been at the forefront of this data collection and analysis, and will continue to be a resource for the region in understanding the increasing risks for renters with renter protections and resources coming to an end.
 
 ## Housing Resource Line
+
+On September 1, 2020, PHA launched the Housing Resource Line to help residents across Central Virginia in need of housing. As of July 2022, the hotline has fielded nearly 15,000 calls from people across the region --- from rural Goochland County to the City of Richmond.
+
+Call volume has remained steady over the near two years that the line has existed; with the call volume not having gone below 500 calls per month since March 2021.
+
 ```{r call-vol, fig.cap="PHA Housing Resource Line call volume. Source: Partnership for Housing Affordability."}
 
 call_vol <- read_csv("data/hrl_vol.csv") |> 
@@ -412,75 +418,98 @@ call_vol_bar <- ggplot(call_vol,
 
 call_vol_bar
 
+
+# sum(call_vol$volume)
+# 
+# 14,838
+
 ```
+
+The majority of calls (56 percent) were for rental options (36 percent) and financial assistance (20 percent). The two other largest share of calls were for an option not listed (17 percent) and homelessness (13 percent). Unsurprisingly, there is an increase in homelessness calls during the colder months. But PHA staff note that there is an overall increase in calls during the summer months --- specifically in regards to people searching for rental options. This uptick in rental option calls could be directly related to lease non-renewals as landlords sought to increase rents (potentially to recoup losses from the pandemic) and the increasing demand for student rental options ahead of the Fall semester. 
 
 ```{r call-topic}
 
-call_top <- read_csv("data/hrl_need.csv")
+call_top <- read_csv("data/hrl_need.csv") |> 
+  mutate(need = case_when(
+    need == "Other - specify in \"Issues\" tab" ~ "Other",
+    TRUE ~ need
+  )) |> 
+  transform(percent = ave(vol,FUN = prop.table))
 
 call_top_bar <- ggplot(call_top,
        aes(x = reorder(need, vol), 
-           y = vol,
+           y = percent,
            fill = need)) +
   geom_bar(stat = "identity") + 
   theme(axis.title = element_blank(),
         legend.position = "none") +
-  scale_y_continuous(labels = number_format(big.mark = ",")) +
+  scale_y_continuous(labels = percent_format()) +
   labs(title = "PHA Housing Resource Line call volume by topic") +
   coord_flip()
 
-call_top_bar
+ggplotly(call_top_bar) |> 
+  plotly_camera()
 
 ```
 
-
 ## Homelessness
-```{r pit}
 
-years <- as.character(2007:2021)
+From 2011 to 2019, the overall count of persons experiencing homelessness across the Greater Richmond Continuum of Care (GRCoC) had been in decline.^[GRCoC covers City of Richmond, and the counties of Charles City, Chesterfield, Goochland, Hanover (including the town of Ashland), Henrico, New Kent, and Powhatan]. But when the COVID-19 pandemic hit, the count jumped --- going from 497 in 2019 to 834 in 2021, a 68 percent increase.
 
-path <- "data/2007-2021-PIT-Counts-by-CoC.xlsx"
+The [Urban Institute recently highlighted](https://www.urban.org/sites/default/files/publication/104529/richmond-virginia-response-to-homelessness-during-the-covid-19-pandemic_0.pdf) Homeward's (the region's planning and coordinating organization for the GRCoC) efforts to address homelessness during the pandemic. Their response measures served as best practice examples in preventing high transmission rates among people experiencing homelessness as well as direct service staff.
 
-full_set <- map_dfr(years, function(yr) {
-  
+But the challenges of reducing homelessness during the pandemic were laid bare. With an eviction moratorium, rental vacancy rates reached record lows --- leaving many seeking rental options with little to none. In addition, providers have also referenced landlords setting high security deposits.
 
-pit_set <- read_excel(path, sheet = yr) |> 
-    clean_names()
+```{r pit, fig.cap="Richmond CoC Point-in-Time count: 2007 to 2021. Source: U.S. Department of Housing and Urban Development (HUD)"}
 
-suffix_to_remove <- paste0("_", yr)
-  
-  if ("co_c_category" %in% names(pit_set)) {
-    pit_renamed <- pit_set %>%
-      rename_with(~str_remove(.x, suffix_to_remove)) |> 
-      mutate(year = yr) %>%
-      select(co_c_number:co_c_name, co_c_category, type_of_count, year, everything()) |> 
-      mutate(across(-c(co_c_number:year), .fns = as.numeric))
-  } else {
-    pit_renamed <- pit_set %>%
-      rename_with(~str_remove(.x, suffix_to_remove)) |> 
-      mutate(year = yr, co_c_category = NA_character_, 
-             type_of_count = NA_character_) |> 
-      select(co_c_number:co_c_name, co_c_category, type_of_count, year, everything()) |> 
-      mutate(across(-c(co_c_number:year), .fns = as.numeric))
-  }
-  
-  pit_renamed
-  
-})
+# years <- as.character(2007:2021)
+# 
+# path <- "data/2007-2021-PIT-Counts-by-CoC.xlsx"
+# 
+# full_set <- map_dfr(years, function(yr) {
+#   
+# 
+# pit_set <- read_excel(path, sheet = yr) |> 
+#     clean_names()
+# 
+# suffix_to_remove <- paste0("_", yr)
+#   
+#   if ("co_c_category" %in% names(pit_set)) {
+#     pit_renamed <- pit_set %>%
+#       rename_with(~str_remove(.x, suffix_to_remove)) |> 
+#       mutate(year = yr) %>%
+#       select(co_c_number:co_c_name, co_c_category, type_of_count, year, everything()) |> 
+#       mutate(across(-c(co_c_number:year), .fns = as.numeric))
+#   } else {
+#     pit_renamed <- pit_set %>%
+#       rename_with(~str_remove(.x, suffix_to_remove)) |> 
+#       mutate(year = yr, co_c_category = NA_character_, 
+#              type_of_count = NA_character_) |> 
+#       select(co_c_number:co_c_name, co_c_category, type_of_count, year, everything()) |> 
+#       mutate(across(-c(co_c_number:year), .fns = as.numeric))
+#   }
+#   
+#   pit_renamed
+#   
+# })
+# 
+# full_set_longer <- full_set %>%
+#   pivot_longer(
+#     cols = overall_homeless:unsheltered_homeless_parenting_youth_under_25_multiple_races, 
+#     names_to = "category",
+#     values_to = "value"
+#   )
+# 
+# rva_coc <- full_set_longer |> 
+#   filter(co_c_number == "VA-500") |> 
+#   filter(str_detect(category, "overall_homeless"))
+# 
+# rva_pit <- rva_coc |> 
+#   filter(category == "overall_homeless")
+# 
+# write_rds(rva_pit, "data/rva_pit.rds")
 
-full_set_longer <- full_set %>%
-  pivot_longer(
-    cols = overall_homeless:unsheltered_homeless_parenting_youth_under_25_multiple_races, 
-    names_to = "category",
-    values_to = "value"
-  )
-
-rva_coc <- full_set_longer |> 
-  filter(co_c_number == "VA-500") |> 
-  filter(str_detect(category, "overall_homeless"))
-
-rva_pit <- rva_coc |> 
-  filter(category == "overall_homeless")
+rva_pit <- read_rds("data/rva_pit.rds")
 
 rva_pit_bar <- ggplot(rva_pit,
        aes(x = year,
@@ -490,11 +519,14 @@ rva_pit_bar <- ggplot(rva_pit,
   theme(axis.title = element_blank()) +
   scale_y_continuous(labels = number_format(big.mark = ","))
 
-rva_pit_bar
+ggplotly(rva_pit_bar) |> 
+  plotly_camera()
 
 
 ```
+The McKinney-Vento Education for Homeless Children and Youth (EHCY) Program collects data on students experiencing homelessness, which often can paint a different picture of homelessness when compared to the Point-in-Time counts. In the region, school divisions have been seeing varying numbers, but between the 2018-2019 and 2019-2020 school years students experiencing homelessness have declined across all school divisions.
 
+The most notable declines in student homelessness have been seen in the Richmond Public School system, where the number of students experiencing homelessness have declined by 40 percent from 2017-2018 to 2019-2020. Given the pandemic and virtual learning environments, more recent McKinney-Vento data may need to be viewed with caution.
 
 ```{r mkv}
 
@@ -514,7 +546,8 @@ mkv_bar <- ggplot(mkv,
         legend.position = "none") +
   scale_y_continuous(labels = number_format(big.mark = ","))
 
-mkv_bar
+ggplotly(mkv_bar) |> 
+  plotly_camera()
 
 ```
 

@@ -13,86 +13,103 @@ pha <- c("51085", "51760", "51087", "51041")
 
 ```
 
-Rental housing gap
-```{r gap}
+## Rental housing gap
 
-tb_18a <- read_csv("data/Table18A_2015to2018.csv")
-tb_18b <- read_csv("data/Table18B_2015to2018.csv")
-tb_18c <- read_csv("data/Table18C_2015to2018.csv")
+Comprehensive Housing Affordability Strategy (CHAS) data provided by the Department of Housing and Urban Development (HUD) allows us to understand the cost of housing in relation to household incomes. For renters making less than 80% AMI across the region, there has been little change in the gap in affordable rental housing. In 2015, there was an overall gap of nearly 40,000 (39,506) rental homes affordable to households making 80% AMI or less. By 2018, that gap had increased by 354 homes to reach a total gap of 39,860.
 
-tb_18 <- rbind(tb_18a, tb_18b)
+Increases in the gap occurred mainly among housing between 31 and 80% AMI, but it is important to note that a gap in housing across all income levels impacts households of any income. Households don't just seek housing that directly matches their income. Often times households desire housing that costs less so that they can spend money on other necessities like transportation, healthcare, and food. But when overall supply is low, this means that households with lower incomes have to compete with those higher income households in the open market --- leaving them having to choose more expensive and lower quality housing.
 
-colnames(tb_18)[16] <- "Cost"
+This accentuates the need for new affordable housing at all income levels --- but especially for 30% AMI or below households, where in 2018, there was a shortage of over 22,000 rental homes.
 
-colnames(tb_18c)[16] <- "Cost"
+```{r gap, fig.cap="Rental housing gap by AMI. Source: CHAS"}
 
-homeowner <- rbind(tb_18, tb_18c) |> 
-  clean_names() |> 
-  filter(line_type == "Detail") |> 
-  select(county, fips, year, estimate, tenure, cost, household_income) |> 
-  group_by(county, fips, year, tenure, cost, household_income) |> 
-  summarise(estimate = sum(estimate)) |> 
-  subset(fips %in% pha)
+# tb_18a <- read_csv("data/Table18A_2015to2018.csv")
+# tb_18b <- read_csv("data/Table18B_2015to2018.csv")
+# tb_18c <- read_csv("data/Table18C_2015to2018.csv")
+# 
+# tb_18 <- rbind(tb_18a, tb_18b)
+# 
+# colnames(tb_18)[16] <- "Cost"
+# 
+# colnames(tb_18c)[16] <- "Cost"
+# 
+# homeowner <- rbind(tb_18, tb_18c) |> 
+#   clean_names() |> 
+#   filter(line_type == "Detail") |> 
+#   select(county, fips, year, estimate, tenure, cost, household_income) |> 
+#   group_by(county, fips, year, tenure, cost, household_income) |> 
+#   summarise(estimate = sum(estimate)) |> 
+#   subset(fips %in% pha)
+# 
+# tb_18_match <- tb_18_combined |> 
+#   filter(tenure == "Renter occupied") |>
+#   mutate(cost = case_when(
+#     cost == "greater than RHUD30 and less than or equal to RHUD50" ~ "31 to 50 percent AMI",
+#     cost == "greater than RHUD50 and less than or equal to RHUD80" ~ "51 to 80 percent AMI",
+#     cost == "greater than RHUD80" ~ "80 percent AMI or greater",
+#     cost == "less than or equal to RHUD30" ~ "30 percent AMI or below"
+#   )) |> 
+#   mutate(household_income = case_when(
+#     household_income == "greater than 100% of HAMFI" ~ "80 percent AMI or greater",
+#     household_income == "greater than 80% of HAMFI but less than or equal to 100% of HAMFI" ~ "80 percent AMI or greater",
+#     household_income == "greater than 50% of HAMFI but less than or equal to 80% of HAMFI" ~ "51 to 80 percent AMI",
+#     household_income == "greater than 30% of HAMFI but less than or equal to 50% of HAMFI" ~ "31 to 50 percent AMI", 
+#     household_income == "less than or equal to 30% of HAMFI" ~ "30 percent AMI or below"
+#   )) |> 
+#   group_by(county, fips, year, cost, household_income) |> 
+#   summarise(estimate = sum(estimate)) |> 
+#   mutate(match = case_when(
+#     cost == household_income ~ "Affordable",
+#     cost == "30 percent AMI or below" & household_income == "31 to 50 percent AMI" ~ "Very affordable", 
+#     cost == "30 percent AMI or below" & household_income == "51 to 80 percent AMI" ~ "Very affordable",
+#     cost == "30 percent AMI or below" & household_income == "80 percent AMI or greater" ~ "Very affordable",
+#         cost == "31 to 50 percent AMI" & household_income == "31 to 50 percent AMI" ~ "Affordable", 
+#     cost == "31 to 50 percent AMI" & household_income == "51 to 80 percent AMI" ~ "Very affordable",
+#     cost == "31 to 50 percent AMI" & household_income == "80 percent AMI or greater" ~ "Very affordable",
+#         cost == "31 to 50 percent AMI" & household_income == "30 percent AMI or below" ~ "Unaffordable",
+#     cost == "51 to 80 percent AMI" & household_income == "30 percent AMI or below" ~ "Unaffordable",
+#         cost == "51 to 80 percent AMI" & household_income == "31 to 50 percent AMI" ~ "Unaffordable",
+#     cost == "51 to 80 percent AMI" & household_income == "80 percent AMI or greater" ~ "Very affordable",
+#     cost == "80 percent AMI or greater" & household_income == "30 percent AMI or below" ~ "Unaffordable",
+#     cost == "80 percent AMI or greater" & household_income == "31 to 50 percent AMI" ~ "Unaffordable", 
+#     cost == "80 percent AMI or greater" & household_income == "51 to 80 percent AMI" ~ "Unaffordable"
+#   )) |> 
+#   mutate(gapcode = case_when(
+#     match == "Unaffordable" ~ "Gap",
+#     TRUE ~ "Matches or less than income"
+#   ))
+# 
+# gap <- tb_18_match |> 
+#   group_by(year, household_income, gapcode) |> 
+#   summarise(estimate = sum(estimate)) |> 
+#   mutate(estimate = case_when(
+#     gapcode == "Gap" ~ estimate * -1,
+#     gapcode == "Matches or less than income" ~ estimate
+#   )) |> 
+#   filter(household_income != "80 percent AMI or greater")
+# 
+# write_rds(gap, "data/gap.rds")
 
-tb_18_match <- tb_18_combined |> 
-  filter(tenure == "Renter occupied") |>
-  mutate(cost = case_when(
-    cost == "greater than RHUD30 and less than or equal to RHUD50" ~ "31 to 50 percent AMI",
-    cost == "greater than RHUD50 and less than or equal to RHUD80" ~ "51 to 80 percent AMI",
-    cost == "greater than RHUD80" ~ "80 percent AMI or greater",
-    cost == "less than or equal to RHUD30" ~ "30 percent AMI or below"
-  )) |> 
-  mutate(household_income = case_when(
-    household_income == "greater than 100% of HAMFI" ~ "80 percent AMI or greater",
-    household_income == "greater than 80% of HAMFI but less than or equal to 100% of HAMFI" ~ "80 percent AMI or greater",
-    household_income == "greater than 50% of HAMFI but less than or equal to 80% of HAMFI" ~ "51 to 80 percent AMI",
-    household_income == "greater than 30% of HAMFI but less than or equal to 50% of HAMFI" ~ "31 to 50 percent AMI", 
-    household_income == "less than or equal to 30% of HAMFI" ~ "30 percent AMI or below"
-  )) |> 
-  group_by(county, fips, year, cost, household_income) |> 
-  summarise(estimate = sum(estimate)) |> 
-  mutate(match = case_when(
-    cost == household_income ~ "Affordable",
-    cost == "30 percent AMI or below" & household_income == "31 to 50 percent AMI" ~ "Very affordable", 
-    cost == "30 percent AMI or below" & household_income == "51 to 80 percent AMI" ~ "Very affordable",
-    cost == "30 percent AMI or below" & household_income == "80 percent AMI or greater" ~ "Very affordable",
-        cost == "31 to 50 percent AMI" & household_income == "31 to 50 percent AMI" ~ "Affordable", 
-    cost == "31 to 50 percent AMI" & household_income == "51 to 80 percent AMI" ~ "Very affordable",
-    cost == "31 to 50 percent AMI" & household_income == "80 percent AMI or greater" ~ "Very affordable",
-        cost == "31 to 50 percent AMI" & household_income == "30 percent AMI or below" ~ "Unaffordable",
-    cost == "51 to 80 percent AMI" & household_income == "30 percent AMI or below" ~ "Unaffordable",
-        cost == "51 to 80 percent AMI" & household_income == "31 to 50 percent AMI" ~ "Unaffordable",
-    cost == "51 to 80 percent AMI" & household_income == "80 percent AMI or greater" ~ "Very affordable",
-    cost == "80 percent AMI or greater" & household_income == "30 percent AMI or below" ~ "Unaffordable",
-    cost == "80 percent AMI or greater" & household_income == "31 to 50 percent AMI" ~ "Unaffordable", 
-    cost == "80 percent AMI or greater" & household_income == "51 to 80 percent AMI" ~ "Unaffordable"
-  )) |> 
-  mutate(gapcode = case_when(
-    match == "Unaffordable" ~ "Gap",
-    TRUE ~ "Matches or less than income"
-  ))
+gap <- read_rds("data/gap.rds")
 
-gap <- tb_18_match |> 
-  group_by(year, household_income, gapcode) |> 
-  summarise(estimate = sum(estimate)) |> 
-  mutate(estimate = case_when(
-    gapcode == "Gap" ~ estimate * -1,
-    gapcode == "Matches or less than income" ~ estimate
-  )) |> 
-  filter(household_income != "80 percent AMI or greater")
-
-ggplot(gap,
+gap_bar <- ggplot(gap,
        aes(x = year, 
            y = estimate,
            fill = gapcode)) +
   geom_bar(stat = "identity") +
-  facet_grid(~household_income)
+  facet_grid(~household_income) +
+  theme(axis.title = element_blank()) +
+  labs(title = "Rental housing gap by AMI: 2015 to 2018", fill = "Gap/Affordability")
 
-
+ggplotly(gap_bar) |> 
+  plotly_camera()
 
 ```
 
-Income versus affordability
+## Income versus affordability
+
+Market asking rents across the region have been on the incline between 2016 and 2020. But median renter household incomes are still not enough for renters in many parts of the region to afford the average rental prices in the region. That gap is most prominent in the City of Richmond, where the typical renter can only afford a rent of \$906, but the regional market asking rent is \$1,339 --- a \$406 gap. The gap is less severe in Henrico County where it is only \$137, while renter incomes in Chesterfield County and Hanover are much more able to afford average market rents.
+
 ```{r renter-rent}
 
 # Compare renter income versus rental prices
@@ -120,7 +137,7 @@ rent_income_gap <- rent_income |>
   ))
   
 
-ggplot(rent_income_gap,
+rent_income_line <- ggplot(rent_income_gap,
        aes(x = year,
            y = dollars,
            color = type
@@ -130,10 +147,13 @@ ggplot(rent_income_gap,
   scale_y_continuous(labels = dollar_format()) +
   theme(axis.title = element_blank(),
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 1)) +
-  labs(title = "Market asking rent versus rent affordable", color = "Rent (2020 inflation-adjusted dollars)")
+  labs(title = "Market asking rent versus rent affordable to typical renter", color = "Rent (2020 inflation-adjusted dollars)")
   
+ggplotly(rent_income_line) |> 
+  plotly_camera()
 
 ```
+For renter households wanting to enter homeownership, the income needed to afford the median home price in the region remains wide for renters in all parts of the region. In Chesterfield and Hanover, the gap between income needed to afford the median home price and the median renter household income is nearly \$10,000. But in Henrico County the gap is \$14,238, while the typical renter in the City of Richmond has an even wider gap of \$26,070.
 
 ```{r  renter-own}
 
@@ -172,7 +192,7 @@ sale_income_gap <- sale_income |>
     data == "inc_needed" ~ "Income needed to afford median home price"
   ))
 
-ggplot(sale_income_gap,
+sale_income_line <- ggplot(sale_income_gap,
        aes(x = year, 
            y = value,
            color = data)) +
@@ -182,6 +202,8 @@ ggplot(sale_income_gap,
   theme(axis.title = element_blank()) +
   scale_y_continuous(labels = dollar_format())
 
+ggplotly(sale_income_line) |> 
+  plotly_camera()
 
 ```
 
