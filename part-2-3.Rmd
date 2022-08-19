@@ -189,7 +189,7 @@ Section 8 Housing Choice Vouchers (HCV) are tenant-based rental assistance that 
 
 This changed significantly in early 2020, when the Virginia General Assembly passed new fair housing legislation that made it illegal to discriminate based on source of income --- defined as "any source that lawfully provides funds to or on behalf of a renter or buyer of housing, including any assistance, benefit, or subsidy program, whether such program is administered by a governmental or nongovernmental entity.”
 
-HCV utilization across the region 
+HCV utilization across the region is concentrated in the East End and Southside of Richmond, but can also be found throughout the counties, as well as the Town of Ashland. Higher HCV utilization (above 20 percent) is seen in areas near Fulton Hill, Oakwood, Manchester, and Bellwood in Chesterfield County.
 
 
 ```{r hcv}
@@ -204,14 +204,28 @@ hcv <- st_read("data/va_hcv_tract.geojson") |>
   clean_names() |> 
   subset(county %in% pha)
 
-hcv_use <- mapview::mapview(hcv, zcol= "hcv_public_pct")
+hcv_use <- mapview::mapview(hcv, 
+                            zcol= "hcv_public_pct",
+                            legend = T,
+                            layer.name = "Percent of renter-occupied housing with HCV")
+
+saveWidget(hcv_use@map, "maps/hcv_use.html")
+
+knitr::include_url("maps/hcv_use.html", height = "500px")
 
 
-hcv_use
 
 ```
 
 ## Rent relief and mortgage relief
+
+In response to the COVID-19 pandemic's impact on renters across the nation, Congress created a \$25 billion Emergency Rental Assistance (ERA) program that was funded through the CARES Act in 2021. The program was implemented through the U.S. Treasury Department and resulted in a total of $1 billion being allocated to the Commonwealth of Virginia and eligible local governments. 
+
+With this funding, the Virginia Department of Housing and Community Development (DHCD) established the Virginia Rent Relief Program (RRP), while Chesterfield County elected to administer their own rental assistance program through local nonprofit, Area Congregations Together in Service (ACTS). 
+
+Through DHCD, a total of 32,029 payments were made to households across Richmond, Henrico, and Hanover. Both Richmond and Henrico saw increasing households receiving rental assistance with slight dips during the early part of 2022. Few households in Hanover County sought rental relief from DHCD.
+
+[*Awaiting Chesterfield County Data*]
 
 ```{r rmrp}
 
@@ -236,7 +250,11 @@ ggplot(rrp,
   scale_y_continuous(labels = number_format(big.mark = ","))
 
 
+
+
 ```
+Average payments per household across the three localities was well into the above \$4,000 for most of the program's duration, with the highest payments being made in Hanover County.
+
 ```{r rrp-payment}
 
 ggplot(rrp,
@@ -251,7 +269,9 @@ ggplot(rrp,
   scale_y_continuous(labels = dollar_format())
 
 ```
-Affordable homeownership
+## Affordable homeownership
+
+*Data requested from housing partners*
 
 ```{r aff-ho}
 
