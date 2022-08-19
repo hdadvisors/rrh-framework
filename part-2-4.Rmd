@@ -15,6 +15,8 @@ library(sp)
 library(viridis)
 library(plotly)
 library(scales)
+library(zoo)
+library(lubridate)
 
 # Utilize the same filters as the Chesterfield County Rental Market Analysis. I've changed the star rating to two or less, which coincides with CoStar's analysis.
 
@@ -36,7 +38,15 @@ Not all affordable housing is supported by public subsidy. In fact, a large shar
 
 The preservation of NOAH properties has been a growing strategy to support affordable housing in communities as the ability to quickly develop new units has been stifled by labor shortages, rising land prices, and supply chain issues. NOAH is at great risk of being lost because it often requires greater investment to maintain and more likely to be redeveloped---in turn contributing to a loss of affordable housing units.
 
-NOAH properties are located all across the region, especially in the City of Richmond and along the borders of the city and counties, where older multifamily properties exist.
+For analysis purposes, we define NOAH properties as:
+
+* Existing multifamily properties with active leases;
+* Classified as Class B, C, or unclassified;
+* No public subsidy, rent caps, or other income-based restrictions;
+* *CoStar Building Rating* of two or fewer stars out of five;^[Per CoStar, this is rating for the building relative to other buildings of the same type throughout the country.] and
+* Built before 2000
+
+Based on this criteria, NOAH properties are located all across the region, especially in the City of Richmond and along the borders of the city and counties, where older multifamily properties exist.
 
 ```{r noah-map, fig.cap="Map of NOAH properties in region. Source: CoStar Group, Inc.}
 
@@ -47,22 +57,26 @@ noah <- read_csv("data/pha_noah_81722.csv") |>
 
 pha_names <- c("Richmond City", "Hanover", "Henrico", "Chesterfield")
 
-# geo_colors <- setNames(viridis(4), nm = pha_names)
-# 
-# pal <-colorFactor(palette = c("#440154FF", "#31688EFF","#35B779FF", "#FDE725FF"),
-#                   levels = c("Richmond City", "Hanover", "Henrico", "Chesterfield"))
-#   
-# noah_map <- leaflet(noah) |> 
+geo_colors <- setNames(viridis(4), nm = pha_names)
+
+pal <-colorFactor(palette = c("#440154FF", "#31688EFF","#35B779FF", "#FDE725FF"),
+                  levels = c("Richmond City", "Hanover", "Henrico", "Chesterfield"))
+
+# noah_map <- leaflet(noah) |>
 #   addProviderTiles(providers$OpenStreetMap.Mapnik) |>
 #   addCircleMarkers(
 #     radius = 5,
 #     color = ~pal(county_name),
-#     stroke = FALSE)
+#     stroke = TRUE, fillOpacity = 1)
 # 
 # saveWidget(noah_map, "maps/noah_map.html")
 
 knitr::include_url("maps/noah_map.html")
 ```
+
+The large share of NOAH is located in the City of Richmond (11,310 units or 45 percent of all NOAH units). This is no doubt due to the large amount of older multifamily properties within city limits --- most of which is located in smaller buildings. Henrico County has the second largest share of NOAH in the region with 8,820 units, followed by Chesterfield County at 3,963 and Hanover County well below 1,000 units.
+
+In total, there are nearly 25,000 NOAH units across 194 properties in the region. This makes up a significant amount of rental inventory, as well as a valuable source of unsubsidized affordable housing. The aging of these properties, as well as the increasing demand for rental housing, puts significant pressure on these properties and their owners. For smaller landlords, the cost to renovate can be far too great --- leading to worsening deferred maintenance and pressure to sell, which both can negatively impact renters.
 
 ```{r noah-cnt, fig.cap="NOAH units by locality"}
 
@@ -85,11 +99,11 @@ noah_cnt_bar <- ggplot(noah_cnt,
 ggplotly(noah_cnt_bar) |> 
   plotly_camera()
 
-
+# Total units is 24,847
 
 ```
 
-```{r noah-type}
+```{r noah-type, eval=FALSE}
 
 
 noah_type <- read_csv("data/pha_noah_72822.csv") |> 
@@ -98,17 +112,42 @@ noah_type <- read_csv("data/pha_noah_72822.csv") |>
 
 
 ```
+NOAH properties have not been immune from the rapid rises in rent. As of Q3 2022, the average asking rent for NOAH properties was \$1,173. This is about \$200 less than the average asking rent across all rental properties. Although this seems like a small difference, an extra \$200 a month means more money saved for childcare or transportation costs.
+
+From the beginning of the pandemic to Q3 2022, NOAH rent has increased by \$104 --- a 10 percent increase. 
 
 ```{r noah-rents}
 
 # Pulled at end of July; hesitant to re-pull because the data keeps changing on CoStar's side. 
 
-noah_rent <- read_csv("data/pha_noah_rent_81722.csv") 
+noah_rent <- read_csv("data/pha_noah_rent_81722.csv") |> 
+  mutate(period = as.Date(as.yearqtr(period, format = "%Y Q%q"), frac = 1)) |> 
+  pivot_longer(cols = 2:3,
+               names_to = "type",
+               values_to = "rent") |> 
+  mutate(type = case_when(
+    type == "inf_adj" ~ "Inflation-adjusted rent",
+    type == "rent" ~ "Rent (Current dollars)"
+  )) |> 
+  mutate(rent = parse_number(rent))
+
+noah_rent_line <- ggplot(noah_rent,
+                         aes(x = period,
+                             y = rent,
+                             color = type)) +
+  geom_line(stat = "identity", size = 1)
+
+ggplotly(noah_rent_line) |> 
+  plotly_camera()
 
 
 ```
 
 ## Manufactured Home Communities
+
+Manufactured home communities (MHCs) are also a valuable source of NOAH across the region. In 2016, the Manufactured Home Community Coalition of Virginia (MHCCV) conducted an assessment of all manufactured home communities across Central Virginia. Their report identified 54 different MHCs, wherein there were at least 2,742 individual manufactured homes. 
+
+This represents both manufactured homes that may be rented, as well as owned, but regardless residents in manufactured home units rent the lot in which their home resides. This leaves many manufactured home community residents who own their homes in a precarious position should a community owner decide to sell or redevelop the property. Manufactured homes are not easily moved once installed, leaving many families forced to abandon their homes and seek new and more expensive housing elsewhere.
 
 ```{r mhc-map}
 
@@ -159,3 +198,7 @@ ggplotly(mhc_bar) |>
   plotly_camera()
 
 ```
+
+The majority of manufactured home community units are located in Chesterfield County --- largely along the Route 1 corridor. But since the Framework was released several large MHCs in Chesterfield County were purchased by real estate investors --- leading to major concerns about increasing rents and redevelopment. Suburban Village, the county's third largest MHC at 226 units, was purchased by a Maryland-based company in August 2021 for \$22.5 million, while Shady Hill Mobile Home Park (an at least 110 unit community) received an offer of \$7.6 million in Spring 2022.
+
+Manufactured homes --- often located along major corridors --- are well-positioned for redevelopment due to their location and proximity, but they offer many residents in need of housing an option. As these communities continue to be at risk, this puts whole communities in danger of displacement. To head off such negative impacts, affordable housing nonprofit, project:HOMES, acquired a 52 unit manufactured home community called Bermuda Estates in Chesterfield County. Since acquiring the community, project:HOMES has made significant infrastructure improvements, replaced some units in disrepair, and constructed a community center.

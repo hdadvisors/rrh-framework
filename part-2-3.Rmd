@@ -19,6 +19,10 @@ library(lubridate)
 
 ### Assisted income-restricted rental
 
+Federal housing assistance programs such as Low-Income Housing Tax Credits (LIHTC) help low-income residents across the region with rental housing opportunities. In an effort to maximize assistance, these rental subsidy programs are often layered --- meaning that a rental unit may be supported by both LIHTC and project-based Section 8 vouchers. LIHTC accounts for over half (56 percent) of federally assisted rental housing in the region, followed by Section 8 project-based rental assistance (21 percent), which includes various programs found [here](https://preservationdatabase.org/documentation/program-descriptions/).
+
+LIHTC properties have a 30 year commitment to affordability, but only a 15 year compliance period, wherein property owners can increase rents. Nonprofit developers will often seek new allocation of tax credits before their commitment period ends, but there is often little incentive for for-profit developers to maintain affordability restrictions past the compliance period.
+
 
 ```{r nhpd}
 
@@ -58,7 +62,7 @@ library(lubridate)
 # 
 # write_rds(nhpd_coded_rr, "data/nhpd_rr.csv")
 
-nhpd_coded_rr <- read_rds("data/nhpd_rr.csv")
+# nhpd_coded_rr <- read_rds("data/nhpd_rr.csv")
 
 # nhpd_coded_rr <- nhpd_coded_rr |>
 #   st_as_sf(coords = c("Longitude", "Latitude"), crs=4326, remove = FALSE) |>
@@ -76,21 +80,50 @@ nhpd_coded_rr <- read_rds("data/nhpd_rr.csv")
 # 
 # saveWidget(nhpd_map, "maps/nhpd_map.html")
 # 
-# knitr::include_url("maps/nhpd_map.html", height = "500px")
+knitr::include_url("maps/nhpd_map.html", height = "500px")
+
+```
+
+```{r subsidy-overall}
+
+nhpd_coded_rr <- read_rds("data/nhpd_rr.csv")
+
+subsidy <- nhpd_coded_rr |> 
+  select(subsidy_name, assisted_units, subsidy_status, locality = address_components.county) |> 
+  filter(locality != "Charles City County") |> 
+  filter(subsidy_status != "Inactive") |> 
+  group_by(subsidy_name) |> 
+  summarise(units = sum(assisted_units)) |> 
+  transform(percent = ave(units, FUN = prop.table))
+
+
+ggplot(subsidy,
+       aes(x = reorder(subsidy_name, units),
+           y = percent,
+           fill = subsidy_name)) +
+  geom_bar(stat = "identity") +
+  theme(axis.title = element_blank(),
+        axis.ticks.x = element_blank()) +
+  labs(title = "Share of federally assisted units by subsidy", fill = "Subsidy name") +
+  scale_y_continuous(labels = percent_format()) +
+  coord_flip()
 
 ```
 
 ```{r subsidy-location}
 
-subsidy <- nhpd_coded_rr |> 
-  select(subsidy_name, assisted_units, locality = address_components.county) |> 
+nhpd_coded_rr <- read_rds("data/nhpd_rr.csv")
+
+subsidy_local <- nhpd_coded_rr |> 
+  select(subsidy_name, assisted_units, subsidy_status, locality = address_components.county) |> 
+  filter(subsidy_status != "Inactive") |> 
+  filter(locality != "Charles City County") |> 
   group_by(locality, subsidy_name) |> 
   summarise(units = sum(assisted_units)) |> 
-  st_drop_geometry() |> 
-  filter(locality != "Charles City County")
+  transform(percent = ave(units, locality, FUN = prop.table))
 
 
-ggplot(subsidy,
+ggplot(subsidy_local,
        aes(x = reorder(subsidy_name, -units),
            y = units,
            fill = subsidy_name)) +
@@ -104,8 +137,39 @@ ggplot(subsidy,
 
 
 ```
+By 2040, a large portion of active LIHTC units will be outside the 30 year commitment period --- even far more will be outside the 15 year compliance period. Just over 13,000 LIHTC units will be beyond the 30 year commitment period by 2040, which accounts for over 80 perceent of active LIHTC units as of early 2022.
+```{r lihtc}
+
+nhpd_coded_rr <- read_rds("data/nhpd_rr.csv")
+
+lihtc <- nhpd_coded_rr |> 
+  filter(subsidy_name == "LIHTC") |> 
+  select(property_name, subsidy_subname, subsidy_status, owner_type, end_date, assisted_units, county = address_components.county) |> 
+  mutate(date = mdy(end_date)) |> 
+  filter(subsidy_status != "Inactive") |> 
+  group_by(date) |> 
+  summarise(units = sum(assisted_units))
+
+lihtc_end <- ggplot(lihtc,
+                    aes(x = date,
+                        y = units)) +
+                      geom_col(fill = "dark blue") +
+  labs(title = "LIHTC units by 30 year commitment expiration date") +
+  theme(axis.title = element_blank()) +
+  scale_y_continuous(labels = number_format(big.mark = ","))
+
+ggplotly(lihtc_end) |> 
+  plotly_camera()
+
+```
+## Public Housing
+The redevelopment of public housing in the City of Richmond has begun to take shape at the first of the "Big Six" public housing courts --- Creighton Court. This public housing property located in Richmond's far East End consisted of 503 public housing units. As part of their first phase of redevelopment, Richmond Redevelopment and Housing Authority's (RRHA) has begun demolition of Creighton Court, with plans to develop roughly 700 units of mixed-income housing. Construction on Phase 1 is expected to begin in Winter 2022 with the entire redevelopment process expected to last ten years.
+
+RRHA's next focus area will be Gilpin Court, north of Jackson Ward, where about 780 public housing units reside. In November 2021, RRHA and the City of Richmond were awarded a Choice Neighborhoods Planning Grant by the U.S. Department of Housing and Urban Development for \$450,000. This planning grant is being utilized to facilitate the community planning process around not only Gilpin Court, but the Jackson Ward community --- including strategies to undo the negative impacts of interstate development on the historically Black communities of Jackson Ward and North Jackson Ward.
 
 ```{r public-housing}
+
+nhpd_coded_rr <- read_rds("data/nhpd_rr.csv")
 
 ph <- nhpd_coded_rr |> 
   filter(subsidy_name == "Public Housing") 
@@ -119,7 +183,14 @@ leaflet(ph) |>
 
 ```
 
-### Housing Choice Vouchers
+## Housing Choice Vouchers
+
+Section 8 Housing Choice Vouchers (HCV) are tenant-based rental assistance that allows recipients to find housing on the open market. This provides household with greater choice in where they want to live, but historically many HCV recipients have faced discrimination from landlords unwilling to accept HCV.
+
+This changed significantly in early 2020, when the Virginia General Assembly passed new fair housing legislation that made it illegal to discriminate based on source of income --- defined as "any source that lawfully provides funds to or on behalf of a renter or buyer of housing, including any assistance, benefit, or subsidy program, whether such program is administered by a governmental or nongovernmental entity.”
+
+HCV utilization across the region 
+
 
 ```{r hcv}
 
@@ -133,9 +204,10 @@ hcv <- st_read("data/va_hcv_tract.geojson") |>
   clean_names() |> 
   subset(county %in% pha)
 
-mapview::mapview(hcv, zcol= "hcv_public_pct")
+hcv_use <- mapview::mapview(hcv, zcol= "hcv_public_pct")
 
 
+hcv_use
 
 ```
 
