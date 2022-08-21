@@ -249,7 +249,7 @@ ggplot(rrp,
   labs(title = "Rent relief payments by locality") +
   scale_y_continuous(labels = number_format(big.mark = ","))
 
-
+# https://crsreports.congress.gov/product/pdf/R/R46688
 
 
 ```
