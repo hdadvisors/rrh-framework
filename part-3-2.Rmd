@@ -1,6 +1,4 @@
-# (PART)GAP ANALYSIS {.unnumbered}
-
-## Impact of housing costs on household budgets {#part-3-2}
+# Impact of housing costs on household budgets {#part-3-2}
 
 ```{r setup}
 
@@ -18,7 +16,8 @@ library(plotly)
 
 ```
 
-```{r chas, eval=FALSE}
+```{r chas-pull, eval=FALSE}
+
 # years <- 2015:2018
 # 
 # sumlev <- "050"
@@ -118,153 +117,252 @@ library(plotly)
 
 ```
 
-## Cost burden
-
-The share of cost-burdened households has been decreasing across the region from 2015 to 2018. In nearly every locality, the share of cost-burdened households has decreased by at least three percentage points --- with Hanover County experiencing a five percentage point decrease in cost-burdened households. This seems surprising given the growing affordability challenges experienced by the region's residents. 
-
 ```{r chas-data}
 
-# cb_7 <- read_csv("data/Table7_2015to2018.csv") |> 
-#   clean_names() |> 
-#   filter(line_type == "Detail") |> 
-#   select(year, estimate, moe, county, fips, tenure, household_income, household_type, cost_burden) |> 
+# cb_7 <- read_csv("data/Table7_2015to2018.csv") |>
+#   clean_names() |>
+#   filter(line_type == "Detail") |>
+#   select(year, estimate, moe, county, fips, tenure, household_income, household_type, cost_burden) |>
 #   mutate(tenure = case_when(
 #     tenure == "Owner occupied" ~ "Homeowner",
 #     tenure == "Renter occupied" ~ "Renter"
-#   )) |> 
+#   )) |>
 #   mutate(household_income = case_when(
 #     household_income == "household income is less than or equal to 30% of HAMFI" ~ "30% AMI or less",
 #     household_income == "household income is greater than 30% but less than or equal to 50% of HAMFI" ~ "31 to 50% AMI",
 #     household_income == "household income is greater than 50% but less than or equal to 80% of HAMFI" ~ "51 to 80% AMI",
-#     household_income == "household income is greater than 80% but less than or equal to 100% of HAMFI" ~ "81 to 100% AMI", 
+#     household_income == "household income is greater than 80% but less than or equal to 100% of HAMFI" ~ "81 to 100% AMI",
 #     household_income == "household income is greater than 100% of HAMFI" ~ "101% AMI or greater"
-#   )) |> 
+#   )) |>
 #   mutate(household_type = case_when(
 #     household_type == "household type is elderly family (2 persons, with either or both age 62 or over)" ~ "Elderly family",
 #     household_type == "household type is small family (2 persons, neither person 62 years or over, or 3 or 4 persons)" ~ "Small family",
 #     household_type == "household type is large family (5 or more persons)" ~ "Large family",
-#     household_type == "household type is elderly non-family" ~ "Elderly non-family", 
+#     household_type == "household type is elderly non-family" ~ "Elderly non-family",
 #     household_type == "other household type (non-elderly non-family)" ~ "Non-elderly non-family"
-#   ))  |> 
+#   ))  |>
 #   mutate(cost_burden = case_when(
-#     cost_burden == "housing cost burden is less than or equal to 30%" ~ "Not cost-burdened", 
+#     cost_burden == "housing cost burden is less than or equal to 30%" ~ "Not cost-burdened",
 #     cost_burden == "housing cost burden is greater than 30% but less than or equal to 50%" ~ "Cost-burdened",
 #     cost_burden == "housing cost burden is greater than 50%" ~ "Severely cost-burdened",
 #     cost_burden == "housing cost burden not computed (household has no/negative income)" ~ "No or negative income"
-#   )) |> 
+#   )) |>
 #   mutate(cb_group = case_when(
 #     cost_burden == "Cost-burdened" ~ "Cost-burdened",
 #     cost_burden == "Severely cost-burdened" ~ "Cost-burdened",
-#     cost_burden == "No or negative income" ~ "Cost-burdened",
 #     TRUE ~ cost_burden
 #   ))
 # 
 # write_rds(cb_7, "data/cb_7.rds")
 
-
+cb_7 <- read_rds("data/cb_7.rds")
 
 pha_localities <- c("Richmond city", "Chesterfield County", "Hanover County", "Henrico County")
 
 ```
 
-```{r cb-locality, fig.cap= Share of cost-burdened households by locality. Source: Comprehensive Housing Affordability Strategy (CHAS)."}
+## Cost burden
 
-cb_7 <- read_rds("data/cb_7.rds")
+When incomes don't rise along with housing costs, we can expect an increase in the number of cost-burdened households who pay more than 30 percent of their gross income on basic housing expenses. Since 2015, cost burden levels in the region decreased for some groups, while increased for others.
 
-income_pha_perc <- cb_7 |> 
-  subset(county %in% pha_localities) |> 
-  group_by(year, county, cb_group) |>
-  summarise(estimate = sum(estimate))
+Data in this section come from the Comprehensive Housing Affordability Strategy (CHAS) dataset published by the U.S. Department of Housing and Urban Development. CHAS estimates are a custom tabulation of American Community Survey responses. As of August 2022, the most recent CHAS data is for the 2014-2018 5-year period.
 
-income_pha_perc <- income_pha_perc |> 
-  transform(percent = ave(estimate, year, county, FUN = prop.table)) |> 
-  filter(year == 2015 | year == 2018)
+Unless otherwise noted, all plots on this page combine data from Chesterfield County, Hanover County, Henrico County, and Richmond city.
 
-cb_share <- ggplot(income_pha_perc,
-       aes(x = county,
-           y = percent,
-           fill = forcats::fct_rev(cb_group))) +
-  facet_grid(~year) +
-  geom_col(position = "stack") +
-  scale_y_continuous(labels = percent_format()) +
-  theme(axis.title = element_blank(),
-        axis.text.x = element_text(angle= 90, hjust = 1, vjust = 1)) +
-  labs(title = "Share of cost-burdened households by locality", fill = "Cost burden") +
-  scale_fill_manual(values = c("grey", "red"))
+### Cost burden by tenure
 
-ggplotly(cb_share) |> 
-  plotly_camera()
+The number of cost-burdened homeowners across the region has declined significantly since 2015, particularly in Chesterfield and Henrico counties. Hanover County and Richmond city saw smaller decreases, but the total "loss" of cost-burdened homeowners in the region still exceeded 6,300.
 
-```
-Most of the decreases in cost burden have been among homeowners across the region. In 2018, there were nearly 8,000 fewer cost-burdened homeowners across the four major localities. Although Chesterfield County saw an increase in 222 cost-burdened renter households, there was an decrease of 1,850 cost-burdened renters across the three other localities.
+Meanwhile, the total number of cost-burdened renter households increased by almost 1,500, with only Hanover County seeing a small decline. Much of this growth was focused in Chesterfield County and Richmond city.
 
-```{r cb-tenure, fig.cap="Change in housing cost burden by tenure. Source: Comprehensive Housing Affordability Strategy (CHAS)."}
+```{r cb-locality, fig.cap = "Cumulative change in cost-burdened households by tenure"}
 
-cb_tenure_pha <- cb_7 |> 
-  subset(county %in% pha_localities) |> 
-  group_by(year, county, tenure, cb_group) |> 
-  summarise(estimate = sum(estimate)) |>
-  pivot_wider(
-    names_from = year,
-    values_from = estimate
-  ) |> 
-  clean_names() |> 
-  transform(difference = (x2018 - x2015))
-
-
-cb_tenure_pha <- cb_tenure_pha |> 
-  filter(cb_group == "Cost-burdened")
-
-cb_tenure_bar <- ggplot(cb_tenure_pha,
-       aes(x = county,
-           y = difference,
-           fill = tenure)) +
-  geom_bar(stat = "identity") + 
-  facet_wrap(~tenure) +
-  labs(title = "Change in housing cost burden by tenure: 2015 to 2018") +
-  theme(legend.position = "none",
-        axis.title = element_blank()) + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 1))
-
-ggplotly(cb_tenure_bar) |> 
-  plotly_camera()
-
-```
-In 2018, there were 6,139 fewer 30% AMI households experiencing cost-burdened than there were in 2015. Other income groups also saw decreases in cost burden, although not as substantial. But the 51-to 80% AMI group saw an increase of 836 households experiencing cost burden.
-
-```{r cb-income, fig.cap="Change in housing cost burden by AMI. Source: Comprehensive Housing Affordability Strategy (CHAS)."}
-
-cb_7_pha <- cb_7 |> 
-  subset(county %in% pha_localities) |> 
-  group_by(year, household_income, cb_group) |> 
+cb_locality <- cb_7 |> 
+  filter(county %in% pha_localities,
+         cb_group == "Cost-burdened") |> 
+  group_by(year, county, tenure) |> 
   summarise(estimate = sum(estimate)) |> 
-  pivot_wider(
-    names_from = year,
-    values_from = estimate
-  ) |> 
-  clean_names() |> 
-  transform(difference = (x2018 - x2015))
+  group_by(county, tenure) |> 
+  mutate(change = estimate - lag(estimate)) |> 
+  drop_na() |> 
+  mutate(run_diff = cumsum(change))
+  
+ggplot(cb_locality,
+       aes(x = year, y = run_diff, fill = tenure)) +
+  geom_col(position = "dodge") +
+  facet_wrap(vars(county)) +
+  scale_y_continuous(labels = label_comma()) +
+  labs(title = "Cumulative change in cost-burdened households by tenure",
+       subtitle = "2015 to 2018",
+       fill = "Tenure",
+       caption = "Source: U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
+  theme(axis.title = element_blank())
 
-cb_income_pha <- cb_7_pha |> 
-  filter(cb_group == "Cost-burdened")
 
-cb_income_bar <- ggplot(cb_income_pha,
-       aes(x = household_income,
-           y = difference,
-           fill = household_income)) +
-  geom_bar(stat = "identity") +
-  scale_y_continuous(labels = number_format(big.mark = ",")) +
-  theme(axis.title = element_blank(),
-        axis.text.x = element_text(angle = 90, hjust = 1, vjust =1)) +
-  scale_x_discrete(limits= c("30% AMI or less", "31 to 50% AMI", "51 to 80% AMI", "81 to 100% AMI", "101% AMI or greater")) +
-  scale_fill_discrete(limits= c("30% AMI or less", "31 to 50% AMI", "51 to 80% AMI", "81 to 100% AMI", "101% AMI or greater")) +
-  labs(title = "Change in housing cost burden by AMI: 2015 to 2018", fill = "AMI")
+```
 
-ggplotly(cb_income_bar) |> 
-  plotly_camera()
+### Cost burden by income
+
+Homeowners above 80 percent AMI saw the largest declines in cost burden since 2016. This is likely due to rising incomes among homeowners with relatively fixed housing costs. Renters with cost burdens shifted up the income spectrum, as the number of cost-burdened renters below 30 percent AMI decreased by more than 1,400, but increased more than 2,705 among those between 30 and 100 percent AMI.
+
+```{r cb-income, fig.cap="Cumulative change in cost-burdened households by income and tenure"}
+
+cb_income <- cb_7 |> 
+  filter(county %in% pha_localities,
+         cb_group == "Cost-burdened") |> 
+  group_by(year, household_income, tenure) |> 
+  summarise(estimate = sum(estimate)) |> 
+  group_by(household_income, tenure) |> 
+  mutate(change = estimate - lag(estimate)) |> 
+  drop_na() |> 
+  mutate(run_diff = cumsum(change)) |> 
+  ungroup() |> 
+  mutate(household_income = fct_relevel(household_income,
+                                        "30% AMI or less",
+                                        "31 to 50% AMI",
+                                        "51 to 80% AMI",
+                                        "81 to 100% AMI",
+                                        "101% AMI or greater"))
+
+  
+ggplot(cb_income,
+       aes(x = year, y = run_diff, fill = tenure)) +
+  geom_col(position = "dodge") +
+  facet_wrap(~household_income, nrow = 1, labeller = label_wrap_gen(width = 18, multi_line = TRUE)) +
+  scale_y_continuous(labels = label_comma()) +
+  labs(title = "Cumulative change in cost-burdened households by income and tenure",
+       subtitle = "2015 to 2018",
+       fill = "Tenure",
+       caption = "Source: U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
+  theme(axis.title = element_blank())
   
 
 ```
+
+However, the significant and unexpected drop among cost-burdened renters below 30 percent AMI from 2017 to 2018 deserves further explanation. Because CHAS estimates are only current through 2018, we can use more recent ACS estimates as a comparison. This data is only available by real household income values and not AMI.
+
+The plot below shows the ACS estimates of renter households by cost burden from 2016 to 2020. There is a steady decline in the number of cost-burdened low-income renters (under \$35,000); however, this corresponds to an increasing number of cost-burdened renters with incomes between \$35,000 and \$75,000.
+
+```{r cb-income-acs-data}
+
+# years <- 2015:2020
+# 
+# pha_geoid <- c("51085", "51760", "51087", "51041")
+# 
+# b25074_raw <- map_dfr(years, function(yr){
+#   b25074_pull <- get_acs(
+#     geography = "county",
+#     table = "B25074",
+#     state = "VA",
+#     year = yr
+#   ) |> 
+#     mutate(year = yr)
+# })
+# 
+# b25074_vars <- load_variables(2020, dataset = "acs5") |> 
+#   filter(str_detect(name, "B25074"))
+# 
+# b25074_vars_cleaned <- b25074_vars |> 
+#   separate(label, into = c("est", "tot", "inc", "cb"), sep = "!!") |> 
+#   select(variable = name, inc, cb) |> 
+#   mutate(across(.fns = ~str_remove_all(.x, ":"))) |> 
+#   drop_na() |> 
+#   mutate(cb_group = case_when(
+#     str_detect(cb, "30.0|35.0|40.0|50.0") ~ "Cost-burdened",
+#     str_detect(cb, "20.0|25.0") ~ "Not cost-burdened",
+#     TRUE ~ "Not computed"
+#   ))
+# 
+# b25074_data <- b25074_raw |> 
+#   filter(GEOID %in% pha_geoid) |> 
+#   right_join(b25074_vars_cleaned, by = "variable") |> 
+#   filter(!year == 2015) |> 
+#   group_by(GEOID, year, inc, cb_group) |> 
+#   summarise(estimate = sum(estimate)) |>
+#   group_by(GEOID, inc, cb_group) |>
+#   mutate(change = estimate - lag(estimate)) |> 
+#   ungroup() |> 
+#   mutate(inc = fct_relevel(inc,
+#                            "Less than $10,000",
+#                            "$10,000 to $19,999",
+#                            "$20,000 to $34,999",
+#                            "$35,000 to $49,999",
+#                            "$50,000 to $74,999",
+#                            "$75,000 to $99,999",
+#                            "$100,000 or more"),
+#          cb_group = fct_relevel(cb_group,
+#                                 "Cost-burdened",
+#                                 "Not cost-burdened",
+#                                 "Not computed"))
+# 
+# write_rds(b25074_data, "data/b25074_data.rds")
+
+```
+
+```{r cb-income-acs-est, fig.cap = "Renter households by income and cost burden"}
+
+b25074_data <- read_rds("data/b25074_data.rds")
+
+ggplot(b25074_data,
+       aes(x = year, y = estimate, fill = cb_group)) +
+  geom_col(position = "dodge") +
+  facet_wrap(~inc, nrow = 1, labeller = label_wrap_gen(width = 12, multi_line = TRUE)) +
+  labs(title = "Renter households by income and cost burden",
+       subtitle = "2016 to 2020",
+       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25074.") +
+  scale_y_continuous(labels = label_comma()) +
+  theme(axis.title = element_blank(),
+        axis.text.x = element_text(size = 8, angle = 90, vjust = 0.5),
+        legend.position = "bottom",
+        legend.title = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.ticks = element_blank()) +
+  scale_fill_manual(values = c("#d8b365", "#018571", "#80cdc1"))
+
+```
+
+Nearly all cost-burdened renter households have incomes below \$75,000. Filtering for just those estimates, the plot below shows the net annual change from 2016 to 2020. The significant decrease from 2019 to 2020 (1,057) is well beyond the range from previous changes, and may also be due in part to lower ACS response rates among lower-income households during the COVID-19 pandemic.
+
+```{r cb-income-acs-yoy, fig.cap = "Year-over-year change in cost-burdened renter households"}
+
+b25074_yoy <- b25074_data |>
+  group_by(year, inc, cb_group) |> 
+  filter(cb_group == "Cost-burdened",
+         !inc %in% c("$75,000 to $99,999", "$100,000 or more")) |> 
+  summarise(sum = sum(estimate)) |> 
+  group_by(year) |> 
+  summarise(sum = sum(sum)) |> 
+  mutate(yoy = sum - lag(sum)) |> 
+  drop_na()
+
+ggplot(b25074_yoy,
+       aes(x = year, y = yoy, label = label_comma()(yoy))) +
+  geom_col(fill = "#d8b365") +
+  geom_text(aes(y = yoy - sign(yoy)/0.02,
+            label = label_comma()(yoy)),
+            color = "white") +
+  labs(title = "Year-over-year change in cost-burdened renter households",
+       subtitle = "Household income below $75,000 only",
+       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25074.") +
+  scale_y_continuous(labels = label_comma()) +
+  theme(axis.title = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.ticks = element_blank())
+
+  
+
+```
+
+In summary, since the *total* number of renter households in the region has not changed significantly from 2016 to 2020, and because the supply of deeply affordable rental housing has not increased, the estimated decline in low-income cost-burdened renters is likely due to a combination of increasing average incomes "re-sorting" households into higher income categories, as well as pandemic data collection challenges.
+
+### Cost burden by household type
+
 While small families and non-elderly, non-family household saw decreases in cost burden across all four localities, there were significant differences among other household types. There was little decrease in large family housing cost burden in every locality except for Chesterfield County, where there was an increase of 174 households with cost burden. Elderly households saw varying changes in housing cost burden, with the highest increases being in Chesterfield County and Richmond city. Henrico County saw decreases in the number of elderly families experiencing cost burden (-115), but a substantial increase in the number of cost-burdened elderly non-family households (i.e. seniors living alone) (+885) --- the highest increase among all localities.
 
 ```{r cb-hh, fig.cap="Change in housing cost burden by household type. Source: Comprehensive Housing Affordability Strategy (CHAS)."}
