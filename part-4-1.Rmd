@@ -1,3 +1,80 @@
-# (PART)LOCAL SUMMARIES {.unnumbered}
+# (PART) Local summaries {.unnumbered}
 
-## Richmond City {#part-4-1}
+# Richmond City {#part-4-1}
+
+This chapter is a summary of the major changes to the City of Richmond's population and housing market in the past five years.
+
+## Takeaways
+
+```
+Add short bullet points summarizing major changes
+```
+
+## Demographic and socioeconomic changes
+
+### Population changes
+
+```
+Add choice of population stat (net change, components, etc)
+```
+
+### Household characteristics
+
+```
+Add choice of household stat (HHs with children, HHs with seniors, subfamilies, etc)
+```
+
+### Income and wages
+
+```
+Add choice of income stat (probably median household income of some kind)
+```
+
+### Persons with disabilities
+
+```
+Add disability stat (probably independent living difficulty)
+```
+
+## Housing supply and market changes
+
+### Homeownership
+
+```
+Median sales price over time
+```
+
+### Rental
+
+```
+Average asking rent over time (by submarket if applicable, maybe by bedroom if no submarkets)
+```
+
+### Housing assistance
+
+```
+Change in number of assisted units (NHPD)
+```
+
+### Naturally-occuring affordable housing
+
+```
+Add choice of NOAH stat (total number, change in rent, etc)
+```
+
+## Gap analysis
+
+...
+
+### Affordability of current housing stock
+
+```
+Add choice of affordability stat (surplus/deficit, income vs prices, etc)
+```
+
+### Impact of housing costs
+
+```
+Add choice of housing cost stat (cost burden, PIT, eviction filings, etc)
+```
+
