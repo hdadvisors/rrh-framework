@@ -8,11 +8,11 @@ library(glue)
 library(readxl)
 library(janitor)
 library(ggplot2)
-library(simplevis)
 library(stats)
 library(lubridate)
 library(scales)
 library(plotly)
+library(viridis)
 
 ```
 
@@ -175,7 +175,7 @@ The number of cost-burdened homeowners across the region has declined significan
 
 Meanwhile, the total number of cost-burdened renter households increased by almost 1,500, with only Hanover County seeing a small decline. Much of this growth was focused in Chesterfield County and Richmond city.
 
-```{r cb-locality, fig.cap = "Cumulative change in cost-burdened households by tenure"}
+```{r cb-locality, fig.cap="Cumulative change in cost-burdened households by tenure"}
 
 cb_locality <- cb_7 |> 
   filter(county %in% pha_localities,
@@ -197,7 +197,6 @@ ggplot(cb_locality,
        fill = "Tenure",
        caption = "Source: U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
   theme(axis.title = element_blank())
-
 
 ```
 
@@ -236,7 +235,6 @@ ggplot(cb_income,
        caption = "Source: U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
   theme(axis.title = element_blank())
   
-
 ```
 
 However, the significant and unexpected drop among cost-burdened renters below 30 percent AMI from 2017 to 2018 deserves further explanation. Because CHAS estimates are only current through 2018, we can use more recent ACS estimates as a comparison. This data is only available by real household income values and not AMI.
@@ -299,7 +297,7 @@ The plot below shows the ACS estimates of renter households by cost burden from 
 
 ```
 
-```{r cb-income-acs-est, fig.cap = "Renter households by income and cost burden"}
+```{r cb-income-acs-est, fig.cap="Renter households by income and cost burden"}
 
 b25074_data <- read_rds("data/b25074_data.rds")
 
@@ -326,7 +324,7 @@ ggplot(b25074_data,
 
 Nearly all cost-burdened renter households have incomes below \$75,000. Filtering for just those estimates, the plot below shows the net annual change from 2016 to 2020. The significant decrease from 2019 to 2020 (1,057) is well beyond the range from previous changes, and may also be due in part to lower ACS response rates among lower-income households during the COVID-19 pandemic.
 
-```{r cb-income-acs-yoy, fig.cap = "Year-over-year change in cost-burdened renter households"}
+```{r cb-income-acs-yoy, fig.cap="Year-over-year change in cost-burdened renter households"}
 
 b25074_yoy <- b25074_data |>
   group_by(year, inc, cb_group) |> 
@@ -363,13 +361,15 @@ In summary, since the *total* number of renter households in the region has not 
 
 ### Cost burden by household type
 
-While small families and non-elderly, non-family household saw decreases in cost burden across all four localities, there were significant differences among other household types. There was little decrease in large family housing cost burden in every locality except for Chesterfield County, where there was an increase of 174 households with cost burden. Elderly households saw varying changes in housing cost burden, with the highest increases being in Chesterfield County and Richmond city. Henrico County saw decreases in the number of elderly families experiencing cost burden (-115), but a substantial increase in the number of cost-burdened elderly non-family households (i.e. seniors living alone) (+885) --- the highest increase among all localities.
+Small families and non-elderly, non-family homeowner households saw the largest decreases in cost burden across all four localities. Among renters, only small family households are now less likely to be cost-burdened, but this change (-685) is an order of magnitude smaller than the decrease for homeowner small families (-5,660).
 
-```{r cb-hh, fig.cap="Change in housing cost burden by household type. Source: Comprehensive Housing Affordability Strategy (CHAS)."}
+Net increases in cost-burden were almost entirely contained to elderly non-family and elderly family households. There are now more than 3,000 additional cost-burdened households in these groups, including both homeowners and renters.
+
+```{r cb-hh, fig.cap="Change in cost-burdened households by household type"}
 
 cb_hh_pha <- cb_7 |> 
   subset(county %in% pha_localities) |> 
-  group_by(year, county, household_type, cb_group) |> 
+  group_by(year, tenure, household_type, cb_group) |> 
   summarise(estimate = sum(estimate)) |> 
   pivot_wider(
     names_from = year,
@@ -377,36 +377,39 @@ cb_hh_pha <- cb_7 |>
   ) |> 
   clean_names() |> 
   transform(difference = (x2018 - x2015)) |> 
-  filter(cb_group == "Cost-burdened")
+  filter(cb_group == "Cost-burdened") |> 
+  mutate(household_type = fct_reorder(household_type, difference, .desc = TRUE))
 
-cb_hh_bar <- ggplot(cb_hh_pha,
+ggplot(cb_hh_pha,
        aes(x = household_type,
            y = difference,
            fill = household_type)) +
   geom_bar(stat = "identity") + 
-  facet_wrap(~county) +
-  labs(title = "Change in housing cost burden by household type: 2015 to 2018") +
+  facet_wrap(~tenure) +
+  labs(title = "Change in cost-burdened households by household type",
+       subtitle = "2015 to 2018",
+       caption = "Source: U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
+  scale_y_continuous(labels = label_comma()) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) +
   theme(legend.position = "none",
         axis.title = element_blank(),
-        axis.text.x = element_text(angle = 90, hjust = 1))
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.ticks = element_blank())
 
-ggplotly(cb_hh_bar) |> 
-  plotly_camera()
 
 
 ```
-The causes of the decrease in cost-burdened households across the region is difficult determine with available data. Data is unable to determine if cost-burdened households are simply moving away from the region or if they are no longer experiencing cost burden. Other data metrics may be more appropriate in measuring the impacts of housing costs on households --- including the residual income approach or the National Low Income Housing Coalition's Housing Wage --- but they may not help quantify the number of households impacted by housing costs.
 
 ## Mortgage delinquency and foreclosure
 
-Since the Great Recession, mortgage delinquency of 90 days or more has been on a steady decline across the region --- reaching decade's low rates throughout much of 2020 and 2021. Pandemic mortgage relief measures laid out in the CARES Act led to a significant forbearance program, wherein homeowners with federally-backed mortgages could enter into forbearance for a year. The decrease in delinquency can be greatly attributed to these measures which stipulated that loans in forbearance would not be reported as delinquent.
+Since the Great Recession, mortgage delinquency of 90 days or more has been on a steady decline across the region ---reaching the decade's lowest rates throughout much of 2020 and 2021. Pandemic mortgage relief measures laid out in the CARES Act led to a significant forbearance program, wherein homeowners with federally-backed mortgages could enter into forbearance for a year. The decrease in delinquency can be greatly attributed to these measures which stipulated that loans in forbearance would not be reported as delinquent.
 
-According to some researchers, this program also led to loans in delinquency prior to the pandemic entering into forbearance as well.^[[(Haughwout, Lee, Scally, and van der Klaauw, 2020)](https://libertystreeteconomics.newyorkfed.org/2020/11/following-borrowers-through-forbearance/)] Interestingly, Hanover County saw a spike in mortgage delinquency during 2018, but has since declined to the lowest rate (0.2%) among all localities as of December 2021.
+According to some researchers, this program also led to loans in delinquency prior to the pandemic entering into forbearance as well.^[[(Haughwout, Lee, Scally, and van der Klaauw, 2020)](https://libertystreeteconomics.newyorkfed.org/2020/11/following-borrowers-through-forbearance/)] Interestingly, Hanover County saw a spike in mortgage delinquency during 2018, but has since declined to the lowest rate (0.2 percent) among all localities as of December 2021.
 
-
-```{r mort-del, fig.cap="Mortgage delinquency rate by locality. Source: Consumer Financial Protection Bureau (CFPB)."}
-
-pha_localities <- c("Richmond city", "Chesterfield County", "Hanover County", "Henrico County")
+```{r mort-del, fig.cap="Mortgage delinquency rate by locality"}
 
 mort_del <- read_csv("data/mortgage_del.csv") |> 
   pivot_longer(
@@ -419,30 +422,36 @@ mort_del <- read_csv("data/mortgage_del.csv") |>
   subset(Name %in% pha_localities) |> 
   mutate(estimate = (estimate/100))
 
-mort_del_line <- ggplot(mort_del,
+ggplot(mort_del,
        aes(x = period,
            y = estimate,
            color = Name)) +
   geom_line(stat = "identity", size = 1) +
-  facet_wrap(~Name) +
+  # facet_wrap(~Name) +
   scale_y_continuous(labels = percent_format()) +
   theme(axis.title = element_blank()) +
-  labs(title = "Mortgage delinquency rate by locality: 2008 through 2021", color = "Locality")
+  labs(title = "Mortgage delinquency rate by locality",
+       subtitle = "Mortgages 90 or more days delinquent: 2008 to 2021",
+       color = "Locality",
+       caption = "Source: Consumer Financial Protection Bureau, Mortgage Performance Trends.")
 
-ggplotly(mort_del_line) |> 
-  plotly_camera()
 
 
 ```
+
 With the moratorium on residential foreclosures having come to an end on June 30, 2022, the region may see increasing mortgage delinquency rates in the coming years.
 
 ## Eviction filings and judgements
 
 Richmond's elevation to national prominence due to its eviction rate spurred state-level responses to address the eviction crisis across the Commonwealth. From 2017 to 2019, the region saw small declines in the number of eviction filings. The City of Richmond saw a 14 percent decrease in average annual filings, while eviction judgements only decreased by 8 percent. 
 
+:::{.rmdinfo}
+For this section, we define eviction *filings* as the number of lawsuits generated by landlords against tenants to begin eviction proceedings. Eviction *judgements* are the subsequent court orders for tenants to vacate their apartment. Not every eviction case results in a judgement, and not every judgement results in a formal eviction carried out by local sheriff's deputies.
+:::
+
 The eviction landscape changed dramatically during the COVID-19 pandemic when the Centers for Disease Control imposed a nationwide federal moratorium on residential evictions in September 2020. In Virginia, Governor Northam requested from the state's Supreme Court a stay on evictions preceding the nationwide moratorium several times. 
 
-```{r evictions, fig.cap="Evictions and filings by locality. Source: RVA Eviction Lab"}
+```{r evictions, fig.cap="Evictions filings and judgements by locality"}
 
 evictions <- read_csv("data/evictions_17_22.csv") |> 
   pivot_longer(3:128,
@@ -450,11 +459,14 @@ evictions <- read_csv("data/evictions_17_22.csv") |>
                values_to = "value") |> 
   mutate(type = case_when(
     str_detect(data, "Filings") ~ "Filings",
-    str_detect(data,"Evictions") ~ "Evictions"
+    str_detect(data,"Evictions") ~ "Eviction judgement"
   )) |> 
   mutate(date = str_sub(data, -7, -1)) |> 
   mutate(date = ym(date)) |> 
-  mutate(year = year(date))
+  mutate(year = year(date)) |> 
+  mutate(type = fct_relevel(type, "Filings", "Eviction orders"))
+
+eviction_colors <- setNames(c("#00BFC4", "#F8766D"), nm = c("Filings", "Eviction orders"))
 
 ggplot(evictions,
        aes(x = date,
@@ -462,190 +474,241 @@ ggplot(evictions,
            fill = type)) +
   geom_col(position = "dodge") +
   facet_wrap(~Jurisdiction) +
-  theme(axis.title = element_blank()) +
-  scale_y_continuous(labels = number_format(big.mark = ",")) +
-  labs(title = "Evictions and filings by locality: 2017 through Q3 2022", fill = "Action")
+  scale_y_continuous(labels = label_comma()) +
+  labs(title = "Evictions filings and orders by locality",
+       subtitle = "January 2017 to March 2022",
+       caption = "Source: RVA Eviction Lab") +
+  scale_fill_manual(values = eviction_colors) +
+  theme(legend.position = "bottom",
+        legend.title = element_blank(),
+        axis.title = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.ticks = element_blank())
 
 ```
 
 These measures led to dramatic decreases in both the number of filings and eviction judgements across the region. However, the eviction moratorium's official end in Virginia on June 30, 2022, brings about concerns among advocates and service providers over a potential wave of evictions and homelessness in the coming months.
 
-In spite of the moratorium, eviction filings and judgements still occurred throughout much of the pandemic. 
-
-```{r evict-avg, fig.cap="Average annual evictions and filings by locality. Source: RVA Eviction Lab"}
+```{r evict-avg, fig.cap="Average annual eviction filings and orders by locality"}
 
 eviction_avg <- evictions |> 
   group_by(Jurisdiction, year, type) |> 
-  summarise(avg = mean(value))
+  summarise(avg = mean(value)) |> 
+  mutate(type = fct_relevel(type, "Filings", "Eviction orders"))
 
-evict_avg_bar <- ggplot(eviction_avg,
+ggplot(eviction_avg,
        aes(x = year,
            y = avg,
            fill = type)) +
   geom_col(position = "dodge") +
   facet_wrap(~Jurisdiction) +
-  labs(title = "Average annual evictions and filings by locality", fill = "Action") +
-  scale_y_continuous(labels = number_format(big.mark = ",")) +
-  theme(axis.title = element_blank()) +
-  scale_x_discrete(limits = c(2017, 2018, 2019, 2020, 2021, 2022))
-
-ggplotly(evict_avg_bar) |> 
-  plotly_camera()
-
+  labs(title = "Average annual eviction filings and orders by locality",
+       subtitle = "2017 to 2022 YTD",
+       caption = "Source: RVA Eviction Lab.") +
+  scale_y_continuous(labels = label_comma()) +
+  scale_fill_manual(values = eviction_colors) +
+  scale_x_discrete(limits = c(2017, 2018, 2019, 2020, 2021, 2022)) +
+  theme(legend.position = "bottom",
+        legend.title = element_blank(),
+        axis.title = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.ticks = element_blank())
 
 ```
+
 Eviction filings should continue to be monitored over the coming months. The RVA Eviction Lab has been at the forefront of this data collection and analysis, and will continue to be a resource for the region in understanding the increasing risks for renters with renter protections and resources coming to an end.
 
 ## Housing Resource Line
 
-On September 1, 2020, PHA launched the Housing Resource Line to help residents across Central Virginia in need of housing. As of July 2022, the hotline has fielded nearly 15,000 calls from people across the region --- from rural Goochland County to the City of Richmond.
+On September 1, 2020, PHA launched the Housing Resource Line to help residents across Central Virginia in need of housing. As of July 2022, the hotline has fielded nearly 15,000 calls from people across the region---from rural Goochland County to the City of Richmond.
 
-Call volume has remained steady over the near two years that the line has existed; with the call volume not having gone below 500 calls per month since March 2021.
+Call volume has remained steady over since the line's launch. Call volume has not dropped below 500 calls per month since March 2021.
 
-```{r call-vol, fig.cap="PHA Housing Resource Line call volume. Source: Partnership for Housing Affordability."}
+```{r call-vol, fig.cap="Housing Resource Line monthly call volume"}
 
 call_vol <- read_csv("data/hrl_vol.csv") |> 
   mutate(date = ym(date))
-
-call_vol_bar <- ggplot(call_vol,
-       aes(x = date,
-           y = volume)) +
-  geom_bar(stat = "identity", fill = "red") +
-  labs(title = "PHA Housing Resource Line call volume") +
-  theme(axis.title = element_blank())
-
-call_vol_bar
-
 
 # sum(call_vol$volume)
 # 
 # 14,838
 
+ggplot(call_vol,
+       aes(x = as.Date(date),
+           y = volume)) +
+  geom_col(aes(fill = "red")) +
+  scale_x_date(labels = label_date_short(), breaks = breaks_width("2 months")) +
+  labs(title = "Housing Resource Line monthly call volume",
+       subtitle = "September 2020 to July 2022",
+       caption = "Source: Partnership for Housing Affordability.") +
+  theme(legend.position = "none",
+        axis.title = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.ticks = element_blank())
+
 ```
 
-The majority of calls (56 percent) were for rental options (36 percent) and financial assistance (20 percent). The two other largest share of calls were for an option not listed (17 percent) and homelessness (13 percent). Unsurprisingly, there is an increase in homelessness calls during the colder months. But PHA staff note that there is an overall increase in calls during the summer months --- specifically in regards to people searching for rental options. This uptick in rental option calls could be directly related to lease non-renewals as landlords sought to increase rents (potentially to recoup losses from the pandemic) and the increasing demand for student rental options ahead of the Fall semester. 
+The majority of calls (56 percent) were for rental options (36 percent) and financial assistance (20 percent). The two other largest share of calls were for an option not listed (17 percent) and homelessness (13 percent).
 
-```{r call-topic}
+```{r call-topic, fig.cap="Housing Resource Line volume by call topic"}
 
 call_top <- read_csv("data/hrl_need.csv") |> 
   mutate(need = case_when(
     need == "Other - specify in \"Issues\" tab" ~ "Other",
     TRUE ~ need
   )) |> 
-  transform(percent = ave(vol,FUN = prop.table))
+  transform(percent = ave(vol,FUN = prop.table)) |> 
+  filter(percent > 0.01)
 
-call_top_bar <- ggplot(call_top,
-       aes(x = reorder(need, vol), 
-           y = percent,
+ggplot(call_top,
+       aes(y = reorder(need, vol), 
+           x = percent,
            fill = need)) +
-  geom_bar(stat = "identity") + 
+  geom_col() +
+  labs(title = "Housing Resource Line volume by call topic",
+       subtitle = "September 2020 to July 2022",
+       caption = "Note: Does not include topics below 1 percent of call volume.\nSource: Partnership for Housing Affordability.") +
   theme(axis.title = element_blank(),
-        legend.position = "none") +
-  scale_y_continuous(labels = percent_format()) +
-  labs(title = "PHA Housing Resource Line call volume by topic") +
-  coord_flip()
-
-ggplotly(call_top_bar) |> 
-  plotly_camera()
+        legend.position = "none",
+        panel.background = element_blank(),
+        panel.grid.major.y = element_blank(),
+        panel.grid.major.x = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.ticks = element_blank()) +
+  scale_x_continuous(labels = label_percent())
 
 ```
 
+Unsurprisingly, there is an increase in homelessness calls during the colder months. PHA staff note that there is an overall increase in calls during the summer months---specifically in regards to people searching for rental options.
+
+This uptick in rental option calls could be directly related to lease non-renewals as landlords sought to increase rents (potentially to recoup losses from the pandemic) and the increasing demand for student rental options ahead of the fall semester.
+
 ## Homelessness
 
-From 2011 to 2019, the overall count of persons experiencing homelessness across the Greater Richmond Continuum of Care (GRCoC) had been in decline.^[GRCoC covers City of Richmond, and the counties of Charles City, Chesterfield, Goochland, Hanover (including the town of Ashland), Henrico, New Kent, and Powhatan]. But when the COVID-19 pandemic hit, the count jumped --- going from 497 in 2019 to 834 in 2021, a 68 percent increase.
+### Point-in-Time counts
+
+From 2011 to 2019, the overall count of persons experiencing homelessness across the Greater Richmond Continuum of Care (GRCoC) had been in decline.^[GRCoC covers City of Richmond, and the counties of Charles City, Chesterfield, Goochland, Hanover (including the town of Ashland), Henrico, New Kent, and Powhatan]. But when the COVID-19 pandemic hit, the count jumped---going from 497 in 2019 to 834 in 2021, a 68 percent increase.
 
 The [Urban Institute recently highlighted](https://www.urban.org/sites/default/files/publication/104529/richmond-virginia-response-to-homelessness-during-the-covid-19-pandemic_0.pdf) Homeward's (the region's planning and coordinating organization for the GRCoC) efforts to address homelessness during the pandemic. Their response measures served as best practice examples in preventing high transmission rates among people experiencing homelessness as well as direct service staff.
 
-But the challenges of reducing homelessness during the pandemic were laid bare. With an eviction moratorium, rental vacancy rates reached record lows --- leaving many seeking rental options with little to none. In addition, providers have also referenced landlords setting high security deposits.
+But the challenges of reducing homelessness during the pandemic were laid bare. With an eviction moratorium, rental vacancy rates reached record lows---leaving many seeking rental options with little to none. In addition, providers have also referenced landlords setting high security deposits.
 
-```{r pit, fig.cap="Richmond CoC Point-in-Time count: 2007 to 2021. Source: U.S. Department of Housing and Urban Development (HUD)"}
+```{r pit-data}
 
 # years <- as.character(2007:2021)
 # 
 # path <- "data/2007-2021-PIT-Counts-by-CoC.xlsx"
 # 
 # full_set <- map_dfr(years, function(yr) {
-#   
 # 
-# pit_set <- read_excel(path, sheet = yr) |> 
+# pit_set <- read_excel(path, sheet = yr) |>
 #     clean_names()
 # 
 # suffix_to_remove <- paste0("_", yr)
-#   
+# 
 #   if ("co_c_category" %in% names(pit_set)) {
 #     pit_renamed <- pit_set %>%
-#       rename_with(~str_remove(.x, suffix_to_remove)) |> 
+#       rename_with(~str_remove(.x, suffix_to_remove)) |>
 #       mutate(year = yr) %>%
-#       select(co_c_number:co_c_name, co_c_category, type_of_count, year, everything()) |> 
+#       select(co_c_number:co_c_name, co_c_category, type_of_count, year, everything()) |>
 #       mutate(across(-c(co_c_number:year), .fns = as.numeric))
 #   } else {
 #     pit_renamed <- pit_set %>%
-#       rename_with(~str_remove(.x, suffix_to_remove)) |> 
-#       mutate(year = yr, co_c_category = NA_character_, 
-#              type_of_count = NA_character_) |> 
-#       select(co_c_number:co_c_name, co_c_category, type_of_count, year, everything()) |> 
+#       rename_with(~str_remove(.x, suffix_to_remove)) |>
+#       mutate(year = yr, co_c_category = NA_character_,
+#              type_of_count = NA_character_) |>
+#       select(co_c_number:co_c_name, co_c_category, type_of_count, year, everything()) |>
 #       mutate(across(-c(co_c_number:year), .fns = as.numeric))
 #   }
-#   
+# 
 #   pit_renamed
-#   
+# 
 # })
 # 
 # full_set_longer <- full_set %>%
 #   pivot_longer(
-#     cols = overall_homeless:unsheltered_homeless_parenting_youth_under_25_multiple_races, 
+#     cols = overall_homeless:unsheltered_homeless_parenting_youth_under_25_multiple_races,
 #     names_to = "category",
 #     values_to = "value"
 #   )
 # 
-# rva_coc <- full_set_longer |> 
-#   filter(co_c_number == "VA-500") |> 
+# rva_coc <- full_set_longer |>
+#   filter(co_c_number == "VA-500") |>
 #   filter(str_detect(category, "overall_homeless"))
 # 
-# rva_pit <- rva_coc |> 
-#   filter(category == "overall_homeless")
+# # Add 2022 PIT count value (directly from Homeward)
+# 
+# rva_pit <- rva_coc |>
+#   filter(category == "overall_homeless") |>
+#   add_row(year = "2022", value = 697)
 # 
 # write_rds(rva_pit, "data/rva_pit.rds")
 
+```
+
+```{r pit-plot, fig.cap="Greater Richmond CoC Point-in-Time count"}
+
 rva_pit <- read_rds("data/rva_pit.rds")
 
-rva_pit_bar <- ggplot(rva_pit,
+ggplot(rva_pit,
        aes(x = year,
            y = value)) +
-  geom_bar(stat = "identity", fill = "dark green") +
-  labs(title = "Richmond Continuum-of-Care Point-in-Time count") +
-  theme(axis.title = element_blank()) +
-  scale_y_continuous(labels = number_format(big.mark = ","))
-
-ggplotly(rva_pit_bar) |> 
-  plotly_camera()
-
+  geom_col(fill = "dark green") +
+  labs(title = "Greater Richmond Continuum-of-Care Point-in-Time count",
+       subtitle = "2007 to 2022",
+       caption = "Sources: U.S. Department of Housing and Urban Development, CoC Homeless Populations and\nSubpopulations Reports; Homeward 2022 Winter PIT Count Preliminary Data.") +
+  scale_y_continuous(labels = label_comma()) +
+  theme(axis.title = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.ticks = element_blank())
 
 ```
+### Students experiencing homelessness
+
 The McKinney-Vento Education for Homeless Children and Youth (EHCY) Program collects data on students experiencing homelessness, which often can paint a different picture of homelessness when compared to the Point-in-Time counts. In the region, school divisions have been seeing varying numbers, but between the 2018-2019 and 2019-2020 school years students experiencing homelessness have declined across all school divisions.
 
-The most notable declines in student homelessness have been seen in the Richmond Public School system, where the number of students experiencing homelessness have declined by 40 percent from 2017-2018 to 2019-2020. Given the pandemic and virtual learning environments, more recent McKinney-Vento data may need to be viewed with caution.
+:::{.rmdinfo}
+Homeless children counted under the McKinney-Vento program are defined as “individuals who lack a fixed, regular, and adequate nighttime residence.” This includes children who are doubled-up with another households or living in motels, along with those living in shelters, vehicles, public areas, and other unsuitable places. This is more expansive than the definition used for PIT counts.
+:::
 
-```{r mkv}
+The most notable declines in student homelessness have been seen in the Richmond Public School system, where the number of students experiencing homelessness have declined by 40 percent from 2017-2018 to 2019-2020. Given the pandemic and virtual learning environments, upcoming McKinney-Vento data through the 2021-2022 school year may need require extra context.
+
+```{r mkv, fig.cap="Enrolled students experiencing homelessness by school year"}
 
 div <- c(21, 42, 43, 123)
 
 mkv <- read_csv("data/mkv.csv") |> 
   subset(Division %in% div)
 
-mkv_bar <- ggplot(mkv,
+ggplot(mkv,
        aes(x = year,
            y = students,
            fill = Name)) +
   geom_bar(stat = "identity") +
   facet_wrap(~Name) +
-  labs(title = "Enrolled students experiencing homelessness by school year", fill = "School division") +
+  labs(title = "Enrolled students experiencing homelessness by school year",
+       subtitle = "2016-2017 to 2019-2020",
+       caption = "William & Mary School of Education, Project HOME - Virginia.") +
   theme(axis.title = element_blank(),
-        legend.position = "none") +
-  scale_y_continuous(labels = number_format(big.mark = ","))
-
-ggplotly(mkv_bar) |> 
-  plotly_camera()
+        legend.position = "none",
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.ticks = element_blank()) +
+  scale_y_continuous(labels = label_comma())
 
 ```
 
