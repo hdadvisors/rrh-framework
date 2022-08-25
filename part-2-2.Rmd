@@ -16,6 +16,9 @@ library(ggthemes)
 library(sf)
 library(sp)
 library(simplevis)
+library(plotly)
+library(scales)
+library(viridis)
 
 # rr includes Charles City, Goochland, New Kent, and Powhatan.
 
@@ -26,28 +29,65 @@ pha_names_costar <- c("Richmond City", "Henrico County", "Hanover County", "Ches
 
 ```
 
-Renter-occupied stock
+## Renter-occupied stock
 
-While many renters across the region do live in multfamily buildings, 
+While many renters across the region do live in multifamily buildings (with 5 or more units), the second largest share of rental housing is single-family housing (either attached or detached). In 2020, over a third (37 percent) of rental housing in the region consisted of single-family housing, while 49 percent was located in buildings with 5 or more units. There has been little change in these percentages since 2016. 
+
+Changes in the shares of rental housing have been small --- but those changes have been among rental housing with 20 or more units (17 percent in 2016 to 19 percent in 2020) and 2 to 4 unit buildings (14 percent in 2016 down to 13 percent in 2020). 
+
+```{r ro-structure-percent}
+
+ro_structure_percent <- b25127_data |> 
+  filter(tenure == "Renter") |> 
+  select(NAME, GEOID, year, structure, estimate) |> 
+  separate(NAME, into = c("county", "state"), sep = ",") |> 
+  mutate(structure = case_when(
+    structure == "20 to 49" ~ "20 or more",
+    structure == "50 or more" ~ "20 or more",
+    TRUE ~ structure
+  )) |> 
+  group_by(year, structure) |> 
+  summarise(estimate = sum(estimate)) |> 
+  mutate(percent = estimate/sum(estimate)) |> 
+  filter(year == 2016 | year == 2020) |> 
+  mutate(year = as.character(year))
+
+ro_st_bar <- ggplot(ro_structure_percent,
+                    aes(x = year,
+                        y = percent,
+                        fill = reorder(structure, estimate))) +
+  geom_col(position = "stack") +
+  scale_y_continuous(labels = percent_format()) +
+  labs(title = "Composition of total rental housing in the region", fill = "Structure type") +
+  theme(axis.title = element_blank())
+
+
+ggplotly(ro_st_bar) |> 
+  plotly_camera()
+
+```
+
+The raw changes in rental housing were most felt in Henrico County and the City of Richmond. In Henrico, there was a 1,930 increase in single-family rental housing and a 1,357 decrease in 2 to 4 unit rental housing (i.e. duplexes, triplexes, and quads). The City of Richmond saw a contrasting decrease in single-family rentals (-1,921), while also experiencing a 2,134 increase in rental housing located in buildings with 20 or more units. Chesterfield County has seen slight increases in multifamily housing of all types, while Hanover County has not seen much change at all.
 
 ```{r ro-structure}
 
 ro_structure <- b25127_data |> 
   filter(tenure == "Renter") |> 
   select(NAME, GEOID, year, structure, estimate) |> 
-  group_by(NAME, GEOID, year, structure) |> 
-  summarise(estimate = sum(estimate)) |> 
-  pivot_wider(
-    names_from = year,
-    values_from = estimate
-  ) |> 
-  mutate(difference = `2020` - `2016`) |> 
   separate(NAME, into = c("county", "state"), sep = ",") |> 
   mutate(structure = case_when(
     structure == "20 to 49" ~ "20 or more",
     structure == "50 or more" ~ "20 or more",
     TRUE ~ structure
-  ))
+  )) |> 
+  group_by(county, GEOID, year, structure) |> 
+  summarise(estimate = sum(estimate)) |> 
+  pivot_wider(
+    names_from = year,
+    values_from = estimate
+  ) |> 
+  mutate(difference = `2020` - `2016`) 
+
 
 ro_structure$structure <- factor(ro_structure$structure, levels = c("1, detached  or attached", "2 to 4", "5 to 19", "20 or more", "Mobile home, boat, RV, van, etc."))
 
@@ -57,13 +97,12 @@ rstructure_bar <- ggplot(ro_structure,
            fill = structure)) +
   geom_bar(stat = "identity") +
   facet_wrap(~county) + 
-  labs(title = "Change in rental housing by structure type", subtitle = "From 2016 to 2020") +
+  labs(title = "Change in rental housing by structure type", subtitle = "From 2016 to 2020", fill = "Structure type") +
   theme(axis.title.x = element_blank(), 
         axis.title.y = element_blank(),
-        axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
-        legend.position = "right",
-        legend.justification = "top")
+        axis.text.x = element_text(angle = 45, hjust = 1, vjust =1),
+        legend.position = "none")
 
 
 plotly::ggplotly(rstructure_bar) |> 
@@ -72,7 +111,9 @@ plotly::ggplotly(rstructure_bar) |>
 
 
 ```
+The vast majority of rental housing in the region is approaching over 30 years of age (built in the 1980s or earlier) With increasing age comes the need for ongoing maintenance and rehabilitation. In order to finance these improvements, many property owners must raise rents, but often times these improvements are avoided --- leading to increasing deferred maintenance issues.
 
+Older rental housing exists in the more urbanized areas of the region --- mainly the City of Richmond, but also the inner-ring suburbs, or areas on the city-county borders. Most new rental housing is being built in Chesterfield County and the City of Richmond. 
 ```{r ro-year-built}
 
 ro_yrblt <- b25127_data |> 
@@ -110,6 +151,10 @@ plotly::ggplotly(ro_yrblt) |>
 
 ```
 
+More bedrooms in rental housing typically come with increasing costs, but with the increasing cost of homeownership, many families are relegated to rental housing that does not meet their household size. This can lead to overcrowded housing situations, which has been shown to have major public health implications. 
+
+The region is largely composed of one- and two-bedroom rental housing --- making up a majority of rental housing in all localities except for Hanover County, where there has been an increase in 3 or more bedroom rentals. The most change in the City has occurred among studio rentals --- going from 4 percent in 2016 to 7 percent in 2020.
+
 ```{r ro-bedrooms}
 
 ro_br <- b25042_data |> 
@@ -131,7 +176,7 @@ ro_br <- b25042_data |>
 ro_br_bar <- ggplot(ro_br,
        aes(x = county,
            y = percent, 
-           fill = br)) +
+           fill = factor(br, levels = c("No bedroom", "1-2 bedrooms", "3-4 bedrooms", "5 or more bedrooms")))) +
   geom_bar(position = "stack", stat = "identity") + 
   scale_fill_discrete(breaks = c("No bedroom", "1-2 bedrooms", "3-4 bedrooms", "5 or more bedrooms")) +
   labs(title = "Homeowner housing by bedrooms", fill = "Bedrooms") + 
@@ -141,12 +186,14 @@ ro_br_bar <- ggplot(ro_br,
         axis.text.x = element_text(angle = 90)) +
   facet_wrap(~year)
 
-plotly::ggplotly(ro_br_bar) |> 
+  ggplotly(ro_br_bar) |> 
   plotly_camera()
 
 ```
 
-Rental market
+## Rental market
+
+Rental demand reached a fever pitch amid the ongoing COVID-19 pandemic. With eviction moratoriums and a flow of rental assistance, low supply gave way to historic rent increases. The average market asking rent in the region reached a two-decade high of \$1,395 in the first quarter of 2022.
 
 ```{r avg-rent}
 
@@ -159,13 +206,17 @@ Rental market
 pha_rent <- read_csv("data/pha_avg_rent.csv") |> 
   clean_names() |> 
   mutate(period = as.Date(as.yearqtr(period, format = "%Y Q%q"), frac = 1)) |> 
-  pivot_longer(cols = 2:3,
+  pivot_longer(cols = 2:5,
                names_to = "type",
                values_to = "rent") |> 
   mutate(type = case_when(
     type == "rent_infl" ~ "Inflation-adjusted rent",
-    type == "rent_cur" ~ "Rent (Current dollars)"
-  ))
+    type == "rent_cur" ~ "Rent (Current dollars)",
+    type == "rent_infl_diff" ~ "Change from previous quarter (inflation-adjusted)",
+    type == "rent_cur_diff" ~ "Change from previous quarter (current dollars)"
+  )) |> 
+  mutate(year = year(period)) |> 
+  filter(type == "Inflation-adjusted rent" | type == "Rent (Current dollars)")
 
 avg_line <- ggplot(pha_rent,
                    aes(x = period,
@@ -181,7 +232,41 @@ ggplotly(avg_line) |>
   plotly_camera()
 
 ```
+Since the start of the pandemic in 2020, average rent has been on a steep increase when compared to pre-pandemic. In fact, the quarterly average change in rent during 2020 and 2021 was above \$10 --- the highest quarterly average increase in the past two decades.
 
+```{r avg-rent-change}
+
+pha_rent_avg <- read_csv("data/pha_avg_rent.csv") |> 
+  clean_names() |> 
+  mutate(period = as.Date(as.yearqtr(period, format = "%Y Q%q"), frac = 1)) |> 
+  pivot_longer(cols = 2:5,
+               names_to = "type",
+               values_to = "rent") |> 
+  mutate(type = case_when(
+    type == "rent_infl" ~ "Inflation-adjusted rent",
+    type == "rent_cur" ~ "Rent (Current dollars)",
+    type == "rent_infl_diff" ~ "Change from previous quarter (inflation-adjusted)",
+    type == "rent_cur_diff" ~ "Change from previous quarter (current dollars)"
+  )) |> 
+  mutate(year = year(period)) |> 
+  filter(str_detect(type, "Change")) |> 
+  group_by(year, type) |> 
+  summarise(avg = mean(rent)) |> 
+  filter(type == "Change from previous quarter (inflation-adjusted)")
+  
+ggplot(pha_rent_avg,
+       aes(x = year,
+           y = avg)) +
+  geom_col(aes(fill = avg)) +
+  labs(title = "Average quarterly change in rent by year", fill = "Avg. quarterly change") +
+  scale_y_continuous(labels = dollar_format()) +
+  theme(axis.title = element_blank()) +
+  scale_fill_gradient(low = "grey", high = "dark green", na.value = NA, labels = dollar_format())
+  
+
+
+```
+Although not adjusted for inflation, rents by submarket show that there are disparate average rents across the region and that the steepest increases have occurred in the counties. 
 
 ```{r avg-rent-submarket}
 
@@ -200,9 +285,9 @@ rr_sub_rent <- read_csv("data/rr_submarket_data.csv") |>
   subset(locality %in% pha_names_costar)
 
 
-# Issue with above is that rents are not inflation-adjusted. May need to revisit. I've requested from CoStar to allow for an inflation-adjusted average rent per unit pull, BUT who knows if they can add it.
+# Issue with above is that rents are not inflation-adjusted. May need to revisit. I've requested from CoStar to allow for an inflation-adjusted average rent per unit pull, BUT who knows if they can add it. Might consider just having a table with most recent rents.
 
-ggplot(rr_sub_rent,
+sub_rent_line <- ggplot(rr_sub_rent,
        aes(x = period,
            y = rent, 
            color = submarket)) +
@@ -211,10 +296,10 @@ ggplot(rr_sub_rent,
   facet_wrap(~locality)
   
 
-
+ggplotly(sub_rent_line)
 ```
 
-
+The higher rent by bedroom count is exemplified in the graph below, where the the average asking rent for a three bedroom apartment in Q3 2022 was \$1,650 --- over \$200 more than the rent for a two-bedroom. From two-bedrooms, a decrease in bedroom count leads to a near \$150 rent decrease. For a family to afford a three-bedroom apartment, their household income would need to be \$66,000 or more in order to not be rent burdened. While this be more manageable for a household with two earners, a single income earner with two children may struggle to afford rent or choose housing that doesn't support their family size.
 ```{r avg-rent-br}
 
 # Aggregated average market asking rent per unit for Chesterfield, Hanover, Henrico, and Richmond City.
@@ -254,6 +339,12 @@ ggplotly(avg_brline) |>
   plotly_camera()
 
 ```
+
+Recently constructed rental housing (built in 2010 and beyond) leads average asking rents at \$1,614. As expected, rental costs correlate to the period in which they were built --- with older rental housing being less expensive. Pre-1980 rental housing is roughly \$400 cheaper than more recent rental housing.
+
+In the last decade, more recent rental housing had steady and modest increases; only increasing \$80 from Q1 2012 to Q3 2022. But older rental housing had much more dramatic increases; increasing an average of \$257 in that same time period.
+
+Rental housing built between 1980 and 2009 had especially steep increases during the height of the pandemic (Q1 2020 to Q3 2021). In this time, the average asking rent increased by over \$130, while rent increases for newer rental housing and pre-1980 housing increased by less than \$100. 
 
 ```{r rents-built}
 
@@ -312,26 +403,50 @@ ggplotly(rent_built) |>
 
 ```
 
-Rental vacancy
+## Rental vacancy
+
+For much of the past two decades, vacancy rates have fluctuated seasonally as new people enter and leave the rental housing market. Across the region, submarkets have largely had vacancy rates below ten percent. In 2022, the average vacancy rate was 5 percent. 
+
+But some submarkets in the region have lower than average vacancy rates; Hanover County (1 percent), Eastern Henrico (3 percent), Northside (3 percent), and East End (4 percent) have significantly lower vacancy rates.  
+
+Vacancy rates dropped across the board at the height of the pandemic in 2020 --- except for in the West End, where there was a significant jump in rental vacancies in Q1 2021. 
+
 ```{r vacancy}
 
 rr_sub_vacancy <- rr_sub_rent |> 
   select(period, locality, submarket, vacancy_rate) |> 
-  mutate(vacancy_rate = parse_number(vacancy_rate)/100)
+  mutate(vacancy_rate = parse_number(vacancy_rate)/100) |> 
+  mutate(year = year(period)) |> 
+  filter(year >= 2015)
+
+
+rr_sub_vacancy_20 <- rr_sub_vacancy |> 
+  filter(year == 2022)
+
+mean(rr_sub_vacancy_20$vacancy_rate)
+
 
 sub_vacancy <- ggplot(rr_sub_vacancy,
                       aes(x = period,
                           y = vacancy_rate,
                           color = submarket)) +
   geom_line(stat = "identity", size = 1) +
-  facet_wrap(~locality)
+  facet_wrap(~locality) +
+  scale_y_continuous(labels = percent_format()) +
+  theme(axis.title = element_blank()) + 
+  labs(title = "Rental vacancy by Richmond region submarket", color = "Submarket")
 
 ggplotly(sub_vacancy) |> 
   plotly_camera()
 
 ```
 
-Construction trends
+## Construction trends
+
+Construction of multifamily properties (with 5 units or more) has been sporadic since the end of the Great Recession. In all localities aside from Hanover County, there have been waves and dips in the multifamily building construction. Hanover has seen little to no activity throughout the last two decades, while Chesterfield County and Richmond have seen the bulk of activity.
+
+During the latter half of the last decade, Chesterfield County had a boom in multifamily construction --- nearing 1,500 units in 2019. Meanwhile, Richmond's multifamily construction saw dips following the Great Recession and again in 2018, but has largely been up in the last couple years of the 2010s. Although Henrico County had dips in 2016 and 2018, multifamily construction has more often than not been above the 700 unit mark.
+
 ```{r mf-permits}
 
 rr_cbps_mf <- rr_cbps |> 

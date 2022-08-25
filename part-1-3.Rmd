@@ -158,7 +158,7 @@ b25119_cpi <- b25119_data |>
   select(NAME, GEOID, year, tenure, dollars20, cdollars = estimate) |> 
   separate(NAME, into = c("locality", "state"), sep = ",") |> 
   filter(tenure != "All households") |> 
-  select(year, locality, tenure, dollars20)
+  select(year, locality, tenure, dollars20, cdollars)
 
 ggplot(b25119_cpi, 
        aes(x = year,

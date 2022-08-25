@@ -143,6 +143,76 @@ ggplotly(noah_rent_line) |>
 
 ```
 
+```{r noah-sales}
+
+# Search CoStar SALES: 
+# NOAH --- Location: Richmond city, Henrico County, Chesterfield County, Hanover County
+# Filters: Sale Date: After 8/23/17; CoStar Rating: 2 stars or less; Property type: Multifamily; Construction status: Existing; Rent type: Market; Year built: max 1999; Class: B, C, and unclassified
+# ALL SALES --- Location: Richmond city, Henrico County, Chesterfield County, Hanover County
+# Filters: Sale Date: After 8/23/17
+
+noah_sales <- read_csv("data/noah_sales_82322.csv") |> 
+  clean_names() |> 
+  mutate(category = "NOAH")
+
+all_sales <- read_csv("data/all_sales_82322.csv") |> 
+  clean_names() |> 
+  mutate(category = "All")
+
+mf_sales <- rbind(noah_sales, all_sales) |> 
+  subset(period != "Search") |> 
+  subset(period != "2017 Q2") |> 
+  subset(period != "2017 Q1") |> 
+  mutate(period = case_when(
+    period == "2022 Q3 QTD" ~ "2022 Q3",
+    TRUE ~ period
+  )) |> 
+  select(period, category, sales = number_of_transactions, avg_sales = average_sale_price, sold_units, average_price_per_unit) |> 
+  mutate(period = as.Date(as.yearqtr(period, format = "%Y Q%q"), frac = 1)) |> 
+  mutate(average_price_per_unit = parse_number(average_price_per_unit)) |> 
+  mutate(sales = parse_number(sales))
+
+
+```
+
+The sale of NOAH properties and ensuing new ownership often leads to rent increases and/or rehabilitation. In some cases, this may take NOAH properties out of market affordability. Over the last five years, NOAH properties have made up nearly half of all multifamily sales (49 percent).
+
+```{r noah-sales-cnt}
+mf_sales_summary <- mf_sales |> 
+  group_by(category) |> 
+  summarise(sales = sum(sales))
+
+mf_sales_bar <- ggplot(mf_sales,
+                        aes(x = period,
+                            y = sales,
+                            fill = category)) +
+  geom_col(position = "identity") +
+  theme(axis.title = element_blank()) +
+  labs(title = "NOAH versus all multifamily sales", color = "Type")
+
+ggplotly(mf_sales_bar) |> 
+  plotly_camera()
+
+```
+
+During this timeframe, NOAH properties had an average price per unit below that of all multifamily sales, but from Q4 2020 to Q1 2021. At the end of 2020, the average price per unit of a NOAH property hit a high of \$221,534 --- over \$44,000 more when compared to all multifamily sales. Although both types of sales took a dip following the end of 2020, the higher NOAH price remained until Q2 2021, when NOAH average price per unit once again went below all sales.
+
+```{r noah-sales-comp}
+
+mf_sales_line <- ggplot(mf_sales,
+                        aes(x = period,
+                            y = average_price_per_unit,
+                            color = category)) +
+  geom_line(size = 1) +
+  scale_y_continuous(labels = dollar_format()) +
+  theme(axis.title = element_blank()) +
+  labs(title = "Average price per unit: NOAH versus all multifamily sales", color = "Type")
+
+ggplotly(mf_sales_line) |> 
+  plotly_camera()
+
+```
+
 ## Manufactured Home Communities
 
 Manufactured home communities (MHCs) are also a valuable source of NOAH across the region. In 2016, the Manufactured Home Community Coalition of Virginia (MHCCV) conducted an assessment of all manufactured home communities across Central Virginia. Their report identified 54 different MHCs, wherein there were at least 2,742 individual manufactured homes. 

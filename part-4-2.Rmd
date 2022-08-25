@@ -1,3 +1,598 @@
 # (PART)LOCAL SUMMARIES {.unnumbered}
 
 ## Chesterfield County {#part-4-2}
+
+```{r setup}
+
+library(tidyverse)
+library(sf)
+library(sp)
+library(plotly)
+library(simplevis)
+library(tidytext)
+library(scales)
+library(readxl)
+library(zoo)
+library(lubridate)
+
+years <- 2016:2020
+cva <- 51041
+
+```
+
+## Takeaways
+
+```
+Add short bullet points summarizing major changes
+```
+
+## Demographic and socioeconomic changes
+
+### Population changes
+
+```{r rva-pop}
+
+#Add choice of population stat (net change, components, etc)
+
+cva_pop <- read_rds("data/pha_pop.rds") |> 
+  filter(NAMELSAD == "Chesterfield County") |> 
+  st_drop_geometry()
+
+cva_pop_bar <- ggplot(cva_pop,
+                      aes(x = year,
+                          y = value)) +
+  geom_col()
+
+ggplotly(cva_pop_bar) |> 
+  plotly_camera()
+  
+
+```
+
+```{r rva-comp}
+
+cva_change <- read_rds("data/pep_change_clean.rds") |> 
+  filter(GEOID == cva)
+
+pep_2021 <- read_rds("data/pep_2021.rds") |> 
+  filter(GEOID == cva)
+
+cva_change_21 <- rbind(cva_change, pep_2021)
+
+
+```
+### Household characteristics
+
+```{r cva-children}
+# Add choice of household stat (HHs with children, HHs with seniors, subfamilies, etc)
+
+b25115_vars <- load_variables(2020, "acs5") |>
+  filter(str_sub(name, end = 6) %in% "B25115")
+
+b25115_raw <- map_dfr(years, function(yr){
+  b25115_pull <- get_acs(
+    geography = "county",
+    state = "VA",
+    table = "B25115",
+    year = yr,
+    survey = "acs5"
+  ) |>
+    mutate(year = yr)
+})
+
+b25115_raw <- b25115_raw |>
+  subset(GEOID %in% cva)
+
+b25115_vars_cleaned <- b25115_vars |>
+  separate(label, into = c("est", "total", "tenure", "family", "type", "rel", "children"), sep = "!!") |>
+  select(variable = name, tenure, family, type, rel, children) |>
+  mutate(tenure = case_when(
+    tenure == "Owner occupied:" ~ "Homeowner",
+    tenure == "Renter occupied:" ~ "Renter"
+  )) |>
+  mutate(family = case_when(
+    family == "Family households:" ~ "Family household",
+    family == "Nonfamily households" ~ "Nonfamily household"
+  )) |>
+  mutate(type = case_when(
+    type == "Married-couple family:" ~ "Married household",
+    rel == "Male householder, no spouse present:" ~ "Single male household",
+    rel == "Female householder, no spouse present:" ~ "Single female household",
+    family == "Nonfamily household" ~ "Nonfamily household"
+  )) |>
+  mutate(children = case_when(
+    rel == "With own children of the householder under 18 years" ~ "With children",
+    rel == "No own children of the householder under 18 years" ~ "No children",
+    children == "No own children of the householder under 18 years" ~ "No children",
+    children == "With own children of the householder under 18 years" ~ "With children",
+    family == "Nonfamily household" ~ "Nonfamily household"
+  )) |>
+  select(variable, tenure, family, type, children) |>
+  drop_na()
+
+cva_b25115 <- b25115_raw |> 
+  right_join(b25115_vars_cleaned, by = "variable") |>
+  select(NAME, GEOID, year, tenure, type, children, estimate) |> 
+  pivot_wider(names_from = year,
+              values_from = estimate) |>
+  transform(change = `2020` - `2016`) |>
+  select(tenure, type, children, change) |>
+  group_by(tenure, children) |>
+  summarise(change = sum(change))
+
+
+ggplot(cva_b25115,
+       aes(x = children, y = change, fill = tenure)) +
+  geom_col(position = "dodge") + 
+  facet_wrap(~children, nrow = 1, scales = "free_x") +
+  scale_y_continuous(labels = label_comma(),
+                     breaks = c(-3000,0,3000,6000,9000),
+                     limits = c(-3050,9050)) +
+  labs(title = "Change in households with children by tenure",
+       subtitle = "2016 to 2020",
+       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25115.") +
+  theme(axis.title = element_blank(),
+        axis.text.x = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.ticks = element_blank()) +
+  scale_fill_manual(values = tenure_colors)
+
+```
+
+```{r cva-seniors}
+
+b09020_vars <- load_variables(2020, "acs5") |>
+  filter(str_sub(name, end = 6) %in% "B09020")
+
+b09020_raw <- map_dfr(years, function(yr){
+  b09020_pull <- get_acs(
+    geography = "county",
+    state = "VA",
+    table = "B09020",
+    year = yr,
+    survey = "acs5"
+  ) |>
+    mutate(year = yr)
+})
+
+b09020_raw <- b09020_raw |>
+  subset(GEOID %in% cva)
+
+b09020_vars_cleaned <- b09020_vars |>
+  separate(label, into = c("est", "total", "hhgq", "family", "relationship", "sex", "alone"), sep = "!!") |>
+  select(variable = name, hhgq, family, relationship, alone) |>
+  filter(!variable %in% c("B09020_001", "B09020_002", "B09020_003", "B09020_005", "B09020_006",
+                          "B09020_012", "B09020_013", "B09020_014", "B09020_017")) |>
+  mutate(relationship = case_when(
+    relationship == "Spouse" ~ "With spouse",
+    relationship == "Nonrelatives" ~ "With nonrelatives",
+    relationship %in% c("Parent", "Parent-in-law", "Other relatives") ~ "With other relative(s)",
+    hhgq == "In group quarters" ~ "Group quarters",
+    !is.na(alone) ~ alone,
+    TRUE ~ relationship
+  )) |>
+  mutate(family = case_when(
+    family == "In family households:" ~ "Family",
+    family == "In nonfamily households:" ~ "Nonfamily",
+    hhgq == "In group quarters" ~ "Group quarters"
+  )) |>
+  mutate(across(.fns = ~str_remove_all(.x, ":"))) |>
+  select(1,3,4)
+
+cva_b09020 <- b09020_raw |>
+  right_join(b09020_vars_cleaned, by = "variable") |>
+  select(NAME, GEOID, year, family, relationship, estimate) |>
+  mutate(NAME = str_remove_all(NAME, ", Virginia")) |>
+  group_by(year, family, relationship) |>
+  summarise(estimate = sum(estimate)) |>
+  group_by(family, relationship) |>
+  mutate(diff = estimate - lag(estimate)) |>
+  drop_na() |>
+  mutate(run_diff = cumsum(diff))
+
+
+cva_b09020 <- cva_b09020 |> 
+  ungroup() |> 
+  filter(year == 2020) |> 
+  mutate(family = str_replace(family, "Group quarters", " "),
+         family = fct_relevel(family, "Family", "Nonfamily", " "))
+
+ggplot(cva_b09020,
+       aes(y = reorder_within(relationship, run_diff, family),
+           x = run_diff,
+           fill = relationship)) +
+  geom_col(position = "dodge") +
+  scale_y_reordered() +
+  scale_x_continuous(labels = label_comma(),
+                     breaks = c(0,2000,4000,6000,8000)) +
+  facet_grid(rows = vars(family), scales = "free_y", space = "free", switch = "y") +
+  #scale_y_discrete(labels = function(x) str_wrap(x, width = 10)) +
+  labs(title="Change in senior population by living arrangement",
+       subtitle="2016 to 2020",
+       fill="Tenure",
+       caption = "Source: U.S. Census Bureau, American Community Survey, Table B09020.") +
+  theme(axis.title = element_blank(),
+        #axis.text.x = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_blank(),
+        legend.position = "none",
+        panel.grid.major.x = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.ticks = element_blank(),
+        strip.placement = "outside",
+        strip.text.y = element_text(angle = 0))
+
+```
+### Income and wages
+
+```{r cva-income}
+
+#Add choice of income stat (probably median household income of some kind)
+
+years <- 2016:2020
+
+b25119_vars <- load_variables(2020, "acs5") |> 
+  filter(str_sub(name, end = 6) %in% "B25119")
+
+b25119_raw <- map_dfr(years, function(yr){
+  b25119_pull <- get_acs(
+    geography = "county",
+    state = "VA",
+    table = "B25119",
+    year = yr,
+    survey = "acs5",
+    cache_table = TRUE
+  ) %>%
+    mutate(year = yr)
+  })
+
+b25119_raw <- b25119_raw |> 
+  subset(GEOID %in% cva)
+
+b25119_vars_cleaned <- b25119_vars |> 
+  separate(label, into = c("est", "income", "total", "tenure"), sep = "!!") |>  
+  select(variable = name, tenure) |> 
+  mutate(tenure = case_when(
+    tenure == "Owner occupied (dollars)" ~ "Homeowner",
+    tenure == "Renter occupied (dollars)" ~ "Renter"
+  ))
+
+b25119_vars_cleaned$tenure <- b25119_vars_cleaned$tenure |>  replace_na('All households')
+
+cva_b25119 <- b25119_raw |> 
+  right_join(b25119_vars_cleaned, by = "variable") |> 
+  select(NAME, GEOID, year, tenure, estimate, moe)
+
+cpi <- read_excel("data/CPI_U_RS.xlsx")
+cpi <- cpi |> 
+  rename(year = Year,
+         priceindex = Index) |> 
+  transform(year = as.numeric(year))
+
+b25119_cva <- cva_b25119 |> 
+    left_join(cpi, by = 'year') |> 
+  transform(dollars20 = ((381.2/priceindex)*estimate)) |> 
+  select(NAME, GEOID, year, tenure, dollars20, cdollars = estimate) |> 
+  separate(NAME, into = c("locality", "state"), sep = ",") |> 
+  filter(tenure != "All households") |> 
+  select(year, locality, tenure, dollars20)
+
+ggplot(b25119_cva, 
+       aes(x = year,
+           y = dollars20,
+           color = tenure)) +
+  geom_line(stat = "identity", size = 1) +
+  theme(axis.title = element_blank()) +
+  scale_y_continuous(labels = dollar_format()) +
+  labs(title = "Median houshold income by tenure")
+
+```
+
+### Persons with disabilities
+
+
+```{r ind-living}
+
+# Add disability stat (probably independent living difficulty)
+
+# Table B18107 Sex by age by independent living difficulty
+
+# "Because of a physical, mental, or emotional problem, having difficulty doing errands alone such as visiting a doctor’s office or shopping (DOUT)."
+
+
+b18107_vars <- load_variables(2020, "acs5") |> 
+  filter(str_sub(name, end = 6) %in% "B18107")
+
+b18107_raw <- map_dfr(years, function(yr){
+  b10107_pull <- get_acs(
+    geography = "county",
+    state = "VA",
+    table = "B18107",
+    year = yr,
+    survey = "acs5",
+    cache_table = TRUE
+  ) |> 
+    mutate(year = yr)
+  })
+
+b18107_raw <- b18107_raw |> 
+  subset(GEOID %in% cva)
+
+b18107_vars_cleaned <- b18107_vars |> 
+  separate(label, into = c("est", "total", "sex", "age", "indliv"), sep = "!!") |> 
+  select(variable = name, sex , age, indliv) |> 
+  drop_na() |> 
+  mutate(across(.fns = ~str_remove_all(.x, ":")))
+
+cva_b18107 <- b18107_raw |> 
+  right_join(b18107_vars_cleaned, by = "variable") |> 
+  select(NAME, GEOID, year, sex, age, indliv, estimate) |> 
+  group_by(year, age, indliv) |> 
+  summarise(estimate = sum(estimate)) |> 
+  filter(indliv == "With an independent living difficulty") |> 
+  pivot_wider(names_from = year,
+              values_from =  estimate) |> 
+  transform(change = `2020` - `2016`) |> 
+  select(age, indliv, change)
+
+ggplot(cva_b18107,
+       aes(x = age,
+           y = change)) +
+  geom_bar(stat = "identity", fill = "blue") +
+  coord_flip() +
+  scale_x_discrete(labels = rev) +
+  scale_y_continuous(labels = number_format(big.mark = ",")) +
+  theme(axis.title = element_blank()) +
+  labs(title = "Change in population with independent living difficulty by age: \n2016 to 2020")
+
+
+```
+
+## Housing supply and market changes
+
+### Homeownership
+
+```{r cva-sales}
+
+# Median sales price over time
+
+cva_price <- read_csv("data/chesterfield_med_sales.csv") |> 
+  clean_names() |> 
+  mutate(geography = "Chesterfield County") |> 
+  pivot_longer(cols = starts_with("sale"),
+    names_to = "label",
+    values_to = "med_price",
+    values_drop_na = TRUE) |> 
+  mutate(year = substr(label, 19,23)) |> 
+  select(geography, year, month, med_price)
+
+cva_price$month <- match(cva_price$month, month.abb)
+
+cva_price <- cva_price |> 
+  mutate(date = make_date(year, month)) |> 
+  mutate(med_price = parse_number(med_price))
+
+ggplot(cva_price,
+       aes(x = date,
+           y = med_price)) +
+  geom_line(stat = "identity") +
+  scale_y_continuous(labels = dollar_format())
+
+```
+
+### Rental
+
+
+```{r rva-rent-submarket}
+
+# Average asking rent over time (by submarket if applicable, maybe by bedroom if no submarkets)
+
+# Disaggregate by Richmond CoStar Submarket
+
+# CoStar Filters: Construction Status - Existing
+
+# Added locality field manually
+
+cva_sub_rent <- read_csv("data/rr_submarket_data.csv") |> 
+  clean_names() |> 
+  separate(geography, into = c("region", "state", "submarket"), sep = " - ") |> 
+  select(period, locality, submarket, "rent" = market_asking_rent_unit, vacancy_rate) |> 
+  mutate(rent = parse_number(rent)) |> 
+  mutate(period = as.Date(as.yearqtr(period, format = "%Y Q%q"), frac = 1)) |> 
+  filter(locality == "Chesterfield County")
+
+# Issue with above is that rents are not inflation-adjusted. May need to revisit. I've requested from CoStar to allow for an inflation-adjusted average rent per unit pull, BUT who knows if they can add it. Might consider just having a table with most recent rents.
+
+csub_rent_line <- ggplot(cva_sub_rent,
+       aes(x = period,
+           y = rent, 
+           color = submarket)) +
+  geom_line(stat = "identity") + 
+  labs(title = "Average asking rent by submarket")
+  
+
+ggplotly(csub_rent_line)
+
+```
+
+
+### Housing assistance
+
+```
+Change in number of assisted units (NHPD)
+```
+
+### Naturally-occuring affordable housing
+
+```{r cva-noah}
+# Add choice of NOAH stat (total number, change in rent, etc) 
+
+# Probably do a histogram by age
+
+cva_noah <- read_csv("data/pha_noah_81722.csv") |> 
+  clean_names() |> 
+  st_as_sf(coords = c("longitude", "latitude"), crs=4326, remove=FALSE) |> 
+  filter(property_name != "Sedgefield" | property_name != "Holidy Mobile Home Park") |> 
+  filter(county_name == "Chesterfield County")
+
+
+```
+
+## Gap analysis
+
+
+```{r cva-rent-gap}
+
+# Compare local median renter income to average asking rent
+
+cva_income <- b25119_cpi |> 
+  filter(locality == "Chesterfield County") |> 
+  filter(tenure == "Renter")
+
+cva_rent <- read_csv("data/rr_annual_rent.csv") |> 
+    pivot_longer(cols = 2:8,
+               names_to = "locality",
+               values_to = "rent_current") |> 
+  clean_names() |> 
+  filter(locality == "Chesterfield County")
+
+cva_rent_gap <- cva_income |> 
+  left_join(cva_rent, by = "year") |> 
+  mutate(rent_current = parse_number(rent_current)) |> 
+  mutate(affordable_rent = (cdollars/12)*.30) |> 
+  mutate(difference = rent_current - affordable_rent) |> 
+  select(year, rent_current, affordable_rent) |> 
+  pivot_longer(2:3,
+               names_to = "type",
+               values_to = "dollars")
+
+crent_gp <- ggplot(cva_rent_gap,
+       aes(x = year,
+           y = dollars,
+           color = type
+        )) +
+  geom_line(stat = "identity", size = 1) +
+  scale_y_continuous(labels = dollar_format()) +
+  theme(axis.title = element_blank(),
+        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 1)) +
+  labs(title = "Average asking rent versus rent affordable to typical renter", color = "Nominal rent")
+  
+ggplotly(crent_gp) |> 
+  plotly_camera()
+
+```
+
+
+```{r cva-own-gap}
+
+#Compare renter income versus home prices
+
+cva_sales_annual <- read_csv("data/rr_annual_sales.csv") |> 
+  pivot_longer(cols = 2:9,
+               names_to = "locality",
+               values_to = "price") |> 
+  clean_names() |> 
+  filter(locality == "Chesterfield County")
+
+int_annual <- read_csv("data/fredmac_int_annual.csv")
+
+downpayment <- 0.05 # 5% downpayment
+closingcosts <- 0.015 # 1.5% closing costs
+utilities <- 250 # Assume $250/month for utilities
+
+cva_sale <- cva_sales_annual |> 
+  left_join(rva_income, by = "year") |> 
+  left_join(int_annual, by = "year") |> 
+  drop_na() |> 
+  mutate(principal = price - (price*downpayment)) |> 
+  mutate(loanamt = principal/(1-closingcosts)) |> 
+  mutate(mortgage = abs(PMT((annual_int/12), 360, loanamt)) + 250) |> 
+  mutate(inc_needed = ((mortgage*10)/2.8)*12) |> 
+  select(year, inc_needed, cdollars)
+
+cva_slgap <- cva_sale |> 
+  pivot_longer(2:3,
+               names_to = "data",
+               values_to = "value") |> 
+  mutate(data = case_when(
+    data == "cdollars" ~ "Renter median household income",
+    data == "inc_needed" ~ "Income needed to afford median home price"
+  ))
+
+csale_gp <- ggplot(cva_slgap,
+       aes(x = year, 
+           y = value,
+           color = data)) +
+  geom_line(stat = "identity", size = 1) +
+  labs(title = "Income needed to afford median home price versus median renter income", color = "Nominal dollars") +
+  theme(axis.title = element_blank()) +
+  scale_y_continuous(labels = dollar_format())
+
+ggplotly(csale_gp) |> 
+  plotly_camera()
+
+```
+...
+
+### Affordability of current housing stock
+
+```{r rva-gap}
+# Add choice of affordability stat (surplus/deficit, income vs prices, etc)
+
+rva_gap <- read_rds("data/tb_18_match.rds") |> 
+  filter(county == "Richmond city") |> 
+  group_by(year, household_income, gapcode) |>
+  summarise(estimate = sum(estimate)) |>
+  mutate(estimate = case_when(
+    gapcode == "Gap" ~ estimate * -1,
+    gapcode == "Matches or less than income" ~ estimate
+  )) |>
+  filter(household_income != "80 percent AMI or greater")
+
+rva_gap_bar <- ggplot(rva_gap,
+       aes(x = year, 
+           y = estimate,
+           fill = gapcode)) +
+  geom_bar(stat = "identity") +
+  facet_grid(~household_income) +
+  theme(axis.title = element_blank()) +
+  labs(title = "Rental housing gap by AMI: 2015 to 2018", fill = "Gap/Affordability")
+
+ggplotly(rva_gap_bar) |> 
+  plotly_camera()
+
+```
+
+### Impact of housing costs
+
+
+```{r rva-cb}
+
+cb_7 <- read_rds("data/cb_7.rds")
+
+cb_rva <- cb_7 |> 
+  filter(county == "Richmond city",
+         cb_group == "Cost-burdened") |> 
+  group_by(year, county, tenure) |> 
+  summarise(estimate = sum(estimate)) |> 
+  group_by(county, tenure) |> 
+  mutate(change = estimate - lag(estimate)) |> 
+  drop_na() |> 
+  mutate(run_diff = cumsum(change))
+  
+ggplot(cb_rva,
+       aes(x = year, y = run_diff, fill = tenure)) +
+  geom_col(position = "dodge") +
+  facet_wrap(vars(county)) +
+  scale_y_continuous(labels = label_comma()) +
+  labs(title = "Cumulative change in cost-burdened households by tenure",
+       subtitle = "2015 to 2018",
+       fill = "Tenure",
+       caption = "Source: U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
+  theme(axis.title = element_blank())
+
+
+```
