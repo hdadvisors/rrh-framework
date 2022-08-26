@@ -4,8 +4,6 @@
 
 library(tidyverse)
 library(tidycensus)
-library(ggplot2)
-library(simplevis)
 library(tigris)
 library(viridis)
 
@@ -30,7 +28,7 @@ tenure_colors <-setNames(viridis(2), nm = tenure)
 
 ```
 
-```{r geography-setup}
+```{r geography-setup, eval=FALSE}
 
 va <- counties(state = "VA", year = 2020,
                progress_bar = FALSE)
@@ -49,58 +47,65 @@ years <- 2016:2020
 
 According to Census estimates, the region gained more than 15,000 households from 2016 to 2020. This growth was driven entirely by new homeowners (17,436). Renter households, instead, saw much slower increases from 2016 to 2019; from 2019 to 2020, the estimated number of renters dropped more than 2,000 for a net loss of 609 over the full period.
 
-::: rmdwarning
+::: {.rmdwarning}
 This anomalous data should be treated with caution. Lower American Community Survey response rates during COVID-19 were most common among lower-income and lower-educated households most likely to rent. Across the Richmond region, overall ACS response rates declined nearly 10 percent from the 2015-2019 to 2016-2020 collection period.
 :::
 
-```{r hh-form-data}
+```{r hh-form-data, eval=FALSE}
 
-# b25003_vars <- load_variables(2020, "acs5") |> 
-#   filter(str_sub(name, end = 6) %in% "B25003") |> 
-#   filter(str_length(name) < 11)
-# 
-# b25003_raw <- map_dfr(years, function(yr){
-#   b25003_pull <- get_acs(
-#     geography = "county",
-#     state = "VA",
-#     table = "B25003",
-#     year = yr,
-#     survey = "acs5",
-#     cache_table = TRUE
-#   ) |> 
-#     mutate(year = yr)
-# })
-# 
-# b25003_raw <- b25003_raw |> 
-#   subset(GEOID %in% pha)
-# 
-# b25003_vars_cleaned <- b25003_vars |> 
-#   separate(label, into = c("est", "total", "tenure"), sep = "!!") |> 
-#   select(variable = name, tenure) |> 
-#   drop_na() |> 
-#   mutate(tenure = case_when(
-#     tenure == "Owner occupied" ~ "Homeowner",
-#     tenure == "Renter occupied" ~ "Renter"
-#   ))
-# 
-# b25003_data <- b25003_raw |> 
-#   right_join(b25003_vars_cleaned, by = "variable") |> 
-#   select(NAME, GEOID, year, tenure, estimate, moe) |> 
-#   mutate(NAME = str_remove_all(NAME, ", Virginia")) |> 
-#   group_by(year, tenure) |> 
-#   summarise(estimate = sum(estimate)) |> 
-#   group_by(tenure) |> 
-#   mutate(diff = estimate - lag(estimate)) |> 
-#   drop_na() |> 
-#   mutate(run_diff = cumsum(diff))
-# 
-# write_rds(b25003_data, "data/b25003_data.rds")
+b25003_vars <- load_variables(2020, "acs5") |>
+  filter(str_sub(name, end = 6) %in% "B25003") |>
+  filter(str_length(name) < 11)
+
+b25003_raw <- map_dfr(years, function(yr){
+  b25003_pull <- get_acs(
+    geography = "county",
+    state = "VA",
+    table = "B25003",
+    year = yr,
+    survey = "acs5",
+    cache_table = TRUE
+  ) |>
+    mutate(year = yr)
+})
+
+b25003_raw <- b25003_raw |>
+  subset(GEOID %in% pha)
+
+b25003_vars_cleaned <- b25003_vars |>
+  separate(label, into = c("est", "total", "tenure"), sep = "!!") |>
+  select(variable = name, tenure) |>
+  drop_na() |>
+  mutate(tenure = case_when(
+    tenure == "Owner occupied" ~ "Homeowner",
+    tenure == "Renter occupied" ~ "Renter"
+  ))
+
+b25003_data <- b25003_raw |>
+  right_join(b25003_vars_cleaned, by = "variable") |>
+  select(NAME, GEOID, year, tenure, estimate, moe) |>
+  mutate(NAME = str_remove_all(NAME, ", Virginia")) |>
+  group_by(NAME, year, tenure) |>
+  summarise(estimate = sum(estimate)) |>
+  group_by(NAME, tenure) |>
+  mutate(diff = estimate - lag(estimate),
+         diff = replace_na(diff, 0)) |>
+  mutate(run_diff = cumsum(diff))
+
+write_rds(b25003_data, "data/b25003_data.rds")
 
 ```
 
 ```{r hh-form-plot}
 
-b25003_data <- read_rds("data/b25003_data.rds")
+b25003_data <- read_rds("data/b25003_data.rds") |> 
+  group_by(year, tenure) |>
+  summarise(estimate = sum(estimate)) |>
+  group_by(tenure) |>
+  mutate(diff = estimate - lag(estimate),
+         diff = replace_na(diff, 0)) |>
+  mutate(run_diff = cumsum(diff)) |> 
+  filter(run_diff != 0)
 
 ggplot(b25003_data,
        aes(x=year,
@@ -128,84 +133,82 @@ ggplot(b25003_data,
 
 ## Households by age
 
-The single largest growing cohort of households across the region are homeowners 65 years and over. Thanks in large part to youngest baby boomers aging into retirement, this group increased by more than 12,500. Younger homeowners saw much smaller gains.
+The single largest growing cohort of households across the region are homeowners 65 years and over. Thanks in large part to youngest baby boomers aging into retirement, this group increased by more than 13,000. Younger homeowners saw much smaller gains.
 
-Among renters, most growth occurred in senior householders. The significant decrease of renter households under 25 (more than 2,500) should be treated with caution, as this population likely had much lower ACS response rates during COVID-19.
+Among renters, most growth occurred in senior householders. The significant decrease of renter households under 25 (more than 3,200) should be treated with caution, as this population likely had much lower ACS response rates during COVID-19.
 
-```{r hh-age-data}
+```{r hh-age-data, eval=FALSE}
 
-# b25007_vars <- load_variables(2020, "acs5") |>
-#   filter(str_sub(name, end = 6) %in% "B25007")
-#
-# b25007_raw <- map_dfr(years, function(yr){
-#   b25007_pull <- get_acs(
-#     geography = "county",
-#     state = "VA",
-#     table = "B25007",
-#     year = yr,
-#     survey = "acs5",
-#     cache_table = TRUE
-#   ) |> 
-#     mutate(year = yr)
-# })
-# 
-# write_rds(b25007_raw, "data/b25007_raw.rds")
-# 
-# b25007_raw <- read_rds("data/b25007_raw.rds")
-# 
-# b25007_raw <- b25007_raw |> 
-#   subset(GEOID %in% pha)
-# 
-# b25007_vars_cleaned <- b25007_vars |> 
-#   separate(label, into = c("est", "total", "tenure", "age"), sep = "!!") |> 
-#   select(variable = name, tenure, age) |> 
-#   drop_na() |> 
-#   mutate(tenure = case_when(
-#     tenure == "Owner occupied:" ~ "Homeowner",
-#     tenure == "Renter occupied:" ~ "Renter"
-#   ))
-# 
-# b25007_data <- b25007_raw |> 
-#   right_join(b25007_vars_cleaned, by = "variable") |> 
-#   select(NAME, GEOID, year, tenure, age, estimate, moe)|> 
-#   mutate(age = case_when(
-#     age == "Householder 15 to 24 years" ~ "Under 25 years old",
-#     age == "Householder 25 to 34 years" ~ "25 to 44 years old",
-#     age == "Householder 35 to 44 years" ~ "25 to 44 years old",
-#     age == "Householder 45 to 54 years" ~ "45 to 64 years old",
-#     age == "Householder 55 to 59 years" ~ "45 to 64 years old",
-#     age == "Householder 60 to 64 years" ~ "45 to 64 years old",
-#     age == "Householder 65 to 74 years" ~ "65 years and over",
-#     age == "Householder 75 to 84 years" ~ "65 years and over",
-#     age == "Householder 85 years and over" ~ "65 years and over"
-#   ))
-# 
-# b25007_data_grp <- b25007_data |> 
-#   group_by(NAME, year, tenure, age) |> 
-#   summarise(estimate = sum(estimate)) |> 
-#   separate(NAME, into = c("locality", "state"), sep = ",") |> 
-#   pivot_wider(names_from = year,
-#               values_from = estimate) |> 
-#   select(tenure, age, `2016`, `2020`) |> 
-#   transform(change = `2020` - `2016`) |> 
-#   group_by(tenure, age) |> 
-#   summarise(change = sum(change)) |> 
-#   mutate(age = fct_relevel(age, "Under 25 years old"))
-# 
-# write_rds(b25007_data_grp, "data/b25007_data_grp.rds")
+b25007_vars <- load_variables(2020, "acs5") |>
+  filter(str_sub(name, end = 6) %in% "B25007")
+
+b25007_raw <- map_dfr(years, function(yr){
+  b25007_pull <- get_acs(
+    geography = "county",
+    state = "VA",
+    table = "B25007",
+    year = yr,
+    survey = "acs5",
+    cache_table = TRUE
+  ) |>
+    mutate(year = yr)
+})
+
+b25007_raw <- b25007_raw |>
+  subset(GEOID %in% pha)
+
+b25007_vars_cleaned <- b25007_vars |>
+  separate(label, into = c("est", "total", "tenure", "age"), sep = "!!") |>
+  select(variable = name, tenure, age) |>
+  drop_na() |>
+  mutate(tenure = case_when(
+    tenure == "Owner occupied:" ~ "Homeowner",
+    tenure == "Renter occupied:" ~ "Renter"
+  ))
+
+b25007_data <- b25007_raw |>
+  right_join(b25007_vars_cleaned, by = "variable") |>
+  select(NAME, GEOID, year, tenure, age, estimate, moe)|>
+  mutate(NAME = str_remove_all(NAME, ", Virginia")) |>
+  mutate(age = case_when(
+    age == "Householder 15 to 24 years" ~ "Under 25 years old",
+    age == "Householder 25 to 34 years" ~ "25 to 44 years old",
+    age == "Householder 35 to 44 years" ~ "25 to 44 years old",
+    age == "Householder 45 to 54 years" ~ "45 to 64 years old",
+    age == "Householder 55 to 59 years" ~ "45 to 64 years old",
+    age == "Householder 60 to 64 years" ~ "45 to 64 years old",
+    age == "Householder 65 to 74 years" ~ "65 years and over",
+    age == "Householder 75 to 84 years" ~ "65 years and over",
+    age == "Householder 85 years and over" ~ "65 years and over"
+  ))
+
+b25007_data <- b25007_data |>
+  group_by(NAME, year, tenure, age) |>
+  summarise(estimate = sum(estimate)) |>
+  pivot_wider(names_from = year,
+              values_from = estimate) |>
+  select(tenure, age, `2016`, `2020`) |>
+  transform(change = `2020` - `2016`) |>
+  group_by(NAME, tenure, age) |>
+  summarise(change = sum(change)) |>
+  mutate(age = fct_relevel(age, "Under 25 years old"))
+
+write_rds(b25007_data, "data/b25007_data.rds")
 
 ```
 
 ```{r hh-age-plot}
 
-b25007_data_grp <- read_rds("data/b25007_data_grp.rds")
+b25007_data <- read_rds("data/b25007_data.rds") |> 
+  group_by(tenure, age) |> 
+  summarise(change = sum(change))
 
-ggplot(b25007_data_grp,
+ggplot(b25007_data,
        aes(y = change, x =tenure, fill = tenure)) +
   geom_col(position = "dodge") +
   facet_wrap(~age, nrow = 1) +
   scale_y_continuous(labels = label_comma(),
-                     breaks = c(-2500,0,2500,5000,7500,10000,12500)) +
+                     breaks = c(-2500,0,2500,5000,7500,10000,12500,15000)) +
   labs(title="Change in households by age and tenure",
        subtitle="2016 to 2020",
        fill="Tenure",
@@ -225,64 +228,66 @@ ggplot(b25007_data_grp,
 
 Married-couple families continued to be the dominant household type in the region, growing by 9,625 from 2016 to 2020. Living alone also become more common, likely the result of seniors increasingly living on their own. Households headed by single females were the only type to decline; however, this could potentially be attributed to lower ACS response rates among those households during COVID-19.
 
-```{r hh-type-data}
+```{r hh-type-data, eval=FALSE}
 
-# b11001_vars <- load_variables(2020, "acs5") |> 
-#   filter(str_sub(name, end = 7) %in% "B11001_")
-# 
-# b11001_raw <- map_dfr(years, function(yr){
-#   b11001_pull <- get_acs(
-#     geography = "county",
-#     state = "VA",
-#     table = "B11001",
-#     year = yr,
-#     survey = "acs5",
-#     cache_table = TRUE
-#   ) |> 
-#     mutate(year = yr)
-# })
-# 
-# 
-# b11001_raw <- b11001_raw |> 
-#   subset(GEOID %in% pha)
-# 
-# b11001_vars_cleaned <- b11001_vars |> 
-#   separate(label, into = c("est", "tot", "type", "relationship", "householder"), 
-#            sep = "!!") |> 
-#   select(variable = name, type, relationship, householder) |> 
-#   mutate(
-#     householder = case_when(
-#       relationship == "Married-couple family" ~ relationship,
-#       relationship == "Householder living alone" ~ relationship,
-#       relationship == "Householder not living alone" ~ relationship,
-#       TRUE ~ householder),
-#     relationship = case_when(
-#       relationship == "Householder living alone" ~ type,
-#       relationship == "Householder not living alone" ~ type,
-#       TRUE ~ relationship)
-#     ) |> 
-#   mutate(across(.fns = ~str_remove_all(.x, ":"))) |> 
-#   drop_na()
-# 
-# b11001_data <- b11001_raw |> 
-#   right_join(b11001_vars_cleaned, by = "variable") |> 
-#   select(NAME, GEOID, year, "hhtype" = householder, relationship, type, estimate) |> 
-#   separate(NAME, into = c("locality", "state"), sep = ",") |> 
-#   pivot_wider(names_from = year,
-#               values_from = estimate) |> 
-#   select(locality, hhtype, `2016`, `2020`) |> 
-#   transform(change = `2020` - `2016`) |> 
-#   group_by(hhtype) |> 
-#   summarise(change = sum(change))
-#
-# write_rds(b11001_data, "data/b11001_data.rds")
+b11001_vars <- load_variables(2020, "acs5") |>
+  filter(str_sub(name, end = 7) %in% "B11001_")
+
+b11001_raw <- map_dfr(years, function(yr){
+  b11001_pull <- get_acs(
+    geography = "county",
+    state = "VA",
+    table = "B11001",
+    year = yr,
+    survey = "acs5",
+    cache_table = TRUE
+  ) |>
+    mutate(year = yr)
+})
+
+
+b11001_raw <- b11001_raw |>
+  subset(GEOID %in% pha)
+
+b11001_vars_cleaned <- b11001_vars |>
+  separate(label, into = c("est", "tot", "type", "relationship", "householder"),
+           sep = "!!") |>
+  select(variable = name, type, relationship, householder) |>
+  mutate(
+    householder = case_when(
+      relationship == "Married-couple family" ~ relationship,
+      relationship == "Householder living alone" ~ relationship,
+      relationship == "Householder not living alone" ~ relationship,
+      TRUE ~ householder),
+    relationship = case_when(
+      relationship == "Householder living alone" ~ type,
+      relationship == "Householder not living alone" ~ type,
+      TRUE ~ relationship)
+    ) |>
+  mutate(across(.fns = ~str_remove_all(.x, ":"))) |>
+  drop_na()
+
+b11001_data <- b11001_raw |>
+  right_join(b11001_vars_cleaned, by = "variable") |>
+  select(NAME, GEOID, year, "hhtype" = householder, relationship, type, estimate) |>
+  mutate(NAME = str_remove_all(NAME, ", Virginia")) |>
+  pivot_wider(names_from = year,
+              values_from = estimate) |>
+  select(NAME, hhtype, `2016`, `2020`) |>
+  transform(change = `2020` - `2016`) |>
+  group_by(NAME, hhtype) |>
+  summarise(change = sum(change))
+
+write_rds(b11001_data, "data/b11001_data.rds")
 
 ```
 
 ```{r hh-type-plot}
 
-b11001_data <- read_rds("data/b11001_data.rds")
-
+b11001_data <- read_rds("data/b11001_data.rds") |> 
+  group_by(hhtype) |> 
+  summarise(change = sum(change))
+  
 ggplot(b11001_data,
        aes(x = reorder(hhtype, -change),
            y = change,
@@ -308,63 +313,63 @@ Two-person homeowning households were by and large the fastest-growing cohort am
 
 Persons living alone were the only size of renter households that grew with any significance over this period. One potential explanation for the notable decreases in the number of three- and four-person renter households is lower ACS response rates among younger adults living with roommates during COVID-19. This population, which does not include college students living in dorms ("group quarters" are not households in Census methodology), was likely to move back home with parents during the initial phases of the pandemic.
 
-```{r hh-size-data}
+```{r hh-size-data, eval=FALSE}
 
-# years <- 2016:2020
-# 
-# b25009_vars <- load_variables(2020, "acs5") |>
-#   filter(str_sub(name, end = 6) %in% "B25009")
-# 
-# b25009_raw <- map_dfr(years, function(yr){
-#   b25009_pull <- get_acs(
-#     geography = "county",
-#     state = "VA",
-#     table = "B25009",
-#     year = yr,
-#     survey = "acs5",
-#     cache_table = TRUE
-#   ) |>
-#     mutate(year = yr)
-# })
-# 
-# b25009_raw <- b25009_raw |> 
-#   subset(GEOID %in% pha)
-# 
-# b25009_vars_cleaned <- b25009_vars |> 
-#   separate(label, into = c("est", "total", "tenure", "size"), sep = "!!") |> 
-#   select(variable = name, tenure, size) |> 
-#   drop_na() |> 
-#   mutate(tenure = case_when(
-#     tenure == "Owner occupied:" ~ "Homeowner",
-#     tenure == "Renter occupied:" ~ "Renter"
-#   ))
-# 
-# b25009_data <- b25009_raw |> 
-#   right_join(b25009_vars_cleaned, by = "variable") |>
-#   select(NAME, GEOID, year, tenure, size, estimate) |> 
-#   separate(NAME, into = c("locality", "state"), sep = ",") |> 
-#   mutate(size = case_when(
-#     size == "1-person household" ~ size,
-#     size == "2-person household" ~ size,
-#     size == "3-person household" ~ size, 
-#     TRUE ~ "4 or more person household"
-#   )) |> 
-#   group_by(year, tenure, size) |> 
-#   summarise(estimate = sum(estimate)) |> 
-#   pivot_wider(names_from = year, 
-#               values_from = estimate) |> 
-#   select(tenure, size, `2016`, `2020`) |> 
-#   transform(change = `2020` - `2016`) |> 
-#   group_by(tenure, size) |> 
-#   summarise(change = sum(change))
-# 
-# write_rds(b25009_data, "data/b25009_data.rds")
+b25009_vars <- load_variables(2020, "acs5") |>
+  filter(str_sub(name, end = 6) %in% "B25009")
+
+b25009_raw <- map_dfr(years, function(yr){
+  b25009_pull <- get_acs(
+    geography = "county",
+    state = "VA",
+    table = "B25009",
+    year = yr,
+    survey = "acs5",
+    cache_table = TRUE
+  ) |>
+    mutate(year = yr)
+})
+
+b25009_raw <- b25009_raw |>
+  subset(GEOID %in% pha)
+
+b25009_vars_cleaned <- b25009_vars |>
+  separate(label, into = c("est", "total", "tenure", "size"), sep = "!!") |>
+  select(variable = name, tenure, size) |>
+  drop_na() |>
+  mutate(tenure = case_when(
+    tenure == "Owner occupied:" ~ "Homeowner",
+    tenure == "Renter occupied:" ~ "Renter"
+  ))
+
+b25009_data <- b25009_raw |>
+  right_join(b25009_vars_cleaned, by = "variable") |>
+  select(NAME, GEOID, year, tenure, size, estimate) |>
+  mutate(NAME = str_remove_all(NAME, ", Virginia")) |>
+  mutate(size = case_when(
+    size == "1-person household" ~ size,
+    size == "2-person household" ~ size,
+    size == "3-person household" ~ size,
+    TRUE ~ "4 or more person household"
+  )) |>
+  group_by(NAME, year, tenure, size) |>
+  summarise(estimate = sum(estimate)) |>
+  pivot_wider(names_from = year,
+              values_from = estimate) |>
+  select(tenure, size, `2016`, `2020`) |>
+  transform(change = `2020` - `2016`) |>
+  group_by(NAME, tenure, size) |>
+  summarise(change = sum(change))
+
+write_rds(b25009_data, "data/b25009_data.rds")
 
 ```
 
 ```{r hh-size-plot}
 
-b25009_data <- read_rds("data/b25009_data.rds")
+b25009_data <- read_rds("data/b25009_data.rds") |> 
+  group_by(tenure, size) |> 
+  summarise(change = sum(change))
 
 ggplot(b25009_data,
        aes(x = tenure, y = change, fill = tenure)) +
@@ -394,70 +399,72 @@ The number of homeowners without children in the region grew significantly (by a
 
 The only group of renters that saw significant growth was nonfamily households. This includes both renters that live alone and those that live with non-related roommates. The estimated number of renters with children declined sharply; this may also be a symptom of lower pandemic ACS responses among lower-income working families.
 
-```{r hh-child-data}
+```{r hh-child-data, eval=FALSE}
 
-# b25115_vars <- load_variables(2020, "acs5") |>
-#   filter(str_sub(name, end = 6) %in% "B25115")
-# 
-# b25115_raw <- map_dfr(years, function(yr){
-#   b25115_pull <- get_acs(
-#     geography = "county",
-#     state = "VA",
-#     table = "B25115",
-#     year = yr,
-#     survey = "acs5"
-#   ) |>
-#     mutate(year = yr)
-# })
-# 
-# b25115_raw <- b25115_raw |> 
-#   subset(GEOID %in% pha)
-# 
-# b25115_vars_cleaned <- b25115_vars |> 
-#   separate(label, into = c("est", "total", "tenure", "family", "type", "rel", "children"), sep = "!!") |> 
-#   select(variable = name, tenure, family, type, rel, children) |> 
-#   mutate(tenure = case_when(
-#     tenure == "Owner occupied:" ~ "Homeowner",
-#     tenure == "Renter occupied:" ~ "Renter"
-#   )) |> 
-#   mutate(family = case_when(
-#     family == "Family households:" ~ "Family household",
-#     family == "Nonfamily households" ~ "Nonfamily household"
-#   )) |> 
-#   mutate(type = case_when(
-#     type == "Married-couple family:" ~ "Married household",
-#     rel == "Male householder, no spouse present:" ~ "Single male household",
-#     rel == "Female householder, no spouse present:" ~ "Single female household", 
-#     family == "Nonfamily household" ~ "Nonfamily household"
-#   )) |> 
-#   mutate(children = case_when(
-#     rel == "With own children of the householder under 18 years" ~ "With children",
-#     rel == "No own children of the householder under 18 years" ~ "No children",
-#     children == "No own children of the householder under 18 years" ~ "No children",
-#     children == "With own children of the householder under 18 years" ~ "With children",
-#     family == "Nonfamily household" ~ "Nonfamily household" 
-#   )) |> 
-#   select(variable, tenure, family, type, children) |> 
-#   drop_na()
-#   
-# b25115_data <- b25115_raw |> 
-#   right_join(b25115_vars_cleaned, by = "variable") |> 
-#   select(NAME, GEOID, year, tenure, type, children, estimate) |> 
-#   separate(NAME, into = c("locality", "state"), sep = ",") |> 
-#   pivot_wider(names_from = year,
-#               values_from = estimate) |> 
-#   transform(change = `2020` - `2016`) |> 
-#   select(tenure, type, children, change) |> 
-#   group_by(tenure, children) |> 
-#   summarise(change = sum(change))
-# 
-# write_rds(b25115_data, "data/b25115_data.rds")
+b25115_vars <- load_variables(2020, "acs5") |>
+  filter(str_sub(name, end = 6) %in% "B25115")
+
+b25115_raw <- map_dfr(years, function(yr){
+  b25115_pull <- get_acs(
+    geography = "county",
+    state = "VA",
+    table = "B25115",
+    year = yr,
+    survey = "acs5"
+  ) |>
+    mutate(year = yr)
+})
+
+b25115_raw <- b25115_raw |>
+  subset(GEOID %in% pha)
+
+b25115_vars_cleaned <- b25115_vars |>
+  separate(label, into = c("est", "total", "tenure", "family", "type", "rel", "children"), sep = "!!") |>
+  select(variable = name, tenure, family, type, rel, children) |>
+  mutate(tenure = case_when(
+    tenure == "Owner occupied:" ~ "Homeowner",
+    tenure == "Renter occupied:" ~ "Renter"
+  )) |>
+  mutate(family = case_when(
+    family == "Family households:" ~ "Family household",
+    family == "Nonfamily households" ~ "Nonfamily household"
+  )) |>
+  mutate(type = case_when(
+    type == "Married-couple family:" ~ "Married household",
+    rel == "Male householder, no spouse present:" ~ "Single male household",
+    rel == "Female householder, no spouse present:" ~ "Single female household",
+    family == "Nonfamily household" ~ "Nonfamily household"
+  )) |>
+  mutate(children = case_when(
+    rel == "With own children of the householder under 18 years" ~ "With children",
+    rel == "No own children of the householder under 18 years" ~ "No children",
+    children == "No own children of the householder under 18 years" ~ "No children",
+    children == "With own children of the householder under 18 years" ~ "With children",
+    family == "Nonfamily household" ~ "Nonfamily household"
+  )) |>
+  select(variable, tenure, family, type, children) |>
+  drop_na()
+
+b25115_data <- b25115_raw |>
+  right_join(b25115_vars_cleaned, by = "variable") |>
+  select(NAME, GEOID, year, tenure, type, children, estimate) |>
+  mutate(NAME = str_remove_all(NAME, ", Virginia")) |>
+  pivot_wider(names_from = year,
+              values_from = estimate) |>
+  transform(change = `2020` - `2016`) |>
+  select(NAME, tenure, type, children, change) |>
+  group_by(NAME, tenure, children) |>
+  summarise(change = sum(change))
+
+write_rds(b25115_data, "data/b25115_data.rds")
 
 ```
 
 ```{r hh-child-plot}
 
-b25115_data <- read_rds("data/b25115_data.rds")
+b25115_data <- read_rds("data/b25115_data.rds") |> 
+  group_by(tenure, children) |> 
+  summarise(change = sum(change))
 
 ggplot(b25115_data,
        aes(x = children, y = change, fill = tenure)) +
@@ -468,6 +475,7 @@ ggplot(b25115_data,
                      limits = c(-3050,9050)) +
   labs(title = "Change in households with children by tenure",
        subtitle = "2016 to 2020",
+       fill = "Tenure",
        caption = "Source: U.S. Census Bureau, American Community Survey, Table B25115.") +
   theme(axis.title = element_blank(),
         axis.text.x = element_blank(),
@@ -490,58 +498,58 @@ Since 2016, the region's senior population increased almost exclusively among th
 
 The estimated number of seniors within group quarters (e.g. nursing homes, assisted living facilities) increased by less than 200. This figure should be assessed in context of ACS collection [challenges](https://www.census.gov/newsroom/blogs/random-samplings/2021/09/collecting-acs-data-from-group-quarters-amid-the-pandemic.html) in group quarters settings throughout the COVID-19 pandemic.
 
-```{r hh-seniors-data}
+```{r hh-seniors-data, eval=FALSE}
 
-# b09020_vars <- load_variables(2020, "acs5") |>
-#   filter(str_sub(name, end = 6) %in% "B09020")
-# 
-# b09020_raw <- map_dfr(years, function(yr){
-#   b09020_pull <- get_acs(
-#     geography = "county",
-#     state = "VA",
-#     table = "B09020",
-#     year = yr,
-#     survey = "acs5"
-#   ) |>
-#     mutate(year = yr)
-# })
-# 
-# b09020_raw <- b09020_raw |> 
-#   subset(GEOID %in% pha)
-# 
-# b09020_vars_cleaned <- b09020_vars |>
-#   separate(label, into = c("est", "total", "hhgq", "family", "relationship", "sex", "alone"), sep = "!!") |>
-#   select(variable = name, hhgq, family, relationship, alone) |>
-#   filter(!variable %in% c("B09020_001", "B09020_002", "B09020_003", "B09020_005", "B09020_006",
-#                           "B09020_012", "B09020_013", "B09020_014", "B09020_017")) |>
-#   mutate(relationship = case_when(
-#     relationship == "Spouse" ~ "With spouse",
-#     relationship == "Nonrelatives" ~ "With nonrelatives",
-#     relationship %in% c("Parent", "Parent-in-law", "Other relatives") ~ "With other relative(s)",
-#     hhgq == "In group quarters" ~ "Group quarters",
-#     !is.na(alone) ~ alone,
-#     TRUE ~ relationship
-#   )) |>
-#   mutate(family = case_when(
-#     family == "In family households:" ~ "Family",
-#     family == "In nonfamily households:" ~ "Nonfamily",
-#     hhgq == "In group quarters" ~ "Group quarters"
-#   )) |>
-#   mutate(across(.fns = ~str_remove_all(.x, ":"))) |>
-#   select(1,3,4)
-# 
-# b09020_data <- b09020_raw |>
-#   right_join(b09020_vars_cleaned, by = "variable") |>
-#   select(NAME, GEOID, year, family, relationship, estimate) |>
-#   mutate(NAME = str_remove_all(NAME, ", Virginia")) |>
-#   group_by(year, family, relationship) |>
-#   summarise(estimate = sum(estimate)) |>
-#   group_by(family, relationship) |>
-#   mutate(diff = estimate - lag(estimate)) |>
-#   drop_na() |>
-#   mutate(run_diff = cumsum(diff))
-# 
-# write_rds(b09020_data, "data/b09020_data.rds")
+b09020_vars <- load_variables(2020, "acs5") |>
+  filter(str_sub(name, end = 6) %in% "B09020")
+
+b09020_raw <- map_dfr(years, function(yr){
+  b09020_pull <- get_acs(
+    geography = "county",
+    state = "VA",
+    table = "B09020",
+    year = yr,
+    survey = "acs5"
+  ) |>
+    mutate(year = yr)
+})
+
+b09020_raw <- b09020_raw |>
+  subset(GEOID %in% pha)
+
+b09020_vars_cleaned <- b09020_vars |>
+  separate(label, into = c("est", "total", "hhgq", "family", "relationship", "sex", "alone"), sep = "!!") |>
+  select(variable = name, hhgq, family, relationship, alone) |>
+  filter(!variable %in% c("B09020_001", "B09020_002", "B09020_003", "B09020_005", "B09020_006",
+                          "B09020_012", "B09020_013", "B09020_014", "B09020_017")) |>
+  mutate(relationship = case_when(
+    relationship == "Spouse" ~ "With spouse",
+    relationship == "Nonrelatives" ~ "With nonrelatives",
+    relationship %in% c("Parent", "Parent-in-law", "Other relatives") ~ "With other relative(s)",
+    hhgq == "In group quarters" ~ "Group quarters",
+    !is.na(alone) ~ alone,
+    TRUE ~ relationship
+  )) |>
+  mutate(family = case_when(
+    family == "In family households:" ~ "Family",
+    family == "In nonfamily households:" ~ "Nonfamily",
+    hhgq == "In group quarters" ~ "Group quarters"
+  )) |>
+  mutate(across(.fns = ~str_remove_all(.x, ":"))) |>
+  select(1,3,4)
+
+b09020_data <- b09020_raw |>
+  right_join(b09020_vars_cleaned, by = "variable") |>
+  select(NAME, GEOID, year, family, relationship, estimate) |>
+  mutate(NAME = str_remove_all(NAME, ", Virginia")) |>
+  group_by(NAME, year, family, relationship) |> 
+  summarise(estimate = sum(estimate)) |> 
+  pivot_wider(names_from = year,
+              values_from = estimate) |>
+  transform(change = `2020` - `2016`) |>
+  select(NAME, family, relationship, change)
+  
+write_rds(b09020_data, "data/b09020_data.rds")
 
 ```
 
@@ -549,24 +557,24 @@ The estimated number of seniors within group quarters (e.g. nursing homes, assis
 
 library(tidytext)
 
-b09020_data <- read_rds("data/b09020_data.rds")
-
+b09020_data <- read_rds("data/b09020_data.rds") |> 
+  group_by(family, relationship) |> 
+  summarise(change = sum(change))
+  
 b09020_data <- b09020_data |> 
-  ungroup() |> 
-  filter(year == 2020) |> 
+  ungroup() |>
   mutate(family = str_replace(family, "Group quarters", " "),
          family = fct_relevel(family, "Family", "Nonfamily", " "))
 
 ggplot(b09020_data,
-       aes(y = reorder_within(relationship, run_diff, family),
-           x = run_diff,
+       aes(y = reorder_within(relationship, change, family),
+           x = change,
            fill = relationship)) +
   geom_col(position = "dodge") +
   scale_y_reordered() +
   scale_x_continuous(labels = label_comma(),
                      breaks = c(0,2000,4000,6000,8000)) +
   facet_grid(rows = vars(family), scales = "free_y", space = "free", switch = "y") +
-  #scale_y_discrete(labels = function(x) str_wrap(x, width = 10)) +
   labs(title="Change in senior population by living arrangement",
        subtitle="2016 to 2020",
        fill="Tenure",
@@ -588,53 +596,55 @@ ggplot(b09020_data,
 
 The Census Bureau defines a *subfamily* as a group of related individuals who live in the household of someone else. As of 2020, there were approximately 9,850 subfamilies across the region. Two-thirds of those are single mothers living with at least one child of their own. These estimates have remained stable since 2016.
 
-```{r hh-subfam-data}
+```{r hh-subfam-data, eval=FALSE}
 
-# b11013_vars <- load_variables(2020, "acs5") |>
-#   filter(str_sub(name, end = 6) %in% "B11013")
-# 
-# b11013_raw <- map_dfr(years, function(yr){
-#   b11013_pull <- get_acs(
-#     geography = "county",
-#     state = "VA",
-#     table = "B11013",
-#     year = yr,
-#     survey = "acs5"
-#   ) |>
-#     mutate(year = yr)
-# })
-# 
-# b11013_raw <- b11013_raw |>
-#   subset(GEOID %in% pha)
-# 
-# b11013_vars_cleaned <- b11013_vars |>
-#   separate(label, into = c("est", "total", "subfamily", "children"), sep = "!!") |>
-#   select(variable = name, subfamily, children) |>
-#   filter(!variable %in% c("B11013_001", "B11013_002")) |>
-#   mutate(subfamily = case_when(
-#     subfamily == "Married-couple subfamily:" ~ "Married couple",
-#     subfamily == "Mother-child subfamily" ~ "Single mother",
-#     subfamily == "Father-child subfamily" ~ "Single father")) |> 
-#   mutate(children = case_when(
-#     children == "With own children under 18 years" ~ "With children",
-#     children == "No own children under 18 years" ~ "No children",
-#     TRUE ~ "With children"))
-# 
-# b11013_data <- b11013_raw |>
-#   right_join(b11013_vars_cleaned, by = "variable") |>
-#   select(NAME, GEOID, year, subfamily, children, estimate) |>
-#   mutate(NAME = str_remove_all(NAME, ", Virginia")) |>
-#   group_by(year, subfamily, children) |>
-#   summarise(estimate = sum(estimate)) |>
-#   mutate(subfamily = fct_relevel(subfamily, "Married couple", "Single father", "Single mother"))
-# 
-# write_rds(b11013_data, "data/b11013_data.rds")
+b11013_vars <- load_variables(2020, "acs5") |>
+  filter(str_sub(name, end = 6) %in% "B11013")
+
+b11013_raw <- map_dfr(years, function(yr){
+  b11013_pull <- get_acs(
+    geography = "county",
+    state = "VA",
+    table = "B11013",
+    year = yr,
+    survey = "acs5"
+  ) |>
+    mutate(year = yr)
+})
+
+b11013_raw <- b11013_raw |>
+  subset(GEOID %in% pha)
+
+b11013_vars_cleaned <- b11013_vars |>
+  separate(label, into = c("est", "total", "subfamily", "children"), sep = "!!") |>
+  select(variable = name, subfamily, children) |>
+  filter(!variable %in% c("B11013_001", "B11013_002")) |>
+  mutate(subfamily = case_when(
+    subfamily == "Married-couple subfamily:" ~ "Married couple",
+    subfamily == "Mother-child subfamily" ~ "Single mother",
+    subfamily == "Father-child subfamily" ~ "Single father")) |>
+  mutate(children = case_when(
+    children == "With own children under 18 years" ~ "With children",
+    children == "No own children under 18 years" ~ "No children",
+    TRUE ~ "With children"))
+
+b11013_data <- b11013_raw |>
+  right_join(b11013_vars_cleaned, by = "variable") |>
+  select(NAME, GEOID, year, subfamily, children, estimate) |>
+  mutate(NAME = str_remove_all(NAME, ", Virginia")) |>
+  group_by(NAME, year, subfamily, children) |>
+  summarise(estimate = sum(estimate)) |>
+  mutate(subfamily = fct_relevel(subfamily, "Married couple", "Single father", "Single mother"))
+
+write_rds(b11013_data, "data/b11013_data.rds")
 
 ```
 
 ```{r hh-subfam-plot}
 
-b11013_data <- readRDS("data/b11013_data.rds")
+b11013_data <- read_rds("data/b11013_data.rds") |> 
+  group_by(year, subfamily, children) |> 
+  summarise(estimate = sum(estimate))
 
 ggplot(b11013_data,
        aes(x = year,
@@ -673,107 +683,107 @@ While PUMA boundaries align with Chesterfield County, Henrico County, and Richmo
 
 Multigenerational households are slightly more common in the core metro area (Chesterfield, Henrico, and Richmond) than the outlying suburbs. The share of multigenerational households in Chesterfield and Richmond appears to be decreasing slightly, while increasing slightly in the outer counties. The share of Henrico's population in multigenerational households continues to sit around 8 percent.
 
-```{r hh-multigen-data}
+```{r hh-multigen-data, eval=FALSE}
 
-# library(sf)
-# 
-# # Load PUMA geographies for Virginia
-# 
-# pumas <- pumas(state = "VA")
-# 
-# # Filter PUMAs to PHA region
-# 
-# pumas_pha <- pumas |> 
-#   filter(str_detect(NAMELSAD10, "Chesterfield|Hanover|Henrico|Richmond"))
-# 
-# # Pull each PUMS year separately because data structure is not same across 2016 to 2020
-# 
-# multigen_2016 <- get_pums(
-#   variables = "MULTG",
-#   state = "VA",
-#   year = 2016,
-#   puma = pumas_pha$PUMACE10)
-# 
-# multigen_2016 <- multigen_2016 |> 
-#   mutate(YEAR = "2016",
-#          SPORDER = as.numeric(SPORDER),
-#          PUMA = case_when(
-#            str_length(PUMA) == 4 ~ paste0("0", PUMA),
-#            TRUE ~ as.character(PUMA))) |> 
-#   select(YEAR, SERIALNO, PUMA, SPORDER, WGTP, PWGTP, MULTG)
-# 
-# multigen_2017 <- get_pums(
-#   variables = "MULTG",
-#   state = "VA",
-#   year = 2017,
-#   puma = pumas_pha$PUMACE10)
-# 
-# multigen_2017 <- multigen_2017 |> 
-#   mutate(SPORDER = as.numeric(SPORDER),
-#          YEAR = "2017") |> 
-#   select(YEAR, SERIALNO, PUMA, SPORDER, WGTP, PWGTP, MULTG)
-# 
-# multigen_2018 <- get_pums(
-#   variables = "MULTG",
-#   state = "VA",
-#   year = 2018,
-#   puma = pumas_pha$PUMACE10)
-# 
-# multigen_2018 <- multigen_2018 |> 
-#   mutate(SPORDER = as.numeric(SPORDER),
-#          YEAR = "2018") |> 
-#   select(YEAR, SERIALNO, PUMA, SPORDER, WGTP, PWGTP, MULTG)
-# 
-# multigen_2019 <- get_pums(
-#   variables = "MULTG",
-#   state = "VA",
-#   year = 2019,
-#   puma = pumas_pha$PUMACE10)
-# 
-# multigen_2019 <- multigen_2019 |> 
-#   mutate(YEAR = "2019") |> 
-#   select(YEAR, SERIALNO, PUMA, SPORDER, WGTP, PWGTP, MULTG)
-# 
-# multigen_2020 <- get_pums(
-#   variables = "MULTG",
-#   state = "VA",
-#   year = 2020,
-#   puma = pumas_pha$PUMACE10)
-# 
-# multigen_2020 <- multigen_2020 |> 
-#   mutate(YEAR = "2020") |> 
-#   select(YEAR, SERIALNO, PUMA, SPORDER, WGTP, PWGTP, MULTG)
-# 
-# # Bind years together and recode
-# 
-# multigen_raw <- bind_rows(multigen_2016, multigen_2017, multigen_2018,
-#                           multigen_2019, multigen_2020) |> 
-#   filter(!MULTG %in% c("b", "0")) |> 
-#   mutate(geography = case_when(
-#     PUMA %in% c("04101", "04102", "04103") ~ "Chesterfield County",
-#     PUMA %in% c("51224", "51225") ~ "Henrico County",
-#     PUMA == "51235" ~ "Richmond city",
-#     PUMA == "51215" ~ "Remainder of PDC"
-#   )) |> 
-#   mutate(MULTG = case_when(
-#     MULTG == "1" ~ "Single generation",
-#     MULTG == "2" ~ "Multiple generations"
-#   ))
-# 
-# # Summarize percent of multigenerational households by year
-# 
-# multigen_data <- multigen_raw |>
-#   group_by(YEAR, geography) |>
-#   summarise(pct = sum(PWGTP[MULTG == "Multiple generations"]) / sum(PWGTP)) |>
-#   mutate(geography = fct_reorder(geography, pct, .desc = TRUE))
-# 
-# saveRDS(multigen_data, "data/multigen_data.rds")
+library(sf)
+
+# Load PUMA geographies for Virginia
+
+pumas <- pumas(state = "VA")
+
+# Filter PUMAs to PHA region
+
+pumas_pha <- pumas |>
+  filter(str_detect(NAMELSAD10, "Chesterfield|Hanover|Henrico|Richmond"))
+
+# Pull each PUMS year separately because data structure is not same across 2016 to 2020
+
+multigen_2016 <- get_pums(
+  variables = "MULTG",
+  state = "VA",
+  year = 2016,
+  puma = pumas_pha$PUMACE10)
+
+multigen_2016 <- multigen_2016 |>
+  mutate(YEAR = "2016",
+         SPORDER = as.numeric(SPORDER),
+         PUMA = case_when(
+           str_length(PUMA) == 4 ~ paste0("0", PUMA),
+           TRUE ~ as.character(PUMA))) |>
+  select(YEAR, SERIALNO, PUMA, SPORDER, WGTP, PWGTP, MULTG)
+
+multigen_2017 <- get_pums(
+  variables = "MULTG",
+  state = "VA",
+  year = 2017,
+  puma = pumas_pha$PUMACE10)
+
+multigen_2017 <- multigen_2017 |>
+  mutate(SPORDER = as.numeric(SPORDER),
+         YEAR = "2017") |>
+  select(YEAR, SERIALNO, PUMA, SPORDER, WGTP, PWGTP, MULTG)
+
+multigen_2018 <- get_pums(
+  variables = "MULTG",
+  state = "VA",
+  year = 2018,
+  puma = pumas_pha$PUMACE10)
+
+multigen_2018 <- multigen_2018 |>
+  mutate(SPORDER = as.numeric(SPORDER),
+         YEAR = "2018") |>
+  select(YEAR, SERIALNO, PUMA, SPORDER, WGTP, PWGTP, MULTG)
+
+multigen_2019 <- get_pums(
+  variables = "MULTG",
+  state = "VA",
+  year = 2019,
+  puma = pumas_pha$PUMACE10)
+
+multigen_2019 <- multigen_2019 |>
+  mutate(YEAR = "2019") |>
+  select(YEAR, SERIALNO, PUMA, SPORDER, WGTP, PWGTP, MULTG)
+
+multigen_2020 <- get_pums(
+  variables = "MULTG",
+  state = "VA",
+  year = 2020,
+  puma = pumas_pha$PUMACE10)
+
+multigen_2020 <- multigen_2020 |>
+  mutate(YEAR = "2020") |>
+  select(YEAR, SERIALNO, PUMA, SPORDER, WGTP, PWGTP, MULTG)
+
+# Bind years together and recode
+
+multigen_raw <- bind_rows(multigen_2016, multigen_2017, multigen_2018,
+                          multigen_2019, multigen_2020) |>
+  filter(!MULTG %in% c("b", "0")) |>
+  mutate(geography = case_when(
+    PUMA %in% c("04101", "04102", "04103") ~ "Chesterfield County",
+    PUMA %in% c("51224", "51225") ~ "Henrico County",
+    PUMA == "51235" ~ "Richmond city",
+    PUMA == "51215" ~ "Remainder of PDC"
+  )) |>
+  mutate(MULTG = case_when(
+    MULTG == "1" ~ "Single generation",
+    MULTG == "2" ~ "Multiple generations"
+  ))
+
+# Summarize percent of multigenerational households by year
+
+multigen_data <- multigen_raw |>
+  group_by(YEAR, geography) |>
+  summarise(pct = sum(PWGTP[MULTG == "Multiple generations"]) / sum(PWGTP)) |>
+  mutate(geography = fct_reorder(geography, pct, .desc = TRUE))
+
+write_rds(multigen_data, "data/multigen_data.rds")
 
 ```
 
 ```{r hh-multigen-plot}
 
-multigen_data <- readRDS("data/multigen_data.rds")
+multigen_data <- read_rds("data/multigen_data.rds")
 
 ggplot(multigen_data,
        aes(x = YEAR,
@@ -807,58 +817,59 @@ Over the past decade, a common stereotype has been the adult millennial child co
 
 Today, more than 75,800 adults 18 to 34 years old in the region---about one-in-three---live with their parents. This is more than any other arrangement. However, since 2016, the fastest growing living arrangement for young adults has been with an unmarried partner, followed by other nonrelatives (roommates). In fact, the share of young adults now living with a married spouse increased slightly more than the share still living with parents.
 
-```{r hh-adultchild-data}
+```{r hh-adultchild-data, eval=FALSE}
 
-# b09021_vars <- load_variables(2020, "acs5") |>
-#   filter(str_sub(name, end = 6) %in% "B09021")
-# 
-# b09021_raw <- map_dfr(years, function(yr){
-#   b09021_pull <- get_acs(
-#     geography = "county",
-#     state = "VA",
-#     table = "B09021",
-#     year = yr,
-#     survey = "acs5"
-#   ) |>
-#     mutate(year = yr)
-# })
-# 
-# b09021_raw <- b09021_raw |>
-#   subset(GEOID %in% pha)
-# 
-# b09021_vars_cleaned <- b09021_vars |>
-#   filter(name %in% c("B09021_009", "B09021_010", "B09021_011",
-#                      "B09021_012", "B09021_013", "B09021_014")) |>
-#   separate(label, into = c("est", "total", "age", "arrangement"), sep = "!!") |>
-#   select(variable = name, arrangement) |>
-#   mutate(arrangement = case_when(
-#     arrangement == "Householder living with spouse or spouse of householder" ~ "With spouse",
-#     arrangement == "Householder living with unmarried partner or unmarried partner of householder" ~ "With partner",
-#     TRUE ~ arrangement
-#   ))
-# 
-# 
-# b09021_data <- b09021_raw |>
-#   right_join(b09021_vars_cleaned, by = "variable") |>
-#   select(NAME, GEOID, year, arrangement, estimate) |>
-#   mutate(NAME = str_remove_all(NAME, ", Virginia")) |>
-#   group_by(year, arrangement) |>
-#   summarise(estimate = sum(estimate)) |>
-#   filter(year %in% c(2016, 2020)) |> 
-#   pivot_wider(names_from = year,
-#               values_from = estimate,
-#               names_prefix = "y") |> 
-#   mutate(change = y2020 - y2016,
-#          pct_change = change/y2016)
-# 
-# write_rds(b09021_data, "data/b09021_data.rds")
+b09021_vars <- load_variables(2020, "acs5") |>
+  filter(str_sub(name, end = 6) %in% "B09021")
 
+b09021_raw <- map_dfr(years, function(yr){
+  b09021_pull <- get_acs(
+    geography = "county",
+    state = "VA",
+    table = "B09021",
+    year = yr,
+    survey = "acs5"
+  ) |>
+    mutate(year = yr)
+})
+
+b09021_raw <- b09021_raw |>
+  subset(GEOID %in% pha)
+
+b09021_vars_cleaned <- b09021_vars |>
+  filter(name %in% c("B09021_009", "B09021_010", "B09021_011",
+                     "B09021_012", "B09021_013", "B09021_014")) |>
+  separate(label, into = c("est", "total", "age", "arrangement"), sep = "!!") |>
+  select(variable = name, arrangement) |>
+  mutate(arrangement = case_when(
+    arrangement == "Householder living with spouse or spouse of householder" ~ "With spouse",
+    arrangement == "Householder living with unmarried partner or unmarried partner of householder" ~ "With partner",
+    TRUE ~ arrangement
+  ))
+
+b09021_data <- b09021_raw |>
+  right_join(b09021_vars_cleaned, by = "variable") |>
+  select(NAME, GEOID, year, arrangement, estimate) |>
+  mutate(NAME = str_remove_all(NAME, ", Virginia")) |>
+  group_by(NAME, year, arrangement) |>
+  summarise(estimate = sum(estimate)) |>
+  filter(year %in% c(2016, 2020)) |>
+  pivot_wider(names_from = year,
+              values_from = estimate) |>
+  mutate(change = `2020` - `2016`,
+         pct_change = change/`2016`)
+
+write_rds(b09021_data, "data/b09021_data.rds")
 
 ```
 
 ```{r hh-adultchild-plot}
 
-b09021_data <- readRDS("data/b09021_data.rds")
+b09021_data <- read_rds("data/b09021_data.rds") |> 
+  group_by(arrangement) |> 
+  summarise(`2016` = sum(`2016`),
+            `2020` = sum(`2020`)) |> 
+  mutate(pct_change = (`2020`-`2016`)/`2016`)
 
 ggplot(b09021_data,
        aes(x = reorder(arrangement, pct_change),
@@ -885,6 +896,4 @@ ggplot(b09021_data,
                                           size = 0.05),
         axis.ticks = element_blank())
 
-  
 ```
-

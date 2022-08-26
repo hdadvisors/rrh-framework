@@ -6,13 +6,12 @@
 
 library(tidycensus)
 library(tidyverse)
-library(knitr)
 library(janitor)
 library(tigris)
+library(sf)
 library(sp)
 library(scales)
 library(plotly)
-library(simplevis)
 library(gridExtra)
 library(viridis)
 library(leaflet)
@@ -35,7 +34,7 @@ pal <-colorFactor(palette = c("#440154FF", "#31688EFF","#35B779FF", "#FDE725FF")
 
 The Richmond region has continued to grow between 2016 and 2020---adding a net of 41,457 residents across the four major localities. The most populous locality, Chesterfield County, experienced a near eight percent increase in its population during this timeframe.
 
-```{r total-pop}
+```{r total-pop-data, eval=FALSE}
 
 pep_total_raw <- get_estimates(
   geography = "county",
@@ -66,8 +65,8 @@ projections <- read_csv("data/uva_proj.csv") |>
   rename(GEOID = FIPS) |> 
   mutate(GEOID = as.character(GEOID))
 
-pep_total_clean <- pep_total_raw %>%
-  filter(!DATE %in% c(2, 3)) %>% # Remove non-decennial 2010 counts
+pep_total_clean <- pep_total_raw |>
+  filter(!DATE %in% c(2, 3)) |> # Remove non-decennial 2010 counts
   mutate(year = # Translate date codes into years
     case_when(
       DATE == 1 ~ "2010",
@@ -79,11 +78,11 @@ pep_total_clean <- pep_total_raw %>%
       DATE == 9 ~ "2016",
       DATE == 10 ~ "2017",
       DATE == 11 ~ "2018",
-      DATE == 12 ~ "2019")) %>% 
+      DATE == 12 ~ "2019")) |> 
   mutate(counttype = # Add descriptions to count types
       case_when(
         DATE == 1 ~ "Census population",
-        TRUE ~ "Population estimate")) %>% 
+        TRUE ~ "Population estimate")) |> 
   select( # Simplify columns
     GEOID,
     year,
@@ -93,9 +92,9 @@ pep_total_clean <- pep_total_raw %>%
 
 # Prep total population counts from 2020 Census summary file
 
-census_clean <- census_raw %>% 
+census_clean <- census_raw |> 
   mutate(year = "2020", # Add year and count type columns
-         counttype = "Census population") %>%
+         counttype = "Census population") |>
   select( # Simplify columns
     GEOID,
     year,
@@ -105,18 +104,22 @@ census_clean <- census_raw %>%
 
 # Append 2020 Census counts to PEP time series
 
-population_data <- pep_total_clean %>% 
+population_data <- pep_total_clean |> 
   bind_rows(census_clean, projections)
 
 pha_population_data <- population_data |> 
   subset(GEOID %in% pha)
 
-# pha_pop <- counties("VA", year = 2021) |> 
-#   right_join(pha_population_data, by = "GEOID") |> 
-#   select(NAMELSAD, year, counttype, value) |> 
-#   filter(counttype != "Forecast")
+pha_pop <- list_counties("VA", year = 2021) |>
+  right_join(pha_population_data, by = "GEOID") |>
+  select(NAMELSAD, year, counttype, value) |> 
+  st_drop_geometry()
 
-# write_rds(pha_pop, "data/pha_pop.rds")
+write_rds(pha_pop, "data/pha_pop.rds")
+
+```
+
+```{r total-pop-plot}
 
 pha_pop <- read_rds("data/pha_pop.rds")
 
@@ -156,7 +159,7 @@ In recent years, nearly two thirds of growth could be attributed to either domes
 
 The region's growth continues to be driven primarily by new people coming from other parts of the state and nation (64 percent of growth between 2020 and 2021).
 
-```{r natural}
+```{r components-data, eval=FALSE}
 
 # PEP does not have data available for 2020 and 2021. There is a gap between 2019 and 2021 because Census uses 2020 as a baseline. 
 
@@ -169,7 +172,9 @@ pep_change_raw <- get_estimates(
   time_series = TRUE
 )
 
-pep_change_clean <- pep_change_raw %>% 
+pep_change_clean <- pep_change_raw |> 
+  mutate(GEOID = as.character(GEOID)) |> 
+  filter(GEOID %in% pha) |> 
   mutate(year = # Translate date codes into years
     case_when(
       PERIOD == 1 ~ "2010",
@@ -181,12 +186,12 @@ pep_change_clean <- pep_change_raw %>%
       PERIOD == 7 ~ "2016",
       PERIOD == 8 ~ "2017",
       PERIOD == 9 ~ "2018",
-      PERIOD == 10 ~ "2019")) %>%
+      PERIOD == 10 ~ "2019")) |>
   mutate(component = # Rename components of change
     case_when(
       variable == "NATURALINC" ~ "Natural increase",
       variable == "DOMESTICMIG" ~ "Domestic migration",
-      variable == "INTERNATIONALMIG" ~ "International migration")) %>% 
+      variable == "INTERNATIONALMIG" ~ "International migration")) |> 
   select( # Simplify columns
     GEOID,
     year,
@@ -194,15 +199,7 @@ pep_change_clean <- pep_change_raw %>%
     value
   )
 
-# write_rds(pep_change_clean, "data/pep_change_clean.rds")
-
-rr_nat_change <- pep_change_clean |> 
-  mutate(GEOID = as.character(GEOID)) |> 
-  filter(GEOID %in% pha)
-
-# Maybe manually add in 2021. There will be a gap at 2020 though.
-
-# I've cleaned the 2021 csv and it can be found at the below:
+# Manually add in 2021
 
 pep_2021 <- read_csv("data/comp_chang_2021.csv") |> 
   pivot_longer(4:6,
@@ -215,18 +212,20 @@ pep_2021 <- read_csv("data/comp_chang_2021.csv") |>
       component == "DOMESTICMIG" ~ "Domestic migration",
       component == "INTERNATIONALMIG" ~ "International migration")) |> 
   select(GEOID, year, component, value) |> 
-  mutate(GEOID = as.character(GEOID)) 
+  mutate(GEOID = as.character(GEOID))
 
-# write_rds(pep_2021, "data/pep_2021.rds")
-
-
-pep_2021 <- read_rds("data/pep_2021.rds") |> 
-  filter(GEOID %in% pha)
-
-comp_chg <- rr_nat_change |> 
+pep_comp_change <- pep_change_clean |> 
   rbind(pep_2021)
 
-comp_chg_summary <- comp_chg |> 
+write_rds(pep_comp_change, "data/pep_comp_change.rds")
+
+```
+
+```{r components-plot}
+
+pep_comp_change <- read_rds("data/pep_comp_change.rds")
+
+comp_chg_summary <- pep_comp_change |> 
   group_by(year, component) |> 
   summarise(value = sum(value)) |> 
   mutate(year = as.numeric(year),
@@ -255,17 +254,10 @@ ggplot(comp_chg_summary,
 
 Between 2020 and 2050, the region is expected to grow by nearly a third (29 percent)---reaching 1,338,306 residents.
 
-```{r forecast}
+```{r forecasts-region-plot}
 
-forecasts <- population_data |> 
-  filter(GEOID %in% pha) |> 
-  mutate(name = case_when(
-    GEOID == "51085" ~ "Hanover County", 
-    GEOID == "51760" ~ "Richmond city", 
-    GEOID == "51087" ~ "Henrico County", 
-    GEOID == "51041" ~ "Chesterfield County"
-  )) |> 
-  filter(year == 2020 | year == 2030 | year == 2040 | year == 2050) |> 
+forecasts <- pha_pop |> 
+  filter(year %in% c("2020", "2030", "2040", "2050")) |> 
   group_by(year, counttype) |> 
   summarise(value = sum(value))
 
@@ -279,9 +271,12 @@ ggplot(forecasts,
             color="white",
             size = 3,
             fontface="bold") +
-  scale_y_continuous(labels = number_format(big.mark = ",")) +
+  scale_y_continuous(labels = label_comma(),
+                     breaks = c(250000, 500000, 750000, 1000000, 1250000)) +
   theme(axis.title = element_blank(),
-        axis.ticks.x = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
         panel.background = element_blank()) +
   labs(title="Population projections",
        subtitle="Regional population in 2020 and forecast to 2050",
@@ -296,29 +291,26 @@ Over the next 30 years, Chesterfield County will continue to lead growth across 
 
 Population growth trends will largely continue as they have with Hanover County experiencing the second greatest growth from their 2020 estimates (27 percent increase). Henrico County follows with a 26 percent increase (+88,565), while the City of Richmond will only increase by about a fifth (20 percent) over 30 years.
 
-```{r forecasts-ind}
+```{r forecasts-locality-plot}
 
-forecasts_ind <- population_data |> 
-  filter(GEOID %in% pha) |> 
-  mutate(name = case_when(
-    GEOID == "51085" ~ "Hanover County", 
-    GEOID == "51760" ~ "Richmond city", 
-    GEOID == "51087" ~ "Henrico County", 
-    GEOID == "51041" ~ "Chesterfield County"
-  )) |> 
-  filter(year == 2020 | year == 2030 | year == 2040 | year == 2050)
+forecasts_locality <- pha_pop |> 
+  filter(year %in% c("2020", "2030", "2040", "2050")) |> 
+  group_by(NAMELSAD, year, counttype) |> 
+  summarise(value = sum(value))
 
-ggplot(forecasts_ind,
+ggplot(forecasts_locality,
        aes(x=year,
            y= value,
-           fill=name)) +
+           fill=NAMELSAD)) +
   geom_bar(stat="identity") +
-  facet_wrap(~name) +
-  scale_y_continuous(labels = number_format(big.mark = ",")) +
+  facet_wrap(~NAMELSAD) +
+  scale_y_continuous(labels = label_comma()) +
   theme(axis.title = element_blank(),
         legend.position = "none",
         panel.background = element_blank(),
-        axis.ticks.x = element_blank()) +
+        axis.ticks = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05)) +
   labs(title="Population projections by locality",
        subtitle="Local population in 2020 and forecast to 2050",
        caption="Source: University of Virginia\nWeldon Cooper Center for Public Service") +
