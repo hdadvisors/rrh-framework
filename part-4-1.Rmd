@@ -25,7 +25,6 @@ fips <- 51760
 name <- "Richmond city"
 costar_name <- "Richmond City"
 
-
 ```
 
 ## Takeaways
@@ -183,7 +182,7 @@ ggplot(b25115,
 
 
 ```
-
+Since 2016, the number of seniors (65 years and over) has been on the rise in the city --- especially among seniors living alone (+1,695). The rise in seniors living alone is a result of the ongoing [desire of older adults to age in place.](https://www.aarp.org/home-family/your-home/info-2021/home-and-community-preferences-survey.html) As this trend continues, so do concerns for senior ability to age in place comfortably with ongoing home maintenance needs or rising rent on fixed incomes. 
 
 ```{r seniors}
 
@@ -257,7 +256,7 @@ seniors <- ggplot(b09020,
                      breaks = c(0,2000,4000,6000,8000)) +
   facet_grid(rows = vars(family), scales = "free_y", space = "free", switch = "y") +
   #scale_y_discrete(labels = function(x) str_wrap(x, width = 10)) +
-  labs(title = paste0(name, ": Change in senior population by living arrangement",
+  labs(title = paste0(name, ": Change in senior population by living arrangement"),
        subtitle="2016 to 2020",
        fill="Tenure",
        caption = "Source: U.S. Census Bureau, American Community Survey, Table B09020.") +
@@ -272,7 +271,7 @@ seniors <- ggplot(b09020,
         strip.placement = "outside",
         strip.text.y = element_text(angle = 0))
 
-
+seniors
 ```
 
 ### Income and wages
@@ -345,14 +344,13 @@ ggplot(b25119_cpi,
   scale_y_continuous(labels = dollar_format()) +
   labs(title = paste0(name, ": Median houshold income by tenure"), 
        color = "Tenure",
-       subtitle = "2016 to 2020 |Adjusted to 2020 dollars",
+       subtitle = "2016 to 2020 | Adjusted to 2020 dollars",
        caption = "Source: U.S. Census Bureau, American Community Survey")
 
 # 16 percent increase for renters
 # 10 percent increase for homeowners
 
 ```
-
 
 ### Persons with disabilities
 
@@ -459,6 +457,7 @@ ggplot(price,
 
 ### Rental
 
+Rents across the city have been on a steady rise. 
 
 ```{r rent-submarket}
 
@@ -485,13 +484,45 @@ sub_rent_line <- ggplot(sub_rent,
            y = rent, 
            color = submarket)) +
   geom_line(stat = "identity") + 
-  labs(title = paste0(name, ": Average asking rent by submarket")
+  labs(title = paste0(name, ": Average asking rent by submarket"),
+       subtitle = "2000 to Q3 2022 | Not adjusted for inflation",
+       color = "Submarket") +
+  scale_y_continuous(labels = dollar_format()) +
+  theme(axis.title = element_blank())
   
 
-ggplotly(sub_rent_line)
+sub_rent_line
 
 ```
+```{r submarket-table}
 
+library(kableExtra)
+library(formattable)
+
+sub_rent_tbl <- read_csv("data/rr_submarket_data.csv") |> 
+  clean_names() |> 
+  separate(geography, into = c("region", "state", "submarket"), sep = " - ") |> 
+  select(period, locality, submarket, "rent" = market_asking_rent_unit) |> 
+  mutate(rent = parse_number(rent)) |> 
+  mutate(period = as.Date(as.yearqtr(period, format = "%Y Q%q"), frac = 1)) |> 
+  filter(locality == costar_name) |> 
+  filter(period == "2022-09-30" | period == "2016-03-31") |> 
+  pivot_wider(names_from = period,
+              values_from = rent)
+
+sub_tbl <- sub_rent_tbl |> 
+  select(2:4) |> 
+  mutate(`2022-09-30` = currency(`2022-09-30`)) |> 
+  mutate(`2016-03-31` = currency(`2016-03-31`)) |> 
+  arrange(desc(`2022-09-30`))
+
+sub_tbl |> 
+  kbl(col.names = c("Richmond Submarket", "2016 Q1 Rent", "2022 Q3 Rent")) |> 
+  kable_material(c("striped", "hover")) |> 
+  footnote(general = "2016 Q1 Rent has not been adjusted for inflation")
+
+
+```
 
 ### Housing assistance
 
