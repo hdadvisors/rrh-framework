@@ -7,6 +7,7 @@ This chapter is a summary of the major changes to the City of Richmond's populat
 ```{r setup}
 
 library(tidyverse)
+library(tidycensus)
 library(sf)
 library(sp)
 library(plotly)
@@ -16,9 +17,12 @@ library(scales)
 library(readxl)
 library(zoo)
 library(lubridate)
+library(janitor)
 
 years <- 2016:2020
-rva <- 51760
+fips <- 51760
+name <- "Richmond city"
+costar_name <- "Richmond City"
 
 ```
 
@@ -32,58 +36,95 @@ Add short bullet points summarizing major changes
 
 ### Population changes
 
-```{r rva-pop}
+Between 2010 and 2020, the U.S. Census Bureau has estimated that the City of Richmond has grown by 11 percent --- an increase of 22,396 residents. Throughout much of the decade the city has been on a slow upward trend until 2020. The 2020 Census estimate shows a slight decline from the 2019 estimate --- a loss of 3,826 residents. This change could be a result of the difficulties associated with [undercounts during the 2020 Census.](https://censuscounts.org/whats-at-stake/will-you-count-renters-in-the-2020-census/)
+
+```{r pop}
 
 #Add choice of population stat (net change, components, etc)
 
-rva_pop <- read_rds("data/pha_pop.rds") |> 
-  filter(NAMELSAD == "Richmond city") |> 
+pop <- read_rds("data/pha_pop.rds") |> 
+  filter(NAMELSAD == name) |> 
   st_drop_geometry()
 
-rva_pop_bar <- ggplot(rva_pop,
+pop_bar <- ggplot(pop,
                       aes(x = year,
-                          y = value)) +
-  geom_col()
+                          y = value,
+                          fill = value)) +
+  geom_col() +
+  scale_fill_continuous(viridis_pal()) +
+  labs(title = paste0(name, ": Total Population"),
+       subtitle = "2010 to 2020",
+       caption = "Source: U.S. Census Bureau Decennial Census and American Community Survey") +
+  scale_y_continuous(labels = number_format(big.mark = ",")) +
+  theme(axis.title = element_blank(),
+        legend.position = "none")
 
-ggplotly(rva_pop_bar) |> 
+ggplotly(pop_bar) |> 
   plotly_camera()
-  
+
+# 2010 to 2020 increase of 22,396 
+# 2019 TO 2020 decrease of 3,826
 
 ```
 
-```{r rva-comp}
+In 2010, much of the population increase in the city was a result of both international migration (+160) and natural increase (+189). During this same timeframe, the city lost 404 residents due to residents moving elsewhere in the nation. This trend has continued well into the next decade, although the numbers have only increased at both ends. Between 2020 and 2021, it's estimated that the city has grown 817 residents due to international migration and natural increase. Domestic out-migration has outpaced this growth --- with 887 residents leaving the city to go elsewhere.
 
-rva_change <- read_rds("data/pep_change_clean.rds") |> 
-  filter(GEOID == rva)
+```{r comp}
+
+change <- read_rds("data/pep_change_clean.rds") |> 
+  filter(GEOID == fips)
 
 pep_2021 <- read_rds("data/pep_2021.rds") |> 
-  filter(GEOID == rva)
+  filter(GEOID == fips)
 
-rva_change_21 <- rbind(rva_change, pep_2021)
+change_21 <- rbind(change, pep_2021) |> 
+  filter(year == "2010" | year == "2021")
+
+ggplot(change_21,
+       aes(x = year,
+           y = value,
+           fill = component)) +
+  geom_col(position = "stack") +
+  labs(title = paste0(name,": Components of population change"), 
+       subtitle = "2010 and 2021",
+       fill = "Component of change",
+       caption = "Source: U.S. Census Bureau, Population Estimates Program") +
+  theme(axis.title = element_blank()) +
+  scale_y_continuous(labels = number_format(style_positive = "plus", big.mark = ","))
 
 
 ```
 ### Household characteristics
 
-```{r rva-children}
+Between 2016 and 2020, there have been distinct changes between homeowner and renter households in the city. The city has seen a 2,555 increase in homeowner households with no children, while the number of renter household with no children has decreased by 607. At the other end of the spectrum, there has been a significant decrease in renter households with children (-2,192), while there are only 162 fewer homeowner households with children in the city. These trends seem to suggest affordability challenges in the homeownership and rental markets of the city. 
+
+New homeowners with fewer financial responsibilities due to children are finding it easier to afford a home, while renters with children are finding it difficulty to afford even a rental --- most likely due to lack of larger rental options, as well as increasing costs.
+
+Nonfamily households have seen an increase for both homeowners and renters, but especially for renters (+1,874). This is no doubt a result of the student population, as well as young professionals, needing additional roommates to afford increasing rents in the city.
+
+```{r children}
 # Add choice of household stat (HHs with children, HHs with seniors, subfamilies, etc)
 
 b25115_vars <- load_variables(2020, "acs5") |>
   filter(str_sub(name, end = 6) %in% "B25115")
+# 
+# b25115_raw <- map_dfr(years, function(yr){
+#   b25115_pull <- get_acs(
+#     geography = "county",
+#     state = "VA",
+#     table = "B25115",
+#     year = yr,
+#     survey = "acs5"
+#   ) |>
+#     mutate(year = yr)
+# })
+# 
+# write_rds(b25115_raw, "data/b25115_raw.rds")
 
-b25115_raw <- map_dfr(years, function(yr){
-  b25115_pull <- get_acs(
-    geography = "county",
-    state = "VA",
-    table = "B25115",
-    year = yr,
-    survey = "acs5"
-  ) |>
-    mutate(year = yr)
-})
+b25115_raw <- read_rds("data/b25115_raw.rds")
 
 b25115_raw <- b25115_raw |>
-  subset(GEOID %in% rva)
+  subset(GEOID %in% fips)
 
 b25115_vars_cleaned <- b25115_vars |>
   separate(label, into = c("est", "total", "tenure", "family", "type", "rel", "children"), sep = "!!") |>
@@ -112,7 +153,7 @@ b25115_vars_cleaned <- b25115_vars |>
   select(variable, tenure, family, type, children) |>
   drop_na()
 
-rva_b25115 <- b25115_raw |> 
+b25115 <- b25115_raw |> 
   right_join(b25115_vars_cleaned, by = "variable") |>
   select(NAME, GEOID, year, tenure, type, children, estimate) |> 
   pivot_wider(names_from = year,
@@ -123,15 +164,14 @@ rva_b25115 <- b25115_raw |>
   summarise(change = sum(change))
 
 
-ggplot(rva_b25115,
+ggplot(b25115,
        aes(x = children, y = change, fill = tenure)) +
   geom_col(position = "dodge") + 
   facet_wrap(~children, nrow = 1, scales = "free_x") +
-  scale_y_continuous(labels = label_comma(),
-                     breaks = c(-3000,0,3000,6000,9000),
-                     limits = c(-3050,9050)) +
-  labs(title = "Change in households with children by tenure",
+  scale_y_continuous(labels = number_format(style_positive = "plus", big.mark = ",")) +
+  labs(title = paste0(name, ": Change in households with children by tenure"),
        subtitle = "2016 to 2020",
+       fill = "Tenure",
        caption = "Source: U.S. Census Bureau, American Community Survey, Table B25115.") +
   theme(axis.title = element_blank(),
         axis.text.x = element_blank(),
@@ -139,29 +179,34 @@ ggplot(rva_b25115,
         panel.grid.major.x = element_blank(),
         panel.grid.major.y = element_line(color = "grey95",
                                           size = 0.05),
-        axis.ticks = element_blank()) +
-  scale_fill_manual(values = tenure_colors)
+        axis.ticks = element_blank())
+
 
 ```
 
-```{r rva-seniors}
+
+```{r seniors}
 
 b09020_vars <- load_variables(2020, "acs5") |>
   filter(str_sub(name, end = 6) %in% "B09020")
+# 
+# b09020_raw <- map_dfr(years, function(yr){
+#   b09020_pull <- get_acs(
+#     geography = "county",
+#     state = "VA",
+#     table = "B09020",
+#     year = yr,
+#     survey = "acs5"
+#   ) |>
+#     mutate(year = yr)
+# })
+# 
+# write_rds(b09020_raw, "data/b09020_raw.rds")
 
-b09020_raw <- map_dfr(years, function(yr){
-  b09020_pull <- get_acs(
-    geography = "county",
-    state = "VA",
-    table = "B09020",
-    year = yr,
-    survey = "acs5"
-  ) |>
-    mutate(year = yr)
-})
+b09020_raw <- read_rds("data/b09020_raw.rds")
 
 b09020_raw <- b09020_raw |>
-  subset(GEOID %in% rva)
+  subset(GEOID %in% fips)
 
 b09020_vars_cleaned <- b09020_vars |>
   separate(label, into = c("est", "total", "hhgq", "family", "relationship", "sex", "alone"), sep = "!!") |>
@@ -184,7 +229,7 @@ b09020_vars_cleaned <- b09020_vars |>
   mutate(across(.fns = ~str_remove_all(.x, ":"))) |>
   select(1,3,4)
 
-rva_b09020 <- b09020_raw |>
+b09020 <- b09020_raw |>
   right_join(b09020_vars_cleaned, by = "variable") |>
   select(NAME, GEOID, year, family, relationship, estimate) |>
   mutate(NAME = str_remove_all(NAME, ", Virginia")) |>
@@ -196,13 +241,13 @@ rva_b09020 <- b09020_raw |>
   mutate(run_diff = cumsum(diff))
 
 
-rva_b09020 <- rva_b09020 |> 
+b09020 <- b09020 |> 
   ungroup() |> 
   filter(year == 2020) |> 
   mutate(family = str_replace(family, "Group quarters", " "),
          family = fct_relevel(family, "Family", "Nonfamily", " "))
 
-ggplot(rva_b09020,
+seniors <- ggplot(b09020,
        aes(y = reorder_within(relationship, run_diff, family),
            x = run_diff,
            fill = relationship)) +
@@ -212,7 +257,7 @@ ggplot(rva_b09020,
                      breaks = c(0,2000,4000,6000,8000)) +
   facet_grid(rows = vars(family), scales = "free_y", space = "free", switch = "y") +
   #scale_y_discrete(labels = function(x) str_wrap(x, width = 10)) +
-  labs(title="Change in senior population by living arrangement",
+  labs(title = paste0(name, ": Change in senior population by living arrangement",
        subtitle="2016 to 2020",
        fill="Tenure",
        caption = "Source: U.S. Census Bureau, American Community Survey, Table B09020.") +
@@ -227,32 +272,41 @@ ggplot(rva_b09020,
         strip.placement = "outside",
         strip.text.y = element_text(angle = 0))
 
+
 ```
+
 ### Income and wages
 
-```{r rva-income}
+There are wide disparities between homeowner and renter incomes in the City of Richmond. The median homeowner household income (\$79,858) is over double that of the median renter household income (\$36,249). This gap has been persistent in spite of a 16 percent increase in median household income for renters between 2016 and 2020. 
+
+
+```{r income}
 
 #Add choice of income stat (probably median household income of some kind)
 
-years <- 2016:2020
+# years <- 2016:2020
+# 
+# b25119_vars <- load_variables(2020, "acs5") |> 
+#   filter(str_sub(name, end = 6) %in% "B25119")
+# 
+# b25119_raw <- map_dfr(years, function(yr){
+#   b25119_pull <- get_acs(
+#     geography = "county",
+#     state = "VA",
+#     table = "B25119",
+#     year = yr,
+#     survey = "acs5",
+#     cache_table = TRUE
+#   ) %>%
+#     mutate(year = yr)
+#   })
+# 
+# write_rds(b25119_raw, "data/b25119_raw.rds")
 
-b25119_vars <- load_variables(2020, "acs5") |> 
-  filter(str_sub(name, end = 6) %in% "B25119")
-
-b25119_raw <- map_dfr(years, function(yr){
-  b25119_pull <- get_acs(
-    geography = "county",
-    state = "VA",
-    table = "B25119",
-    year = yr,
-    survey = "acs5",
-    cache_table = TRUE
-  ) %>%
-    mutate(year = yr)
-  })
+b25119_raw <- read_rds("data/b25119_raw.rds")
 
 b25119_raw <- b25119_raw |> 
-  subset(GEOID %in% rva)
+  subset(GEOID %in% fips)
 
 b25119_vars_cleaned <- b25119_vars |> 
   separate(label, into = c("est", "income", "total", "tenure"), sep = "!!") |>  
@@ -264,7 +318,7 @@ b25119_vars_cleaned <- b25119_vars |>
 
 b25119_vars_cleaned$tenure <- b25119_vars_cleaned$tenure |>  replace_na('All households')
 
-rva_b25119 <- b25119_raw |> 
+b25119 <- b25119_raw |> 
   right_join(b25119_vars_cleaned, by = "variable") |> 
   select(NAME, GEOID, year, tenure, estimate, moe)
 
@@ -274,7 +328,7 @@ cpi <- cpi |>
          priceindex = Index) |> 
   transform(year = as.numeric(year))
 
-b25119_rva <- rva_b25119 |> 
+b25119_cpi <- b25119 |> 
     left_join(cpi, by = 'year') |> 
   transform(dollars20 = ((381.2/priceindex)*estimate)) |> 
   select(NAME, GEOID, year, tenure, dollars20, cdollars = estimate) |> 
@@ -282,18 +336,27 @@ b25119_rva <- rva_b25119 |>
   filter(tenure != "All households") |> 
   select(year, locality, tenure, dollars20)
 
-ggplot(b25119_rva, 
+ggplot(b25119_cpi, 
        aes(x = year,
            y = dollars20,
            color = tenure)) +
   geom_line(stat = "identity", size = 1) +
   theme(axis.title = element_blank()) +
   scale_y_continuous(labels = dollar_format()) +
-  labs(title = "Median houshold income by tenure")
+  labs(title = paste0(name, ": Median houshold income by tenure"), 
+       color = "Tenure",
+       subtitle = "2016 to 2020 |Adjusted to 2020 dollars",
+       caption = "Source: U.S. Census Bureau, American Community Survey")
+
+# 16 percent increase for renters
+# 10 percent increase for homeowners
 
 ```
 
+
 ### Persons with disabilities
+
+Independent living difficulties make it necessary for many individuals to seek assisted living facilities or significant modifications to their home to continue to live comfortably. However, both options can be costly --- increasing the need for funding of home accessibility rehabilitation or new accessible housing construction.
 
 
 ```{r ind-living}
@@ -321,7 +384,7 @@ b18107_raw <- map_dfr(years, function(yr){
   })
 
 b18107_raw <- b18107_raw |> 
-  subset(GEOID %in% rva)
+  subset(GEOID %in% fips)
 
 b18107_vars_cleaned <- b18107_vars |> 
   separate(label, into = c("est", "total", "sex", "age", "indliv"), sep = "!!") |> 
@@ -329,7 +392,7 @@ b18107_vars_cleaned <- b18107_vars |>
   drop_na() |> 
   mutate(across(.fns = ~str_remove_all(.x, ":")))
 
-rva_b18107 <- b18107_raw |> 
+b18107 <- b18107_raw |> 
   right_join(b18107_vars_cleaned, by = "variable") |> 
   select(NAME, GEOID, year, sex, age, indliv, estimate) |> 
   group_by(year, age, indliv) |> 
@@ -340,18 +403,16 @@ rva_b18107 <- b18107_raw |>
   transform(change = `2020` - `2016`) |> 
   select(age, indliv, change)
 
-ggplot(rva_b18107,
+ggplot(b18107,
        aes(x = age,
-           y = change)) +
+           y = change,
+           )) +
   geom_bar(stat = "identity", fill = "blue") +
   coord_flip() +
-  scale_x_discrete(labels = rev) +
-  scale_y_continuous(labels = number_format(big.mark = ",")) +
+  scale_y_continuous(labels = number_format(style_positive = "plus", big.mark = ",")) +
   theme(axis.title = element_blank()) +
-  labs(title = "Change in population with independent living difficulty by age: \n2016 to 2020")
-  
-
-
+  labs(title = paste0(name, ": Change in population with independent living difficulty by age"),
+       subtitle = "2016 to 2020")
 
 ```
 
@@ -359,13 +420,15 @@ ggplot(rva_b18107,
 
 ### Homeownership
 
-```{r rva-sales}
+From the start of 2017 to June 2022, the median home price in the city has increased by 85 percent --- going from \$210,500 to \$389,950.
+
+```{r sales}
 
 # Median sales price over time
 
-richmond_price <- read_csv("data/richmond_med_sales.csv") |> 
+price <- read_csv("data/richmond_med_sales.csv") |> 
   clean_names() |> 
-  mutate(geography = "Richmond City") |> 
+  mutate(geography = name) |> 
   pivot_longer(cols = starts_with("sale"),
     names_to = "label",
     values_to = "med_price",
@@ -373,24 +436,31 @@ richmond_price <- read_csv("data/richmond_med_sales.csv") |>
   mutate(year = substr(label, 19,23)) |> 
   select(geography, year, month, med_price)
 
-richmond_price$month <- match(richmond_price$month, month.abb)
+price$month <- match(price$month, month.abb)
 
-richmond_price <- richmond_price |> 
+price <- price |> 
   mutate(date = make_date(year, month)) |> 
   mutate(med_price = parse_number(med_price))
 
-ggplot(richmond_price,
+ggplot(price,
        aes(x = date,
-           y = med_price)) +
-  geom_line(stat = "identity") +
-  scale_y_continuous(labels = dollar_format())
+           y = med_price,
+           color = med_price)) +
+  geom_line(stat = "identity", size = 1) +
+  scale_y_continuous(labels = dollar_format()) +
+  labs(title = paste0(name, ": Median home sales price"),
+       color = "Median price",
+       caption = "Source: Central Virginia Regional Multiple Listing Service") +
+  theme(axis.title = element_blank()) +
+  scale_color_continuous(type = "viridis", label = dollar_format())
+
 
 ```
 
 ### Rental
 
 
-```{r rva-rent-submarket}
+```{r rent-submarket}
 
 # Average asking rent over time (by submarket if applicable, maybe by bedroom if no submarkets)
 
@@ -400,25 +470,25 @@ ggplot(richmond_price,
 
 # Added locality field manually
 
-rva_sub_rent <- read_csv("data/rr_submarket_data.csv") |> 
+sub_rent <- read_csv("data/rr_submarket_data.csv") |> 
   clean_names() |> 
   separate(geography, into = c("region", "state", "submarket"), sep = " - ") |> 
   select(period, locality, submarket, "rent" = market_asking_rent_unit, vacancy_rate) |> 
   mutate(rent = parse_number(rent)) |> 
   mutate(period = as.Date(as.yearqtr(period, format = "%Y Q%q"), frac = 1)) |> 
-  filter(locality == "Richmond City")
+  filter(locality == costar_name)
 
 # Issue with above is that rents are not inflation-adjusted. May need to revisit. I've requested from CoStar to allow for an inflation-adjusted average rent per unit pull, BUT who knows if they can add it. Might consider just having a table with most recent rents.
 
-rsub_rent_line <- ggplot(rva_sub_rent,
+sub_rent_line <- ggplot(sub_rent,
        aes(x = period,
            y = rent, 
            color = submarket)) +
   geom_line(stat = "identity") + 
-  labs(title = "Average asking rent by submarket")
+  labs(title = paste0(name, ": Average asking rent by submarket")
   
 
-ggplotly(rsub_rent_line)
+ggplotly(sub_rent_line)
 
 ```
 
@@ -431,7 +501,7 @@ Change in number of assisted units (NHPD)
 
 ### Naturally-occuring affordable housing
 
-```{r rva-noah}
+```{r noah}
 # Add choice of NOAH stat (total number, change in rent, etc) 
 
 # Probably do a histogram by age
@@ -440,7 +510,9 @@ rva_noah <- read_csv("data/pha_noah_81722.csv") |>
   clean_names() |> 
   st_as_sf(coords = c("longitude", "latitude"), crs=4326, remove=FALSE) |> 
   filter(property_name != "Sedgefield" | property_name != "Holidy Mobile Home Park") |> 
-  filter(county_name == "Richmond City")
+  filter(county_name == costar_name)
+
+
 
 
 ```
@@ -452,19 +524,22 @@ rva_noah <- read_csv("data/pha_noah_81722.csv") |>
 
 # Compare local median renter income to average asking rent
 
-rva_income <- b25119_cpi |> 
-  filter(locality == "Richmond city") |> 
+b25119_cpi <- read_rds("data/b25119_cpi_rr.rds")
+
+income <- b25119_cpi |> 
+  filter(locality == name) |> 
   filter(tenure == "Renter")
 
-rva_rent <- read_csv("data/rr_annual_rent.csv") |> 
+rent <- read_csv("data/rr_annual_rent.csv") |> 
     pivot_longer(cols = 2:8,
                names_to = "locality",
                values_to = "rent_current") |> 
   clean_names() |> 
-  filter(locality == "Richmond City")
+  filter(locality == costar_name)
 
-rva_rent_gap <- rva_income |> 
-  left_join(rva_rent, by = "year") |> 
+
+rent_gap <- income |> 
+  left_join(rent, by = "year") |> 
   mutate(rent_current = parse_number(rent_current)) |> 
   mutate(affordable_rent = (cdollars/12)*.30) |> 
   mutate(difference = rent_current - affordable_rent) |> 
@@ -473,33 +548,33 @@ rva_rent_gap <- rva_income |>
                names_to = "type",
                values_to = "dollars")
 
-rrent_gp <- ggplot(rva_rent_gap,
+rent_gp <- ggplot(rent_gap,
        aes(x = year,
            y = dollars,
-           color = type
-        )) +
+           color = type)) +
   geom_line(stat = "identity", size = 1) +
   scale_y_continuous(labels = dollar_format()) +
   theme(axis.title = element_blank(),
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 1)) +
-  labs(title = "Average asking rent versus rent affordable to typical renter", color = "Nominal rent")
+  labs(title = paste0(name, ": Average asking rent versus rent affordable to typical renter", color = "Nominal rent"))
+       
   
-ggplotly(rrent_gp) |> 
+ggplotly(rent_gp) |> 
   plotly_camera()
 
 ```
 
 
-```{r  rva-own-gap}
+```{r  own-gap}
 
-#Compare renter income versus home prices
+# Compare local renter income versus local home prices
 
 rr_sales_annual <- read_csv("data/rr_annual_sales.csv") |> 
   pivot_longer(cols = 2:9,
                names_to = "locality",
                values_to = "price") |> 
   clean_names() |> 
-  filter(locality == "Richmond City")
+  filter(locality == costar_name)
 
 int_annual <- read_csv("data/fredmac_int_annual.csv")
 
@@ -507,7 +582,7 @@ downpayment <- 0.05 # 5% downpayment
 closingcosts <- 0.015 # 1.5% closing costs
 utilities <- 250 # Assume $250/month for utilities
 
-rva_sale <- rr_sales_annual |> 
+sale <- rr_sales_annual |> 
   left_join(rva_income, by = "year") |> 
   left_join(int_annual, by = "year") |> 
   drop_na() |> 
@@ -517,7 +592,7 @@ rva_sale <- rr_sales_annual |>
   mutate(inc_needed = ((mortgage*10)/2.8)*12) |> 
   select(year, inc_needed, cdollars)
 
-rva_slgap <- rva_sale |> 
+slgap <- sale |> 
   pivot_longer(2:3,
                names_to = "data",
                values_to = "value") |> 
@@ -526,16 +601,16 @@ rva_slgap <- rva_sale |>
     data == "inc_needed" ~ "Income needed to afford median home price"
   ))
 
-rsale_gp <- ggplot(rva_slgap,
+sale_gp <- ggplot(slgap,
        aes(x = year, 
            y = value,
            color = data)) +
   geom_line(stat = "identity", size = 1) +
-  labs(title = "Income needed to afford median home price versus median renter income", color = "Nominal dollars") +
+  labs(title = paste0(name, ": Income needed to afford median home price versus median renter income", color = "Nominal dollars")) +
   theme(axis.title = element_blank()) +
   scale_y_continuous(labels = dollar_format())
 
-ggplotly(rsale_gp) |> 
+ggplotly(sale_gp) |> 
   plotly_camera()
 
 ```
@@ -543,11 +618,11 @@ ggplotly(rsale_gp) |>
 
 ### Affordability of current housing stock
 
-```{r rva-gap}
+```{r gap}
 # Add choice of affordability stat (surplus/deficit, income vs prices, etc)
 
-rva_gap <- read_rds("data/tb_18_match.rds") |> 
-  filter(county == "Richmond city") |> 
+gap <- read_rds("data/tb_18_match.rds") |> 
+  filter(county == name) |> 
   group_by(year, household_income, gapcode) |>
   summarise(estimate = sum(estimate)) |>
   mutate(estimate = case_when(
@@ -556,16 +631,16 @@ rva_gap <- read_rds("data/tb_18_match.rds") |>
   )) |>
   filter(household_income != "80 percent AMI or greater")
 
-rva_gap_bar <- ggplot(rva_gap,
+gap_bar <- ggplot(gap,
        aes(x = year, 
            y = estimate,
            fill = gapcode)) +
   geom_bar(stat = "identity") +
   facet_grid(~household_income) +
   theme(axis.title = element_blank()) +
-  labs(title = "Rental housing gap by AMI: 2015 to 2018", fill = "Gap/Affordability")
+  labs(title = paste0(name, ": Rental housing gap by AMI: 2015 to 2018"), fill = "Gap/Affordability")
 
-ggplotly(rva_gap_bar) |> 
+ggplotly(gap_bar) |> 
   plotly_camera()
 
 ```
@@ -573,12 +648,12 @@ ggplotly(rva_gap_bar) |>
 ### Impact of housing costs
 
 
-```{r rva-cb}
+```{r cb}
 
 cb_7 <- read_rds("data/cb_7.rds")
 
-cb_rva <- cb_7 |> 
-  filter(county == "Richmond city",
+cb <- cb_7 |> 
+  filter(county == name,
          cb_group == "Cost-burdened") |> 
   group_by(year, county, tenure) |> 
   summarise(estimate = sum(estimate)) |> 
@@ -587,12 +662,12 @@ cb_rva <- cb_7 |>
   drop_na() |> 
   mutate(run_diff = cumsum(change))
   
-ggplot(cb_rva,
+ggplot(cb,
        aes(x = year, y = run_diff, fill = tenure)) +
   geom_col(position = "dodge") +
   facet_wrap(vars(county)) +
   scale_y_continuous(labels = label_comma()) +
-  labs(title = "Cumulative change in cost-burdened households by tenure",
+  labs(title = paste0(name, ": Cumulative change in cost-burdened households by tenure"),
        subtitle = "2015 to 2018",
        fill = "Tenure",
        caption = "Source: U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
@@ -601,9 +676,9 @@ ggplot(cb_rva,
 
 ```
 Add choice of housing cost stat (cost burden, PIT, eviction filings, etc)
-```{r rva-evictions}
+```{r evictions}
 
-rva_evictions <- read_csv("data/evictions_17_22.csv") |> 
+evictions <- read_csv("data/evictions_17_22.csv") |> 
   pivot_longer(3:128,
                names_to = "data",
                values_to = "value") |> 
@@ -615,17 +690,17 @@ rva_evictions <- read_csv("data/evictions_17_22.csv") |>
   mutate(date = ym(date)) |> 
   mutate(year = year(date)) |> 
   mutate(type = fct_relevel(type, "Filings", "Eviction orders")) |> 
-  filter(Jurisdiction == "Richmond City")
+  filter(Jurisdiction == costar_name)
 
 eviction_colors <- setNames(c("#00BFC4", "#F8766D"), nm = c("Filings", "Eviction orders"))
 
-ggplot(rva_evictions,
+ggplot(evictions,
        aes(x = date,
            y = value,
            fill = type)) +
   geom_col(position = "dodge") +
   scale_y_continuous(labels = label_comma()) +
-  labs(title = "Evictions filings and orders by locality",
+  labs(title = paste0(name, ": Evictions filings and orders by locality",
        subtitle = "January 2017 to March 2022",
        caption = "Source: RVA Eviction Lab") +
   scale_fill_manual(values = eviction_colors) +
