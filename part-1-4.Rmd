@@ -61,7 +61,6 @@ ggplot(b18107_data,
            y = change)) +
   geom_bar(stat = "identity", fill = "blue") +
   coord_flip() +
-  scale_x_discrete(labels = rev) +
   scale_y_continuous(labels = number_format(big.mark = ",")) +
   theme(axis.title = element_blank()) +
   labs(title = "Change in population with independent living difficulty by age: \n2016 to 2020")
