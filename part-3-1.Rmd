@@ -24,13 +24,7 @@ This accentuates the need for new affordable housing at all income levels --- bu
 
 ```{r gap, fig.cap="Rental housing gap by AMI. Source: CHAS"}
 
-# tb_18a <- read_csv("data/Table18A_2015to2018.csv")
-# tb_18b <- read_csv("data/Table18B_2015to2018.csv")
 # tb_18c <- read_csv("data/Table18C_2015to2018.csv")
-# 
-# tb_18 <- rbind(tb_18a, tb_18b)
-# 
-# colnames(tb_18)[16] <- "Cost"
 # 
 # colnames(tb_18c)[16] <- "Cost"
 # 
@@ -40,7 +34,7 @@ This accentuates the need for new affordable housing at all income levels --- bu
 #   select(county, fips, year, estimate, tenure, cost, household_income) |>
 #   group_by(county, fips, year, tenure, cost, household_income) |>
 #   summarise(estimate = sum(estimate)) |>
-#   subset(fips %in% pha)
+#   subset(fips %in% rr)
 # 
 # tb_18_match <- renter |>
 #   filter(tenure == "Renter occupied") |>
@@ -81,15 +75,18 @@ This accentuates the need for new affordable housing at all income levels --- bu
 #   ))
 # 
 # write_rds(tb_18_match, "data/tb_18_match.rds")
-# 
-# gap <- tb_18_match |>
-#   group_by(year, household_income, gapcode) |>
-#   summarise(estimate = sum(estimate)) |>
-#   mutate(estimate = case_when(
-#     gapcode == "Gap" ~ estimate * -1,
-#     gapcode == "Matches or less than income" ~ estimate
-#   )) |>
-#   filter(household_income != "80 percent AMI or greater")
+
+tb_18_match <- read_rds("data/tb_18_match.rds")
+
+gap <- tb_18_match |>
+  group_by(year, household_income, gapcode) |>
+  summarise(estimate = sum(estimate)) |>
+  mutate(estimate = case_when(
+    gapcode == "Gap" ~ estimate * -1,
+    gapcode == "Matches or less than income" ~ estimate
+  )) |>
+  filter(household_income != "80 percent AMI or greater") |> 
+  subset(fips %in% pha)
 
 # write_rds(gap, "data/gap.rds")
 

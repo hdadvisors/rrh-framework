@@ -1,8 +1,6 @@
-# (PART) Local summaries {.unnumbered}
+# Powhatan County {#part-4-5}
 
-# Richmond City {#part-4-1}
-
-This chapter is a summary of the major changes to the City of Richmond's population and housing market in the past five years.
+This chapter is a summary of the major changes to the Powhatan County's population and housing market in the past five years.
 
 ```{r setup}
 
@@ -19,11 +17,12 @@ library(zoo)
 library(lubridate)
 library(janitor)
 library(tigris)
+library(optiRum)
 
 years <- 2016:2020
-fips <- 51760
-name <- "Richmond city"
-costar_name <- "Richmond City"
+fips <- 51145
+name <- "Powhatan County"
+costar_name <- "Powhatan County"
 
 
 ```
@@ -38,7 +37,6 @@ Add short bullet points summarizing major changes
 
 ### Population changes
 
-Between 2010 and 2020, the U.S. Census Bureau has estimated that the City of Richmond has grown by 11 percent --- an increase of 22,396 residents. Throughout much of the decade the city has been on a slow upward trend until 2020. The 2020 Census estimate shows a slight decline from the 2019 estimate --- a loss of 3,826 residents. This change could be a result of the difficulties associated with [undercounts during the 2020 Census.](https://censuscounts.org/whats-at-stake/will-you-count-renters-in-the-2020-census/)
 
 ```{r pop}
 
@@ -67,12 +65,9 @@ pop_bar <- ggplot(pop,
 ggplotly(pop_bar) |> 
   plotly_camera()
 
-# 2010 to 2020 increase of 22,396 
-# 2019 TO 2020 decrease of 3,826
-
 ```
 
-In 2010, much of the population increase in the city was a result of both international migration (+160) and natural increase (+189). During this same timeframe, the city lost 404 residents due to residents moving elsewhere in the nation. This trend has continued well into the next decade, although the numbers have only increased at both ends. Between 2020 and 2021, it's estimated that the city has grown 817 residents due to international migration and natural increase. Domestic out-migration has outpaced this growth --- with 887 residents leaving the city to go elsewhere.
+
 
 ```{r comp}
 
@@ -96,11 +91,6 @@ ggplot(change,
 ```
 ### Household characteristics
 
-Between 2016 and 2020, there have been distinct changes between homeowner and renter households in the city. The city has seen a 2,555 increase in homeowner households with no children, while the number of renter household with no children has decreased by 607. At the other end of the spectrum, there has been a significant decrease in renter households with children (-2,192), while there are only 162 fewer homeowner households with children in the city. These trends seem to suggest affordability challenges in the homeownership and rental markets of the city. 
-
-New homeowners with fewer financial responsibilities due to children are finding it easier to afford a home, while renters with children are finding it difficulty to afford even a rental --- most likely due to lack of larger rental options, as well as increasing costs.
-
-Nonfamily households have seen an increase for both homeowners and renters, but especially for renters (+1,874). This is no doubt a result of the student population, as well as young professionals, needing additional roommates to afford increasing rents in the city.
 
 ```{r children}
 # Add choice of household stat (HHs with children, HHs with seniors, subfamilies, etc)
@@ -277,9 +267,6 @@ seniors <- ggplot(b09020,
 
 ### Income and wages
 
-There are wide disparities between homeowner and renter incomes in the City of Richmond. The median homeowner household income (\$79,858) is over double that of the median renter household income (\$36,249). This gap has been persistent in spite of a 16 percent increase in median household income for renters between 2016 and 2020. 
-
-
 ```{r income}
 
 #Add choice of income stat (probably median household income of some kind)
@@ -420,13 +407,13 @@ ggplot(b18107,
 
 ### Homeownership
 
-From the start of 2017 to June 2022, the median home price in the city has increased by 85 percent --- going from \$210,500 to \$389,950.
 
 ```{r sales}
 
-# Median sales price over time
+# Median sales price over time 
+# Charles City had low sales numbers and this may not be representative
 
-price <- read_csv("data/richmond_med_sales.csv") |> 
+price <- read_csv("data/powhatan_med_sales.csv") |> 
   clean_names() |> 
   mutate(geography = name) |> 
   pivot_longer(cols = starts_with("sale"),
@@ -485,7 +472,7 @@ sub_rent_line <- ggplot(sub_rent,
            y = rent, 
            color = submarket)) +
   geom_line(stat = "identity") + 
-  labs(title = paste0(name, ": Average asking rent by submarket")
+  labs(title = paste0(name, ": Average asking rent by submarket"))
   
 
 ggplotly(sub_rent_line)
@@ -583,7 +570,7 @@ closingcosts <- 0.015 # 1.5% closing costs
 utilities <- 250 # Assume $250/month for utilities
 
 sale <- rr_sales_annual |> 
-  left_join(rva_income, by = "year") |> 
+  left_join(income, by = "year") |> 
   left_join(int_annual, by = "year") |> 
   drop_na() |> 
   mutate(principal = price - (price*downpayment)) |> 
@@ -675,42 +662,30 @@ ggplot(cb,
 
 
 ```
-Add choice of housing cost stat (cost burden, PIT, eviction filings, etc)
-```{r evictions}
 
-evictions <- read_csv("data/evictions_17_22.csv") |> 
-  pivot_longer(3:128,
-               names_to = "data",
-               values_to = "value") |> 
-  mutate(type = case_when(
-    str_detect(data, "Filings") ~ "Filings",
-    str_detect(data,"Evictions") ~ "Eviction judgement"
-  )) |> 
-  mutate(date = str_sub(data, -7, -1)) |> 
-  mutate(date = ym(date)) |> 
-  mutate(year = year(date)) |> 
-  mutate(type = fct_relevel(type, "Filings", "Eviction orders")) |> 
-  filter(Jurisdiction == costar_name)
+```{r mkv, fig.cap="Enrolled students experiencing homelessness by school year"}
 
-eviction_colors <- setNames(c("#00BFC4", "#F8766D"), nm = c("Filings", "Eviction orders"))
+div <- 72
 
-ggplot(evictions,
-       aes(x = date,
-           y = value,
-           fill = type)) +
-  geom_col(position = "dodge") +
-  scale_y_continuous(labels = label_comma()) +
-  labs(title = paste0(name, ": Evictions filings and orders by locality",
-       subtitle = "January 2017 to March 2022",
-       caption = "Source: RVA Eviction Lab") +
-  scale_fill_manual(values = eviction_colors) +
-  theme(legend.position = "bottom",
-        legend.title = element_blank(),
-        axis.title = element_blank(),
+mkv <- read_csv("data/mkv.csv") |> 
+  subset(Division %in% div)
+
+ggplot(mkv,
+       aes(x = year,
+           y = students,
+           fill = Name)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~Name) +
+  labs(title = "Enrolled students experiencing homelessness by school year",
+       subtitle = "2016-2017 to 2019-2020",
+       caption = "William & Mary School of Education, Project HOME - Virginia.") +
+  theme(axis.title = element_blank(),
+        legend.position = "none",
         panel.background = element_blank(),
         panel.grid.major.x = element_blank(),
         panel.grid.major.y = element_line(color = "grey95",
                                           size = 0.05),
-        axis.ticks = element_blank())
+        axis.ticks = element_blank()) +
+  scale_y_continuous(labels = label_comma())
 
 ```
