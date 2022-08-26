@@ -160,6 +160,8 @@ b25119_cpi <- b25119_data |>
   filter(tenure != "All households") |> 
   select(year, locality, tenure, dollars20, cdollars)
 
+# write_rds(b25119_cpi, "data/b25119_cpi_rr.rds") Wrote rds based on the entire region to use for local summaries
+
 ggplot(b25119_cpi, 
        aes(x = year,
            y = dollars20,
