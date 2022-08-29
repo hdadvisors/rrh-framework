@@ -36,7 +36,9 @@ years <- 2016:2020
 
 ## Household incomes
 
-```{r hh-inc-data}
+From 2016 to 2020, homewo
+
+```{r hh-inc-data, eval=FALSE}
 
 b25118_vars <- load_variables(2020, "acs5") |> 
   filter(str_sub(name, end = 6) %in% "B25118")
@@ -80,32 +82,49 @@ b25118_data <- b25118_raw |>
     income == "$50,000 to $74,999" ~ "$50,000 to $74,999",
     TRUE ~ income
   )) |> 
-  group_by(year, NAME, tenure, income) |> 
+  group_by(NAME, year, tenure, income) |> 
   summarise(estimate = sum(estimate)) |> 
-  select(year, NAME, tenure, income, estimate) |> 
-  subset(year %in% c(2016, 2020))
-
+  filter(year %in% c(2016, 2020)) |> 
+  pivot_wider(names_from = year,
+              values_from = estimate) |>
+  mutate(change = `2020` - `2016`,
+         pct_change = change/`2016`)
+  
 write_rds(b25118_data, "data/b25118_data.rds")
 
 ```
 
-```{hh-inc-plot}
+```{r hh-inc-plot}
 
+b25118_data <-read_rds("data/b25118_data.rds") |> 
+  group_by(tenure, income) |> 
+  summarise(`2016` = sum(`2016`),
+            `2020` = sum(`2020`)) |> 
+  mutate(change = `2020`-`2016`,
+         pct_change = change/`2016`)
 
-ggplot(b25118_pha, 
-       aes(x = income,
-           y = estimate,
+ggplot(b25118_data, 
+       aes(y = income,
+           x = change,
            fill = tenure)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  facet_grid(tenure ~ year) +
-  scale_x_discrete(limits = c("Less than $15,000","$15,000 to $24,999", "$25,000 to $49,999", "$50,000 to $74,999", "$75,000 to $99,999", "$100,000 to $149,999", "$150,000 or more")) +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 1),
-        axis.title = element_blank(),
-        legend.position = "none") +
-  scale_y_continuous(labels = number_format(big.mark = ",")) +
-  labs(title = "Income distribution by tenure: 2016 to 2020")
-
-
+  geom_col(position = "dodge") +
+  facet_grid(~tenure) +
+  scale_x_continuous(labels = label_comma()) +
+  scale_y_discrete(limits = c("Less than $15,000","$15,000 to $24,999",
+                              "$25,000 to $49,999", "$50,000 to $74,999",
+                              "$75,000 to $99,999", "$100,000 to $149,999",
+                              "$150,000 or more"),
+                   labels = function(x) str_wrap(x, width = 12)) +
+  labs(title = "Change households by tenure and income level",
+       subtitle="2016 to 2020",
+       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25118.") +
+  theme(axis.title = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_blank(),
+        legend.position = "none",
+        panel.grid.major.x = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.ticks = element_blank())
 ```
 
 ```{r med-income}

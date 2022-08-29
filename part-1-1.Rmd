@@ -21,6 +21,9 @@ pha <- c("51085", "51760", "51087", "51041")
 
 # Set palette colors; may need to find a palette that better complements the PHA branding.
 
+rr_names <- c("Richmond city", "Hanover County", "Henrico County", "Chesterfield County",
+              "Powhatan County", "Goochland County", "New Kent County", "Charles City County")
+
 pha_names <- c("Richmond city", "Hanover County", "Henrico County", "Chesterfield County")
 
 geo_colors <- setNames(viridis(4), nm = pha_names)
@@ -107,21 +110,22 @@ census_clean <- census_raw |>
 population_data <- pep_total_clean |> 
   bind_rows(census_clean, projections)
 
-pha_population_data <- population_data |> 
-  subset(GEOID %in% pha)
+rr_population_data <- population_data |> 
+  subset(GEOID %in% rr)
 
-pha_pop <- list_counties("VA", year = 2021) |>
-  right_join(pha_population_data, by = "GEOID") |>
+rr_pop <- counties("VA", year = 2021) |>
+  right_join(rr_population_data, by = "GEOID") |>
   select(NAMELSAD, year, counttype, value) |> 
   st_drop_geometry()
 
-write_rds(pha_pop, "data/pha_pop.rds")
+write_rds(rr_pop, "data/rr_pop.rds")
 
 ```
 
 ```{r total-pop-plot}
 
-pha_pop <- read_rds("data/pha_pop.rds")
+pha_pop <- read_rds("data/rr_pop.rds") |> 
+  filter(NAMELSAD %in% pha_names)
 
 pha_pop_compare <- pha_pop |> 
   filter(year == 2016 | year == 2020) |> 
@@ -174,7 +178,7 @@ pep_change_raw <- get_estimates(
 
 pep_change_clean <- pep_change_raw |> 
   mutate(GEOID = as.character(GEOID)) |> 
-  filter(GEOID %in% pha) |> 
+  filter(GEOID %in% rr) |> 
   mutate(year = # Translate date codes into years
     case_when(
       PERIOD == 1 ~ "2010",
@@ -214,18 +218,22 @@ pep_2021 <- read_csv("data/comp_chang_2021.csv") |>
   select(GEOID, year, component, value) |> 
   mutate(GEOID = as.character(GEOID))
 
-pep_comp_change <- pep_change_clean |> 
-  rbind(pep_2021)
+rr_comp_change <- pep_change_clean |> 
+  rbind(pep_2021) |>
+  filter(GEOID %in% rr) |> 
+  right_join(counties("VA", year = 2021), by = "GEOID") |>
+  select(NAMELSAD, year, component, value)
 
-write_rds(pep_comp_change, "data/pep_comp_change.rds")
+write_rds(pep_comp_change, "data/rr_comp_change.rds")
 
 ```
 
 ```{r components-plot}
 
-pep_comp_change <- read_rds("data/pep_comp_change.rds")
+pha_comp_change <- read_rds("data/rr_comp_change.rds") |> 
+  filter(NAMELSAD %in% pha_names)
 
-comp_chg_summary <- pep_comp_change |> 
+comp_chg_summary <- pha_comp_change |> 
   group_by(year, component) |> 
   summarise(value = sum(value)) |> 
   mutate(year = as.numeric(year),
