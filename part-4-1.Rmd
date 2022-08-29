@@ -11,7 +11,6 @@ library(tidycensus)
 library(sf)
 library(sp)
 library(plotly)
-library(simplevis)
 library(tidytext)
 library(scales)
 library(readxl)
@@ -19,6 +18,7 @@ library(zoo)
 library(lubridate)
 library(janitor)
 library(tigris)
+library(tidytext)
 
 years <- 2016:2020
 fips <- 51760
@@ -37,13 +37,11 @@ Add short bullet points summarizing major changes
 
 ### Population changes
 
-Between 2010 and 2020, the U.S. Census Bureau has estimated that the City of Richmond has grown by 11 percent --- an increase of 22,396 residents. Throughout much of the decade the city has been on a slow upward trend until 2020. The 2020 Census estimate shows a slight decline from the 2019 estimate --- a loss of 3,826 residents. This change could be a result of the difficulties associated with [undercounts during the 2020 Census.](https://censuscounts.org/whats-at-stake/will-you-count-renters-in-the-2020-census/)
+Between 2010 and 2020, the U.S. Census Bureau has estimated that the City of Richmond has grown by 11 percent --- an increase of 22,396 residents. Throughout much of the decade the city has been on a slow upward trend until 2020. The 2020 Census estimate shows a slight decline from the 2019 estimate --- a loss of 3,826 residents. This change could be a result of the difficulties associated with [undercounts during the 2020 Census](https://censuscounts.org/whats-at-stake/will-you-count-renters-in-the-2020-census/).
 
-```{r pop}
+```{r pop, fig.cap=paste0(name, ": Total Population")}
 
-#Add choice of population stat (net change, components, etc)
-
-
+# Add choice of population stat (net change, components, etc)
 
 pop <- read_rds("data/rr_pop_data.rds") |> 
   mutate(GEOID = parse_number(GEOID)) |> 
@@ -58,116 +56,73 @@ pop_bar <- ggplot(pop,
   scale_fill_continuous(viridis_pal()) +
   labs(title = paste0(name, ": Total Population"),
        subtitle = "2010 to 2020",
-       caption = "Source: U.S. Census Bureau Decennial Census and American Community Survey") +
-  scale_y_continuous(labels = number_format(big.mark = ",")) +
+       caption = "Source: U.S. Census Bureau Decennial Census and American Community Survey.") +
+  scale_y_continuous(labels = label_comma()) +
   theme(axis.title = element_blank(),
-        legend.position = "none")
+        legend.position = "none",
+        panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
 
-ggplotly(pop_bar) |> 
-  plotly_camera()
+# ggplotly(pop_bar) |> 
+#   plotly_camera()
 
 # 2010 to 2020 increase of 22,396 
 # 2019 TO 2020 decrease of 3,826
 
+pop_bar
+
 ```
 
-In 2010, much of the population increase in the city was a result of both international migration (+160) and natural increase (+189). During this same timeframe, the city lost 404 residents due to residents moving elsewhere in the nation. This trend has continued well into the next decade, although the numbers have only increased at both ends. Between 2020 and 2021, it's estimated that the city has grown 817 residents due to international migration and natural increase. Domestic out-migration has outpaced this growth --- with 887 residents leaving the city to go elsewhere.
+Census estimates from 2016 show Richmond gaining more than 2,000 net persons that year who moved from somewhere else in the state or country. However, the city has experienced a net loss in domestic migration since then. The majority of the city's population growth over the past five years has been due to migration from abroad along with natural increases through new births.
 
-```{r comp}
+```{r comp, fig.cap=paste0(name,": Components of population change"}
 
 change <- read_rds("data/rr_comp_change.rds") |> 
-  filter(year == "2010" | year == "2021") |> 
-  filter(GEOID == fips)
+  filter(year %in% as.character(years) | year == "2021") |> 
+  filter(NAMELSAD == name)
 
 ggplot(change,
        aes(x = year,
            y = value,
            fill = component)) +
-  geom_col(position = "stack") +
+  geom_col() +
+  facet_wrap(~component) +
   labs(title = paste0(name,": Components of population change"), 
-       subtitle = "2010 and 2021",
+       subtitle = "2016 through 2021",
        fill = "Component of change",
-       caption = "Source: U.S. Census Bureau, Population Estimates Program") +
-  theme(axis.title = element_blank()) +
-  scale_y_continuous(labels = number_format(style_positive = "plus", big.mark = ","))
-
+       caption = "Note: 2020 components of change data not available.\nSource: U.S. Census Bureau, Population Estimates Program.") +
+  theme(axis.title = element_blank(),
+        legend.position = "none",
+        panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05)) +
+  scale_y_continuous(labels = label_number(big.mark = ",", style_positive = "plus", style_negative = "minus"))
 
 ```
+
 ### Household characteristics
 
 Between 2016 and 2020, there have been distinct changes between homeowner and renter households in the city. The city has seen a 2,555 increase in homeowner households with no children, while the number of renter household with no children has decreased by 607. At the other end of the spectrum, there has been a significant decrease in renter households with children (-2,192), while there are only 162 fewer homeowner households with children in the city. These trends seem to suggest affordability challenges in the homeownership and rental markets of the city. 
 
-New homeowners with fewer financial responsibilities due to children are finding it easier to afford a home, while renters with children are finding it difficulty to afford even a rental --- most likely due to lack of larger rental options, as well as increasing costs.
+New homeowners without children (and with fewer financial responsibilities) often find it easier to afford a home, while renters with children are finding it difficulty to afford even a rental --- most likely due to lack of larger rental options, as well as increasing costs.
 
-Nonfamily households have seen an increase for both homeowners and renters, but especially for renters (+1,874). This is no doubt a result of the student population, as well as young professionals, needing additional roommates to afford increasing rents in the city.
+Nonfamily households have seen an increase for both homeowners and renters, but especially for renters (+1,874). This is likely a result of the student population, as well as young professionals, needing additional roommates to afford increasing rents in the city.
 
-```{r children}
+```{r children, fig.cap=paste0(name, ": Change in households with children by tenure"}
+
 # Add choice of household stat (HHs with children, HHs with seniors, subfamilies, etc)
 
-b25115_vars <- load_variables(2020, "acs5") |>
-  filter(str_sub(name, end = 6) %in% "B25115")
-# 
-# b25115_raw <- map_dfr(years, function(yr){
-#   b25115_pull <- get_acs(
-#     geography = "county",
-#     state = "VA",
-#     table = "B25115",
-#     year = yr,
-#     survey = "acs5"
-#   ) |>
-#     mutate(year = yr)
-# })
-# 
-# write_rds(b25115_raw, "data/b25115_raw.rds")
-
-b25115_raw <- read_rds("data/b25115_raw.rds")
-
-b25115_raw <- b25115_raw |>
-  subset(GEOID %in% fips)
-
-b25115_vars_cleaned <- b25115_vars |>
-  separate(label, into = c("est", "total", "tenure", "family", "type", "rel", "children"), sep = "!!") |>
-  select(variable = name, tenure, family, type, rel, children) |>
-  mutate(tenure = case_when(
-    tenure == "Owner occupied:" ~ "Homeowner",
-    tenure == "Renter occupied:" ~ "Renter"
-  )) |>
-  mutate(family = case_when(
-    family == "Family households:" ~ "Family household",
-    family == "Nonfamily households" ~ "Nonfamily household"
-  )) |>
-  mutate(type = case_when(
-    type == "Married-couple family:" ~ "Married household",
-    rel == "Male householder, no spouse present:" ~ "Single male household",
-    rel == "Female householder, no spouse present:" ~ "Single female household",
-    family == "Nonfamily household" ~ "Nonfamily household"
-  )) |>
-  mutate(children = case_when(
-    rel == "With own children of the householder under 18 years" ~ "With children",
-    rel == "No own children of the householder under 18 years" ~ "No children",
-    children == "No own children of the householder under 18 years" ~ "No children",
-    children == "With own children of the householder under 18 years" ~ "With children",
-    family == "Nonfamily household" ~ "Nonfamily household"
-  )) |>
-  select(variable, tenure, family, type, children) |>
-  drop_na()
-
-b25115 <- b25115_raw |> 
-  right_join(b25115_vars_cleaned, by = "variable") |>
-  select(NAME, GEOID, year, tenure, type, children, estimate) |> 
-  pivot_wider(names_from = year,
-              values_from = estimate) |>
-  transform(change = `2020` - `2016`) |>
-  select(tenure, type, children, change) |>
-  group_by(tenure, children) |>
-  summarise(change = sum(change))
-
+b25115 <- read_rds("data/b25115_data.rds") |> 
+  filter(NAME == name)
 
 ggplot(b25115,
        aes(x = children, y = change, fill = tenure)) +
   geom_col(position = "dodge") + 
   facet_wrap(~children, nrow = 1, scales = "free_x") +
-  scale_y_continuous(labels = number_format(style_positive = "plus", big.mark = ",")) +
+  scale_y_continuous(labels = label_number(style_positive = "plus", big.mark = ",")) +
   labs(title = paste0(name, ": Change in households with children by tenure"),
        subtitle = "2016 to 2020",
        fill = "Tenure",
@@ -180,80 +135,23 @@ ggplot(b25115,
                                           size = 0.05),
         axis.ticks = element_blank())
 
-
 ```
 Since 2016, the number of seniors (65 years and over) has been on the rise in the city --- especially among seniors living alone (+1,695). The rise in seniors living alone is a result of the ongoing [desire of older adults to age in place.](https://www.aarp.org/home-family/your-home/info-2021/home-and-community-preferences-survey.html) As this trend continues, so do concerns for senior ability to age in place comfortably with ongoing home maintenance needs or rising rent on fixed incomes. 
 
-```{r seniors}
+```{r seniors, fig.cap=paste0(name, ": Change in senior population by living arrangement"}
 
-b09020_vars <- load_variables(2020, "acs5") |>
-  filter(str_sub(name, end = 6) %in% "B09020")
-# 
-# b09020_raw <- map_dfr(years, function(yr){
-#   b09020_pull <- get_acs(
-#     geography = "county",
-#     state = "VA",
-#     table = "B09020",
-#     year = yr,
-#     survey = "acs5"
-#   ) |>
-#     mutate(year = yr)
-# })
-# 
-# write_rds(b09020_raw, "data/b09020_raw.rds")
-
-b09020_raw <- read_rds("data/b09020_raw.rds")
-
-b09020_raw <- b09020_raw |>
-  subset(GEOID %in% fips)
-
-b09020_vars_cleaned <- b09020_vars |>
-  separate(label, into = c("est", "total", "hhgq", "family", "relationship", "sex", "alone"), sep = "!!") |>
-  select(variable = name, hhgq, family, relationship, alone) |>
-  filter(!variable %in% c("B09020_001", "B09020_002", "B09020_003", "B09020_005", "B09020_006",
-                          "B09020_012", "B09020_013", "B09020_014", "B09020_017")) |>
-  mutate(relationship = case_when(
-    relationship == "Spouse" ~ "With spouse",
-    relationship == "Nonrelatives" ~ "With nonrelatives",
-    relationship %in% c("Parent", "Parent-in-law", "Other relatives") ~ "With other relative(s)",
-    hhgq == "In group quarters" ~ "Group quarters",
-    !is.na(alone) ~ alone,
-    TRUE ~ relationship
-  )) |>
-  mutate(family = case_when(
-    family == "In family households:" ~ "Family",
-    family == "In nonfamily households:" ~ "Nonfamily",
-    hhgq == "In group quarters" ~ "Group quarters"
-  )) |>
-  mutate(across(.fns = ~str_remove_all(.x, ":"))) |>
-  select(1,3,4)
-
-b09020 <- b09020_raw |>
-  right_join(b09020_vars_cleaned, by = "variable") |>
-  select(NAME, GEOID, year, family, relationship, estimate) |>
-  mutate(NAME = str_remove_all(NAME, ", Virginia")) |>
-  group_by(year, family, relationship) |>
-  summarise(estimate = sum(estimate)) |>
-  group_by(family, relationship) |>
-  mutate(diff = estimate - lag(estimate)) |>
-  drop_na() |>
-  mutate(run_diff = cumsum(diff))
-
-
-b09020 <- b09020 |> 
-  ungroup() |> 
-  filter(year == 2020) |> 
+b09020 <- read_rds("data/b09020_data.rds") |> 
+  filter(NAME == name) |> 
   mutate(family = str_replace(family, "Group quarters", " "),
          family = fct_relevel(family, "Family", "Nonfamily", " "))
 
-seniors <- ggplot(b09020,
-       aes(y = reorder_within(relationship, run_diff, family),
-           x = run_diff,
+ggplot(b09020,
+       aes(y = reorder_within(relationship, change, family),
+           x = change,
            fill = relationship)) +
   geom_col(position = "dodge") +
   scale_y_reordered() +
-  scale_x_continuous(labels = label_comma(),
-                     breaks = c(0,2000,4000,6000,8000)) +
+  scale_x_continuous(labels = label_comma()) +
   facet_grid(rows = vars(family), scales = "free_y", space = "free", switch = "y") +
   #scale_y_discrete(labels = function(x) str_wrap(x, width = 10)) +
   labs(title = paste0(name, ": Change in senior population by living arrangement"),
@@ -271,81 +169,36 @@ seniors <- ggplot(b09020,
         strip.placement = "outside",
         strip.text.y = element_text(angle = 0))
 
-seniors
 ```
 
 ### Income and wages
 
 There are wide disparities between homeowner and renter incomes in the City of Richmond. The median homeowner household income (\$79,858) is over double that of the median renter household income (\$36,249). This gap has been persistent in spite of a 16 percent increase in median household income for renters between 2016 and 2020. 
 
+```{r income, fig.cap=paste0(name, ": Median houshold income by tenure")}
 
-```{r income}
+# Add choice of income stat (probably median household income of some kind)
 
-#Add choice of income stat (probably median household income of some kind)
-
-# years <- 2016:2020
-# 
-# b25119_vars <- load_variables(2020, "acs5") |> 
-#   filter(str_sub(name, end = 6) %in% "B25119")
-# 
-# b25119_raw <- map_dfr(years, function(yr){
-#   b25119_pull <- get_acs(
-#     geography = "county",
-#     state = "VA",
-#     table = "B25119",
-#     year = yr,
-#     survey = "acs5",
-#     cache_table = TRUE
-#   ) %>%
-#     mutate(year = yr)
-#   })
-# 
-# write_rds(b25119_raw, "data/b25119_raw.rds")
-
-b25119_raw <- read_rds("data/b25119_raw.rds")
-
-b25119_raw <- b25119_raw |> 
-  subset(GEOID %in% fips)
-
-b25119_vars_cleaned <- b25119_vars |> 
-  separate(label, into = c("est", "income", "total", "tenure"), sep = "!!") |>  
-  select(variable = name, tenure) |> 
-  mutate(tenure = case_when(
-    tenure == "Owner occupied (dollars)" ~ "Homeowner",
-    tenure == "Renter occupied (dollars)" ~ "Renter"
-  ))
-
-b25119_vars_cleaned$tenure <- b25119_vars_cleaned$tenure |>  replace_na('All households')
-
-b25119 <- b25119_raw |> 
-  right_join(b25119_vars_cleaned, by = "variable") |> 
-  select(NAME, GEOID, year, tenure, estimate, moe)
-
-cpi <- read_excel("data/CPI_U_RS.xlsx")
-cpi <- cpi |> 
-  rename(year = Year,
-         priceindex = Index) |> 
-  transform(year = as.numeric(year))
-
-b25119_cpi <- b25119 |> 
-    left_join(cpi, by = 'year') |> 
-  transform(dollars20 = ((381.2/priceindex)*estimate)) |> 
-  select(NAME, GEOID, year, tenure, dollars20, cdollars = estimate) |> 
-  separate(NAME, into = c("locality", "state"), sep = ",") |> 
-  filter(tenure != "All households") |> 
-  select(year, locality, tenure, dollars20)
+b25119_cpi <-read_rds("data/b25119_cpi.rds") |> 
+  filter(NAME == name)
 
 ggplot(b25119_cpi, 
        aes(x = year,
            y = dollars20,
-           color = tenure)) +
-  geom_line(stat = "identity", size = 1) +
-  theme(axis.title = element_blank()) +
-  scale_y_continuous(labels = dollar_format()) +
+           fill = tenure)) +
+  geom_col() +
+  facet_wrap(~tenure) +
+  scale_y_continuous(labels = dollar_format(), limits = c(0, NA)) +
   labs(title = paste0(name, ": Median houshold income by tenure"), 
        color = "Tenure",
        subtitle = "2016 to 2020 | Adjusted to 2020 dollars",
-       caption = "Source: U.S. Census Bureau, American Community Survey")
+       caption = "Source: U.S. Census Bureau, American Community Survey") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        legend.position = "none")
 
 # 16 percent increase for renters
 # 10 percent increase for homeowners
@@ -356,61 +209,33 @@ ggplot(b25119_cpi,
 
 Independent living difficulties make it necessary for many individuals to seek assisted living facilities or significant modifications to their home to continue to live comfortably. However, both options can be costly --- increasing the need for funding of home accessibility rehabilitation or new accessible housing construction.
 
+Since 2016, there are now over 500 more persons in the city with independent living difficulties. This growth has been among younger adults (under 35) and "young" seniors (65 to 74). The latter group's growth is likely the result of middle-age adults with these difficulties (which saw a large decline) aging into this category in the last five years. 
 
-```{r ind-living}
+```{r ind-living, paste0(name, ": Net change in individuals with independent living difficulties by age"}
 
 # Add disability stat (probably independent living difficulty)
 
-# Table B18107 Sex by age by independent living difficulty
-
-# "Because of a physical, mental, or emotional problem, having difficulty doing errands alone such as visiting a doctor’s office or shopping (DOUT)."
-
-
-b18107_vars <- load_variables(2020, "acs5") |> 
-  filter(str_sub(name, end = 6) %in% "B18107")
-
-b18107_raw <- map_dfr(years, function(yr){
-  b10107_pull <- get_acs(
-    geography = "county",
-    state = "VA",
-    table = "B18107",
-    year = yr,
-    survey = "acs5",
-    cache_table = TRUE
-  ) |> 
-    mutate(year = yr)
-  })
-
-b18107_raw <- b18107_raw |> 
-  subset(GEOID %in% fips)
-
-b18107_vars_cleaned <- b18107_vars |> 
-  separate(label, into = c("est", "total", "sex", "age", "indliv"), sep = "!!") |> 
-  select(variable = name, sex , age, indliv) |> 
-  drop_na() |> 
-  mutate(across(.fns = ~str_remove_all(.x, ":")))
-
-b18107 <- b18107_raw |> 
-  right_join(b18107_vars_cleaned, by = "variable") |> 
-  select(NAME, GEOID, year, sex, age, indliv, estimate) |> 
-  group_by(year, age, indliv) |> 
-  summarise(estimate = sum(estimate)) |> 
-  filter(indliv == "With an independent living difficulty") |> 
-  pivot_wider(names_from = year,
-              values_from =  estimate) |> 
-  transform(change = `2020` - `2016`) |> 
-  select(age, indliv, change)
+b18107 <- read_rds("data/b18107_data.rds") |> 
+  filter(NAME == name) |> 
+  group_by(age) |> 
+  summarise(change = sum(change))
 
 ggplot(b18107,
        aes(x = age,
            y = change,
-           )) +
-  geom_bar(stat = "identity", fill = "blue") +
-  coord_flip() +
-  scale_y_continuous(labels = number_format(style_positive = "plus", big.mark = ",")) +
-  theme(axis.title = element_blank()) +
-  labs(title = paste0(name, ": Change in population with independent living difficulty by age"),
-       subtitle = "2016 to 2020")
+           fill = age)) +
+  geom_col() +
+  labs(title=paste0(name, ": Net change in individuals with\nindependent living difficulties by age"),
+       subtitle="2016 to 2020",
+       caption="Source: U.S. Census Bureau, American Community Survey, Table B18107.") +
+  scale_y_continuous(labels = label_comma()) +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = "none",
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
 
 ```
 
@@ -420,7 +245,7 @@ ggplot(b18107,
 
 From the start of 2017 to June 2022, the median home price in the city has increased by 85 percent --- going from \$210,500 to \$389,950.
 
-```{r sales}
+```{r sales, fig.cap=paste0(name, ": Median home sales price")}
 
 # Median sales price over time
 
@@ -445,11 +270,18 @@ ggplot(price,
            y = med_price,
            color = med_price)) +
   geom_line(stat = "identity", size = 1) +
-  scale_y_continuous(labels = dollar_format()) +
+  scale_y_continuous(labels = label_dollar(), limits = c(0, NA)) +
+  scale_x_date(date_labels = "%Y", date_breaks = "1 year") +
   labs(title = paste0(name, ": Median home sales price"),
-       color = "Median price",
-       caption = "Source: Central Virginia Regional Multiple Listing Service") +
-  theme(axis.title = element_blank()) +
+       subtitle = "January 2017 to June 2022",
+       caption = "Source: Central Virginia Regional Multiple Listing Service.") +
+  theme(axis.title = element_blank(),
+        panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        legend.title = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05)) +
   scale_color_continuous(type = "viridis", label = dollar_format())
 
 
@@ -457,9 +289,9 @@ ggplot(price,
 
 ### Rental
 
-Rents across the city have been on a steady rise. 
+Rents across the city have steadily risen over the last ten years, accelerating most rapidly in the pandemic's wake since 2020. This trend is present across all of CoStar's five submarkets for the city, especially for Northside and South Richmond. These submarkets have seen some of the largest average rent increases over time, each growing around 40 percent since 2016.
 
-```{r rent-submarket}
+```{r rent-submarket, fig.cap=paste0(name, ": Average asking rent by submarket"}
 
 # Average asking rent over time (by submarket if applicable, maybe by bedroom if no submarkets)
 
@@ -479,22 +311,26 @@ sub_rent <- read_csv("data/rr_submarket_data.csv") |>
 
 # Issue with above is that rents are not inflation-adjusted. May need to revisit. I've requested from CoStar to allow for an inflation-adjusted average rent per unit pull, BUT who knows if they can add it. Might consider just having a table with most recent rents.
 
-sub_rent_line <- ggplot(sub_rent,
+ggplot(sub_rent,
        aes(x = period,
            y = rent, 
            color = submarket)) +
   geom_line(stat = "identity") + 
   labs(title = paste0(name, ": Average asking rent by submarket"),
-       subtitle = "2000 to Q3 2022 | Not adjusted for inflation",
+       subtitle = "2000 Q1 to 2022 Q3 | Not adjusted for inflation",
        color = "Submarket") +
-  scale_y_continuous(labels = dollar_format()) +
-  theme(axis.title = element_blank())
-  
-
-sub_rent_line
+  scale_y_continuous(labels = label_dollar(), limits = c(0, NA), n.breaks = 7) +
+  scale_x_date(date_labels = "%Y", date_breaks = "2 years", limits = as.Date(c("2000-01-01", "2022-09-30"))) +
+  theme(axis.title = element_blank(),
+        panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
 
 ```
-```{r submarket-table}
+
+```{r submarket-table, fig.cap="Change in average rents by Richmond submarket"}
 
 library(kableExtra)
 library(formattable)
@@ -512,12 +348,13 @@ sub_rent_tbl <- read_csv("data/rr_submarket_data.csv") |>
 
 sub_tbl <- sub_rent_tbl |> 
   select(2:4) |> 
-  mutate(`2022-09-30` = currency(`2022-09-30`)) |> 
-  mutate(`2016-03-31` = currency(`2016-03-31`)) |> 
-  arrange(desc(`2022-09-30`))
+  mutate(pct_change = (`2022-09-30`-`2016-03-31`)/`2016-03-31`) |> 
+  mutate(across(c(2,3), ~currency(.x, digits = 0)),
+         pct_change = percent(pct_change, digits = 0)) |> 
+  arrange(desc(pct_change))
 
 sub_tbl |> 
-  kbl(col.names = c("Richmond Submarket", "2016 Q1 Rent", "2022 Q3 Rent")) |> 
+  kbl(col.names = c("Richmond submarket", "2016 Q1 Rent", "2022 Q3 Rent", "Percent change")) |> 
   kable_material(c("striped", "hover")) |> 
   footnote(general = "2016 Q1 Rent has not been adjusted for inflation")
 
@@ -533,6 +370,7 @@ Change in number of assisted units (NHPD)
 ### Naturally-occuring affordable housing
 
 ```{r noah}
+
 # Add choice of NOAH stat (total number, change in rent, etc) 
 
 # Probably do a histogram by age
@@ -543,8 +381,12 @@ rva_noah <- read_csv("data/pha_noah_81722.csv") |>
   filter(property_name != "Sedgefield" | property_name != "Holidy Mobile Home Park") |> 
   filter(county_name == costar_name)
 
-
-
+ggplot(rva_noah,
+       aes(x = avg_asking_unit,
+           y = ..density..,
+           weight = number_of_units)) +
+  geom_histogram()
+  
 
 ```
 

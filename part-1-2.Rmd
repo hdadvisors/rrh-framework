@@ -15,6 +15,9 @@ pha <- c("51085", "51760", "51087", "51041")
 
 # Set palette colors; may need to find a palette that better complements the PHA branding.
 
+rr_names <- c("Richmond city", "Hanover County", "Henrico County", "Chesterfield County",
+              "Powhatan County", "Goochland County", "New Kent County", "Charles City County")
+
 pha_names <- c("Richmond city", "Hanover County", "Henrico County", "Chesterfield County")
 
 geo_colors <- setNames(viridis(4), nm = pha_names)
@@ -70,7 +73,7 @@ b25003_raw <- map_dfr(years, function(yr){
 })
 
 b25003_raw <- b25003_raw |>
-  subset(GEOID %in% pha)
+  subset(GEOID %in% rr)
 
 b25003_vars_cleaned <- b25003_vars |>
   separate(label, into = c("est", "total", "tenure"), sep = "!!") |>
@@ -99,6 +102,7 @@ write_rds(b25003_data, "data/b25003_data.rds")
 ```{r hh-form-plot}
 
 b25003_data <- read_rds("data/b25003_data.rds") |> 
+  filter(NAME %in% pha_names) |> 
   group_by(year, tenure) |>
   summarise(estimate = sum(estimate)) |>
   group_by(tenure) |>
@@ -155,7 +159,7 @@ b25007_raw <- map_dfr(years, function(yr){
 })
 
 b25007_raw <- b25007_raw |>
-  subset(GEOID %in% pha)
+  subset(GEOID %in% rr)
 
 b25007_vars_cleaned <- b25007_vars |>
   separate(label, into = c("est", "total", "tenure", "age"), sep = "!!") |>
@@ -200,6 +204,7 @@ write_rds(b25007_data, "data/b25007_data.rds")
 ```{r hh-age-plot}
 
 b25007_data <- read_rds("data/b25007_data.rds") |> 
+  filter(NAME %in% pha_names) |>
   group_by(tenure, age) |> 
   summarise(change = sum(change))
 
@@ -247,7 +252,7 @@ b11001_raw <- map_dfr(years, function(yr){
 
 
 b11001_raw <- b11001_raw |>
-  subset(GEOID %in% pha)
+  subset(GEOID %in% rr)
 
 b11001_vars_cleaned <- b11001_vars |>
   separate(label, into = c("est", "tot", "type", "relationship", "householder"),
@@ -285,6 +290,7 @@ write_rds(b11001_data, "data/b11001_data.rds")
 ```{r hh-type-plot}
 
 b11001_data <- read_rds("data/b11001_data.rds") |> 
+  filter(NAME %in% pha_names) |>
   group_by(hhtype) |> 
   summarise(change = sum(change))
   
@@ -331,7 +337,7 @@ b25009_raw <- map_dfr(years, function(yr){
 })
 
 b25009_raw <- b25009_raw |>
-  subset(GEOID %in% pha)
+  subset(GEOID %in% rr)
 
 b25009_vars_cleaned <- b25009_vars |>
   separate(label, into = c("est", "total", "tenure", "size"), sep = "!!") |>
@@ -368,6 +374,7 @@ write_rds(b25009_data, "data/b25009_data.rds")
 ```{r hh-size-plot}
 
 b25009_data <- read_rds("data/b25009_data.rds") |> 
+  filter(NAME %in% pha_names) |>
   group_by(tenure, size) |> 
   summarise(change = sum(change))
 
@@ -416,7 +423,7 @@ b25115_raw <- map_dfr(years, function(yr){
 })
 
 b25115_raw <- b25115_raw |>
-  subset(GEOID %in% pha)
+  subset(GEOID %in% rr)
 
 b25115_vars_cleaned <- b25115_vars |>
   separate(label, into = c("est", "total", "tenure", "family", "type", "rel", "children"), sep = "!!") |>
@@ -463,6 +470,7 @@ write_rds(b25115_data, "data/b25115_data.rds")
 ```{r hh-child-plot}
 
 b25115_data <- read_rds("data/b25115_data.rds") |> 
+  filter(NAME %in% pha_names) |> 
   group_by(tenure, children) |> 
   summarise(change = sum(change))
 
@@ -515,7 +523,7 @@ b09020_raw <- map_dfr(years, function(yr){
 })
 
 b09020_raw <- b09020_raw |>
-  subset(GEOID %in% pha)
+  subset(GEOID %in% rr)
 
 b09020_vars_cleaned <- b09020_vars |>
   separate(label, into = c("est", "total", "hhgq", "family", "relationship", "sex", "alone"), sep = "!!") |>
@@ -558,10 +566,9 @@ write_rds(b09020_data, "data/b09020_data.rds")
 library(tidytext)
 
 b09020_data <- read_rds("data/b09020_data.rds") |> 
+  filter(NAME %in% pha_names) |>
   group_by(family, relationship) |> 
-  summarise(change = sum(change))
-  
-b09020_data <- b09020_data |> 
+  summarise(change = sum(change)) |> 
   ungroup() |>
   mutate(family = str_replace(family, "Group quarters", " "),
          family = fct_relevel(family, "Family", "Nonfamily", " "))
@@ -613,7 +620,7 @@ b11013_raw <- map_dfr(years, function(yr){
 })
 
 b11013_raw <- b11013_raw |>
-  subset(GEOID %in% pha)
+  subset(GEOID %in% rr)
 
 b11013_vars_cleaned <- b11013_vars |>
   separate(label, into = c("est", "total", "subfamily", "children"), sep = "!!") |>
@@ -643,6 +650,7 @@ write_rds(b11013_data, "data/b11013_data.rds")
 ```{r hh-subfam-plot}
 
 b11013_data <- read_rds("data/b11013_data.rds") |> 
+  filter(NAME %in% pha_names) |>
   group_by(year, subfamily, children) |> 
   summarise(estimate = sum(estimate))
 
@@ -834,7 +842,7 @@ b09021_raw <- map_dfr(years, function(yr){
 })
 
 b09021_raw <- b09021_raw |>
-  subset(GEOID %in% pha)
+  subset(GEOID %in% rr)
 
 b09021_vars_cleaned <- b09021_vars |>
   filter(name %in% c("B09021_009", "B09021_010", "B09021_011",
@@ -866,6 +874,7 @@ write_rds(b09021_data, "data/b09021_data.rds")
 ```{r hh-adultchild-plot}
 
 b09021_data <- read_rds("data/b09021_data.rds") |> 
+  filter(NAME %in% pha_names) |>
   group_by(arrangement) |> 
   summarise(`2016` = sum(`2016`),
             `2020` = sum(`2020`)) |> 

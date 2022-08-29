@@ -1,6 +1,4 @@
-# (PART)Demographic and socioeconomic changes {.unnumbered}
-
-## Special populations{#part-1-4}
+# Special populations {#part-1-4}
 
 ```{r setup}
 
@@ -9,16 +7,38 @@ library(tidycensus)
 library(ggplot2)
 library(simplevis)
 
+# rr includes Charles City, Goochland, New Kent, and Powhatan.
+
+rr <- c("51085", "51760", "51075", "51145", "51087", "51127", "51036", "51041")
+
+pha <- c("51085", "51760", "51087", "51041")
+
+# Set palette colors; may need to find a palette that better complements the PHA branding.
+
+rr_names <- c("Richmond city", "Hanover County", "Henrico County", "Chesterfield County",
+              "Powhatan County", "Goochland County", "New Kent County", "Charles City County")
+
+pha_names <- c("Richmond city", "Hanover County", "Henrico County", "Chesterfield County")
+
+geo_colors <- setNames(viridis(4), nm = pha_names)
+
+pal <-colorFactor(palette = c("#440154FF", "#31688EFF","#35B779FF", "#FDE725FF"),
+                  levels = c("Richmond City", "Hanover", "Henrico", "Chesterfield"))
+
+tenure <- c("Homeowner", "Renter")
+
+tenure_colors <-setNames(viridis(2), nm = tenure)
+
+years <- 2016:2020
+
 ```
 
 
-```{r ind-living}
+```{r ind-liv-data, eval=FALSE}
 
 # Table B18107 Sex by age by independent living difficulty
 
 # "Because of a physical, mental, or emotional problem, having difficulty doing errands alone such as visiting a doctor’s office or shopping (DOUT)."
-
-years <- 2016:2020
 
 b18107_vars <- load_variables(2020, "acs5") |> 
   filter(str_sub(name, end = 6) %in% "B18107")
@@ -36,7 +56,7 @@ b18107_raw <- map_dfr(years, function(yr){
   })
 
 b18107_raw <- b18107_raw |> 
-  subset(GEOID %in% pha)
+  subset(GEOID %in% rr)
 
 b18107_vars_cleaned <- b18107_vars |> 
   separate(label, into = c("est", "total", "sex", "age", "indliv"), sep = "!!") |> 
@@ -47,26 +67,41 @@ b18107_vars_cleaned <- b18107_vars |>
 b18107_data <- b18107_raw |> 
   right_join(b18107_vars_cleaned, by = "variable") |> 
   select(NAME, GEOID, year, sex, age, indliv, estimate) |> 
-  separate(NAME, into = c("locality", "state"), sep = ",") |> 
-  group_by(year, age, indliv) |> 
+  mutate(NAME = str_remove_all(NAME, ", Virginia")) |>
+  group_by(year, NAME, age, indliv) |> 
   summarise(estimate = sum(estimate)) |> 
   filter(indliv == "With an independent living difficulty") |> 
   pivot_wider(names_from = year,
               values_from =  estimate) |> 
-  transform(change = `2020` - `2016`) |> 
-  select(age, indliv, change)
+  transform(change = `2020` - `2016`)
+
+write_rds(b18107_data, "data/b18107_data.rds")
+
+```
+
+```{r ind-liv-plot}
+
+b18107_data <- read_rds("data/b18107_data.rds") |> 
+  filter(NAME %in% pha_names) |> 
+  group_by(age) |> 
+  summarise(change = sum(change))
 
 ggplot(b18107_data,
        aes(x = age,
-           y = change)) +
-  geom_bar(stat = "identity", fill = "blue") +
-  coord_flip() +
-  scale_y_continuous(labels = number_format(big.mark = ",")) +
-  theme(axis.title = element_blank()) +
-  labs(title = "Change in population with independent living difficulty by age: \n2016 to 2020")
-  
-
-
+           y = change,
+           fill = age)) +
+  geom_col() +
+  labs(title="Net change in individuals with independent living difficulties by age",
+       subtitle="2016 to 2020",
+       caption="Source: U.S. Census Bureau, American Community Survey, Table B18107.") +
+  scale_y_continuous(labels = label_comma()) +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = "none",
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
 
 ```
 

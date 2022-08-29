@@ -17,6 +17,7 @@ library(viridis)
 library(leaflet)
 
 rr <- c("51085", "51760", "51075", "51145", "51087", "51127", "51036", "51041")
+
 pha <- c("51085", "51760", "51087", "51041")
 
 # Set palette colors; may need to find a palette that better complements the PHA branding.
