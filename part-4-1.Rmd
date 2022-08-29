@@ -19,6 +19,7 @@ library(lubridate)
 library(janitor)
 library(tigris)
 library(tidytext)
+library(optiRum)
 
 years <- 2016:2020
 fips <- 51760
@@ -358,7 +359,6 @@ sub_tbl |>
   kable_material(c("striped", "hover")) |> 
   footnote(general = "2016 Q1 Rent has not been adjusted for inflation")
 
-
 ```
 
 ### Housing assistance
@@ -367,40 +367,57 @@ sub_tbl |>
 Change in number of assisted units (NHPD)
 ```
 
-### Naturally-occuring affordable housing
+### Naturally-occurring affordable housing
 
-```{r noah}
+As defined in this report, there are 128 rental properties in the City of Richmond that qualify as naturally-occurring affordable housing. There are more than 9,100 apartments across these properties, which make up approximately 25 percent of all multifamily (two or more units) rental housing in the city.
+
+Older NOAH properties command slightly higher rents than those built in 1960 and beyond. Most of the pre-1960 properties are located in the city's older neighborhoods north of the river, such as Shockoe Bottom and The Fan, and have average rents between \$1,000 and \$1,400. "Newer" NOAH units built in the 1960s and afterward are generally located in the Northside and Southside areas of the city and have average rents between \$750 and \$1,000.
+
+```{r noah, fig.cap=paste0(name, ": Distribution of average asking rents\nin NOAH properties by year built")}
 
 # Add choice of NOAH stat (total number, change in rent, etc) 
-
-# Probably do a histogram by age
 
 rva_noah <- read_csv("data/pha_noah_81722.csv") |> 
   clean_names() |> 
   st_as_sf(coords = c("longitude", "latitude"), crs=4326, remove=FALSE) |> 
   filter(property_name != "Sedgefield" | property_name != "Holidy Mobile Home Park") |> 
-  filter(county_name == costar_name)
+  filter(county_name == costar_name) |> 
+  mutate(period_built = case_when(
+    year_built < 1940 ~ "Before 1940",
+    year_built %in% 1940:1959 ~ "1940 to 1959",
+    year_built %in% 1960:1969 ~ "1960 to 1969",
+    year_built > 1969 ~ "1970 or after"
+  )) |> 
+  mutate(period_built = fct_relevel(period_built, "Before 1940"))
+  
 
 ggplot(rva_noah,
-       aes(x = avg_asking_unit,
-           y = ..density..,
-           weight = number_of_units)) +
-  geom_histogram()
+       aes(x = period_built,
+           y = avg_asking_unit,
+           fill = period_built)) +
+  geom_boxplot() +
+  scale_y_continuous(labels = label_dollar()) +
+  labs(title = paste0(name, ": Distribution of average asking rents\nin NOAH properties by year built"),
+       caption = "Source: CoStar Group, Inc.") +
+  theme(legend.position = "none",
+        panel.background = element_blank(),
+        axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
   
 
 ```
 
 ## Gap analysis
 
+### Affordability of current housing stock
 
-```{r rva-rent-gap}
+```{r income-rent-gap, fig.cap=paste0(name, ": Average asking rent versus\nrent affordable to median renter income")}
 
 # Compare local median renter income to average asking rent
 
-b25119_cpi <- read_rds("data/b25119_cpi_rr.rds")
-
-income <- b25119_cpi |> 
-  filter(locality == name) |> 
+b25119_cpi_rent <- b25119_cpi |> 
   filter(tenure == "Renter")
 
 rent <- read_csv("data/rr_annual_rent.csv") |> 
@@ -410,8 +427,7 @@ rent <- read_csv("data/rr_annual_rent.csv") |>
   clean_names() |> 
   filter(locality == costar_name)
 
-
-rent_gap <- income |> 
+rent_gap <- b25119_cpi_rent |> 
   left_join(rent, by = "year") |> 
   mutate(rent_current = parse_number(rent_current)) |> 
   mutate(affordable_rent = (cdollars/12)*.30) |> 
@@ -419,26 +435,33 @@ rent_gap <- income |>
   select(year, rent_current, affordable_rent) |> 
   pivot_longer(2:3,
                names_to = "type",
-               values_to = "dollars")
+               values_to = "dollars") |> 
+  mutate(type = case_when(
+    type == "affordable_rent" ~ "Affordable rent",
+    type == "rent_current" ~ "Current rent"
+  ))
 
-rent_gp <- ggplot(rent_gap,
+ggplot(rent_gap,
        aes(x = year,
            y = dollars,
-           color = type)) +
-  geom_line(stat = "identity", size = 1) +
-  scale_y_continuous(labels = dollar_format()) +
+           fill = type)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_y_continuous(labels = label_dollar()) +
+  labs(title = paste0(name, ": Average asking rent versus\nrent affordable to median renter income"),
+       subtitle = "2016 to 2020",
+       fill = "Nominal rent",
+       caption = "Sources: U.S. Census Bureau, American Community Survey, Table B25119\nand CoStar Group Inc.") +
   theme(axis.title = element_blank(),
-        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 1)) +
-  labs(title = paste0(name, ": Average asking rent versus rent affordable to typical renter", color = "Nominal rent"))
-       
-  
-ggplotly(rent_gp) |> 
-  plotly_camera()
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
 
 ```
+...
 
-
-```{r  own-gap}
+```{r income-own-gap, fig.cap=title = paste0(name, ": Income needed to afford median home price\nversus median renter income")}
 
 # Compare local renter income versus local home prices
 
@@ -456,7 +479,7 @@ closingcosts <- 0.015 # 1.5% closing costs
 utilities <- 250 # Assume $250/month for utilities
 
 sale <- rr_sales_annual |> 
-  left_join(rva_income, by = "year") |> 
+  left_join(b25119_cpi_rent, by = "year") |> 
   left_join(int_annual, by = "year") |> 
   drop_na() |> 
   mutate(principal = price - (price*downpayment)) |> 
@@ -474,24 +497,29 @@ slgap <- sale |>
     data == "inc_needed" ~ "Income needed to afford median home price"
   ))
 
-sale_gp <- ggplot(slgap,
-       aes(x = year, 
+ggplot(slgap,
+       aes(x = year,
            y = value,
-           color = data)) +
-  geom_line(stat = "identity", size = 1) +
-  labs(title = paste0(name, ": Income needed to afford median home price versus median renter income", color = "Nominal dollars")) +
-  theme(axis.title = element_blank()) +
-  scale_y_continuous(labels = dollar_format())
+           fill = str_wrap(data, 25))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_y_continuous(labels = label_dollar()) +
+  labs(title = paste0(name, ": Income needed to afford median home price\nversus median renter income"),
+       subtitle = "2016 to 2020",
+       fill = "Nominal income",
+       caption = "Sources: U.S. Census Bureau, American Community Survey, Table B25119\nand Central Virginia Regional Multiple Listing Service.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        legend.key.height=unit(1, "cm"))
 
-ggplotly(sale_gp) |> 
-  plotly_camera()
 
 ```
 ...
 
-### Affordability of current housing stock
+```{r gap, fig.cap=paste0(name, ": Rental housing gap by AMI")}
 
-```{r gap}
 # Add choice of affordability stat (surplus/deficit, income vs prices, etc)
 
 gap <- read_rds("data/tb_18_match.rds") |> 
@@ -502,30 +530,39 @@ gap <- read_rds("data/tb_18_match.rds") |>
     gapcode == "Gap" ~ estimate * -1,
     gapcode == "Matches or less than income" ~ estimate
   )) |>
+  mutate(gapcode = case_when(
+    gapcode == "Gap" ~ "Shortage of units",
+    gapcode == "Matches or less than income" ~ "Households at or less than income"
+  )) |>
   filter(household_income != "80 percent AMI or greater")
 
-gap_bar <- ggplot(gap,
+ggplot(gap,
        aes(x = year, 
            y = estimate,
            fill = gapcode)) +
   geom_bar(stat = "identity") +
   facet_grid(~household_income) +
-  theme(axis.title = element_blank()) +
-  labs(title = paste0(name, ": Rental housing gap by AMI: 2015 to 2018"), fill = "Gap/Affordability")
-
-ggplotly(gap_bar) |> 
-  plotly_camera()
+  scale_y_continuous(labels = label_comma()) +
+  labs(title = paste0(name, ": Rental housing gap by AMI"),
+       subtitle = "2015 to 2018",
+       caption = "Source: U.S. Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        legend.position = "bottom",
+        legend.title = element_blank())
 
 ```
 
 ### Impact of housing costs
 
+...
 
-```{r cb}
+```{r cb, fig.cap=paste0(name, ": Cumulative change in cost-burdened households by tenure")}
 
-cb_7 <- read_rds("data/cb_7.rds")
-
-cb <- cb_7 |> 
+cb <- read_rds("data/cb_7.rds") |> 
   filter(county == name,
          cb_group == "Cost-burdened") |> 
   group_by(year, county, tenure) |> 
@@ -534,22 +571,25 @@ cb <- cb_7 |>
   mutate(change = estimate - lag(estimate)) |> 
   drop_na() |> 
   mutate(run_diff = cumsum(change))
-  
+
 ggplot(cb,
        aes(x = year, y = run_diff, fill = tenure)) +
   geom_col(position = "dodge") +
-  facet_wrap(vars(county)) +
   scale_y_continuous(labels = label_comma()) +
   labs(title = paste0(name, ": Cumulative change in cost-burdened households by tenure"),
        subtitle = "2015 to 2018",
        fill = "Tenure",
        caption = "Source: U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
-  theme(axis.title = element_blank())
-
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
 
 ```
-Add choice of housing cost stat (cost burden, PIT, eviction filings, etc)
-```{r evictions}
+...
+
+```{r evictions, fig.cap=paste0(name, ": Evictions filings and judgements")}
 
 evictions <- read_csv("data/evictions_17_22.csv") |> 
   pivot_longer(3:128,
@@ -557,23 +597,25 @@ evictions <- read_csv("data/evictions_17_22.csv") |>
                values_to = "value") |> 
   mutate(type = case_when(
     str_detect(data, "Filings") ~ "Filings",
-    str_detect(data,"Evictions") ~ "Eviction judgement"
+    str_detect(data,"Evictions") ~ "Eviction judgements"
   )) |> 
   mutate(date = str_sub(data, -7, -1)) |> 
   mutate(date = ym(date)) |> 
   mutate(year = year(date)) |> 
-  mutate(type = fct_relevel(type, "Filings", "Eviction orders")) |> 
+  mutate(type = fct_relevel(type, "Filings", "Eviction judgements")) |> 
   filter(Jurisdiction == costar_name)
 
-eviction_colors <- setNames(c("#00BFC4", "#F8766D"), nm = c("Filings", "Eviction orders"))
+eviction_colors <- setNames(c("#00BFC4", "#F8766D"),
+                            nm = c("Filings", "Eviction judgements"))
 
 ggplot(evictions,
        aes(x = date,
            y = value,
            fill = type)) +
   geom_col(position = "dodge") +
+  scale_x_date(labels = label_date_short(), breaks = breaks_width("6 months")) +
   scale_y_continuous(labels = label_comma()) +
-  labs(title = paste0(name, ": Evictions filings and orders by locality",
+  labs(title = paste0(name, ": Evictions filings and judgements"),
        subtitle = "January 2017 to March 2022",
        caption = "Source: RVA Eviction Lab") +
   scale_fill_manual(values = eviction_colors) +
