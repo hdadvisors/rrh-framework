@@ -42,7 +42,7 @@ Still to come:
 -   Improve formatting for call-out boxes
 -   PDF version of full report and locality summaries
 
-## How to read this report
+## How to read this report {.unnumbered}
 
 This report is an interactive website with three main columns for navigation:
 
@@ -52,7 +52,7 @@ This report is an interactive website with three main columns for navigation:
 
 Links to both the previous and next chapter are included at the bottom of each chapter page.
 
-## How to provide feedback on this draft
+## How to provide feedback on this draft {.unnumbered}
 
 All comments, questions, and suggestions should be emailed to [jonathan\@hdadvisors.net](mailto:jonathan@hdadvisors.net){.email} and [eric\@hdadvisors.net](mailto:eric@hdadvisors.net){.email}.
 

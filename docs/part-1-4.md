@@ -42,18 +42,6 @@ Nearly all persons with independent living difficulties throughout the region li
 
 Persons with independent living difficulties are most likely to live with one other person in their home. Slightly larger households (3 to 4 persons total) are also common. Still, more than 15 percent live alone---including nearly one-in-four in Richmond. However, based on ACS data collection methods, "living alone" also includes persons residing in group quarters.
 
-
-```
-#> # A tibble: 5 × 3
-#>   NP                   est   pct
-#>   <fct>              <dbl> <dbl>
-#> 1 2 persons         288739 0.334
-#> 2 3 persons         176111 0.204
-#> 3 4 persons         152239 0.176
-#> 4 5 or more persons 116202 0.134
-#> 5 Living alone      131011 0.152
-```
-
 <div class="figure">
 <img src="part-1-4_files/figure-html/ind-liv-size-plot-1.png" alt="Percent of persons with independent living difficulties by household size" width="100%" style="border:none;" />
 <p class="caption">(\#fig:ind-liv-size-plot)Percent of persons with independent living difficulties by household size</p>

@@ -1,6 +1,6 @@
-# (PART)Housing supply and market changes {.unnumbered}
+# (PART) PART 2: Housing supply and market changes {.unnumbered}
 
-## Homeownership characteristics{#part-2-1}
+# Homeownership {#part-2-1}
 
 ```{r setup}
 
@@ -12,28 +12,38 @@ library(stringi)
 library(zoo)
 library(lubridate)
 library(tigris)
-library(ggthemes)
 library(scales)
 library(plotly)
-library(simplevis)
 
 # rr includes Charles City, Goochland, New Kent, and Powhatan.
 
-rr <- c("51085", "51760", "51075", "51145", "51087", "51127", "51036", "51041")
+rr <- c("51760", "51085", "51087", "51041",
+        "51145", "51075", "51127", "51036")
+
 pha <- c("51085", "51760", "51087", "51041")
 
-pha_names <- c("Richmond City", "Henrico County", "Hanover County", "Chesterfield County")
+# Set palette colors; may need to find a palette that better complements the PHA branding.
+
+rr_names <- c("Richmond city", "Hanover County", "Henrico County", "Chesterfield County",
+              "Powhatan County", "Goochland County", "New Kent County", "Charles City County")
+
+pha_names <- c("Richmond city", "Hanover County", "Henrico County", "Chesterfield County")
+
+rr_df <- data.frame(GEOID = rr, NAME = rr_names)
+
+years <- 2016:2020
 
 ```
 
-## Homeownership housing stock
+## Supply
 
-The stock of homeowner housing has been growing across the region. From 2016 to 2020, owner-occupied housing has increased by 17,436 --- an increase of seven percent. Unsurprisingly, much of that growth (93 percent) has occurred in the single-family home market, including detached and attached homes. The largest share of that single-family home growth has occurred in Chesterfield County, where there was a net gain of 7,184 single-family homeowners.
-```{r oo-structure}
+### Change in stock
 
-# Table B25127 Tenure by year structure built by units in structure
+The stock of homeowner housing has been growing across the region. From 2016 to 2020, owner-occupied housing has increased by 17,436---an increase of seven percent. Unsurprisingly, much of that growth (93 percent) has occurred in the single-family home market, including detached and attached homes. The largest share of that single-family home growth has occurred in Chesterfield County, where there was a net gain of 7,184 single-family owner-occupied homes.
 
-years <- 2016:2020
+```{r oo-structure-data, eval=FALSE}
+
+# Table B25127: Tenure by year structure built by units in structure
 
 b25127_vars <- load_variables(2020, "acs5") |> 
   filter(str_sub(name, end = 6) %in% "B25127")
@@ -50,9 +60,6 @@ b25127_raw <- map_dfr(years, function(yr){
     mutate(year = yr)
 })
 
-b25127_raw <- b25127_raw |> 
-  subset(GEOID %in% pha)
-
 b25127_vars_cleaned <- b25127_vars |> 
   separate(label, into = c("est", "total", "tenure", "yrbuilt", "structure"), sep = "!!") |> 
   select(variable = name, tenure, yrbuilt, structure) |> 
@@ -63,91 +70,104 @@ b25127_vars_cleaned <- b25127_vars |>
     tenure == "Renter occupied" ~ "Renter"
   ))
 
-b25127_data <- b25127_raw |> 
+b25127_raw <- b25127_raw |> 
+  subset(GEOID %in% rr) |> 
   right_join(b25127_vars_cleaned, by = "variable") |> 
   select(NAME, GEOID, year, tenure, yrbuilt, structure, estimate, moe)
 
-oo_structure <- b25127_data |> 
-  filter(tenure == "Homeowner") |> 
-  select(NAME, GEOID, year, structure, estimate) |> 
-  group_by(NAME, GEOID, year, structure) |> 
+b25127_data <- b25127_raw |> 
+  mutate(NAME = str_remove_all(NAME, ", Virginia"),
+         yrbuilt = str_remove_all(yrbuilt, "Built ")) |>
+  select(NAME, GEOID, year, tenure, yrbuilt, structure, estimate) |> 
+  mutate(structure = case_when(
+    structure == "1, detached  or attached" ~ "Single-family",
+    structure == "2 to 4" ~ "2 to 4 units",
+    structure == "5 to 19" ~ "5 to 19 units",
+    structure == "20 to 49" ~ "20 or more units",
+    structure == "50 or more" ~ "20 or more units",
+    TRUE ~ "Other"
+  )) |> 
+  group_by(NAME, GEOID, year, tenure, yrbuilt, structure) |> 
   summarise(estimate = sum(estimate)) |> 
   pivot_wider(
     names_from = year,
     values_from = estimate
   ) |> 
-  mutate(difference = `2020` - `2016`) |> 
-  mutate(pchange = difference/`2016`) |> 
-  separate(NAME, into = c("county", "state"), sep = ",")  |> 
-  mutate(structure = case_when(
-    structure == "20 to 49" ~ "20 or more",
-    structure == "50 or more" ~ "20 or more",
-    TRUE ~ structure
-  ))
+  mutate(change = `2020` - `2016`) |> 
+  mutate(structure = fct_relevel(structure, "Single-family", "2 to 4 units", "5 to 19 units",
+                                 "20 or more units", "Other"))
 
-structure_bar <- ggplot(oo_structure,
-       aes(x = reorder(structure, -difference), 
-           y = difference,
+write_rds(b25127_data, "data/b25127_data.rds")
+
+```
+
+```{r oo-structure-plot, fig.cap="Change in owner-occupied housing units by structure type"}
+
+b25127_str <-  read_rds("data/b25127_data.rds") |> 
+  filter(tenure == "Homeowner") |>
+  filter(NAME %in% pha_names) |>
+  group_by(structure) |> 
+  summarise(change = sum(change))
+
+ggplot(b25127_str,
+       aes(x = structure,
+           y = change,
            fill = structure)) +
-  geom_bar(stat = "identity") +
-  facet_wrap(~county) + 
-  labs(title = "Change in homeowner housing by structure type", subtitle = "From 2016 to 2020", fill = "Structure type") +
-  theme(axis.title.x = element_blank(), 
-        axis.title.y = element_blank(),
-        axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        legend.position = "right",
-        legend.justification = "top") +
-  scale_y_continuous(labels = number_format(big.mark = ","))
-
-ggplotly(structure_bar) |> 
-  plotly_camera()
+  geom_col() + 
+  labs(title = "Change in owner-occupied housing units by structure type",
+       subtitle = "2016 to 2020",
+       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25127.") +
+  theme(panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = "none") +
+  scale_y_continuous(labels = label_comma()) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 16))
 
 ```
 
-The vast majority of homeowner housing in the region was constructed in the latter half of the 20th century. The amount of housing structured in the 2000s pales in comparison to the housing built between 1980 and 1999. With so much owner-occupied housing beyond twenty years of age, homeowners will increasingly need resources to maintain their homes, or brand new housing stock to move into.
+### Age of stock
 
-```{r oo-year-built}
+Between 2016 and 2020, almost all additions to the homeowner-occupied housing stock in the region were, intuitively, homes built in the past decade. However, there have also been thousands of net additions among homes built before 1940 and between 1980 and 2009. These homes were most likely previously occupied by renters and have now been reconverted into homeownership opportunities.
 
-oo_yrblt <- b25127_data |> 
-  filter(tenure == "Homeowner") |> 
-  filter(year == 2020) |> 
-  select(NAME, GEOID, year, yrbuilt, estimate) |> 
-  group_by(NAME, GEOID, year, yrbuilt) |> 
-  summarise(estimate = sum(estimate)) |> 
-  mutate(yrbuilt = case_when(
-    yrbuilt == "Built 1940 to 1959" ~ "Built 1940 to 1979",
-    yrbuilt == "Built 1960 to 1979" ~ "Built 1940 to 1979",
-    TRUE ~ yrbuilt
-  )) |> 
-  separate(NAME, into = c("county", "state"), sep = ",") |> 
-  group_by(county, GEOID, year, yrbuilt) |> 
-  summarise(estimate = sum(estimate))
-  
-yrblt <- ggplot(oo_yrblt,
+```{r oo-age-plot, fig.cap="Change in owner-occupied housing units by year built"}
+
+b25127_age <-  read_rds("data/b25127_data.rds") |> 
+  filter(tenure == "Homeowner") |>
+  filter(NAME %in% pha_names) |>
+  group_by(yrbuilt) |> 
+  summarise(change = sum(change))
+
+ggplot(b25127_age,
        aes(x = yrbuilt,
-           y = estimate,
-           fill = yrbuilt
-           )) + 
-  geom_bar(stat = "identity", position = "dodge") +
-  facet_wrap(~county) +
-  labs(title = "Owner-occupied housing by year built", subtitle = "Total housing units in 2020", fill = "Year built") +
-  theme(axis.title.x = element_blank(), 
-        axis.title.y = element_blank(),
-        axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        legend.position = "right",
-        legend.justification = "top") +
-  scale_y_continuous(labels = number_format(big.mark = ","))
+           y = change,
+           fill = yrbuilt)) +
+  geom_col() + 
+  labs(title = "Change in owner-occupied housing units by year built",
+       subtitle = "2016 to 2020",
+       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25127.") +
+  theme(panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = "none") +
+  scale_y_continuous(labels = label_comma()) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 16))
 
-plotly::ggplotly(yrblt) |> 
-  plotly_camera()
+
 
 ```
-The majority of existing homeowner housing across the region is and has been three- or more bedroom homes since 2016. Smaller housing options exist largely in the City of Richmond or Henrico County. While one- to two-bedroom housing is often much more affordable, these housing options are often in older, but highly desirable neighborhoods in the City of Richmond (i.e. The Fan and Church Hill).
-```{r oo-bedrooms}
 
-years <- 2016:2020
+### Bedrooms
+
+The majority of new owner-occupied homes in the region have three or more bedrooms, continuing design and size trends prevalent since the mid 20th century. At the same time, homeowner households have become smaller, which creates a surplus of largely unused bedrooms across the market.
+
+Smaller housing options exist largely in the City of Richmond or Henrico County. While single-family homes---or condo units---with one- or two- bedrooms are usually much more affordable, these housing options are often in older, but highly desirable neighborhoods in the City of Richmond (i.e., The Fan and Church Hill).
+
+```{r oo-beds-data, eval=FALSE}
 
 b25042_vars <- load_variables(2020, "acs5") |> 
   filter(str_sub(name, end = 6) %in% "B25042")
@@ -164,9 +184,6 @@ b25042_raw <- map_dfr(years, function(yr) {
     mutate(year = yr)
 })
 
-b25042_raw <- b25042_raw |> 
-  subset(GEOID %in% pha)
-
 b25042_vars_cleaned <- b25042_vars |> 
   separate(label, into = c("est", "total", "tenure", "br"), sep = "!!") |> 
   select(variable = name, tenure, br) |> 
@@ -177,52 +194,426 @@ b25042_vars_cleaned <- b25042_vars |>
     tenure == "Renter occupied" ~ "Renter"
   ))
 
-b25042_data <- b25042_raw |> 
+b25042_raw <- b25042_raw |> 
+  filter(GEOID %in% rr) |> 
   right_join(b25042_vars_cleaned, by = "variable") |> 
   select(NAME, GEOID, year, tenure, br, estimate)
 
-oo_br <- b25042_data |> 
-  filter(tenure == "Homeowner") |> 
-  mutate(br = case_when(
-    br == "1 bedroom" ~ "1-2 bedrooms", 
-    br == "2 bedrooms" ~ "1-2 bedrooms",
-    br == "3 bedrooms" ~ "3-4 bedrooms",
-    br == "4 bedrooms" ~ "3-4 bedrooms",
-    TRUE ~ br
+b25042_data <- b25042_raw |> 
+  mutate(NAME = str_remove_all(NAME, ", Virginia")) |>
+  select(NAME, GEOID, year, tenure, br, estimate) |>
+  pivot_wider(
+    names_from = year,
+    values_from = estimate
+  ) |> 
+  mutate(change = `2020` - `2016`) |> 
+  mutate(br = fct_relevel(br, "No bedroom"))
+
+write_rds(b25042_data, "data/b25042_data.rds")
+
+```
+
+```{r oo-beds-plot, fig.cap="Change in owner-occupied housing units by number of bedrooms"}
+
+b25042_data <-  read_rds("data/b25042_data.rds") |> 
+  filter(tenure == "Homeowner") |>
+  filter(NAME %in% pha_names) |>
+  group_by(br) |> 
+  summarise(change = sum(change))
+
+ggplot(b25042_data,
+       aes(x = br,
+           y = change,
+           fill = br)) +
+  geom_col() + 
+  labs(title = "Change in owner-occupied housing units by number of bedrooms",
+       subtitle = "2016 to 2020",
+       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25042.") +
+  theme(panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = "none") +
+  scale_y_continuous(labels = label_comma()) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 16))
+
+```
+
+### Production
+
+All localities in the region experienced single-family construction declines as a result of the Great Recession from late 2007 to early 2012 --- especially Chesterfield and Henrico. Recovery has been unevenly distributed, however.
+
+From 2010 onward, every locality has seen increasing single-family home construction, but the steepest increase has been in Chesterfield County. From 2010 to 2020, single-family home construction has gone from 545 units to 2,202 per year in a decade --- a 300% increase. Although Chesterfield County was on its way to pre-Recession levels, all other localities are seeing slow growth in the single-family home construction space.
+
+```{r bps-data, eval=FALSE}
+
+bps_years <- 2000:2020
+
+header_rows <- read_csv("https://www2.census.gov/econ/bps/County/co2020a.txt", 
+                        col_names = FALSE,
+                        n_max = 2)
+
+column_names <- header_rows %>%
+  select(X1:X18) %>%
+  t() %>%
+  as_tibble() %>%
+  mutate(group = rep(1:6, each = 3)) %>%
+  group_by(group) %>%
+  fill(V1, .direction = "updown") %>%
+  mutate(names = paste0(V1, ": ", V2)) %>%
+  pull(names)
+
+cbps_raw <- map_df(bps_years, ~{
+  raw <- read_csv(glue("https://www2.census.gov/econ/bps/County/co{.x}a.txt"), skip = 2, 
+                    col_names = FALSE) %>%
+    select(X1:X18) %>%
+    set_names(column_names)
+  
+  raw
+  
+})
+
+cbps_data <- cbps_raw %>% 
+  mutate(year = `Survey: Date`,
+         GEOID = paste0(`FIPS: State`, `FIPS: County`)) %>%
+  select(`1-unit: Bldgs`:GEOID) %>%
+  filter(GEOID %in% rr) %>%
+  pivot_longer(`1-unit: Bldgs`:`5+ units: Value`,
+               names_to = "type",
+               values_to = "value") %>%
+  separate(type, into = c("Type", "col"), sep = ": ") %>%
+  pivot_wider(names_from = col,
+              values_from = value) %>%
+  rename_with(tolower, Type:Value) %>% 
+  select(GEOID, year, type:units)
+
+rr_cbps <- cbps_data |> 
+  right_join(rr_df, by = "GEOID") |> 
+  select(GEOID, NAME, year, type:units)
+
+write_rds(rr_cbps, "data/rr_cbps.rds")
+
+```
+
+```{r bps-plot, fig.cap="Single-family building permits"}
+
+pha_cbps <- read_rds("data/rr_cbps.rds") |> 
+  filter(NAME %in% pha_names,
+         type == "1-unit")
+
+ggplot(pha_cbps,
+       aes(x = year, y = units, fill = NAME)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~NAME) +
+  scale_y_continuous(labels = label_comma()) +
+  labs(title = "Single-family building permits",
+       subtitle = "2000 to 2020",
+       caption = "U.S. Census Bureau, Building Permits Survey.") +
+  theme(panel.background = element_blank(),
+        axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = "none",
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
+```
+
+## Homeownership rate
+
+### By locality
+
+Since 2016, overall homeownership rates for localities in the region have increased slightly. This accounts for the net increase in homeowners (over 15,000) and relatively steady number of renters over this time period.
+
+```{r ho-rate-data, eval=FALSE}
+
+b25003_vars <- load_variables(2020, "acs5") |> 
+  filter(str_sub(name, end = 7) %in% "B25003_")
+
+b25003_raw <- map_dfr(years, function(yr){
+   b25003_pull <- get_acs(
+    geography = "county",
+    state = "VA",
+    table = "B25003",
+    year = yr,
+    survey = "acs5"
+  ) |> 
+    mutate(year = yr)
+})
+
+b25003_vars_cleaned <- b25003_vars |> 
+  separate(label, into = c("est", "total", "tenure"), sep = "!!") |> 
+  select(variable = name, tenure) |> 
+  mutate(tenure = case_when(
+    tenure == "Owner occupied" ~ "Homeowner",
+    tenure == "Renter occupied" ~ "Renter"
   )) |> 
-  group_by(NAME, GEOID, year, br) |> 
+  drop_na()
+
+b25003_raw <- b25003_raw |> 
+  filter(GEOID %in% rr)
+
+b25003_data <- b25003_raw |> 
+  right_join(b25003_vars_cleaned, by = "variable") |> 
+  select(NAME, GEOID, year, tenure, estimate) |> 
+  mutate(NAME = str_remove_all(NAME, ", Virginia")) |>
+  group_by(NAME, year) |> 
+  mutate(pct = estimate/sum(estimate)) |> 
+  filter(tenure == "Homeowner")
+
+write_rds(b25003_data, "data/b25003_data.rds")
+
+```
+
+```{r ho-rate-plot, fig.cap="Homeownership rate by locality"}
+
+b25003_data <- read_rds("data/b25003_data.rds") |> 
+  filter(NAME %in% pha_names)
+
+ggplot(b25003_data,
+       aes(x = year, 
+           y = pct, 
+           color = NAME)) +
+  facet_wrap(~NAME, nrow = 1) +
+  geom_line(stat = "identity", size = 1) + 
+  scale_y_continuous(labels = label_percent(), limits = c(0.1, NA)) +
+  labs(title = "Homeownership rate by locality",
+       subtitle = "2016 to 2020",
+       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25003.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = "none",
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.text.x = element_text(angle = 90, vjust = 0.5),
+        axis.line.x = element_line(color = "grey50",
+                                   size = 0.1))
+
+```
+
+### By age
+
+Despite high rents, high debt, and low inventory, younger households (under 35) have made some progress toward homeownership since 2016. Their homeownership rate across the region increased from 30 to 35 percent. On the other hand, homeownership rates for middle-age and older households remained about the same from 2016 to 2020.
+
+```{r ho-age-data, eval=FALSE}
+
+b25007_vars <- load_variables(2020, "acs5") |> 
+  filter(str_sub(name, end = 6) %in% "B25007")
+
+b25007_raw <- map_dfr(years, function(yr){
+   b25007_pull <- get_acs(
+    geography = "county",
+    state = "VA",
+    table = "B25007",
+    year = yr,
+    survey = "acs5"
+  ) |> 
+    mutate(year = yr)
+})
+
+b25007_vars_cleaned <- b25007_vars |> 
+  separate(label, into = c("est", "total", "tenure", "age"), sep = "!!") |> 
+  select(variable = name, tenure, age) |> 
+  mutate(across(.fns = ~str_remove_all(.x, ":")),
+         across(.fns = ~str_remove_all(.x,"Householder "))) |>  
+  mutate(tenure = case_when(
+    tenure == "Owner occupied" ~ "Homeowner",
+    tenure == "Renter occupied" ~ "Renter"
+  )) |> 
+  mutate(age = case_when(
+    age == "15 to 24 years" ~ "34 years and under",
+    age == "25 to 34 years" ~ "34 years and under",
+    age == "35 to 44 years" ~ "35 to 64 years",
+    age == "45 to 54 years" ~ "35 to 64 years",
+    age == "55 to 59 years" ~ "35 to 64 years",
+    age == "60 to 64 years" ~ "35 to 64 years",
+    age == "65 to 74 years" ~ "65 years and over",
+    age == "75 to 84 years" ~ "65 years and over",
+    age == "85 years and over" ~ "65 years and over"
+  )) |> 
+  drop_na()
+
+
+```
+
+```{r ho-age-plot, fig.cap="Homeownership rate by age group"}
+
+b25007_data <- read_rds("data/b25007_data.rds") |> 
+  filter(NAME %in% pha_names) |> 
+  select(-moe) |> 
+  mutate(age = case_when(
+    age == "Householder 15 to 24 years" ~ "34 years and under",
+    age == "Householder 25 to 34 years" ~ "34 years and under",
+    age == "Householder 35 to 44 years" ~ "35 to 64 years",
+    age == "Householder 45 to 54 years" ~ "35 to 64 years",
+    age == "Householder 55 to 59 years" ~ "35 to 64 years",
+    age == "Householder 60 to 64 years" ~ "35 to 64 years",
+    age == "Householder 65 to 74 years" ~ "65 years and over",
+    age == "Householder 75 to 84 years" ~ "65 years and over",
+    age == "Householder 85 years and over" ~ "65 years and over"
+  )) |> 
+  group_by(NAME, year, tenure, age) |> 
   summarise(estimate = sum(estimate)) |> 
-  mutate(percent = estimate/sum(estimate)) |> 
-  ungroup() |> 
-  separate(NAME, into = c("county", "state"), sep = ",") |> 
-  filter(year == 2020 | year == 2016)
+  group_by(year, tenure, age) |> 
+  summarise(estimate = sum(estimate)) |> 
+  group_by(year, age) |> 
+  mutate(pct = estimate/sum(estimate)) |> 
+  filter(tenure == "Homeowner")
 
-br_bar <- ggplot(oo_br,
-       aes(x = county,
-           y = percent, 
-           fill = factor(br, levels = c("No bedroom", "1-2 bedrooms", "3-4 bedrooms", "5 or more bedrooms")))) +
-  geom_bar(position = "stack", stat = "identity") + 
-  scale_fill_discrete(breaks = c("No bedroom", "1-2 bedrooms", "3-4 bedrooms", "5 or more bedrooms")) +
-  labs(title = "Homeowner housing by bedrooms", fill = "Bedrooms") + 
-  scale_y_continuous(labels = scales::percent) +
-  theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank(),
-        axis.text.x = element_text(angle = 90)) +
-  facet_wrap(~year)
+ggplot(b25007_data,
+       aes(x = year, 
+           y = pct, 
+           color = age)) +
+  facet_wrap(~age, nrow = 1) +
+  geom_line(stat = "identity", size = 1) + 
+  scale_y_continuous(labels = label_percent(), limits = c(0, .9), expand = c(0,0)) +
+  labs(title = "Homeownership rate by age group",
+       subtitle = "2016 to 2020",
+       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25007.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = "none",
+        legend.title = element_blank(),
+        legend.key = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.text.x = element_text(angle = 90, vjust = 0.5),
+        axis.line.x = element_line(color = "grey50",
+                                   size = 0.1))
 
-plotly::ggplotly(br_bar) |> 
-  plotly_camera()
+```
 
+### By race and ethnicity
+
+Across the region, the homeownership gap remains wide between white households and households of color. White households in the Richmond area are the only group with a homeownership rate above 70 percent. However, several other groups---including Asian, multiracial, and Black households---have seen slight increases in their homeownership rates since 2016. At the same time, homeownership rates have fallen slightly for Hispanic or Latino households and those of another race.
+
+```{r ho-race-data, eval=FALSE}
+ 
+b25003_tables <- paste0("B25003", LETTERS[2:9])
+
+b25003_race_vars <- load_variables(2020, "acs5") %>%
+  filter(str_sub(name, end = 7) %in% b25003_tables) %>%
+  filter(str_detect(name, "PR") == FALSE)
+
+concept_to_race <- function(x) {
+  out <- x %>%
+    str_remove_all("TENURE \\(|\\)") %>%
+    str_to_title() %>%
+    str_replace_all("And", "and") %>%
+    str_replace_all("Or", "or") %>%
+    str_remove_all(" Alone")
+
+  out
+}
+
+b25003_race_clean <- b25003_race_vars %>%
+  mutate(race = concept_to_race(concept)) %>%
+  separate(label, into = c("est", "total", "tenure"), sep = "!!") %>%
+  select(variable = name, race, tenure) %>%
+  mutate(across(.fns = ~str_remove_all(.x, ":")),
+         across(.fns = ~str_remove_all(.x, " --")),
+         across(.fns = ~str_replace_all(.x, "total", "All")),
+         across(.fns = ~str_replace_all(.x, "Tenure", "All"))) |> 
+  mutate(race = case_when(
+    race == "Black or African American Householder" ~ "Black",
+    race == "American Indian and Alaska Native Householder" ~ "Another race",
+    race == "Asian Householder" ~ "Asian",
+    race == "Native Hawaiian and Other Pacific Islander Householder" ~ "Another race",
+    race == "Some Other Race Householder" ~ "Another race",
+    race == "Two or More Races Householder" ~ "Multiracial",
+    race == "White, Not Hispanic or Latino Householder" ~ "White, non-Hispanic",
+    race == "Hispanic or Latino Householder" ~ "Hispanic or Latino"
+  )) |> 
+  drop_na()
+
+b25003_race_raw <- map_dfr(b25003_tables, function(tb) {
+  yearly_data <- map_dfr(years, function(yr) {
+
+    acs_pull <- get_acs(
+      geography = "county",
+      table = tb,
+      year = yr,
+      state = "VA",
+      cache_table = TRUE
+    ) %>%
+      left_join(b25003_race_clean, by = "variable")
+
+    acs_rearranged <- acs_pull %>%
+      mutate(year = yr) %>%
+      select(variable, year, locality = NAME, fips = GEOID, race, tenure,
+             estimate, moe)
+
+    acs_rearranged
+  })
+  yearly_data
+})
+
+b25003_race_raw <- b25003_race_raw |>
+  filter(fips %in% rr) |> 
+  drop_na()
+
+b25003_race_data <- b25003_race_raw |>
+  select(year, locality, fips, race, tenure, estimate) |>
+  mutate(locality = str_remove_all(locality, ", Virginia"),
+         tenure = case_when(
+           tenure == "Owner occupied" ~ "Homeowner",
+           TRUE ~ "Renter"
+         )) |>
+  group_by(year, locality, fips, race, tenure) |>
+  summarise(estimate = sum(estimate))
+
+write_rds(b25003_race_data, "data/b25003_race_data.rds")
+
+```
+
+```{r ho-race-plot, fig.cap="Homeownership rate by race and ethnicity"}
+
+b25003_race_data <- read_rds("data/b25003_race_data.rds") |> 
+  filter(locality %in% pha_names) |> 
+  group_by(year, tenure, race) |> 
+  summarise(estimate = sum(estimate)) |> 
+  group_by(year, race) |> 
+  mutate(pct = estimate/sum(estimate)) |> 
+  filter(tenure == "Homeowner")
+
+ggplot(b25003_race_data,
+       aes(x = year, 
+           y = pct, 
+           color = race)) +
+  facet_wrap(~fct_reorder(race, pct, .fun = median, .desc = TRUE),
+             labeller = label_wrap_gen(10),
+             nrow = 1) +
+  geom_line(stat = "identity", size = 1) + 
+  scale_y_continuous(labels = label_percent(), limits = c(0.05, 0.85), n.breaks = 8) +
+  labs(title = "Homeownership rate by race and ethnicity",
+       subtitle = "2016 to 2020",
+       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25003.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = "none",
+        legend.title = element_blank(),
+        legend.key = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.text.x = element_text(angle = 90, vjust = 0.5),
+        axis.line.x = element_line(color = "grey50",
+                                   size = 0.1))
 
 ```
 
 ## For-sale market
 
-Home sales in the region continued to follow seasonal patterns during the COVID-19 pandemic. All localities saw reductions in typical sales volumes during early parts of the pandemic (spring to early summer 2020) --- no doubt a result of stay-at-home orders. But by 2021, sales volume began to climb back as historically low interest rates incentivized home buying. 
+### Closed sales
 
-Chesterfield County continued to lead the region in home sales --- hitting a monthly peak in June 2021, with a total of 809 sales. In nearly all localities except for Chesterfield County, the average monthly home sales has largely remained the same. Only in Chesterfield County was there a more than 10 percent increase (15 percent increase) in average monthly home sales between 2019 and 2021.
+Home sales in the region continued to follow seasonal patterns during the COVID-19 pandemic. All localities saw reductions in typical sales volumes during early parts of the pandemic (spring to early summer 2020)---no doubt a result of stay-at-home orders. But by 2021, sales volume began to climb back as historically low interest rates incentivized home buying. 
 
-```{r n-sales}
+```{r sales-data, eval=FALSE}
 
 # Pull in MLS data csv for each county from 2017 to 2022 by month for four major localities by month as of July 11, 2022.
 
@@ -246,7 +637,7 @@ richmond_sales <- read_csv("data/richmond_num_sales.csv") |>
   clean_names() |> 
   mutate(geography = "Richmond City")
 
-pha <- list(chesterfield_sales, hanover_sales, henrico_sales, richmond_sales)
+pha_sales_list <- list(chesterfield_sales, hanover_sales, henrico_sales, richmond_sales)
 
 clean_data <- function(df){
   df |> pivot_longer(cols = starts_with("sales"),
@@ -257,7 +648,7 @@ clean_data <- function(df){
 mutate(year = substr(label, 17,20))
 }
 
-pha_sales <- map_dfr(pha, clean_data) |> 
+pha_sales <- map_dfr(pha_sales_list, clean_data) |> 
   select(geography, year, month, sales)
 
 pha_sales$month <- match(pha_sales$month, month.abb)
@@ -265,40 +656,66 @@ pha_sales$month <- match(pha_sales$month, month.abb)
 pha_sales <- pha_sales |> 
   mutate(date = make_date(year, month)) 
 
-n_sales <- ggplot(pha_sales,
-       aes(x = date, y = sales, fill = geography)) +
-  geom_bar(stat = "identity") +
-  facet_wrap(~geography) +
-  labs(title = "Home sales in the Richmond Region", subtitle = "Homes sales by quarter from 2017 to 2022", fill = "Locality")
-
-plotly::ggplotly(n_sales) |> 
-  plotly_camera()
+write_rds(pha_sales, "data/pha_sales.rds")
 
 ```
 
-```{r avg-sales}
+```{r sales-plot, fig.cap="Monthly home sales by locality"}
+
+pha_sales <- read_rds("data/pha_sales.rds")
+
+ggplot(pha_sales,
+       aes(x = date, y = sales, fill = geography)) +
+  geom_col() +
+  facet_wrap(~geography) +
+  scale_y_continuous(labels = label_comma()) +
+  scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
+  labs(title = "Monthly home sales by locality",
+       subtitle = "January 2017 to June 2022",
+       caption = "Source: Central Virginia Regional Multiple Listing Service.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = "none",
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
+```
+
+Chesterfield County continued to lead the region in home sales---hitting a monthly peak in June 2021, with a total of 809 sales. In nearly all localities except for Chesterfield County, the average monthly home sales has largely remained the same. Only in Chesterfield County was there a more than 10 percent increase in average monthly home sales between 2019 and 2021.
+
+```{r sales-avg-plot, fig.cap="Average monthly home sales by locality"}
 
 avg_sales <- pha_sales |> 
   group_by(year, geography) |> 
-  summarise(average = mean(sales)) |> 
-  filter(year != 2022)
+  summarise(average = mean(sales))
 
-a_sales <- ggplot(avg_sales,
+ggplot(avg_sales,
        aes(x = year, y = average, fill = geography)) +
-  geom_bar(stat = "identity") +
+  geom_col() +
   facet_wrap(~geography) +
-  labs(title = "Average monthly home sales in the Richmond Region", colour = "Locality")
-
-plotly::ggplotly(a_sales) |> 
-  plotly_camera()
+  scale_y_continuous(labels = label_comma()) +
+  labs(title = "Average monthly home sales by locality",
+       subtitle = "2017 to 2022 YTD",
+       caption = "Source: Central Virginia Regional Multiple Listing Service.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = "none",
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
 
 ```
 
-Median home prices have continued to climb in the Richmond Region --- reaching over \$300,000 in all four major localities. The greatest price increases have occurred in the City of Richmond during 2022, where the median home price went from \$292,000 in February to \$389,950 in June, a 33 percent increase. Home prices are continuing to trend upward in spite of rising mortgage interest rates. 
+### Sales price
 
-Hanover County remains the most expensive locality in the region with a median home price of \$431,020 in June 2020, followed by the City of Richmond (\$389.950), Chesterfield County (\$380,000), and Henrico County (\$350,000).
+Median home prices have continued to climb in the Richmond Region---reaching over \$300,000 in all four major localities. The greatest price increases have occurred in the City of Richmond during 2022, where the median home price went from \$292,000 in February to \$389,950 in June, a 33 percent increase. Home prices are continuing to trend upward in spite of rising mortgage interest rates. 
 
-```{r sales-price}
+Hanover County remains the most expensive locality in the region with a median home price of \$431,020 in June 2020, followed by the City of Richmond (\$389,950), Chesterfield County (\$380,000), and Henrico County (\$350,000).
+
+```{r sales-price-data, eval=FALSE}
 
 # Pull in MLS data csv for each county from 2017 to 2022 by month for four major localities by month.
 
@@ -324,7 +741,7 @@ richmond_price <- read_csv("data/richmond_med_sales.csv") |>
   clean_names() |> 
   mutate(geography = "Richmond City")
 
-pha_price <- list(chesterfield_price, hanover_price, henrico_price, richmond_price)
+pha_price_list <- list(chesterfield_price, hanover_price, henrico_price, richmond_price)
 
 clean_data <- function(df){
   df |> pivot_longer(cols = starts_with("sale"),
@@ -333,9 +750,9 @@ clean_data <- function(df){
     values_drop_na = TRUE
   ) |> 
 mutate(year = substr(label, 19,23))
+}
 
-
-pha_price <- map_dfr(pha_price, clean_data) |> 
+pha_price <- map_dfr(pha_price_list, clean_data) |> 
   select(geography, year, month, med_price)
 
 pha_price$month <- match(pha_price$month, month.abb)
@@ -344,35 +761,46 @@ pha_price <- pha_price |>
   mutate(date = make_date(year, month)) |> 
   mutate(med_price = parse_number(med_price))
 
-price_line <- ggplot(pha_price,
-       aes(x = date,
-           y = med_price,
-           colour = geography)) +
-  geom_line(stat = "identity") +
-  facet_wrap(~geography) +
-  scale_y_continuous(labels = dollar_format())
-
-plotly::ggplotly(price_line) |> 
-  plotly_camera()
-
-
-# CHESTERFIELD - $237,398 TO $380,000
+write_rds(pha_price, "data/pha_price.rds")
 
 ```
 
-The inventory of for-sale housing before the pandemic typically sat at two months or more --- meaning that it would take two or more months to sell at current prices. A healthy level of supply has said to be five or six months worth, but in recent years the region has been below that, which indicates a strong seller's market. 
+```{r sales-price-plot, fig.cap="Monthly median sales price by locality"}
+
+pha_price <- read_rds("data/pha_price.rds")
+
+ggplot(pha_price,
+       aes(x = date, y = med_price, color = geography)) +
+  geom_line(size = 1) +
+  facet_wrap(~geography) +
+  scale_y_continuous(labels = label_dollar()) +
+  scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
+  labs(title = "Monthly median sales price by locality",
+       subtitle = "January 2017 to June 2022",
+       caption = "Source: Central Virginia Regional Multiple Listing Service.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = "none",
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
+```
+
+### Supply
+
+The inventory of for-sale housing before the pandemic typically sat at two months or more---meaning that it would take two or more months to sell at current prices. A healthy level of supply has said to be five or six months worth, but in recent years the region has been below that, which indicates a strong seller's market. 
 
 When pandemic began in March 2020, months supply dropped to two months and then by June 2020 hit a low of one month and has sat squarely there ever since. Even amid rising interest rates in 2022 and talks of a housing recession, months supply continues to remain low.
 
-```{r supply}
+```{r supply-data}
 
 # Pull in MLS data csv for just the region.
 
 # Months supply by quarter
 
-pha_supply <- read_csv("data/pha_mos_supply.csv")
-
-pha_supply <- pha_supply|> 
+pha_supply <- read_csv("data/pha_mos_supply.csv") |> 
   pivot_longer(cols = starts_with("Months"),
     names_to = "label",
     values_to = "months_sup",
@@ -385,17 +813,33 @@ pha_supply <- pha_supply |>
   mutate(date = make_date(year, Month)) |> 
   select(date, months_sup)
 
-supply_bar <- ggplot(pha_supply,
-                     aes(x = date, 
-                         y = months_sup)) +
-  geom_bar(stat = "identity", fill = "dark green") +
-  labs(title = "Months supply of for-sale housing by quarter") +
-  theme(axis.title = element_blank())
+```
 
-ggplotly(supply_bar) |> 
-  plotly_camera()
+```{r supply-plot, fig.cap="Months of supply"}
+
+ggplot(pha_supply,
+       aes(x = date,
+           y = months_sup)) +
+  geom_line(size = 1,
+            color = "#C77CFF") +
+  scale_y_continuous(labels = label_number(suffix = " months"),
+                     limits = c(0,4.5),
+                     expand = c(0,0)) +
+  scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
+  labs(title = "Months of supply",
+       subtitle = "January 2017 to June 2022",
+       caption = "Source: Central Virginia Regional Multiple Listing Service.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.line.x = element_line(color = "grey50",
+                                   size = 0.1))
 
 ```
+
 ### Starter homes
 
 Starter homes provide young adults the ability to get on the first rung of the homeownership ladder. This allows many young adults the ability to build equity before their household grows (i.e. marriage and children). But starter homes are becoming more and more scarce. This has largely because those starter home opportunities are not coming to market. In some cases, older homes occupied by seniors are not hitting the market because senior desire to age-in-place remains high or seniors simply cannot find other affordable options themselves. Starter homes are also ripe for investor flipping, which leaves first-time homebuyers competing with all cash offers. 
@@ -406,15 +850,19 @@ In 2021, the Virginia REALTORS® (VAR) conducted an analysis of the number and s
 
 For the region, the share of starter homes sold has been in a steady decline. The greatest decrease has occurred in Chesterfield County, where the share of starter homes sold has gone from 63 percent to 46 percent. The smallest decreased occurred in Henrico County, a decrease of only 8 percentage points.
 
-```{r starter-homes}
+```{r starter-data}
 
-# Utilizing data pulled by VAR for HB854; does not have data for 2022 
+# Utilizing data pulled by VAR for HB854; do not have data for 2022 
 
 st_homes <- read_csv("data/var_starterhomes.csv") |> 
   subset(County_Name %in% pha_names) |> 
   mutate(FY = as.character(FY))
 
-starter_share <- ggplot(st_homes, 
+```
+
+```{r starter-plot, fig.cap="Share of sold homes affordable to 80% AMI"}
+
+ggplot(st_homes, 
          aes(x = FY,
            y = starter_homes_pct,
            fill = County_Name)) +
@@ -425,16 +873,34 @@ starter_share <- ggplot(st_homes,
         axis.text.x = element_text(angle = 90, vjust = .1, hjust = 1)) +
   labs(title = "Share of starter homes sold", fill = "Locality")
 
-ggplotly(starter_share) |> 
-  plotly_camera()
+ggplot(st_homes,
+       aes(x = FY, y = starter_homes_pct, fill = County_Name)) +
+  geom_col() +
+  facet_wrap(~County_Name) +
+  scale_y_continuous(labels = label_percent(),
+                     limits = c(0,.75)) +
+  labs(title = "Share of sold homes affordable to 80% AMI",
+       subtitle = "2013 to 2021",
+       caption = "Source: Virginia REALTORS.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = "none",
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
 
 ```
 
-## New construction versus re-sale
+## New construction versus resale
 
-The affordability of resale homes compared to new construction has often made them the first rung on the homeownership ladder. But since the start of the pandemic, the median resale home price has risen above the \$300,000 mark and in June 2022 reached a high of \$371,000. During this timeframe, new construction median home prices have remained above \$350,000 and throughout 2022 so far have stayed above \$400,000. On average, there is a \$89,127 difference between new construction and resale sales price --- leaving new construction significantly out of reach for lower income households.
+### Sales price
 
-```{r comp-price, fig.cap= "Sales price comparison: new construction versus resale"}
+The affordability of resale homes compared to new construction has often made them the first rung on the homeownership ladder. But since the start of the pandemic, the median resale home price has risen above the \$300,000 mark and in June 2022 reached a high of \$371,000.
+
+During this timeframe, new construction median home prices have remained above \$350,000 and throughout 2022 so far have stayed above \$400,000. On average, there is a \$89,127 difference between new construction and resale sales price---leaving new construction significantly out of reach for lower income households.
+
+```{r comp-price-data, eval=FALSE}
 
 newconstruction_price <- read_csv("data/pha_price_new.csv") |> 
   clean_names() |> 
@@ -462,36 +928,42 @@ pha_comp$month <- match(pha_comp$month, month.abb)
 
 pha_price_comp <- pha_comp |> 
   mutate(date = make_date(year, month)) |> 
-  mutate(med_price = parse_number(med_price)) |> 
-  filter(year == "2020" | year == "2021" | year == "2022")
+  mutate(med_price = parse_number(med_price))
 
-price_comp_bar <- ggplot(pha_price_comp,
-       aes(x = date, y = med_price, fill = type)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  labs(title = "Sales price comparison: new construction versus resale", fill = "Construction Type") +
-  theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank(),
-        legend.position = "none") +
-  scale_y_continuous(labels = dollar_format()) +
-  facet_grid(~type)
-
-ggplotly(price_comp_bar) |> 
-  plotly_camera()
-
-# pha_price_comp_long <- pha_price_comp |> 
-#   pivot_wider(names_from = type,
-#               values_from = med_price) |> 
-#   clean_names() |> 
-#   mutate(difference = (new_construction-resale))
-# 
-# mean(pha_price_comp_long$difference)
-# 89127.67
+write_rds(pha_price_comp, "data/pha_price_comp.rds")
 
 ```
+
+```{r comp-price-plot, fig.cap="Median price of new construction and resale"}
+
+pha_price_comp <-  read_rds("data/pha_price_comp.rds")
+
+ggplot(pha_price_comp,
+       aes(x = date, y = med_price, fill = type)) +
+  geom_bar(stat = "identity",
+           position = "dodge") +
+  scale_y_continuous(labels = label_dollar()) +
+  scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
+  labs(title = "Median price of new construction and resale",
+       subtitle = "January 2017 to June 2022",
+       caption = "Source: Central Virginia Regional Multiple Listing Service.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        legend.position = "bottom",
+        legend.title = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
+```
+
+### Bedrooms
+
 The majority of home sales in the region have been for three- and four-bedroom homes --- roughly three in four homes sold in the past five years. Nuances exist at either end of the bedroom spectrum. 
 
 New construction of homes with one- to two-bedrooms has been increasing --- going from six percent of sales in 2017 to nine percent in 2022 YTD. At the other end, new construction of five or more bedroom homes has increased as well with an increase of three percent (15 percent of sales in 2017 to 18 percent in 2022 YTD). For resale homes, the share of homes by bedroom has remained largely unchanged each year.
-```{r comp-br}
+
+```{r comp-br-data, eval=FALSE}
 
 # New construction versus Resale by bedrooms - total sales 
 # 1-2 bedroom // 3-4 bedroom // 5 + bedroom
@@ -521,7 +993,6 @@ re_5br <- read_csv("data/pha_re_5br.csv") |>
   mutate(type = "Resale")|> 
   mutate(br = "5+ bedroom")
 
-
 pha_br <- list(nc_2br, nc_4br, nc_5br, re_2br, re_4br, re_5br)
 
 pha_br_clean <- function(df){
@@ -544,26 +1015,40 @@ pha_br_comp <- pha_br_comp |>
   summarise(sales = sum(sales)) |> 
   mutate(percent = sales/sum(sales))
 
-br_comp_bar <- ggplot(pha_br_comp,
+write_rds(pha_br_comp, "data/pha_br_comp.rds")
+
+```
+
+```{r comp-br-plot, fig.cap="Share of bedrooms by new construction and resales"}
+
+pha_br_comp <- read_rds("data/pha_br_comp.rds")
+
+ggplot(pha_br_comp,
        aes(x = year, y = percent, fill = br)) +
   geom_bar(stat = "identity", position = "stack") +
   facet_wrap(~type) +
-  labs(title = "Sales comparison by bedrooms: New Construction versus Resale", fill = "Bedrooms") +
-  theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank(),
+  scale_y_continuous(labels = label_percent()) +
+  labs(title = "Share of bedrooms by new construction and resales",
+       subtitle = "2017 to 2022 YTD",
+       fill = "Bedrooms",
+       caption = "Source: Central Virginia Regional Multiple Listing Service.") +
+  theme(axis.title = element_blank(),
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.2),
-        axis.ticks.x = element_blank()) + 
-  scale_y_continuous(labels = percent_format())
-  
-ggplotly(br_comp_bar) |> 
-  plotly_camera()
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
 
 ```
+
+### Size
+
 In the past five years, there have been clear differences in new construction and resale sales by square footage. The majority of resale homes have been under 2,000 square feet, while new construction is overwhelmingly over 2,000 square feet. These differences have clear implications on home prices (i.e. more square footage means higher prices). But across the region, minimum requirements set out by localities in zoning ordinances impact these builder decisions. 
 
 Building smaller homes is less profitable given the rising cost to develop a single detached home (e.g. rising land, infrastructure, and regulatory costs). In order to maximize profit, home builders need to increase square footage to recoup costs and meet development requirements.
 
-```{r comp-sf}
+```{r comp-sf-data, eval=FALSE}
 
 # New construction versus Resale by SF // Total sales
 # Less than 1000 SF // 1000-1999 SF // 2000-2999 SF / 3000 + SF
@@ -601,7 +1086,6 @@ re_3000 <- read_csv("data/pha_re_3000sf.csv") |>
   mutate(type = "Resale")|> 
   mutate(sf = "3,000+ SF")
 
-
 pha_sf <- list(nc_999, nc_1999, nc_2999, nc_3000, re_999, re_1999, re_2999, re_3000)
 
 pha_sf_clean <- function(df){
@@ -623,322 +1107,33 @@ pha_sf_comp <- pha_sf_comp |>
   group_by(year, type, sf) |> 
   summarise(sales = sum(sales)) |> 
   mutate(percent = sales/sum(sales))
-  
+
+write_rds(pha_sf_comp, "data/pha_sf_comp.rds")
+
+```
+
+```{r comp-sf-plot, fig.cap="Home size by new construction and resales"}
+
+pha_sf_comp <-  read_rds("data/pha_sf_comp.rds")
 
 ggplot(pha_sf_comp,
-       aes(x = year, y = percent, fill = factor(sf, levels = c("Less than 1,000 SF", "1,000-1,999 SF", "2,000-2,999 SF", "3,000+ SF")))) +
+       aes(x = year, y = percent,
+           fill = factor(sf, levels = c("Less than 1,000 SF", "1,000-1,999 SF",
+                                        "2,000-2,999 SF", "3,000+ SF")))) +
   geom_bar(stat = "identity", position = "stack") +
   facet_wrap(~type) +
-  labs(title = "Sales comparison by square footage: New Construction versus Resale", fill = "Construction Type") +
-  theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank())
-
-
-```
-
-
-### Construction trends
-
-All localities in the region experienced single-family construction declines as a result of the Great Recession from late 2007 to early 2012 --- especially Chesterfield and Henrico. Recovery has been unevenly distributed, however. From 2010 onward, every locality has seen increasing single-family home construction, but the steepest increase has been in Chesterfield County. From 2010 to 2020, single-family home construction has gone from 545 units to 2,202 per year in a decade --- a 300% increase. Although Chesterfield County was on its way to pre-Recession levels, all other localities are seeing slow growth in the single-family home construction space.
-
-```{r sf-construction}
-
-years <- 2000:2020
-
-header_rows <- read_csv("https://www2.census.gov/econ/bps/County/co2020a.txt", 
-                        col_names = FALSE,
-                        n_max = 2)
-
-column_names <- header_rows %>%
-  select(X1:X18) %>%
-  t() %>%
-  as_tibble() %>%
-  mutate(group = rep(1:6, each = 3)) %>%
-  group_by(group) %>%
-  fill(V1, .direction = "updown") %>%
-  mutate(names = paste0(V1, ": ", V2)) %>%
-  pull(names)
-
-cbps_raw <- map_df(years, ~{
-  raw <- read_csv(glue("https://www2.census.gov/econ/bps/County/co{.x}a.txt"), skip = 2, 
-                    col_names = FALSE) %>%
-    select(X1:X18) %>%
-    set_names(column_names)
-  
-  raw
-  
-})
-
-cbps_data <- cbps_raw %>% 
-  mutate(year = `Survey: Date`,
-         GEOID = paste0(`FIPS: State`, `FIPS: County`)) %>%
-  select(`1-unit: Bldgs`:GEOID) %>%
-  subset(GEOID %in% rr) %>%
-  pivot_longer(`1-unit: Bldgs`:`5+ units: Value`,
-               names_to = "type",
-               values_to = "value") %>%
-  separate(type, into = c("Type", "col"), sep = ": ") %>%
-  pivot_wider(names_from = col,
-              values_from = value) %>%
-  rename_with(tolower, Type:Value) %>% 
-  select(GEOID, year, type:units)
-
-rr_cbps <- cbps_data |> 
-  right_join(rr_va, by = "GEOID") |> 
-  select(GEOID, NAME, year, type:units)
-
-pha_cbps <- rr_cbps |> 
-  subset(GEOID %in% pha) |> 
-  filter(type == "1-unit")
-
-sf_permits_line <- ggplot(pha_cbps,
-       aes(x = year, y = units, colour = NAME)) +
-  geom_line(stat = "identity") +
-  facet_wrap(~NAME) +
+  scale_y_continuous(labels = label_percent()) +
+  labs(title = "Home size by new construction and resales",
+       subtitle = "2017 to 2022 YTD",
+       fill = "Square footage",
+       caption = "Source: Central Virginia Regional Multiple Listing Service.") +
   theme(axis.title = element_blank(),
-        legend.position = "none") +
-  labs(title = "Single-family building permits") +
-  scale_y_continuous(labels = number_format(big.mark = ","))
-
-ggplotly(sf_permits_line) |> 
-  plotly_camera()
-
-```
-
-
-## Homeownership rate
-
-The high cost of homeownership and lifestyle preference changes have led to decreasing homeownership rates across the nation. In the region, homeownership has been in a slow decline from 2010. As with most urban areas, the homeownership rate in the City of Richmond remains low at 44 percent, while in the counties, homeownership rates remain well above 60 percent. With fewer multifamily options in the rural and suburban areas of the region, this trend will no doubt continue.
-
-```{r ho-rate}
-
-years <- 2010:2020
-
-b25003_vars <- load_variables(2020, "acs5") |> 
-  filter(str_sub(name, end = 7) %in% "B25003_")
-
-b25003_raw <- map_dfr(years, function(yr){
-   b25003_pull <- get_acs(
-    geography = "county",
-    state = "VA",
-    table = "B25003",
-    year = yr,
-    survey = "acs5"
-  ) |> 
-    mutate(year = yr)
-})
-
-b25003_raw <- b25003_raw |> 
-  subset(GEOID %in% pha)
-
-b25003_vars_cleaned <- b25003_vars |> 
-  separate(label, into = c("est", "total", "tenure"), sep = "!!") |> 
-  select(variable = name, tenure) |> 
-  mutate(across(.fns = ~str_replace_na(.x, "All households"))) |>  mutate(tenure = case_when(
-    tenure == "Owner occupied" ~ "Homeowner",
-    tenure == "Renter occupied" ~ "Renter",
-    TRUE ~ tenure
-  ))
-
-b25003_data <- b25003_raw |> 
-  right_join(b25003_vars_cleaned, by = "variable") |> 
-  select(NAME, GEOID, year, tenure, estimate)
-
-pha_homeownership <- b25003_data |> 
-  pivot_wider(
-    names_from = tenure,
-    values_from = estimate
-  ) |> 
-  mutate(ho_rate = (Homeowner/`All households`))  |> 
-  separate(NAME, into = c("county", "state"), sep = ",")
-
-ho_line <- ggplot(pha_homeownership,
-       aes(x = year, 
-           y = ho_rate, 
-           color = county)) +
-  geom_line(stat = "identity", size = 1) + 
-  scale_y_continuous(labels = percent_format()) +
-  labs(title = "Homeownership rate by locality: 2010 to 2020", color = "Locality") +
-  theme(axis.title = element_blank()) +
-  scale_x_continuous(breaks = c(2010, 2015, 2020))
-
-ggplotly(ho_line) |> 
-  plotly_camera()
-  
+        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.2),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
 
 ```
 
-Growing homeownership costs coupled with increasing debt from things like student and auto loans are having significant impact on younger households entering the homeownership market. The homeownership rate among householders under 25 years of age has remained below 10 percent from 2016 to 2020. Nearly three in four householders 45 years old or older are likely to be a homeowner, while half of householders between 25 and 44 years old are homeowners. These homeownership rates have remained largely unchanged throughout the latter half of the last decade. 
 
-```{r ho-age}
-
-years <- 2016:2020
-
-b25007_vars <- load_variables(2020, "acs5") |> 
-  filter(str_sub(name, end = 6) %in% "B25007")
-
-b25007_raw <- map_dfr(years, function(yr){
-   b25007_pull <- get_acs(
-    geography = "county",
-    state = "VA",
-    table = "B25007",
-    year = yr,
-    survey = "acs5"
-  ) |> 
-    mutate(year = yr)
-})
-
-b25007_raw <- b25007_raw |> 
-  subset(GEOID %in% pha)
-
-b25007_vars_cleaned <- b25007_vars |> 
-  separate(label, into = c("est", "total", "tenure", "age"), sep = "!!") |> 
-  select(variable = name, tenure, age) |> 
-  mutate(across(.fns = ~str_remove_all(.x, ":")),
-         across(.fns = ~str_remove_all(.x,"Householder "))) |>  
-  mutate(tenure = case_when(
-    tenure == "Owner occupied" ~ "Homeowner",
-    tenure == "Renter occupied" ~ "Renter",
-    TRUE ~ tenure
-  )) |> 
-    drop_na()
-
-b25007_data <- b25007_raw |> 
-  right_join(b25007_vars_cleaned, by = "variable") |> 
-  select(NAME, GEOID, year, tenure, age, estimate) |> 
-  mutate(age = case_when(
-    age == "25 to 34 years" ~ "25 to 44 years",
-    age == "35 to 44 years" ~ "25 to 44 years",
-    age == "45 to 54 years" ~ "45 to 64 years",
-    age == "55 to 59 years" ~ "45 to 64 years",
-    age == "60 to 64 years" ~ "45 to 64 years",
-    age == "65 to 74 years" ~ "65 years and over",
-    age == "75 to 84 years" ~ "65 years and over",
-    age == "85 years and over" ~ "65 years and over",
-    TRUE ~ age
-  )) |> 
-  separate(NAME, into = c("locality", "state"), sep = ",")
-
-ho_age <- b25007_data |> 
-  group_by(year, tenure, age) |> 
-  summarise(estimate = sum(estimate)) |> 
-  pivot_wider(
-    names_from = tenure,
-    values_from = estimate
-  ) |> 
-  mutate(total = Homeowner + Renter) |> 
-  mutate(ho_rate = (Homeowner/total))
-
-ho_age_line <- ggplot(ho_age,
-       aes(x = year, 
-           y = ho_rate, 
-           color = age)) +
-  geom_line(stat = "identity", size = 1) +
-  theme(axis.title = element_blank()) +
-  scale_y_continuous(labels = percent_format()) +
-  labs(title = "Homeownership rate by age", color = "Householder age")
-
-ggplotly(ho_age_line) |> 
-  plotly_camera()
-  
-```
-Across the region, the homeownership gap remains wide between white households and households of color. The gap is widest among white and Hispanic households, where the gap is nearly 30 percentage points in every locality other than Hanover County, where it is still wide at 24 percentage points.
-
-The Black-white homeownership gap remains wide, as well --- 20 percentages points in every locality except for Hanover County, where the gap has been closing in recent years. The greatest disparities continue to be in Henrico County and the City of Richmond, where white homeownership remains comparatively higher than all other racial and ethnic groups.
-```{r ho-rate-race}
-
-# years <- 2016:2020
-# 
-# tables <- paste0("B25003", LETTERS[2:9])
-# 
-# b25003_race_vars <- load_variables(2020, "acs5") %>%
-#   filter(str_sub(name, end = 7) %in% tables) %>% 
-#   filter(str_detect(name, "PR") == FALSE)
-# 
-# concept_to_race <- function(x) {
-#   out <- x %>%
-#     str_remove_all("TENURE \\(|\\)") %>%
-#     str_to_title() %>%
-#     str_replace_all("And", "and") %>%
-#     str_replace_all("Or", "or") %>%
-#     str_remove_all(" Alone")
-#   
-#   out
-# }
-# 
-# b25003_race_clean <- b25003_race_vars %>%
-#   mutate(race = concept_to_race(concept)) %>%
-#   separate(label, into = c("est", "total", "tenure"), sep = "!!") %>% 
-#   select(variable = name, race, tenure) %>% 
-#   mutate(across(.fns = ~replace_na(.x, "All")),
-#          across(.fns = ~str_remove_all(.x, ":")),
-#          across(.fns = ~str_remove_all(.x, " --")),
-#          across(.fns = ~str_replace_all(.x, "total", "All")),
-#          across(.fns = ~str_replace_all(.x, "Tenure", "All")))
-# 
-# b25003_race_raw <- map_dfr(tables, function(tb) {
-#   yearly_data <- map_dfr(years, function(yr) {
-#     
-#     acs_pull <- get_acs(
-#       geography = "county",
-#       table = tb,
-#       year = yr,
-#       state = "VA",
-#       cache_table = TRUE
-#     ) %>%
-#       left_join(b25003_race_clean, by = "variable")
-#     
-#     acs_rearranged <- acs_pull %>%
-#       mutate(year = yr) %>%
-#       select(variable, year, locality = NAME, fips = GEOID, race, tenure,
-#              estimate, moe)
-#     
-#     acs_rearranged
-#   })
-#   yearly_data
-# })
-# 
-# b25003_race_raw <- b25003_race_raw |> 
-#   subset(fips %in% pha)
-# 
-# b25003_race_wide <- b25003_race_raw |>  
-#   select(year, locality, fips, race, tenure, estimate) |> 
-#   pivot_wider(names_from = tenure,
-#               values_from = estimate) |> 
-#   separate(locality, into = c("locality", "state"), sep = ",") |> 
-#   mutate(race = case_when(
-#     race == "Black or African American Householder" ~ "Black",
-#     race == "American Indian and Alaska Native Householder" ~ "Another race",
-#     race == "Asian Householder" ~ "Asian",
-#     race == "Native Hawaiian and Other Pacific Islander Householder" ~ "Another race",
-#     race == "Some Other Race Householder" ~ "Another race",
-#     race == "Two or More Races Householder" ~ "Multiracial",
-#     race == "White, Not Hispanic or Latino Householder" ~ "White, non-Hispanic",
-#     race == "Hispanic or Latino Householder" ~ "Hispanic or Latino"
-#   )) |> 
-#   clean_names() |> 
-#   group_by(year, locality, fips, race) |> 
-#   summarise(all = sum(all),
-#             owner_occupied = sum(owner_occupied),
-#             renter_occupoed = sum(renter_occupied)) |> 
-#   mutate(ho_rate = owner_occupied/all)
-# 
-# write_rds(b25003_race_wide, "data/b25003_race_wide.rds")
-
-b25003_race_wide <- read_rds("data/b25003_race_wide.rds")
-
-ho_race <- ggplot(b25003_race_wide,
-       aes(x = year, 
-           y = ho_rate,
-           colour = race)) +
-  geom_line(stat = "identity") +
-  facet_wrap(~locality) +
-  scale_y_continuous(labels = percent_format()) +
-  labs(title = "Homeownership rate by race and ethnicity", colour = "Race or ethnicity") +
-  theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank())
-
-plotly::ggplotly(ho_race) |> 
-  plotly_camera()
-
-```
