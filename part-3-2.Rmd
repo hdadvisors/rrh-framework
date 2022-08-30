@@ -459,14 +459,14 @@ evictions <- read_csv("data/evictions_17_22.csv") |>
                values_to = "value") |> 
   mutate(type = case_when(
     str_detect(data, "Filings") ~ "Filings",
-    str_detect(data,"Evictions") ~ "Eviction judgement"
+    str_detect(data,"Evictions") ~ "Eviction judgements"
   )) |> 
   mutate(date = str_sub(data, -7, -1)) |> 
   mutate(date = ym(date)) |> 
   mutate(year = year(date)) |> 
-  mutate(type = fct_relevel(type, "Filings", "Eviction orders"))
+  mutate(type = fct_relevel(type, "Filings", "Eviction judgements"))
 
-eviction_colors <- setNames(c("#00BFC4", "#F8766D"), nm = c("Filings", "Eviction orders"))
+eviction_colors <- setNames(c("#00BFC4", "#F8766D"), nm = c("Filings", "Eviction judgements"))
 
 ggplot(evictions,
        aes(x = date,
@@ -474,8 +474,9 @@ ggplot(evictions,
            fill = type)) +
   geom_col(position = "dodge") +
   facet_wrap(~Jurisdiction) +
+    scale_x_date(labels = label_date_short(), breaks = breaks_width("6 months")) +
   scale_y_continuous(labels = label_comma()) +
-  labs(title = "Evictions filings and orders by locality",
+  labs(title = "Evictions filings and judgements by locality",
        subtitle = "January 2017 to March 2022",
        caption = "Source: RVA Eviction Lab") +
   scale_fill_manual(values = eviction_colors) +

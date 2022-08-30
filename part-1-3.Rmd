@@ -7,9 +7,8 @@ library(tidycensus)
 library(tigris)
 library(lubridate)
 library(readxl)
-library(viridis)
 library(leaflet)
-library(scales)
+library(janitor)
 
 # rr includes Charles City, Goochland, New Kent, and Powhatan.
 
@@ -36,7 +35,9 @@ years <- 2016:2020
 
 ## Household incomes
 
-From 2016 to 2020, homewo
+### Incomes by tenure
+
+From 2016 to 2020...
 
 ```{r hh-inc-data, eval=FALSE}
 
@@ -94,7 +95,7 @@ write_rds(b25118_data, "data/b25118_data.rds")
 
 ```
 
-```{r hh-inc-plot}
+```{r hh-inc-plot, fig.cap="Change households by tenure and income level"}
 
 b25118_data <-read_rds("data/b25118_data.rds") |> 
   filter(NAME %in% pha_names) |>
@@ -128,7 +129,9 @@ ggplot(b25118_data,
         axis.ticks = element_blank())
 ```
 
-```{r med-income-data}
+...
+
+```{r med-income-data, eval=FALSE}
 
 b25119_vars <- load_variables(2020, "acs5") |> 
   filter(str_sub(name, end = 6) %in% "B25119")
@@ -192,119 +195,135 @@ ggplot(b25119_cpi,
   geom_line(stat = "identity", size = 1) +
   facet_wrap(~tenure) +
   scale_color_manual(values = geo_colors) +
-  theme(axis.title = element_blank()) +
-  scale_y_continuous(labels = dollar_format()) +
-  labs(title = "Median houshold income by tenure and locality", color = "Locality")
-  
+  scale_y_continuous(labels = dollar_format(), limits = c(0, NA)) +
+  labs(title = "Median houshold income by tenure and locality",
+       subtitle = "2016 to 2020",
+       color = "Locality",
+       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25119.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        legend.key = element_blank(),
+        axis.text.x = element_text(angle = 90, vjust = 0.5),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
 
 ```
 
-```{r med-income-race}
+### Incomes by race
 
-# years <- 2010:2020
-# 
-# b19013 <- paste0("B19013", LETTERS[2:9])
-# 
-# b19013_defns <- load_variables(2020, "acs5") %>%
-#   filter(str_sub(name, end = 7) %in% b19013) %>%
-#   filter(str_detect(name, "PR") == FALSE)
-# 
-# concept_to_race <- function(x) {
-#   out <- x %>%
-#     str_remove_all("MEDIAN HOUSEHOLD INCOME IN THE PAST 12 MONTHS \\(\\IN 2020 INFLATION-ADJUSTED DOLLARS\\)\\ \\(|\\)") %>%
-#     str_to_title()
-# }
-# 
-# b19013_cleaned <- b19013_defns %>%
-#   mutate(race = concept_to_race(concept)) %>%
-#   separate(label, c("estimate", "medhhincome"), sep = "!!") %>%
-#   select(variable = name, medhhincome, race) %>%
-#   mutate(across(.fns = ~replace_na(.x, "All")),
-#           across(.fns = ~str_remove_all(.x, ":")))
-# 
-# b19013_raw <- map_dfr(b19013, function(tb) {
-#   yearly_data <- map_dfr(years, function(yr) {
-#     
-#     acs_pull <- get_acs(
-#       geography = "county",
-#       table = tb,
-#       year = yr,
-#       state = "VA"
-#     ) %>%
-#     left_join(b19013_cleaned, by = "variable")
-#     
-#     acs_rearranged <- acs_pull %>%
-#       mutate(year = yr) %>%
-#       select(variable, year, NAME, GEOID, race, medhhincome,
-#              estimate, moe)
-#     
-#     acs_rearranged
-#   })
-#   yearly_data
-# })
-# 
-# write_rds(b19013_raw, "data/b19013_raw.rds")
+...
 
-b19013_raw <- read_rds("data/b19013_raw.rds")
+```{r inc-race-data, eval=FALSE}
 
-b19013_data <- b19013_raw |> 
-  subset(GEOID %in% rr) |> 
-  mutate(across(.fns = ~str_remove_all(.x, "Alone Householder")),
-         across(.fns = ~trimws(.x))) |> 
-  select(variable, year, NAME, GEOID, race, estimate, moe)
+b19013 <- paste0("B19013", LETTERS[2:9])
+
+b19013_defns <- load_variables(2020, "acs5") %>%
+  filter(str_sub(name, end = 7) %in% b19013) %>%
+  filter(str_detect(name, "PR") == FALSE)
+
+concept_to_race <- function(x) {
+  out <- x %>%
+    str_remove_all("MEDIAN HOUSEHOLD INCOME IN THE PAST 12 MONTHS \\(\\IN 2020 INFLATION-ADJUSTED DOLLARS\\)\\ \\(|\\)") %>%
+    str_to_title()
+}
+
+b19013_cleaned <- b19013_defns %>%
+  mutate(race = concept_to_race(concept)) %>%
+  separate(label, c("estimate", "medhhincome"), sep = "!!") %>%
+  select(variable = name, medhhincome, race) %>%
+  mutate(across(.fns = ~replace_na(.x, "All")),
+          across(.fns = ~str_remove_all(.x, ":")))
+
+b19013_raw <- map_dfr(b19013, function(tb) {
+  yearly_data <- map_dfr(years, function(yr) {
+
+    acs_pull <- get_acs(
+      geography = "county",
+      table = tb,
+      year = yr,
+      state = "VA"
+    ) %>%
+    left_join(b19013_cleaned, by = "variable")
+
+    acs_rearranged <- acs_pull %>%
+      mutate(year = yr) %>%
+      select(variable, year, NAME, GEOID, race, medhhincome,
+             estimate, moe)
+
+    acs_rearranged
+  })
+  yearly_data
+})
 
 cpi <- read_excel("data/CPI_U_RS.xlsx") |> 
   rename(year = Year,
          priceindex = Index) |> 
   transform(year = as.numeric(year))
 
-b19013_data_clean <- b19013_data |> 
+b19013_data <- b19013_raw |> 
+  subset(GEOID %in% rr) |> 
+  mutate(across(.fns = ~str_remove_all(.x, "Alone Householder")),
+         across(.fns = ~str_remove_all(.x, ", Virginia")),
+         across(.fns = ~trimws(.x))) |> 
+  select(year, NAME, GEOID, race, estimate, moe) |> 
   transform(year = as.numeric(year),
             estimate = as.numeric(estimate))|> 
   left_join(cpi, by = 'year')|> 
-  select(variable, year, NAME, GEOID, race, estimate, moe, priceindex) |> 
+  select(year, NAME, GEOID, race, estimate, moe, priceindex) |> 
   transform(dollars20 = ((381.2/priceindex)*estimate)) |> 
-  separate(NAME, into = c("locality", "state"), sep = ",") |> 
   mutate(race = case_when(
     race == "Black Or African American" ~ "Black",
     race == "Two Or More Races Householder" ~ "Multiracial",
     race == "White Alone, Not Hispanic Or Latino Householder" ~ "White, non-Hispanic",
     race == "Hispanic Or Latino Householder" ~ "Hispanic or Latino",
     TRUE ~ race
-  )) 
+  )) |> 
+  filter(race %in% c("White, non-Hispanic", "Black", "Asian", "Multiracial", "Hispanic or Latino"))
 
-race_values = c("White, non-Hispanic", "Black", "Asian", "Multiracial", "Hispanic or Latino")
-
-pha_values = c("Richmond city", "Henrico County", "Hanover County", "Chesterfield County")
-
-b19013_pha <- b19013_data_clean |> 
-  subset(race %in% race_values) |> 
-  subset(locality %in% pha_values)
-
-inc_race <- gg_line_col_facet(b19013_pha,
-            x_var = year,
-            y_var = dollars20,
-            col_var = race,
-            facet_var = locality
-) + labs(title = "Median household income by race and ethnicity",
-         x = "Year", y = "2020 inflation-adjusted dollars") +
-  scale_y_continuous(labels = scales::dollar_format())
-
-plotly:: ggplotly(inc_race) |> 
-  plotly_camera()
+write_rds(b19013_data, "data/b19013_data.rds")
 
 ```
-```{r med-income-child}
 
-# Table B19125 Median Family Income by Presence of Own Children
+```{r inc-race-plot, fig.cap="Median household income by race and ethnicity"}
 
-years <- 2016:2020
+b19013_data <- read_rds("data/b19013_data.rds") |> 
+  filter(NAME %in% pha_names)
+
+ggplot(b19013_data,
+       aes(x = year,
+           y = dollars20/1000,
+           color = race)) +
+  facet_wrap(~NAME, nrow = 1) +
+  geom_line(size = 1) +
+  scale_y_continuous(labels = label_dollar(suffix = "k"),
+                     limits = c(0, NA),
+                     breaks = c(0, 25, 50, 75, 100, 125)) +
+  labs(title = "Median household income by race and ethnicity",
+       subtitle = "2016 to 2020 | 2020 inflation-adjusted dollars",
+       caption = "Source: U.S. Census Bureau, American Community Survey, Table B19013.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        legend.position = "bottom",
+        legend.key = element_blank(),
+        legend.title = element_blank(),
+        axis.text.x = element_text(angle = 90, vjust = 0.5),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
+```
+
+### Incomes by family type
+
+...
+
+```{r inc-child-data, eval=FALSE}
+
+# Table B19125: Median Family Income by Presence of Own Children
 
 b19125_vars <- load_variables(2020, "acs5") |> 
   filter(str_sub(name, end = 6) %in% "B19125")
-
-b19202_vars <- load_variables(2020, "acs5") |> 
-  filter(str_sub(name, end = 6) %in% "B19202")
 
 b19125_raw <- map_dfr(years, function(yr){
   b25119_pull <- get_acs(
@@ -319,49 +338,222 @@ b19125_raw <- map_dfr(years, function(yr){
   })
 
 b19125_raw <- b19125_raw |> 
-  subset(GEOID %in% pha)
+  filter(GEOID %in% rr)
 
 b19125_vars_cleaned <- b19125_vars |> 
-  separate(label, into = c("est", "total", "children"), sep = "!!") |>  
-  select(variable = name, children) |> 
-  mutate(children = case_when(
-    children == "With own children of the householder under 18 years" ~ "With children",
-    children == "No own children of the householder under 18 years" ~ "No children"
+  separate(label, into = c("est", "total", "type"), sep = "!!") |>  
+  select(variable = name, type) |> 
+  mutate(type = case_when(
+    type == "With own children of the householder under 18 years" ~ "Family, with children",
+    type == "No own children of the householder under 18 years" ~ "Family, no children"
   )) |> 
   drop_na()
 
 b19125_data <- b19125_raw |> 
   right_join(b19125_vars_cleaned, by = "variable") |> 
-  select(NAME, GEOID, year, children, estimate) 
+  select(NAME, GEOID, year, type, estimate)
 
-cpi <- read_excel("data/CPI_U_RS.xlsx")
-cpi <- cpi |> 
+# Table B19202: Median Nonfamily Household Income
+
+b19202_raw <- map_dfr(years, function(yr){
+  b19202_pull <- get_acs(
+    geography = "county",
+    state = "VA",
+    variable = "B19202_001",
+    year = yr,
+    survey = "acs5",
+    cache_table = TRUE
+  ) %>%
+    mutate(year = yr)
+  })
+
+b19202_data <- b19202_raw |> 
+  filter(GEOID %in% rr) |> 
+  mutate(type = "Non-family") |> 
+  select(NAME, GEOID, year, type, estimate)
+
+cpi <- read_excel("data/CPI_U_RS.xlsx") |> 
   rename(year = Year,
          priceindex = Index) |> 
   transform(year = as.numeric(year))
 
-b19125_cpi <- b19125_data |> 
-    left_join(cpi, by = 'year') |> 
-  transform(dollars20 = ((381.2/priceindex)*estimate)) |> 
-  select(NAME, GEOID, year, children, dollars20, cdollars = estimate) |> 
-  separate(NAME, into = c("locality", "state"), sep = ",") |> 
-  select(year, locality, children, dollars20)
+b19125_b19202_data <- b19125_data |> 
+  bind_rows(b19202_data) |> 
+  mutate(NAME = str_remove_all(NAME, ", Virginia"))
 
-ggplot(b19125_cpi, 
-       aes(x = year,
-           y = dollars20,
-           color = children)) +
-  geom_line(stat = "identity", size = 1) +
-  facet_wrap(~locality) +
-  theme(axis.title = element_blank()) +
-  scale_y_continuous(labels = dollar_format()) +
-  labs(title = "Median family income by children and locality", color = "Children")
+b19125_b19202_cpi <- b19125_b19202_data |> 
+  left_join(cpi, by = 'year') |> 
+  transform(dollars20 = ((381.2/priceindex)*estimate)) |> 
+  select(year, NAME, type, dollars20)
+
+write_rds(b19125_b19202_cpi, "data/b19125_b19202_cpi.rds")
 
 ```
-Wages
-```{r wages}
 
-# Pull in BLS data? QCEW? I haven't found a great way to do this.
+```{r inc-child-plot, fig.cap="Median household income by family type"}
+
+b19125_b19202_cpi <-  read_rds("data/b19125_b19202_cpi.rds") |> 
+  filter(NAME %in% pha_names)
+
+ggplot(b19125_b19202_cpi,
+       aes(x = year,
+           y = dollars20/1000,
+           color = type)) +
+  facet_wrap(~NAME, nrow = 1) +
+  geom_line(size = 1) +
+  scale_y_continuous(labels = label_dollar(suffix = "k"),
+                     limits = c(0, NA),
+                     breaks = c(0, 25, 50, 75, 100, 125)) +
+  labs(title = "Median household income by family type",
+       subtitle = "2016 to 2020 | 2020 inflation-adjusted dollars",
+       caption = "Source: U.S. Census Bureau, American Community Survey, Tables B19125 and B19202.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        legend.position = "bottom",
+        legend.key = element_blank(),
+        legend.title = element_blank(),
+        axis.text.x = element_text(angle = 90, vjust = 0.5),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
+```
+
+## Wages
+
+### Wage change by percentile
+
+...
+
+```{r wage-pct-data, eval=FALSE}
+
+# Load OEWS files already filtered to Richmond, VA MSA
+
+oews_2019 <- read_xlsx("data/oews_rva_2019.xlsx",
+                       sheet = "m2019",
+                       na = c("*", "**", "#"))
+
+oews_2021 <- read_xlsx("data/oews_rva_2021.xlsx",
+                       sheet = "m2021",
+                       na = c("*", "**", "#")) |> 
+  janitor::clean_names(case = "snake")
+
+# Pull out annual wage percentiles for each year
+
+percentiles_2019 <- oews_2019 |> 
+  filter(occ_code == "00-0000") |> 
+  select(9, 24:28) |> 
+  mutate(year = "y2019", .before = 1)
+
+percentiles_2021 <- oews_2021 |> 
+  filter(occ_code == "00-0000") |> 
+  select(10, 26:30) |> 
+  mutate(year = "y2021", .before = 1)
+
+# Combine years, rearrange, and calculate percent change over time
+
+percentiles <- bind_rows(percentiles_2019, percentiles_2021) |> 
+  pivot_longer(3:7) |> 
+  pivot_wider(names_from = year,
+              values_from = value) |> 
+  mutate(pct_change = (y2021 - y2019)/y2019,
+         wage = case_when(
+           name == "a_pct10" ~ "10th percentile",
+           name == "a_pct25" ~ "25th percentile",
+           name == "a_median" ~ "Median",
+           name == "a_pct75" ~ "75th percentile",
+           name == "a_pct90" ~ "90th percentile"
+         )) |> 
+  mutate(wage = fct_relevel(wage,
+                            "10th percentile",
+                            "25th percentile",
+                            "Median",
+                            "75th percentile",
+                            "90th percentile"))
+
+write_rds(percentiles, "data/oews_pct.rds")
+
+```
+
+```{r wage-pct-plot, fig.cap="Percent change in annual wage in Richmond, VA MSA"}
+
+oews_pct <- read_rds("data/oews_pct.rds")
+
+ggplot(oews_pct,
+       aes(x = pct_change,
+           y = wage,
+           fill = wage)) +
+  geom_col() +
+  geom_text(aes(label = label_percent(accuracy = 0.1)(pct_change),
+                color = wage),
+            nudge_x = 0.01) +
+  labs(title = "Percent change in annual wage by wage percentile",
+       subtitle = "Richmond, VA MSA | May 2019 to May 2021",
+       caption = "Source: U.S. Bureau of Labor Statistics, Occupational Employment and Wage Statistics.") +
+  scale_x_continuous(labels = label_percent()) +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_blank(),
+        legend.position = "none",
+        panel.grid.major.x = element_line(color = "grey95",
+                                          size = 0.05))
+
+```
+
+### Wage change by occupation
+
+...
+
+```{r wage-occ-data, eval=FALSE}
+
+# Find 5 most common major occupation categories from 2021
+
+oews_occ <- oews_2021 |> 
+  filter(o_group == "major") |> 
+  slice_max(tot_emp, n = 5) |> 
+  select(9, 10, tot_emp_2021 = 12, a_median_2021 = 28)
+
+# Add 2019 wage data for those occupations
+
+oews_occ <- oews_occ |> 
+  left_join(oews_2019, by = "occ_code") |> 
+  select(1, occ_title = 2, 3, 4, tot_emp_2019 = 14, a_median_2019 = 29)
+
+# Calculate wage percent change and add median for all occupations
+
+oews_occ <- oews_occ |> 
+  mutate(pct_change = (a_median_2021 - a_median_2019) / a_median_2019) |> 
+  add_row(occ_title = "All Occupations", pct_change = as.numeric(oews_pct[oews_pct$wage == "Median",5]))
+
+write_rds(oews_occ, "data/oews_occ.rds")
+
+```
+
+```{r wage-occ-plot, fig.cap="Percent change in annual wage for top 5 most common occupation categories"}
+
+oews_occ <- read_rds("data/oews_occ.rds")
+
+ggplot(oews_occ,
+       aes(x = pct_change,
+           y = reorder(occ_title, pct_change),
+           fill = occ_title)) +
+  geom_col() +
+  geom_text(aes(label = label_percent(accuracy = 0.1)(pct_change),
+                color = occ_title),
+            nudge_x = 0.01) +
+  labs(title = "Percent change in annual wage for\ntop 5 most common occupation categories",
+       subtitle = "Richmond, VA MSA | May 2019 to May 2021",
+       caption = "Source: U.S. Bureau of Labor Statistics, Occupational Employment and Wage Statistics.") +
+  scale_x_continuous(labels = label_percent()) +
+  scale_y_discrete(labels = function(x) str_wrap(x, width = 20)) +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_blank(),
+        legend.position = "none",
+        panel.grid.major.x = element_line(color = "grey95",
+                                          size = 0.05))
 
 
 

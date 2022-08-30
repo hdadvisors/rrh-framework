@@ -5,7 +5,7 @@
 library(tidyverse)
 library(tidycensus)
 library(ggplot2)
-library(simplevis)
+library(sf)
 
 # rr includes Charles City, Goochland, New Kent, and Powhatan.
 
@@ -33,8 +33,11 @@ years <- 2016:2020
 
 ```
 
+## Independent living difficulty
 
-```{r ind-liv-data, eval=FALSE}
+### By age
+
+```{r ind-liv-age-data, eval=FALSE}
 
 # Table B18107 Sex by age by independent living difficulty
 
@@ -79,7 +82,7 @@ write_rds(b18107_data, "data/b18107_data.rds")
 
 ```
 
-```{r ind-liv-plot}
+```{r ind-liv-age-plot}
 
 b18107_data <- read_rds("data/b18107_data.rds") |> 
   filter(NAME %in% pha_names) |> 
@@ -105,20 +108,140 @@ ggplot(b18107_data,
 
 ```
 
-```{r vets}
+### By tenure
 
-# Table B21005 Age by veteran status by employment status for civilian population 18 to 64 years
+...
 
-years <- 2016:2020
+:::{.rmdinfo}
+The detailed estimates for persons with independent living difficulties in this and the next section are not available from the standard ACS tables published by the Census Bureau. The data in these sections come from the Public Use Microdata Sample (PUMS), which are available only by special Public Use Microdata Areas (PUMAs) which contain at least 100,000 people.
 
-b21005_vars <- load_variables(2020, "acs5") |> 
-  filter(str_sub(name, end = 6) %in% "B21005")
+While PUMA boundaries align with Chesterfield County, Henrico County, and Richmond city, the PUMA containing Hanover County also includes Powhatan, Goochland, New Kent, King William, Charles City counties.
+:::
 
-b21005_raw <- map_dfr(years, function(yr){
-  b21005_pull <- get_acs(
+```{r ind-liv-tenure-data, eval=FALSE}
+
+# Load PUMA geographies for Virginia
+
+pumas <- pumas(state = "VA")
+
+# Filter PUMAs to PHA region
+
+pumas_pha <- pumas |>
+  filter(str_detect(NAMELSAD10, "Chesterfield|Hanover|Henrico|Richmond"))
+
+indliv_pums <- get_pums(
+  variables = c("TEN", "NP", "DOUT"),
+  state = "VA",
+  year = 2020,
+  puma = pumas_pha$PUMACE10)
+
+indliv_raw <- indliv_pums |> 
+  select(SERIALNO, PUMA, SPORDER, WGTP, PWGTP, TEN, NP, DOUT) |> 
+  filter(DOUT == "2") |> 
+  mutate(geography = case_when(
+    PUMA %in% c("04101", "04102", "04103") ~ "Chesterfield County",
+    PUMA %in% c("51224", "51225") ~ "Henrico County",
+    PUMA == "51235" ~ "Richmond city",
+    PUMA == "51215" ~ "Remainder of PDC")) |> 
+  mutate(TEN = case_when(
+    TEN == "b" ~ "Group quarters",
+    TEN %in% c("1", "2") ~ "Owner-occupied",
+    TEN == "3" ~ "Renter-occupied",
+    TRUE ~ "No payment provided")) |> 
+  mutate(NP = case_when(
+    NP == 1 ~ "Living alone",
+    NP == 2 ~ "2 persons",
+    NP == 3 ~ "3 persons",
+    NP == 4 ~ "4 persons",
+    TRUE ~ "5 or more persons"))
+
+indliv_data <- indliv_raw |>
+  select(geography, TEN, NP, WGTP, PWGTP)
+
+write_rds(indliv_data, "data/indliv_data.rds")
+
+```
+
+```{r ind-liv-tenure-plot, fig.cap="Percent of persons with independent living difficulties by household tenure"}
+
+indliv_tenure <- read_rds("data/indliv_data.rds") |> 
+  group_by(geography, TEN) |> 
+  summarise(est = sum(PWGTP)) |> 
+  mutate(pct = est/sum(est)) |> 
+  mutate(TEN = fct_relevel(TEN, "Owner-occupied", "Renter-occupied", "Group quarters", "No payment provided"))
+
+ggplot(indliv_tenure,
+       aes(x = TEN,
+           y = pct,
+           fill = TEN)) +
+  facet_wrap(~geography, nrow = 1) +
+  geom_col() +
+  scale_x_discrete() +
+  scale_y_continuous(labels = label_percent()) +
+  labs(title = "Percent of persons with independent living difficulties\nby household tenure",
+       subtitle = "Includes persons in group quarters",
+       caption = "Source: U.S. Census Bureau, American Community Survey,\nPublic Use Microdata Sample, 2016-2020 5-year estimates.") +
+  theme(legend.position = "bottom",
+        legend.title = element_blank(),
+        axis.text.x = element_blank(),
+        axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
+```
+
+### By household size
+
+...
+
+```{r ind-liv-size-plot, fig.cap="Percent of persons with independent living difficulties by household size"}
+
+indliv_size <- read_rds("data/indliv_data.rds") |> 
+  group_by(geography, NP) |> 
+  summarise(est = sum(PWGTP)) |> 
+  mutate(pct = est/sum(est)) |> 
+  mutate(NP = fct_relevel(NP, "Living alone"))
+
+ggplot(indliv_size,
+       aes(x = NP,
+           y = pct,
+           fill = NP)) +
+  facet_wrap(~geography, nrow = 1) +
+  geom_col() +
+  scale_x_discrete() +
+  scale_y_continuous(labels = label_percent()) +
+  labs(title = "Percent of persons with independent living difficulties\nby household size",
+       subtitle = "Persons in group quarters are counted as living alone",
+       caption = "Source: U.S. Census Bureau, American Community Survey,\nPublic Use Microdata Sample, 2016-2020 5-year estimates.") +
+  theme(legend.position = "bottom",
+        legend.title = element_blank(),
+        axis.text.x = element_blank(),
+        axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
+```
+
+## Veterans with disabilities
+
+https://www.va.gov/disability/about-disability-ratings/
+
+```{r vets-data, eval=FALSE}
+
+# Table B21007: Age by Veteran Status by Poverty Status by Disability Status for the Civilian Population 18 Years and Over
+
+b21100_vars <- load_variables(2020, "acs5") |> 
+  filter(str_sub(name, end = 6) %in% "B21100")
+
+b21100_raw <- map_dfr(years, function(yr){
+  b21100_pull <- get_acs(
     geography = "county",
     state = "VA",
-    table = "B21005",
+    table = "B21100",
     year = yr,
     survey = "acs5",
     cache_table = TRUE
@@ -126,36 +249,49 @@ b21005_raw <- map_dfr(years, function(yr){
     mutate(year = yr)
   })
 
-b21005_raw <- b21005_raw |> 
-  subset(GEOID %in% pha)
+b21100_raw <- b21100_raw |> 
+  subset(GEOID %in% rr)
 
-b21005_vars_cleaned <- b21005_vars |> 
-  separate(label, into = c("est", "total", "age", "vet", "labor", "emp"), sep = "!!") |> 
-  select(variable = name, age, vet, labor, emp) |> 
-  mutate(emp = case_when(
-    labor == "Not in labor force" ~ "Not in labor force",
-    TRUE ~ emp
-  )) |> 
-  drop_na() |> 
-  mutate(across(.fns = ~str_remove_all(.x, ":")))
+b21100_vars_cleaned <- b21100_vars |> 
+  separate(label, into = c("est", "total", "disability", "rating"), sep = "!!") |> 
+  select(variable = name, rating) |> 
+  drop_na()
 
-b21005_data <- b21005_raw |> 
-  right_join(b21005_vars_cleaned, by = "variable") |> 
-  select(NAME, GEOID, year, vet, emp, estimate) |> 
-  separate(NAME, into = c("locality", "state"), sep = ",") |> 
-  group_by(year, vet, emp) |> 
-  summarise(estimate = sum(estimate)) |> 
-  filter(vet == "Veteran",
-         emp != "Employed")
+b21100_data <- b21100_raw |> 
+  right_join(b21100_vars_cleaned, by = "variable") |> 
+  select(NAME, GEOID, year, rating, estimate) |> 
+  mutate(NAME = str_remove_all(NAME, ", Virginia")) |>
+  pivot_wider(names_from = year,
+              values_from =  estimate) |> 
+  transform(change = `2020` - `2016`)
 
+write_rds(b21100_data, "data/b21100_data.rds")
 
-ggplot(b21005_data,
-       aes(x = year,
-           y = estimate,
-           fill = emp)) +
-  geom_bar(stat = "identity", position = "stack") +
-  theme(axis.title = element_blank()) +
-  scale_y_continuous(labels = number_format(big.mark = ",")) +
-  labs(title = "Non-working veteran population: 2016 to 2020", fill = "Status")
+```
+
+```{r vets-plot, fig.cap="Net change in veterans with service-connected disability by disability rating"}
+
+b21100_data <- read_rds("data/b21100_data.rds") |> 
+  filter(NAME %in% pha_names) |> 
+  group_by(rating) |> 
+  summarise(change = sum(change))
+
+ggplot(b21100_data,
+       aes(x = rating,
+           y = change,
+           fill = rating)) +
+  geom_col() +
+  labs(title="Net change in veterans with service-connected disability by disability rating",
+       subtitle="2016 to 2020",
+       caption="Source: U.S. Census Bureau, American Community Survey, Table B21100.") +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 15)) +
+  scale_y_continuous(labels = label_comma()) +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = "none",
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
 
 ```

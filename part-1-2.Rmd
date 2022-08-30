@@ -99,7 +99,7 @@ write_rds(b25003_data, "data/b25003_data.rds")
 
 ```
 
-```{r hh-form-plot}
+```{r hh-form-plot, fig.cap="Net change in households by tenure"}
 
 b25003_data <- read_rds("data/b25003_data.rds") |> 
   filter(NAME %in% pha_names) |> 
@@ -201,7 +201,7 @@ write_rds(b25007_data, "data/b25007_data.rds")
 
 ```
 
-```{r hh-age-plot}
+```{r hh-age-plot, fig.cap="Change in households by age and tenure"}
 
 b25007_data <- read_rds("data/b25007_data.rds") |> 
   filter(NAME %in% pha_names) |>
@@ -371,7 +371,7 @@ write_rds(b25009_data, "data/b25009_data.rds")
 
 ```
 
-```{r hh-size-plot}
+```{r hh-size-plot, fig.cap="Change in household size by tenure"}
 
 b25009_data <- read_rds("data/b25009_data.rds") |> 
   filter(NAME %in% pha_names) |>
@@ -467,7 +467,7 @@ write_rds(b25115_data, "data/b25115_data.rds")
 
 ```
 
-```{r hh-child-plot}
+```{r hh-child-plot, fig.cap="Change in households with children by tenure"}
 
 b25115_data <- read_rds("data/b25115_data.rds") |> 
   filter(NAME %in% pha_names) |> 
@@ -561,7 +561,7 @@ write_rds(b09020_data, "data/b09020_data.rds")
 
 ```
 
-```{r hh-seniors-plot}
+```{r hh-seniors-plot, fig.cap="Change in senior population by living arrangement"}
 
 library(tidytext)
 
@@ -647,7 +647,7 @@ write_rds(b11013_data, "data/b11013_data.rds")
 
 ```
 
-```{r hh-subfam-plot}
+```{r hh-subfam-plot, fig.cap="Subfamilies by type and presence of own children"}
 
 b11013_data <- read_rds("data/b11013_data.rds") |> 
   filter(NAME %in% pha_names) |>
@@ -789,7 +789,7 @@ write_rds(multigen_data, "data/multigen_data.rds")
 
 ```
 
-```{r hh-multigen-plot}
+```{r hh-multigen-plot, fig.cap="Percent of population living in multiple generation households"}
 
 multigen_data <- read_rds("data/multigen_data.rds")
 
@@ -871,7 +871,7 @@ write_rds(b09021_data, "data/b09021_data.rds")
 
 ```
 
-```{r hh-adultchild-plot}
+```{r hh-adultchild-plot, fig.cap="Change in 18-34 year old population by living arrangement"}
 
 b09021_data <- read_rds("data/b09021_data.rds") |> 
   filter(NAME %in% pha_names) |>
