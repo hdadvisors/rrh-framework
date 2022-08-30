@@ -27,9 +27,9 @@ rmd_files:
 # - "part-2-4.Rmd"
 # 
 # - "part-3-1.Rmd"
-#- "part-3-2.Rmd"
+- "part-3-2.Rmd"
 # 
-#- "part-4-1.Rmd"
+- "part-4-1.Rmd"
 # - "part-4-2.Rmd"
 # - "part-4-3.Rmd"
 # - "part-4-4.Rmd"

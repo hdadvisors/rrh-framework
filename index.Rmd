@@ -28,11 +28,22 @@ There are four parts in this report:
 
 ## Changelog {.unnumbered}
 
-### Release 1.0 {.unnumbered}
+### Release 0.1 {.unnumbered}
 
 *`r Sys.Date()`*
 
-First full draft of all chapters. Made available for initial feedback from PHA.
+First partial draft. Test site rendering and hosting. PART 1 chapters fully drafted. Remaining chapters in final production.
+
+Next release will include:
+
+-   PART 2 chapters:
+    -   Rental
+    -   Housing Assistance
+    -   Naturally-occurring affordable housing
+-   PART 3 chapters:
+    -   Affordability of current housing stock
+-   PART 4 chapters:
+    -   Remaining local summaries
 
 Still to come:
 

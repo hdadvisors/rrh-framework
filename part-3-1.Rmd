@@ -1,16 +1,29 @@
-# (PART)GAP ANALYSIS {.unnumbered}
+# (PART) PART 3: Gap analysis {.unnumbered}
 
-## Affordability of current housing stock {#part-3-1}
+# Affordability of current housing stock {#part-3-1}
 
 ```{r setup}
 
+library(tidyverse)
 library(janitor)
 library(optiRum)
-library(tidyverse)
 library(scales)
 
+# rr includes Charles City, Goochland, New Kent, and Powhatan.
+
+rr <- c("51760", "51085", "51087", "51041",
+        "51145", "51075", "51127", "51036")
+
 pha <- c("51085", "51760", "51087", "51041")
-pha_names <- c("Hanover County", "Henrico County", "Chesterfield County", "Richmond City")
+
+# Set palette colors; may need to find a palette that better complements the PHA branding.
+
+rr_names <- c("Richmond city", "Hanover County", "Henrico County", "Chesterfield County",
+              "Powhatan County", "Goochland County", "New Kent County", "Charles City County")
+
+pha_names <- c("Richmond city", "Hanover County", "Henrico County", "Chesterfield County")
+
+rr_df <- data.frame(GEOID = rr, NAME = rr_names)
 
 ```
 
@@ -22,77 +35,110 @@ Increases in the gap occurred mainly among housing between 31 and 80% AMI, but i
 
 This accentuates the need for new affordable housing at all income levels --- but especially for 30% AMI or below households, where in 2018, there was a shortage of over 22,000 rental homes.
 
-```{r gap, fig.cap="Rental housing gap by AMI. Source: CHAS"}
+```{r gap-data, eval=FALSE}
 
-# tb_18c <- read_csv("data/Table18C_2015to2018.csv")
-# 
-# colnames(tb_18c)[16] <- "Cost"
-# 
-# renter <- tb_18c |>
-#   clean_names() |>
-#   filter(line_type == "Detail") |>
-#   select(county, fips, year, estimate, tenure, cost, household_income) |>
-#   group_by(county, fips, year, tenure, cost, household_income) |>
-#   summarise(estimate = sum(estimate)) |>
-#   subset(fips %in% rr)
-# 
-# tb_18_match <- renter |>
-#   filter(tenure == "Renter occupied") |>
-#   mutate(cost = case_when(
-#     cost == "greater than RHUD30 and less than or equal to RHUD50" ~ "31 to 50 percent AMI",
-#     cost == "greater than RHUD50 and less than or equal to RHUD80" ~ "51 to 80 percent AMI",
-#     cost == "greater than RHUD80" ~ "80 percent AMI or greater",
-#     cost == "less than or equal to RHUD30" ~ "30 percent AMI or below"
-#   )) |>
-#   mutate(household_income = case_when(
-#     household_income == "greater than 100% of HAMFI" ~ "80 percent AMI or greater",
-#     household_income == "greater than 80% of HAMFI but less than or equal to 100% of HAMFI" ~ "80 percent AMI or greater",
-#     household_income == "greater than 50% of HAMFI but less than or equal to 80% of HAMFI" ~ "51 to 80 percent AMI",
-#     household_income == "greater than 30% of HAMFI but less than or equal to 50% of HAMFI" ~ "31 to 50 percent AMI",
-#     household_income == "less than or equal to 30% of HAMFI" ~ "30 percent AMI or below"
-#   )) |>
-#   group_by(county, fips, year, cost, household_income) |>
-#   summarise(estimate = sum(estimate)) |>
-#   mutate(match = case_when(
-#     cost == household_income ~ "Affordable",
-#     cost == "30 percent AMI or below" & household_income == "31 to 50 percent AMI" ~ "Very affordable",
-#     cost == "30 percent AMI or below" & household_income == "51 to 80 percent AMI" ~ "Very affordable",
-#     cost == "30 percent AMI or below" & household_income == "80 percent AMI or greater" ~ "Very affordable",
-#         cost == "31 to 50 percent AMI" & household_income == "31 to 50 percent AMI" ~ "Affordable",
-#     cost == "31 to 50 percent AMI" & household_income == "51 to 80 percent AMI" ~ "Very affordable",
-#     cost == "31 to 50 percent AMI" & household_income == "80 percent AMI or greater" ~ "Very affordable",
-#         cost == "31 to 50 percent AMI" & household_income == "30 percent AMI or below" ~ "Unaffordable",
-#     cost == "51 to 80 percent AMI" & household_income == "30 percent AMI or below" ~ "Unaffordable",
-#         cost == "51 to 80 percent AMI" & household_income == "31 to 50 percent AMI" ~ "Unaffordable",
-#     cost == "51 to 80 percent AMI" & household_income == "80 percent AMI or greater" ~ "Very affordable",
-#     cost == "80 percent AMI or greater" & household_income == "30 percent AMI or below" ~ "Unaffordable",
-#     cost == "80 percent AMI or greater" & household_income == "31 to 50 percent AMI" ~ "Unaffordable",
-#     cost == "80 percent AMI or greater" & household_income == "51 to 80 percent AMI" ~ "Unaffordable"
-#   )) |>
-#   mutate(gapcode = case_when(
-#     match == "Unaffordable" ~ "Gap",
-#     TRUE ~ "Matches or less than income"
-#   ))
-# 
-# write_rds(tb_18_match, "data/tb_18_match.rds")
+tb_18c <- read_csv("data/Table18C_2015to2018.csv")
+
+colnames(tb_18c)[16] <- "Cost"
+
+renter <- tb_18c |>
+  clean_names() |>
+  filter(line_type == "Detail") |>
+  select(county, fips, year, estimate, tenure, cost, household_income) |>
+  group_by(county, fips, year, tenure, cost, household_income) |>
+  summarise(estimate = sum(estimate)) |>
+  filter(fips %in% rr)
+
+tb_18_match <- renter |>
+  filter(tenure == "Renter occupied") |>
+  mutate(cost = case_when(
+    cost == "greater than RHUD30 and less than or equal to RHUD50" ~ "31 to 50 percent AMI",
+    cost == "greater than RHUD50 and less than or equal to RHUD80" ~ "51 to 80 percent AMI",
+    cost == "greater than RHUD80" ~ "80 percent AMI or greater",
+    cost == "less than or equal to RHUD30" ~ "30 percent AMI or below"
+  )) |>
+  mutate(household_income = case_when(
+    household_income == "greater than 100% of HAMFI" ~ "80 percent AMI or greater",
+    household_income == "greater than 80% of HAMFI but less than or equal to 100% of HAMFI" ~ "80 percent AMI or greater",
+    household_income == "greater than 50% of HAMFI but less than or equal to 80% of HAMFI" ~ "51 to 80 percent AMI",
+    household_income == "greater than 30% of HAMFI but less than or equal to 50% of HAMFI" ~ "31 to 50 percent AMI",
+    household_income == "less than or equal to 30% of HAMFI" ~ "30 percent AMI or below"
+  )) |>
+  group_by(county, fips, year, cost, household_income) |>
+  summarise(estimate = sum(estimate))
+
+tb_18_match <- tb_18_match |>
+  mutate(match = case_when(
+    cost == household_income ~ "Affordable",
+    cost == "30 percent AMI or below" & household_income == "31 to 50 percent AMI" ~ "Very affordable",
+    cost == "30 percent AMI or below" & household_income == "51 to 80 percent AMI" ~ "Very affordable",
+    cost == "30 percent AMI or below" & household_income == "80 percent AMI or greater" ~ "Very affordable",
+        cost == "31 to 50 percent AMI" & household_income == "31 to 50 percent AMI" ~ "Affordable",
+    cost == "31 to 50 percent AMI" & household_income == "51 to 80 percent AMI" ~ "Very affordable",
+    cost == "31 to 50 percent AMI" & household_income == "80 percent AMI or greater" ~ "Very affordable",
+        cost == "31 to 50 percent AMI" & household_income == "30 percent AMI or below" ~ "Unaffordable",
+    cost == "51 to 80 percent AMI" & household_income == "30 percent AMI or below" ~ "Unaffordable",
+        cost == "51 to 80 percent AMI" & household_income == "31 to 50 percent AMI" ~ "Unaffordable",
+    cost == "51 to 80 percent AMI" & household_income == "80 percent AMI or greater" ~ "Very affordable",
+    cost == "80 percent AMI or greater" & household_income == "30 percent AMI or below" ~ "Unaffordable",
+    cost == "80 percent AMI or greater" & household_income == "31 to 50 percent AMI" ~ "Unaffordable",
+    cost == "80 percent AMI or greater" & household_income == "51 to 80 percent AMI" ~ "Unaffordable"
+  )) |>
+  mutate(gapcode = case_when(
+    match == "Unaffordable" ~ "Gap",
+    TRUE ~ "Matches or less than income"
+  ))
+
+write_rds(tb_18_match, "data/tb_18_match.rds")
 
 tb_18_match <- read_rds("data/tb_18_match.rds")
 
 gap <- tb_18_match |>
+  filter(fips %in% as.numeric(pha)) |> 
   group_by(year, household_income, gapcode) |>
   summarise(estimate = sum(estimate)) |>
   mutate(estimate = case_when(
     gapcode == "Gap" ~ estimate * -1,
     gapcode == "Matches or less than income" ~ estimate
   )) |>
-  filter(household_income != "80 percent AMI or greater") |> 
-  subset(fips %in% pha)
+  filter(household_income != "80 percent AMI or greater")
 
-# write_rds(gap, "data/gap.rds")
+write_rds(gap, "data/gap.rds")
+
+```
+
+
+```{r gap-jtk, eval=FALSE}
+
+library(ggsankey)
+library(ggalluvial)
+
+gap_jtk <- tb_18_match |>
+  ungroup() |> 
+  filter(year == 2018) |> 
+  mutate(across(.fns = ~str_replace_all(.x, " percent", "%"))) |> 
+  group_by(cost, household_income) |> 
+  summarise(estimate = sum(estimate))
+
+ggplot(gap_jtk,
+       aes(y = estimate,
+           axis2 = cost,
+           axis1 = household_income)) +
+  geom_alluvium(aes(fill = household_income)) +
+  geom_stratum() +
+  geom_text(stat = "stratum",
+            aes(label = after_stat(stratum))) +
+  scale_x_discrete(limits = c("Income", "Cost")) +
+  theme_void()
+
+```
+
+
+```{r gap-plot, fig.cap=""}
 
 gap <- read_rds("data/gap.rds")
 
-gap_bar <- ggplot(gap,
+ggplot(gap,
        aes(x = year, 
            y = estimate,
            fill = gapcode)) +
@@ -100,9 +146,6 @@ gap_bar <- ggplot(gap,
   facet_grid(~household_income) +
   theme(axis.title = element_blank()) +
   labs(title = "Rental housing gap by AMI: 2015 to 2018", fill = "Gap/Affordability")
-
-ggplotly(gap_bar) |> 
-  plotly_camera()
 
 ```
 

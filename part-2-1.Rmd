@@ -846,7 +846,7 @@ Starter homes provide young adults the ability to get on the first rung of the h
 
 In addition, smaller homes do not make up a significant share of new construction stock. Smaller homes (two-bedroom or less) are often more desirable among seniors and young adults without children. The lack of this stock prevents the movement of households from different rungs along the homeownership ladder --- locking homeowners into homes that often no longer work for them.
 
-In 2021, the Virginia REALTORS® (VAR) conducted an analysis of the number and share of starter homes sold in Virginia from 2013 to mid-2021. This analysis was included in the statewide housing study conducted by HousingForward Virginia as part of HB 854. To calculate the number and share of starter homes sold, VAR calculated the number of homes sold that would be affordable to a household making 80 percent of AMI.^[Full methodology provided in appendix.]
+In 2021, the Virginia REALTORS® (VAR) conducted an analysis of the number and share of starter homes sold in Virginia from 2013 to mid-2021. This analysis was included in the statewide housing study conducted by HousingForward Virginia as part of HB 854. To calculate the number and share of starter homes sold, VAR calculated the number of homes sold that would be affordable to a household making 80 percent of AMI.
 
 For the region, the share of starter homes sold has been in a steady decline. The greatest decrease has occurred in Chesterfield County, where the share of starter homes sold has gone from 63 percent to 46 percent. The smallest decreased occurred in Henrico County, a decrease of only 8 percentage points.
 
@@ -861,17 +861,6 @@ st_homes <- read_csv("data/var_starterhomes.csv") |>
 ```
 
 ```{r starter-plot, fig.cap="Share of sold homes affordable to 80% AMI"}
-
-ggplot(st_homes, 
-         aes(x = FY,
-           y = starter_homes_pct,
-           fill = County_Name)) +
-  geom_bar(stat = "identity") + 
-  facet_wrap(~County_Name) +
-  scale_y_continuous(labels = percent_format())  +
-  theme(axis.title = element_blank(),
-        axis.text.x = element_text(angle = 90, vjust = .1, hjust = 1)) +
-  labs(title = "Share of starter homes sold", fill = "Locality")
 
 ggplot(st_homes,
        aes(x = FY, y = starter_homes_pct, fill = County_Name)) +

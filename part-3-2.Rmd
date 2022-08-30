@@ -1,3 +1,5 @@
+# (PART) PART 3: Gap analysis {.unnumbered}
+
 # Impact of housing costs on household budgets {#part-3-2}
 
 ```{r setup}
@@ -18,97 +20,95 @@ library(viridis)
 
 ```{r chas-pull, eval=FALSE}
 
-# years <- 2015:2018
-# 
-# sumlev <- "050"
-# 
-# dir.create(glue("data/{sumlev}"))
-# 
-# walk(years, ~{
-#   
-#   url <- glue("https://www.huduser.gov/PORTAL/datasets/cp/{.x - 4}thru{.x}-{sumlev}-csv.zip")
-#   
-#   file <- basename(url)
-#   
-#   path <- file.path("data", sumlev, file)
-#   
-#   if (!file.exists(path)) {
-#     GET(url, write_disk(path, overwrite = TRUE), progress(type = "down"))
-#   }
-#   
-#   print(glue("Unzipping {.x}..."))
-#   unzip(path, exdir = file.path("data", sumlev, .x))
-#   
-# })
-# 
-# years <- 2015:2018
-# 
-# # Tables to get
-# tables <- c(7, 9, paste0(18, LETTERS[1:3]))
-# 
-# # Go through and write out the various tables
-# walk(tables, function(table) {
-#   
-#   mytable <- purrr::map_df(years, function(year) {
-#     
-#     # Identify the year-specific folder
-#     path <- file.path("data", "050", year)
-#     
-#     # Find the file - it may be buried so use recursive = TRUE
-#     file <- list.files(path, pattern = glue("Table{table}.csv"), recursive = TRUE)
-#     
-#     # Read in the file quietly
-#     raw <- read_csv(file.path(path, file), col_types = cols())
-#     
-#     # Clean it up
-#     cleaned <- raw |> 
-#       clean_names() |> 
-#       mutate(fips = substr(geoid, 8, 12)) |> 
-#       separate(name, into = c("county", "state"), sep = ",") |> 
-#       filter(st == "51") |> 
-#       pivot_longer(starts_with("T"), 
-#                    names_to = "code",
-#                    values_to = "value") |> 
-#       mutate(id = str_extract(code, "\\d+$"),
-#              type = str_extract(code, "est|moe")) |> 
-#       select(-code) |> 
-#       pivot_wider(names_from = type, values_from = value) |> 
-#       rename(Estimate = est, MOE = moe) |> 
-#       mutate(Code := glue("T{table}_est{id}"),
-#              Year = year) |> 
-#       select(Code, Year, Estimate, MOE, everything(), -id) |>       
-#       mutate(fips = case_when(
-#         fips == "51515" ~ "51019",
-#         TRUE ~ fips
-#       )) |> 
-#       mutate(county = case_when(
-#         county == "Bedford city" ~ "Bedford County",
-#         TRUE ~ county
-#       )) |> 
-#       subset(fips %in% rr)
-#     
-#     # Account for different data dictionaries
-#     # Find the data dictionary in the appropriate folder
-#     dict_path <- list.files(path, pattern = "dictionary", recursive = TRUE, full.names = TRUE) 
-#     
-#     # Read in the data dictionary and merge
-#     dict <- read_excel(dict_path, 
-#                        sheet = glue("Table {table}"))
-#     
-#     cleaned_with_dict <- cleaned %>%
-#       left_join(dict, by = c("Code" = "Column Name"))
-#     
-#     cleaned_with_dict
-#     
-#   }) 
-#   
-#   file_name <- glue("Table{table}_2015to2018.csv")
-#   
-#   message(glue("Writing file {file_name}..."))
-#   
-#   write_csv(mytable, glue("data/{file_name}"))
-#   
-# })
+years <- 2015:2018
+
+sumlev <- "050"
+
+dir.create(glue("data/{sumlev}"))
+
+walk(years, ~{
+
+  url <- glue("https://www.huduser.gov/PORTAL/datasets/cp/{.x - 4}thru{.x}-{sumlev}-csv.zip")
+
+  file <- basename(url)
+
+  path <- file.path("data", sumlev, file)
+
+  if (!file.exists(path)) {
+    GET(url, write_disk(path, overwrite = TRUE), progress(type = "down"))
+  }
+
+  print(glue("Unzipping {.x}..."))
+  unzip(path, exdir = file.path("data", sumlev, .x))
+
+})
+
+# Tables to get
+tables <- c(7, 9, paste0(18, LETTERS[1:3]))
+
+# Go through and write out the various tables
+walk(tables, function(table) {
+
+  mytable <- purrr::map_df(years, function(year) {
+
+    # Identify the year-specific folder
+    path <- file.path("data", "050", year)
+
+    # Find the file - it may be buried so use recursive = TRUE
+    file <- list.files(path, pattern = glue("Table{table}.csv"), recursive = TRUE)
+
+    # Read in the file quietly
+    raw <- read_csv(file.path(path, file), col_types = cols())
+
+    # Clean it up
+    cleaned <- raw |>
+      clean_names() |>
+      mutate(fips = substr(geoid, 8, 12)) |>
+      separate(name, into = c("county", "state"), sep = ",") |>
+      filter(st == "51") |>
+      pivot_longer(starts_with("T"),
+                   names_to = "code",
+                   values_to = "value") |>
+      mutate(id = str_extract(code, "\\d+$"),
+             type = str_extract(code, "est|moe")) |>
+      select(-code) |>
+      pivot_wider(names_from = type, values_from = value) |>
+      rename(Estimate = est, MOE = moe) |>
+      mutate(Code := glue("T{table}_est{id}"),
+             Year = year) |>
+      select(Code, Year, Estimate, MOE, everything(), -id) |>
+      mutate(fips = case_when(
+        fips == "51515" ~ "51019",
+        TRUE ~ fips
+      )) |>
+      mutate(county = case_when(
+        county == "Bedford city" ~ "Bedford County",
+        TRUE ~ county
+      )) |>
+      subset(fips %in% rr)
+
+    # Account for different data dictionaries
+    # Find the data dictionary in the appropriate folder
+    dict_path <- list.files(path, pattern = "dictionary", recursive = TRUE, full.names = TRUE)
+
+    # Read in the data dictionary and merge
+    dict <- read_excel(dict_path,
+                       sheet = glue("Table {table}"))
+
+    cleaned_with_dict <- cleaned %>%
+      left_join(dict, by = c("Code" = "Column Name"))
+
+    cleaned_with_dict
+
+  })
+
+  file_name <- glue("Table{table}_2015to2018.csv")
+
+  message(glue("Writing file {file_name}..."))
+
+  write_csv(mytable, glue("data/{file_name}"))
+
+})
 
 # Consider adding script to remove the "data/050" file folder of zips and tables to create space.
 
@@ -117,47 +117,43 @@ library(viridis)
 
 ```
 
-```{r chas-data}
+```{r chas-data, eval=FALSE}
 
-# cb_7 <- read_csv("data/Table7_2015to2018.csv") |>
-#   clean_names() |>
-#   filter(line_type == "Detail") |>
-#   select(year, estimate, moe, county, fips, tenure, household_income, household_type, cost_burden) |>
-#   mutate(tenure = case_when(
-#     tenure == "Owner occupied" ~ "Homeowner",
-#     tenure == "Renter occupied" ~ "Renter"
-#   )) |>
-#   mutate(household_income = case_when(
-#     household_income == "household income is less than or equal to 30% of HAMFI" ~ "30% AMI or less",
-#     household_income == "household income is greater than 30% but less than or equal to 50% of HAMFI" ~ "31 to 50% AMI",
-#     household_income == "household income is greater than 50% but less than or equal to 80% of HAMFI" ~ "51 to 80% AMI",
-#     household_income == "household income is greater than 80% but less than or equal to 100% of HAMFI" ~ "81 to 100% AMI",
-#     household_income == "household income is greater than 100% of HAMFI" ~ "101% AMI or greater"
-#   )) |>
-#   mutate(household_type = case_when(
-#     household_type == "household type is elderly family (2 persons, with either or both age 62 or over)" ~ "Elderly family",
-#     household_type == "household type is small family (2 persons, neither person 62 years or over, or 3 or 4 persons)" ~ "Small family",
-#     household_type == "household type is large family (5 or more persons)" ~ "Large family",
-#     household_type == "household type is elderly non-family" ~ "Elderly non-family",
-#     household_type == "other household type (non-elderly non-family)" ~ "Non-elderly non-family"
-#   ))  |>
-#   mutate(cost_burden = case_when(
-#     cost_burden == "housing cost burden is less than or equal to 30%" ~ "Not cost-burdened",
-#     cost_burden == "housing cost burden is greater than 30% but less than or equal to 50%" ~ "Cost-burdened",
-#     cost_burden == "housing cost burden is greater than 50%" ~ "Severely cost-burdened",
-#     cost_burden == "housing cost burden not computed (household has no/negative income)" ~ "No or negative income"
-#   )) |>
-#   mutate(cb_group = case_when(
-#     cost_burden == "Cost-burdened" ~ "Cost-burdened",
-#     cost_burden == "Severely cost-burdened" ~ "Cost-burdened",
-#     TRUE ~ cost_burden
-#   ))
-# 
-# write_rds(cb_7, "data/cb_7.rds")
+cb_7 <- read_csv("data/Table7_2015to2018.csv") |>
+  clean_names() |>
+  filter(line_type == "Detail") |>
+  select(year, estimate, moe, county, fips, tenure, household_income, household_type, cost_burden) |>
+  mutate(tenure = case_when(
+    tenure == "Owner occupied" ~ "Homeowner",
+    tenure == "Renter occupied" ~ "Renter"
+  )) |>
+  mutate(household_income = case_when(
+    household_income == "household income is less than or equal to 30% of HAMFI" ~ "30% AMI or less",
+    household_income == "household income is greater than 30% but less than or equal to 50% of HAMFI" ~ "31 to 50% AMI",
+    household_income == "household income is greater than 50% but less than or equal to 80% of HAMFI" ~ "51 to 80% AMI",
+    household_income == "household income is greater than 80% but less than or equal to 100% of HAMFI" ~ "81 to 100% AMI",
+    household_income == "household income is greater than 100% of HAMFI" ~ "101% AMI or greater"
+  )) |>
+  mutate(household_type = case_when(
+    household_type == "household type is elderly family (2 persons, with either or both age 62 or over)" ~ "Elderly family",
+    household_type == "household type is small family (2 persons, neither person 62 years or over, or 3 or 4 persons)" ~ "Small family",
+    household_type == "household type is large family (5 or more persons)" ~ "Large family",
+    household_type == "household type is elderly non-family" ~ "Elderly non-family",
+    household_type == "other household type (non-elderly non-family)" ~ "Non-elderly non-family"
+  ))  |>
+  mutate(cost_burden = case_when(
+    cost_burden == "housing cost burden is less than or equal to 30%" ~ "Not cost-burdened",
+    cost_burden == "housing cost burden is greater than 30% but less than or equal to 50%" ~ "Cost-burdened",
+    cost_burden == "housing cost burden is greater than 50%" ~ "Severely cost-burdened",
+    cost_burden == "housing cost burden not computed (household has no/negative income)" ~ "No or negative income"
+  )) |>
+  mutate(cb_group = case_when(
+    cost_burden == "Cost-burdened" ~ "Cost-burdened",
+    cost_burden == "Severely cost-burdened" ~ "Cost-burdened",
+    TRUE ~ cost_burden
+  ))
 
-cb_7 <- read_rds("data/cb_7.rds")
-
-pha_localities <- c("Richmond city", "Chesterfield County", "Hanover County", "Henrico County")
+write_rds(cb_7, "data/cb_7.rds")
 
 ```
 
@@ -176,6 +172,10 @@ The number of cost-burdened homeowners across the region has declined significan
 Meanwhile, the total number of cost-burdened renter households increased by almost 1,500, with only Hanover County seeing a small decline. Much of this growth was focused in Chesterfield County and Richmond city.
 
 ```{r cb-locality, fig.cap="Cumulative change in cost-burdened households by tenure"}
+
+cb_7 <- read_rds("data/cb_7.rds")
+
+pha_localities <- c("Richmond city", "Chesterfield County", "Hanover County", "Henrico County")
 
 cb_locality <- cb_7 |> 
   filter(county %in% pha_localities,
@@ -196,7 +196,12 @@ ggplot(cb_locality,
        subtitle = "2015 to 2018",
        fill = "Tenure",
        caption = "Source: U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
-  theme(axis.title = element_blank())
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
 
 ```
 
@@ -223,7 +228,6 @@ cb_income <- cb_7 |>
                                         "81 to 100% AMI",
                                         "101% AMI or greater"))
 
-  
 ggplot(cb_income,
        aes(x = year, y = run_diff, fill = tenure)) +
   geom_col(position = "dodge") +
@@ -233,7 +237,12 @@ ggplot(cb_income,
        subtitle = "2015 to 2018",
        fill = "Tenure",
        caption = "Source: U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
-  theme(axis.title = element_blank())
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text.x = element_text(angle = 90, vjust = 0.5),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
   
 ```
 
@@ -241,59 +250,59 @@ However, the significant and unexpected drop among cost-burdened renters below 3
 
 The plot below shows the ACS estimates of renter households by cost burden from 2016 to 2020. There is a steady decline in the number of cost-burdened low-income renters (under \$35,000); however, this corresponds to an increasing number of cost-burdened renters with incomes between \$35,000 and \$75,000.
 
-```{r cb-income-acs-data}
+```{r cb-income-acs-data, eval=FALSE}
 
-# years <- 2015:2020
-# 
-# pha_geoid <- c("51085", "51760", "51087", "51041")
-# 
-# b25074_raw <- map_dfr(years, function(yr){
-#   b25074_pull <- get_acs(
-#     geography = "county",
-#     table = "B25074",
-#     state = "VA",
-#     year = yr
-#   ) |> 
-#     mutate(year = yr)
-# })
-# 
-# b25074_vars <- load_variables(2020, dataset = "acs5") |> 
-#   filter(str_detect(name, "B25074"))
-# 
-# b25074_vars_cleaned <- b25074_vars |> 
-#   separate(label, into = c("est", "tot", "inc", "cb"), sep = "!!") |> 
-#   select(variable = name, inc, cb) |> 
-#   mutate(across(.fns = ~str_remove_all(.x, ":"))) |> 
-#   drop_na() |> 
-#   mutate(cb_group = case_when(
-#     str_detect(cb, "30.0|35.0|40.0|50.0") ~ "Cost-burdened",
-#     str_detect(cb, "20.0|25.0") ~ "Not cost-burdened",
-#     TRUE ~ "Not computed"
-#   ))
-# 
-# b25074_data <- b25074_raw |> 
-#   filter(GEOID %in% pha_geoid) |> 
-#   right_join(b25074_vars_cleaned, by = "variable") |> 
-#   filter(!year == 2015) |> 
-#   group_by(GEOID, year, inc, cb_group) |> 
-#   summarise(estimate = sum(estimate)) |>
-#   group_by(GEOID, inc, cb_group) |>
-#   mutate(change = estimate - lag(estimate)) |> 
-#   ungroup() |> 
-#   mutate(inc = fct_relevel(inc,
-#                            "Less than $10,000",
-#                            "$10,000 to $19,999",
-#                            "$20,000 to $34,999",
-#                            "$35,000 to $49,999",
-#                            "$50,000 to $74,999",
-#                            "$75,000 to $99,999",
-#                            "$100,000 or more"),
-#          cb_group = fct_relevel(cb_group,
-#                                 "Cost-burdened",
-#                                 "Not cost-burdened",
-#                                 "Not computed"))
-# 
-# write_rds(b25074_data, "data/b25074_data.rds")
+years_acs <- 2015:2020
+
+pha_geoid <- c("51085", "51760", "51087", "51041")
+
+b25074_raw <- map_dfr(years_acs, function(yr){
+  b25074_pull <- get_acs(
+    geography = "county",
+    table = "B25074",
+    state = "VA",
+    year = yr
+  ) |>
+    mutate(year = yr)
+})
+
+b25074_vars <- load_variables(2020, dataset = "acs5") |>
+  filter(str_detect(name, "B25074"))
+
+b25074_vars_cleaned <- b25074_vars |>
+  separate(label, into = c("est", "tot", "inc", "cb"), sep = "!!") |>
+  select(variable = name, inc, cb) |>
+  mutate(across(.fns = ~str_remove_all(.x, ":"))) |>
+  drop_na() |>
+  mutate(cb_group = case_when(
+    str_detect(cb, "30.0|35.0|40.0|50.0") ~ "Cost-burdened",
+    str_detect(cb, "20.0|25.0") ~ "Not cost-burdened",
+    TRUE ~ "Not computed"
+  ))
+
+b25074_data <- b25074_raw |>
+  filter(GEOID %in% pha_geoid) |>
+  right_join(b25074_vars_cleaned, by = "variable") |>
+  filter(!year == 2015) |>
+  group_by(GEOID, year, inc, cb_group) |>
+  summarise(estimate = sum(estimate)) |>
+  group_by(GEOID, inc, cb_group) |>
+  mutate(change = estimate - lag(estimate)) |>
+  ungroup() |>
+  mutate(inc = fct_relevel(inc,
+                           "Less than $10,000",
+                           "$10,000 to $19,999",
+                           "$20,000 to $34,999",
+                           "$35,000 to $49,999",
+                           "$50,000 to $74,999",
+                           "$75,000 to $99,999",
+                           "$100,000 or more"),
+         cb_group = fct_relevel(cb_group,
+                                "Cost-burdened",
+                                "Not cost-burdened",
+                                "Not computed"))
+
+write_rds(b25074_data, "data/b25074_data.rds")
 
 ```
 
@@ -353,8 +362,6 @@ ggplot(b25074_yoy,
                                           size = 0.05),
         axis.ticks = element_blank())
 
-  
-
 ```
 
 In summary, since the *total* number of renter households in the region has not changed significantly from 2016 to 2020, and because the supply of deeply affordable rental housing has not increased, the estimated decline in low-income cost-burdened renters is likely due to a combination of increasing average incomes "re-sorting" households into higher income categories, as well as pandemic data collection challenges.
@@ -399,8 +406,6 @@ ggplot(cb_hh_pha,
                                           size = 0.05),
         axis.ticks = element_blank())
 
-
-
 ```
 
 ## Mortgage delinquency and foreclosure
@@ -427,15 +432,21 @@ ggplot(mort_del,
            y = estimate,
            color = Name)) +
   geom_line(stat = "identity", size = 1) +
-  # facet_wrap(~Name) +
-  scale_y_continuous(labels = percent_format()) +
-  theme(axis.title = element_blank()) +
+  scale_y_continuous(labels = label_percent(accuracy = 0.1), expand = c(0,0), limits = c(0,0.055)) +
+  scale_x_date(date_breaks = "2 years", date_labels = "%Y") +
   labs(title = "Mortgage delinquency rate by locality",
        subtitle = "Mortgages 90 or more days delinquent: 2008 to 2021",
        color = "Locality",
-       caption = "Source: Consumer Financial Protection Bureau, Mortgage Performance Trends.")
-
-
+       caption = "Source: Consumer Financial Protection Bureau, Mortgage Performance Trends.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        legend.title = element_blank(),
+        legend.key = element_blank(),
+        axis.line.x = element_line(color = "grey50",
+                                   size = 0.1),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
 
 ```
 
@@ -603,56 +614,56 @@ The [Urban Institute recently highlighted](https://www.urban.org/sites/default/f
 
 But the challenges of reducing homelessness during the pandemic were laid bare. With an eviction moratorium, rental vacancy rates reached record lows---leaving many seeking rental options with little to none. In addition, providers have also referenced landlords setting high security deposits.
 
-```{r pit-data}
+```{r pit-data, eval=FALSE}
 
-# years <- as.character(2007:2021)
-# 
-# path <- "data/2007-2021-PIT-Counts-by-CoC.xlsx"
-# 
-# full_set <- map_dfr(years, function(yr) {
-# 
-# pit_set <- read_excel(path, sheet = yr) |>
-#     clean_names()
-# 
-# suffix_to_remove <- paste0("_", yr)
-# 
-#   if ("co_c_category" %in% names(pit_set)) {
-#     pit_renamed <- pit_set %>%
-#       rename_with(~str_remove(.x, suffix_to_remove)) |>
-#       mutate(year = yr) %>%
-#       select(co_c_number:co_c_name, co_c_category, type_of_count, year, everything()) |>
-#       mutate(across(-c(co_c_number:year), .fns = as.numeric))
-#   } else {
-#     pit_renamed <- pit_set %>%
-#       rename_with(~str_remove(.x, suffix_to_remove)) |>
-#       mutate(year = yr, co_c_category = NA_character_,
-#              type_of_count = NA_character_) |>
-#       select(co_c_number:co_c_name, co_c_category, type_of_count, year, everything()) |>
-#       mutate(across(-c(co_c_number:year), .fns = as.numeric))
-#   }
-# 
-#   pit_renamed
-# 
-# })
-# 
-# full_set_longer <- full_set %>%
-#   pivot_longer(
-#     cols = overall_homeless:unsheltered_homeless_parenting_youth_under_25_multiple_races,
-#     names_to = "category",
-#     values_to = "value"
-#   )
-# 
-# rva_coc <- full_set_longer |>
-#   filter(co_c_number == "VA-500") |>
-#   filter(str_detect(category, "overall_homeless"))
-# 
-# # Add 2022 PIT count value (directly from Homeward)
-# 
-# rva_pit <- rva_coc |>
-#   filter(category == "overall_homeless") |>
-#   add_row(year = "2022", value = 697)
-# 
-# write_rds(rva_pit, "data/rva_pit.rds")
+years_pit <- as.character(2007:2021)
+
+path <- "data/2007-2021-PIT-Counts-by-CoC.xlsx"
+
+full_set <- map_dfr(years_pit, function(yr) {
+
+pit_set <- read_excel(path, sheet = yr) |>
+    clean_names()
+
+suffix_to_remove <- paste0("_", yr)
+
+  if ("co_c_category" %in% names(pit_set)) {
+    pit_renamed <- pit_set %>%
+      rename_with(~str_remove(.x, suffix_to_remove)) |>
+      mutate(year = yr) %>%
+      select(co_c_number:co_c_name, co_c_category, type_of_count, year, everything()) |>
+      mutate(across(-c(co_c_number:year), .fns = as.numeric))
+  } else {
+    pit_renamed <- pit_set %>%
+      rename_with(~str_remove(.x, suffix_to_remove)) |>
+      mutate(year = yr, co_c_category = NA_character_,
+             type_of_count = NA_character_) |>
+      select(co_c_number:co_c_name, co_c_category, type_of_count, year, everything()) |>
+      mutate(across(-c(co_c_number:year), .fns = as.numeric))
+  }
+
+  pit_renamed
+
+})
+
+full_set_longer <- full_set %>%
+  pivot_longer(
+    cols = overall_homeless:unsheltered_homeless_parenting_youth_under_25_multiple_races,
+    names_to = "category",
+    values_to = "value"
+  )
+
+rva_coc <- full_set_longer |>
+  filter(co_c_number == "VA-500") |>
+  filter(str_detect(category, "overall_homeless"))
+
+# Add 2022 PIT count value (directly from Homeward)
+
+rva_pit <- rva_coc |>
+  filter(category == "overall_homeless") |>
+  add_row(year = "2022", value = 697)
+
+write_rds(rva_pit, "data/rva_pit.rds")
 
 ```
 

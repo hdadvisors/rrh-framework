@@ -139,7 +139,7 @@ Starter homes provide young adults the ability to get on the first rung of the h
 
 In addition, smaller homes do not make up a significant share of new construction stock. Smaller homes (two-bedroom or less) are often more desirable among seniors and young adults without children. The lack of this stock prevents the movement of households from different rungs along the homeownership ladder --- locking homeowners into homes that often no longer work for them.
 
-In 2021, the Virginia REALTORS® (VAR) conducted an analysis of the number and share of starter homes sold in Virginia from 2013 to mid-2021. This analysis was included in the statewide housing study conducted by HousingForward Virginia as part of HB 854. To calculate the number and share of starter homes sold, VAR calculated the number of homes sold that would be affordable to a household making 80 percent of AMI.^[Full methodology provided in appendix.]
+In 2021, the Virginia REALTORS® (VAR) conducted an analysis of the number and share of starter homes sold in Virginia from 2013 to mid-2021. This analysis was included in the statewide housing study conducted by HousingForward Virginia as part of HB 854. To calculate the number and share of starter homes sold, VAR calculated the number of homes sold that would be affordable to a household making 80 percent of AMI.
 
 For the region, the share of starter homes sold has been in a steady decline. The greatest decrease has occurred in Chesterfield County, where the share of starter homes sold has gone from 63 percent to 46 percent. The smallest decreased occurred in Henrico County, a decrease of only 8 percentage points.
 
@@ -147,10 +147,7 @@ For the region, the share of starter homes sold has been in a steady decline. Th
 
 <div class="figure">
 <img src="part-2-1_files/figure-html/starter-plot-1.png" alt="Share of sold homes affordable to 80% AMI" width="100%" style="border:none;" />
-<p class="caption">(\#fig:starter-plot-1)Share of sold homes affordable to 80% AMI</p>
-</div><div class="figure">
-<img src="part-2-1_files/figure-html/starter-plot-2.png" alt="Share of sold homes affordable to 80% AMI" width="100%" style="border:none;" />
-<p class="caption">(\#fig:starter-plot-2)Share of sold homes affordable to 80% AMI</p>
+<p class="caption">(\#fig:starter-plot)Share of sold homes affordable to 80% AMI</p>
 </div>
 
 ## New construction versus resale
