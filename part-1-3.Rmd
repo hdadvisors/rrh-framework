@@ -7,8 +7,10 @@ library(tidycensus)
 library(tigris)
 library(lubridate)
 library(readxl)
-library(leaflet)
 library(janitor)
+library(leaflet)
+library(scales)
+library(viridisLite)
 
 # rr includes Charles City, Goochland, New Kent, and Powhatan.
 
@@ -37,7 +39,9 @@ years <- 2016:2020
 
 ### Incomes by tenure
 
-From 2016 to 2020...
+From 2016 to 2020, the region saw large increases in the number of six-figure income households, particularly among homeowners (well over 25,000), but also renters (almost 6,500). This growth can likely be attributed to both new high-income residents from outside the region, as well as income growth among households already in the region.
+
+There was also a minor increase in the number of middle-income renters earning between \$50,000 and \$100,000, reflecting continued demand for new market-rate apartments---along with affordable starter homes.
 
 ```{r hh-inc-data, eval=FALSE}
 
@@ -126,10 +130,12 @@ ggplot(b25118_data,
         legend.position = "none",
         panel.grid.major.x = element_line(color = "grey95",
                                           size = 0.05),
-        axis.ticks = element_blank())
+        axis.ticks = element_blank()) +
+  scale_fill_manual(values = tenure_colors)
+
 ```
 
-...
+Average homeowner incomes continue to be well above average renter incomes across the region. When adjusted for inflation, incomes across tenures for each locality show very minor to modest growth. Incomes in the city---for both homeowners and renters---remain significantly below those in the surrounding counties. The average household income for homeowners in the counties is around three times that of renters in Richmond.
 
 ```{r med-income-data, eval=FALSE}
 
@@ -183,7 +189,7 @@ write_rds(b25119_cpi, "data/b25119_cpi.rds")
 
 ```
 
-```{r med-income-plot}
+```{r med-income-plot, fig.cap="Median houshold income by tenure and locality"}
 
 b25119_cpi <-read_rds("data/b25119_cpi.rds") |> 
   filter(NAME %in% pha_names)
@@ -197,7 +203,7 @@ ggplot(b25119_cpi,
   scale_color_manual(values = geo_colors) +
   scale_y_continuous(labels = dollar_format(), limits = c(0, NA)) +
   labs(title = "Median houshold income by tenure and locality",
-       subtitle = "2016 to 2020",
+       subtitle = "2016 to 2020 | 2020 inflation-adjusted dollars",
        color = "Locality",
        caption = "Source: U.S. Census Bureau, American Community Survey, Table B25119.") +
   theme(axis.title = element_blank(),
@@ -210,9 +216,9 @@ ggplot(b25119_cpi,
 
 ```
 
-### Incomes by race
+### Incomes by race and ethnicity
 
-...
+Average incomes in the region remain unequal by race and ethnicity. Households with the highest incomes include Asian and white, non-Hispanic residents in the counties---earning well above \$75,000. Black and Hispanic households consistently have the lowest average incomes, along with multiracial households in Henrico and Richmond.
 
 ```{r inc-race-data, eval=FALSE}
 
@@ -288,7 +294,9 @@ write_rds(b19013_data, "data/b19013_data.rds")
 ```{r inc-race-plot, fig.cap="Median household income by race and ethnicity"}
 
 b19013_data <- read_rds("data/b19013_data.rds") |> 
-  filter(NAME %in% pha_names)
+  filter(NAME %in% pha_names) |> 
+  mutate(cv = ((as.numeric(moe)/1.645)/estimate)) |> 
+  filter(cv < .15)
 
 ggplot(b19013_data,
        aes(x = year,
@@ -301,7 +309,7 @@ ggplot(b19013_data,
                      breaks = c(0, 25, 50, 75, 100, 125)) +
   labs(title = "Median household income by race and ethnicity",
        subtitle = "2016 to 2020 | 2020 inflation-adjusted dollars",
-       caption = "Source: U.S. Census Bureau, American Community Survey, Table B19013.") +
+       caption = "Note: Estimates with low reliability are omitted.\nSource: U.S. Census Bureau, American Community Survey, Table B19013.") +
   theme(axis.title = element_blank(),
         axis.ticks = element_blank(),
         panel.background = element_blank(),
@@ -316,7 +324,7 @@ ggplot(b19013_data,
 
 ### Incomes by family type
 
-...
+Household incomes also vary by the presence of children or other related individuals. Throughout the region, non-family households (i.e., persons living alone or with unrelated persons) consistently have average incomes below \$50,000. In Henrico and Chesterfield counties, families living with and without children under 18 have very similar income levels. This trend is different in Hanover, where families with children have much higher incomes, as well as Richmond, where they have much lower incomes.
 
 ```{r inc-child-data, eval=FALSE}
 
@@ -421,9 +429,21 @@ ggplot(b19125_b19202_cpi,
 
 ## Wages
 
+:::{.rmdnote}
+Wage data in this section is sourced from the Occupational Employment and Wage Statistics (OEWS) program of the Bureau of Labor Statistics. OEWS is updated annually, most recently for 2021 data. This dataset provides a rich look into wage distribution by industry and occupation. 
+
+However, OEWS is only available at the national, state, and metro levels. Therefore, the data below covers the full Richmond, Virginia Metropolitan Statistical Area (MSA) rather than the (smaller) PHA region.
+:::
+
 ### Wage change by percentile
 
-...
+While regional wages increased across the board from May 2019 to May 2021, the largest percent increases in average wages were among jobs that paid at and below the median wage. In fact, the largest growth occurred in the lowest 10th percentile of wages, due in large part to state lawmakers adopting incremental increases to Virginia's minimum wage in 2020. The first increase from \$7.25 to \$9.50 per hour took effect in 2021.
+
+:::{.rmdnote}
+Today, state minimum wage is \$11.00 per hour. Under [current law](https://lis.virginia.gov/cgi-bin/legp604.exe?201+sum+SB7), it will increase again to \$12.00 in 2023. Lawmakers must reenact the measure by July 2024 to initiative further increases to \$15.00 per hour by 2026.
+:::
+
+Another factor in this low-end wage growth is likely the [increased pay](https://www.bls.gov/opub/ted/2022/24-percent-of-establishments-increased-pay-or-paid-bonuses-because-of-covid-19-pandemic.htm) offered by many businesses, especially in the food, retail, and accommodation sectors, to encourage workers to return during the COVID-19 recovery.
 
 ```{r wage-pct-data, eval=FALSE}
 
@@ -503,7 +523,9 @@ ggplot(oews_pct,
 
 ### Wage change by occupation
 
-...
+Over this same period, wages in the region grew for four of the five most common occupation categories by total employment numbers. Workers in the Transportation and Material Moving sector saw the largest increases---from an average annual salary of \$30,250 to \$36,370 (over 20 percent).
+
+Jobs in Food Preparation and Serving, Sales, and Business and Financial Operations sectors---totaling more than 162,000 workers in the region as of May 2021---also saw wage growth, but less than the 13.3 percent average increase. Meanwhile, wages among Office and Administrative Support positions remained nearly the same (-0.2 percent) from 2019 to 2021.
 
 ```{r wage-occ-data, eval=FALSE}
 
@@ -554,7 +576,5 @@ ggplot(oews_occ,
         legend.position = "none",
         panel.grid.major.x = element_line(color = "grey95",
                                           size = 0.05))
-
-
 
 ```

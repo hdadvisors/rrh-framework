@@ -1,4 +1,4 @@
-# (PART) Demographic and socioeconomic changes {.unnumbered}
+# (PART) PART 1: Demographic and socioeconomic changes {.unnumbered}
 
 # Population changes {#part-1-1}
 
@@ -152,7 +152,9 @@ ggplot(pha_pop_compare,
        caption="Sources: U.S. Census Bureau, Population Estimates Program.") +
   theme(axis.title = element_blank(),
         panel.background = element_blank(),
-        axis.ticks.x = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
         legend.position = "none") +
   scale_fill_manual(values = geo_colors)
   
@@ -252,8 +254,10 @@ ggplot(comp_chg_summary,
        caption = "Note: Data not available for 2020.\nSource: U.S. Census Bureau, Population Estimates Program.") +
   theme(axis.title = element_blank(),
         panel.background = element_blank(),
-        axis.ticks.x = element_blank(),
-        legend.title = element_blank()) +
+        legend.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05)) +
   scale_y_continuous(labels = percent_format()) +
   scale_fill_manual(values = viridis(3))
 

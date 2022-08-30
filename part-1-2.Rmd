@@ -6,6 +6,8 @@ library(tidyverse)
 library(tidycensus)
 library(tigris)
 library(viridis)
+library(leaflet)
+library(scales)
 
 # rr includes Charles City, Goochland, New Kent, and Powhatan.
 
@@ -51,7 +53,7 @@ years <- 2016:2020
 According to Census estimates, the region gained more than 15,000 households from 2016 to 2020. This growth was driven entirely by new homeowners (17,436). Renter households, instead, saw much slower increases from 2016 to 2019; from 2019 to 2020, the estimated number of renters dropped more than 2,000 for a net loss of 609 over the full period.
 
 ::: {.rmdwarning}
-This anomalous data should be treated with caution. Lower American Community Survey response rates during COVID-19 were most common among lower-income and lower-educated households most likely to rent. Across the Richmond region, overall ACS response rates declined nearly 10 percent from the 2015-2019 to 2016-2020 collection period.
+This anomalous data should be treated with caution. Lower American Community Survey response rates during COVID-19 were most common among lower-income and lower-educated households most likely to rent. Across the Richmond region, overall ACS response rates [declined nearly 10 percent](https://www.prb.org/articles/capturing-covids-impact-on-the-american-community-survey-across-counties/) from the 2015-2019 to 2016-2020 collection period.
 :::
 
 ```{r hh-form-data, eval=FALSE}
@@ -99,7 +101,7 @@ write_rds(b25003_data, "data/b25003_data.rds")
 
 ```
 
-```{r hh-form-plot, fig.cap="Net change in households by tenure"}
+```{r hh-form-plot, fig.cap="Cumulative change in households by tenure"}
 
 b25003_data <- read_rds("data/b25003_data.rds") |> 
   filter(NAME %in% pha_names) |> 
@@ -117,7 +119,7 @@ ggplot(b25003_data,
            fill=tenure)) +
   geom_col() +
   facet_wrap(~tenure) +
-  labs(title="Net change in households by tenure",
+  labs(title="Cumulative change in households by tenure",
        subtitle="2016 to 2020",
        caption="Source: U.S. Census Bureau, American Community Survey, Table B25003.",
        fill="Tenure") +
@@ -128,7 +130,8 @@ ggplot(b25003_data,
         panel.background = element_blank(),
         panel.grid.major.x = element_blank(),
         panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+                                          size = 0.05)) +
+  scale_fill_manual(values = tenure_colors)
 
 # Homeowner change = 17,436
 # Renter change = -609
@@ -287,7 +290,7 @@ write_rds(b11001_data, "data/b11001_data.rds")
 
 ```
 
-```{r hh-type-plot}
+```{r hh-type-plot, fig.cap="Change in household type"}
 
 b11001_data <- read_rds("data/b11001_data.rds") |> 
   filter(NAME %in% pha_names) |>
@@ -683,7 +686,7 @@ The Census Bureau defines *multigenerational* households as those with three or 
 
 However, multigenerational households in the Richmond region are less common than the national average. As of 2020, the share of persons in multiple generation households across the region has stayed between 7 and 8 percent from 2016 to 2020. 
 
-:::{.rmdinfo}
+:::{.rmdnote}
 Multigenerational households estimates are not available from the standard ACS tables published by the Census Bureau. The data in this section comes from the Public Use Microdata Sample (PUMS), which are available only by special Public Use Microdata Areas (PUMAs) which contain at least 100,000 people.
 
 While PUMA boundaries align with Chesterfield County, Henrico County, and Richmond city, the PUMA containing Hanover County also includes Powhatan, Goochland, New Kent, King William, Charles City counties.

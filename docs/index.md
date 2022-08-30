@@ -1,7 +1,7 @@
 ---
 title: "Richmond Regional Housing Framework Data Update"
 author: "HDAdvisors"
-date: "`r Sys.Date()`"
+date: "2022-08-30"
 site: bookdown::bookdown_site
 documentclass: book
 # url: your book url like https://bookdown.org/yihui/bookdown
@@ -14,7 +14,7 @@ csl: chicago-fullnote-bibliography.csl
 # About {.unnumbered}
 
 ::: rmdcaution
-This report is currently in development. It was last updated on **`r Sys.Date()`**.
+This report is currently in development. It was last updated on **2022-08-30**.
 :::
 
 This report is a data update for the Richmond Regional Housing Framework, which was [released](https://pharva.com/framework/about-the-framework/) by the Partnership for Housing Affordability (PHA) in January 2020. It will support PHA's ongoing efforts to educate both decision-makers and the public at large about the region's housing needs and opportunities. Data in the report will also help PHA continue to monitor, change, and implement the policy solutions outlined in the Framework.
@@ -30,7 +30,7 @@ There are four parts in this report:
 
 ### Release 1.0 {.unnumbered}
 
-*`r Sys.Date()`*
+*2022-08-30*
 
 First full draft of all chapters. Made available for initial feedback from PHA.
 
@@ -42,7 +42,7 @@ Still to come:
 -   Improve formatting for call-out boxes
 -   PDF version of full report and locality summaries
 
-## How to read this report {.unnumbered}
+## How to read this report
 
 This report is an interactive website with three main columns for navigation:
 
@@ -52,7 +52,7 @@ This report is an interactive website with three main columns for navigation:
 
 Links to both the previous and next chapter are included at the bottom of each chapter page.
 
-## How to provide feedback on this draft {.unnumbered}
+## How to provide feedback on this draft
 
 All comments, questions, and suggestions should be emailed to [jonathan\@hdadvisors.net](mailto:jonathan@hdadvisors.net){.email} and [eric\@hdadvisors.net](mailto:eric@hdadvisors.net){.email}.
 
