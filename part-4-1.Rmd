@@ -422,8 +422,9 @@ Based on the 2020 median renter income estimate, the affordable rent for an aver
 
 # Compare local median renter income to average asking rent
 
-b25119_cpi_rent <- b25119_cpi |> 
-  filter(tenure == "Renter")
+b25119_cpi_rent <- read_rds("data/b25119_cpi.rds") |> 
+  filter(tenure == "Renter",
+         NAME == name)
 
 rent <- read_csv("data/rr_annual_rent.csv") |> 
     pivot_longer(cols = 2:8,

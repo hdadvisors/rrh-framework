@@ -15,6 +15,7 @@ library(scales)
 library(readxl)
 library(zoo)
 library(lubridate)
+library(janitor)
 
 years <- 2016:2020
 fips <- 51087
@@ -194,8 +195,6 @@ ggplot(b25119_cpi,
                                           size = 0.05),
         legend.position = "none")
 
-# 16 percent increase for renters
-# 10 percent increase for homeowners
 
 ```
 
@@ -241,7 +240,7 @@ ggplot(b18107,
 
 # Median sales price over time
 
-price <- read_csv("data/richmond_med_sales.csv") |> 
+price <- read_csv("data/henrico_med_sales.csv") |> 
   clean_names() |> 
   mutate(geography = name) |> 
   pivot_longer(cols = starts_with("sale"),

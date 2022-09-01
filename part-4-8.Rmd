@@ -244,7 +244,7 @@ ggplot(b18107,
 
 # Median sales price over time
 
-price <- read_csv("data/richmond_med_sales.csv") |> 
+price <- read_csv("data/powhatan_med_sales.csv") |> 
   clean_names() |> 
   mutate(geography = name) |> 
   pivot_longer(cols = starts_with("sale"),
