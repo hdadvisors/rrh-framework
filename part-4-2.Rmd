@@ -16,20 +16,25 @@ library(zoo)
 library(lubridate)
 library(janitor)
 library(optiRum)
+library(viridis)
 
 years <- 2016:2020
 fips <- 51041
 name <- "Chesterfield County"
 costar_name <- "Chesterfield County"
+tenure <- c("Homeowner", "Renter")
+tenure_colors <-setNames(viridis(2), nm = tenure)
 
 
 ```
 
 ## Takeaways
 
-```
-Add short bullet points summarizing major changes
-```
+- Chesterfield County's residential growth continues to be on par with Northern Virginia localities --- increasing demand for housing at all price levels.
+- Renters with children are increasingly coming to Chesterfield County --- no doubt a result of a strong public school system and limited affordable for-sale housing.
+- Younger adults with independent living difficulties are on the rise --- increasing the need for housing with wrap around services or additional support for families to take care of adult children (i.e. home modifications, accessory dwelling units, etc.).
+- Higher income renters are increasing demand for rentals in the county, but for the typical renter household income, homeownership is still challenging --- requiring roughly \$62,000 to afford the median home price with modest terms.
+- Manufactured home communities serve as a valuable source of naturally-occurring affordable housing, but as of 2022, two of the county's larger communities are at-risk.
 
 ## Demographic and socioeconomic changes
 
@@ -75,7 +80,7 @@ pop_bar
 
 ```
 
-The county's substantial growth in recent years has been directly tied to domestic migration (i.e. people living in the region, state, or nation moving into the county). Between 2020 and 2021, the county increased by 4,402 due to domestic migration.   International migration and natural increases pale in comparison and have otherwise been in decline.
+The county's substantial growth in recent years has been directly tied to domestic migration (i.e. people living in the region, state, or nation moving into the county). Between 2020 and 2021, the county increased by 4,402 due to domestic migration. International migration and natural increases pale in comparison and have otherwise been in decline.
 
 ```{r comp, fig.cap=paste0(name,": Components of population change"}
 
@@ -105,7 +110,7 @@ ggplot(change,
 
 ### Household characteristics
 
-The increasing number of homeowners in the county has been outpacing renters since 2016. Homeowner household increases have been across all types of households --- especially those with no children (+3,068). On the other hand, renter increases have mainly been among households with children (+617), while the major decrease in households was among nonfamily renter households (-289). 
+The increasing number of homeowners in the county has been outpacing renters since 2016. Homeowner household increases have been across all types of households --- especially those with no children (+3,068). On the other hand, renter increases have mainly been among households with children (+617), while the major decrease in households was among nonfamily renter households (-289).
 
 ```{r children, fig.cap=paste0(name, ": Change in households with children by tenure"}
 
@@ -129,11 +134,12 @@ ggplot(b25115,
         panel.grid.major.x = element_blank(),
         panel.grid.major.y = element_line(color = "grey95",
                                           size = 0.05),
-        axis.ticks = element_blank())
+        axis.ticks = element_blank()) +
+  scale_fill_manual(values = tenure_colors)
 
 ```
 
-As with much of the region, the senior population in the county has continued to see major growth. In the county, this growth has mainly been among seniors in family households (mainly those living with a spouse or are the head of household) (+6,566). Growth has also been significant among seniors living alone (+2,687). But declines have only been seen among seniors living with other relatives, which could include a child. 
+As with much of the region, the senior population in the county has continued to see major growth. In the county, this growth has mainly been among seniors in family households (mainly those living with a spouse or are the head of household) (+6,566). Growth has also been significant among seniors living alone (+2,687). But declines have only been seen among seniors living with other relatives, which could include a child.
 
 ```{r seniors, fig.cap=paste0(name, ": Change in senior population by living arrangement"}
 
@@ -172,7 +178,7 @@ ggplot(b09020,
 
 Between 2016 and 2020, the median renter household income increased by 7 percent, while the median homeowner household income increased 5 percent. In spite of those gains among the typical renter household in the county, renter incomes are nearly half that of a homeowner. The wide gap between between renter and homeowner incomes continues to speak to not only the greater wealth provided by homeownership, but also the continuing affordability challenges faced by renters seeking homeownership opportunities.
 
-```{r income, fig.cap=paste0(name, ": Median houshold income by tenure")}
+```{r income, fig.cap=paste0(name, ": Median household income by tenure")}
 
 # Add choice of income stat (probably median household income of some kind)
 
@@ -195,7 +201,8 @@ ggplot(b25119_cpi,
         panel.background = element_blank(),
         panel.grid.major.y = element_line(color = "grey95",
                                           size = 0.05),
-        legend.position = "none")
+        legend.position = "none") +
+  scale_fill_manual(values = tenure_colors)
 
 # 7 percent increase for renters
 # 5 percent increase for homeowners
@@ -204,7 +211,7 @@ ggplot(b25119_cpi,
 
 ### Persons with disabilities
 
-In Chesterfield County, the number of individuals with independent living difficulties has increased largely among the younger age group (18 to 34 years old). While older age groups saw new increases in individuals with living difficulties of less than 100, the 18 to 34 age group had an increase of 744 individuals. 
+In Chesterfield County, the number of individuals with independent living difficulties has increased largely among the younger age group (18 to 34 years old). While older age groups saw new increases in individuals with living difficulties of less than 100, the 18 to 34 age group had an increase of 744 individuals.
 
 ```{r ind-living, paste0(name, ": Net change in individuals with independent living difficulties by age"}
 
@@ -364,16 +371,15 @@ ggplot(sub_rent,
 
 ```
 
-
 ### Housing assistance
 
-```
-Change in number of assisted units (NHPD)
-```
+    Change in number of assisted units (NHPD)
 
 ### Naturally-occurring affordable housing
 
 As defined in this report, there are 19 rental properties in the Chesterfield County that qualify as naturally-occurring affordable housing. There are about 3,712 apartments across these properties, which make up approximately 23 percent of all multifamily (two or more units) rental housing in the county.
+
+The majority of these properties were constructed in the 1970s and 1980s. These properties command much higher rents than those built pre-1970. 
 
 ```{r noah, fig.cap=paste0(name, ": Distribution of average asking rents\nin NOAH properties by year built")}
 
@@ -411,6 +417,7 @@ ggplot(noah,
   
 
 ```
+
 This estimate does not include manufactured home communities which could also be considered NOAH properties because of their deep affordability without public subsidy. Chesterfield County still remains the region's foremost location for manufactured home communities --- with at least 1,543 homes spread out across 13 communities.
 
 Since the release of the Framework, Bermuda Estates, located along the county's Route 1 corridor, was purchased by project:HOMES. This initiative was taken upon by project:HOMES in order to stabilize the community and since the acquisition, they have made significant infrastructure improvements, replaced homes, conducted noteworthy community engagement, and placed a community center.
@@ -437,11 +444,12 @@ sum(mhc$Units)
 
 
 ```
+
 ## Gap analysis
 
 ### Affordability of current housing stock
 
-In Chesterfield County, the median renter household income is just enough to afford the average market asking rent. In 2020, the rent affordable based on the median renter household income was \$1,328, while the average asking rent was \$$1,265 --- meaning that the typical renter could afford \$63 more than the average asking rent.
+In Chesterfield County, the median renter household income is just enough to afford the average market asking rent. In 2020, the rent affordable based on the median renter household income was \$1,328, while the average asking rent was \$\$1,265 --- meaning that the typical renter could afford \$63 more than the average asking rent.
 
 This difference between affordable rent and asking rent has been shrinking in recent years. From a difference of \$89 in 2016 to \$63 in 2020.
 
@@ -492,7 +500,8 @@ ggplot(rent_gap,
 
 
 ```
-Although a typical renter can more easily find an affordable rental, if they are looking to move onto homeownership, they face a wider gap to cross. 
+
+Although a typical renter can more easily find an affordable rental, if they are looking to move onto homeownership, they face a wider gap to cross.
 
 In Chesterfield County, median renter household incomes have not been enough to afford the median sales price in the county from 2016 to 2020. In 2020, the gap between renter income and the income needed to afford the median priced home was \$8,800. This is an increase of nearly \$800 from the gap in 2016.
 
@@ -552,7 +561,7 @@ ggplot(slgap,
 
 ```
 
-Across renter households with incomes below 80 percent AMI, the gap in affordable housing has increased by 204 units from 2015 to 2018. This estimated gap is based on matching renter income to rental housing affordable to that income and should be considered with some caution. Household incomes matching housing costs does not necessarily reflect that a household is able to afford housing costs given the numerous other financial responsibilities held by individuals and families. Nonetheless, the estimated gap provides our closest assessment of a gap in housing at specific income-levels. For Chesterfield County, the gap has increased most significantly for households between 51 and 80 percent AMI --- suggesting a growing need for affordable housing for higher income households.
+Across renter households with incomes below 80 percent AMI, the gap in affordable housing has increased by 204 units from 2015 to 2018 --- for a total shortage of 7,569 rental units affordable to households making 80 percent AMI or less. This estimated gap is based on matching renter income to rental housing affordable to that income and should be considered with some caution. Household incomes matching housing costs does not necessarily reflect that a household is able to afford housing costs given the numerous other financial responsibilities held by individuals and families. Nonetheless, the estimated gap provides our closest assessment of a gap in housing at specific income-levels. For Chesterfield County, the gap has increased most significantly for households between 51 and 80 percent AMI --- suggesting a growing need for affordable housing for higher income households.
 
 ```{r gap, fig.cap=paste0(name, ": Rental housing gap by AMI")}
 
@@ -594,7 +603,7 @@ ggplot(gap,
 
 ### Impact of housing costs
 
-From 2015 to 2018, the number of cost burden homeowners has been in decline. By 2018, there was a total decline of 2,661 cost-burdened homeowners from 2015 estimates. But during this same timeframe, the number of cost-burdened renters has increased by 696. The disparate changes in cost burden in Chesterfield County speak to growing affordability issues for renters and greater stability for existing homeowners. 
+From 2015 to 2018, the number of cost burden homeowners has been in decline. By 2018, there was a total decline of 2,661 cost-burdened homeowners from 2015 estimates. But during this same timeframe, the number of cost-burdened renters has increased by 696. The disparate changes in cost burden in Chesterfield County speak to growing affordability issues for renters and greater stability for existing homeowners.
 
 ```{r cb, fig.cap=paste0(name, ": Cumulative change in cost-burdened households by tenure")}
 

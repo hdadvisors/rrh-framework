@@ -20,19 +20,27 @@ library(janitor)
 library(tigris)
 library(tidytext)
 library(optiRum)
+library(viridis)
 
 years <- 2016:2020
 fips <- 51760
 name <- "Richmond city"
 costar_name <- "Richmond City"
+tenure <- c("Homeowner", "Renter")
+tenure_colors <-setNames(viridis(2), nm = tenure)
+
 
 ```
 
 ## Takeaways
 
-```
-Add short bullet points summarizing major changes
-```
+- The City of Richmond has largely grown as a result of international migration and natural increase (+817 between 2020 and 2021).
+- Growth in renter households in the city has been the direct result of nonfamily households --- while renters with children have significantly decreased (-2,192).
+- Rents across the city have grown substantially, especially the Northside and Southside rental markets (growing by nearly 40 percent, respectively since 2016). 
+- The typical renter household still has an income unable to afford the average asking rent, as well as the median home price in the city.
+- Renter cost burden has increased 1,107 households from 2015 to 2018.
+- The greatest need still remains for households making below 30 percent AMI; there was a shortage of nearly 11,000 rental homes for extremely low-income households.
+
 
 ## Demographic and socioeconomic changes
 
@@ -134,7 +142,8 @@ ggplot(b25115,
         panel.grid.major.x = element_blank(),
         panel.grid.major.y = element_line(color = "grey95",
                                           size = 0.05),
-        axis.ticks = element_blank())
+        axis.ticks = element_blank()) +
+  scale_fill_manual(values = tenure_colors)
 
 ```
 Since 2016, the number of seniors (65 years and over) has been on the rise in the city --- especially among seniors living alone (+1,695). The rise in seniors living alone is a result of the ongoing [desire of older adults to age in place.](https://www.aarp.org/home-family/your-home/info-2021/home-and-community-preferences-survey.html) As this trend continues, so do concerns for senior ability to age in place comfortably with ongoing home maintenance needs or rising rent on fixed incomes. 
@@ -199,7 +208,8 @@ ggplot(b25119_cpi,
         panel.background = element_blank(),
         panel.grid.major.y = element_line(color = "grey95",
                                           size = 0.05),
-        legend.position = "none")
+        legend.position = "none") +
+  scale_fill_manual(values = tenure_colors)
 
 # 16 percent increase for renters
 # 10 percent increase for homeowners
@@ -522,7 +532,9 @@ ggplot(slgap,
 
 
 ```
+Based on HUD Comprehensive Housing Affordability Strategy (CHAS) data, there was a shortage of 17,834 rental homes for households making less than 80 percent AMI. This was a deficit increase of 300 homes from 2015 when the shortage was 17,534. The most severe shortage in the City of Richmond is among deeply affordable rentals for households at 30 percent AMI or less.
 
+But there has been a growing shortage among higher income households between 31 and 80 percent AMI.
 
 ```{r gap, eval=FALSE, fig.cap=paste0(name, ": Rental housing gap by AMI"), include=FALSE}
 
@@ -590,7 +602,8 @@ ggplot(cb,
         axis.ticks = element_blank(),
         panel.background = element_blank(),
         panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+                                          size = 0.05)) +
+  scale_fill_manual(values = tenure_colors)
 
 ```
 Federal and state eviction protections during the pandemic significantly reduced the number of eviction filings and judgements processed by Richmond City District Court. However, these measures have now expired---along with the state's rent relief program. This data does not include the summer months of 2022, when many observers have started to notice an increase in filings.
