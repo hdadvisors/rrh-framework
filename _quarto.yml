@@ -43,7 +43,7 @@ book:
 
 knitr:
   opts_chunk: 
-    echo: true
+    echo: false
     warning: false
     message: false
 
