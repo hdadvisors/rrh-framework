@@ -1,0 +1,677 @@
+# Chesterfield County {#part-4-2}
+
+This chapter is a summary of the major changes to the Chesterfield County's population and housing market in the past five years.
+
+```{r setup}
+
+library(tidyverse)
+library(sf)
+library(sp)
+library(plotly)
+library(simplevis)
+library(tidytext)
+library(scales)
+library(readxl)
+library(zoo)
+library(lubridate)
+library(janitor)
+library(optiRum)
+library(viridis)
+
+years <- 2016:2020
+fips <- 51041
+name <- "Chesterfield County"
+costar_name <- "Chesterfield County"
+tenure <- c("Homeowner", "Renter")
+tenure_colors <-setNames(viridis(2), nm = tenure)
+
+
+```
+
+## Takeaways
+
+- Chesterfield County's residential growth continues to be on par with Northern Virginia localities --- increasing demand for housing at all price levels.
+- Renters with children are increasingly coming to Chesterfield County --- no doubt a result of a strong public school system and limited affordable for-sale housing.
+- Younger adults with independent living difficulties are on the rise --- increasing the need for housing with wrap around services or additional support for families to take care of adult children (i.e. home modifications, accessory dwelling units, etc.).
+- Higher income renters are increasing demand for rentals in the county, but for the typical renter household income, homeownership is still challenging --- requiring roughly \$62,000 to afford the median home price with modest terms.
+- Manufactured home communities serve as a valuable source of naturally-occurring affordable housing, but as of 2022, two of the county's larger communities are at-risk.
+
+## Demographic and socioeconomic changes
+
+### Population changes
+
+Chesterfield County's population has been on a continual rise since 2010. Between 2016 and 2020, county population experienced an 8 percent increase --- just over 26,000 new residents. As of the 2020 Census, Chesterfield County was the fourth-most populous locality in Virginia --- falling only behind the Northern Virginia counties of Fairfax, Prince William, and Loudoun.
+
+```{r pop, fig.cap=paste0(name, ": Total Population")}
+
+# Add choice of population stat (net change, components, etc)
+
+pop <- read_rds("data/rr_pop_data.rds") |> 
+  mutate(GEOID = parse_number(GEOID)) |> 
+  filter(counttype != "Forecast",
+         GEOID == fips)
+
+pop_bar <- ggplot(pop,
+                      aes(x = year,
+                          y = value,
+                          fill = value)) +
+  geom_col() +
+  scale_fill_continuous(viridis_pal()) +
+  labs(title = paste0(name, ": Total Population"),
+       subtitle = "2010 to 2020",
+       caption = "Source: U.S. Census Bureau Decennial Census and American Community Survey.") +
+  scale_y_continuous(labels = label_comma()) +
+  theme(axis.title = element_blank(),
+        legend.position = "none",
+        panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
+ggplotly(pop_bar) |>
+  plotly_camera()
+
+# 2010 to 2020 increase of 48,312 --- 15 percent increase
+# 2019 TO 2020 increase of 11,746 --- 3 percent increase
+# 2016 to 2020 increase of 26,069 --- 8 percent increase
+# 2020 value is 364,548
+
+pop_bar
+
+```
+
+The county's substantial growth in recent years has been directly tied to domestic migration (i.e. people living in the region, state, or nation moving into the county). Between 2020 and 2021, the county increased by 4,402 due to domestic migration. International migration and natural increases pale in comparison and have otherwise been in decline.
+
+```{r comp, fig.cap=paste0(name,": Components of population change"}
+
+change <- read_rds("data/rr_comp_change.rds") |> 
+  filter(year %in% as.character(years) | year == "2021") |> 
+  filter(NAMELSAD == name)
+
+ggplot(change,
+       aes(x = year,
+           y = value,
+           fill = component)) +
+  geom_col() +
+  facet_wrap(~component) +
+  labs(title = paste0(name,": Components of population change"), 
+       subtitle = "2016 through 2021",
+       fill = "Component of change",
+       caption = "Note: 2020 components of change data not available.\nSource: U.S. Census Bureau, Population Estimates Program.") +
+  theme(axis.title = element_blank(),
+        legend.position = "none",
+        panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05)) +
+  scale_y_continuous(labels = label_number(big.mark = ",", style_positive = "plus", style_negative = "minus"))
+
+```
+
+### Household characteristics
+
+The increasing number of homeowners in the county has been outpacing renters since 2016. Homeowner household increases have been across all types of households --- especially those with no children (+3,068). On the other hand, renter increases have mainly been among households with children (+617), while the major decrease in households was among nonfamily renter households (-289).
+
+```{r children, fig.cap=paste0(name, ": Change in households with children by tenure"}
+
+# Add choice of household stat (HHs with children, HHs with seniors, subfamilies, etc)
+
+b25115 <- read_rds("data/b25115_data.rds") |> 
+  filter(NAME == name)
+
+ggplot(b25115,
+       aes(x = children, y = change, fill = tenure)) +
+  geom_col(position = "dodge") + 
+  facet_wrap(~children, nrow = 1, scales = "free_x") +
+  scale_y_continuous(labels = label_number(style_positive = "plus", big.mark = ",")) +
+  labs(title = paste0(name, ": Change in households with children by tenure"),
+       subtitle = "2016 to 2020",
+       fill = "Tenure",
+       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25115.") +
+  theme(axis.title = element_blank(),
+        axis.text.x = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.ticks = element_blank()) +
+  scale_fill_manual(values = tenure_colors)
+
+```
+
+As with much of the region, the senior population in the county has continued to see major growth. In the county, this growth has mainly been among seniors in family households (mainly those living with a spouse or are the head of household) (+6,566). Growth has also been significant among seniors living alone (+2,687). But declines have only been seen among seniors living with other relatives, which could include a child.
+
+```{r seniors, fig.cap=paste0(name, ": Change in senior population by living arrangement"}
+
+b09020 <- read_rds("data/b09020_data.rds") |> 
+  filter(NAME == name) |> 
+  mutate(family = str_replace(family, "Group quarters", " "),
+         family = fct_relevel(family, "Family", "Nonfamily", " "))
+
+ggplot(b09020,
+       aes(y = reorder_within(relationship, change, family),
+           x = change,
+           fill = relationship)) +
+  geom_col(position = "dodge") +
+  scale_y_reordered() +
+  scale_x_continuous(labels = label_comma()) +
+  facet_grid(rows = vars(family), scales = "free_y", space = "free", switch = "y") +
+  #scale_y_discrete(labels = function(x) str_wrap(x, width = 10)) +
+  labs(title = paste0(name, ": Change in senior population by living arrangement"),
+       subtitle="2016 to 2020",
+       fill="Tenure",
+       caption = "Source: U.S. Census Bureau, American Community Survey, Table B09020.") +
+  theme(axis.title = element_blank(),
+        #axis.text.x = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_blank(),
+        legend.position = "none",
+        panel.grid.major.x = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.ticks = element_blank(),
+        strip.placement = "outside",
+        strip.text.y = element_text(angle = 0))
+
+```
+
+### Income and wages
+
+Between 2016 and 2020, the median renter household income increased by 7 percent, while the median homeowner household income increased 5 percent. In spite of those gains among the typical renter household in the county, renter incomes are nearly half that of a homeowner. The wide gap between between renter and homeowner incomes continues to speak to not only the greater wealth provided by homeownership, but also the continuing affordability challenges faced by renters seeking homeownership opportunities.
+
+```{r income, fig.cap=paste0(name, ": Median household income by tenure")}
+
+# Add choice of income stat (probably median household income of some kind)
+
+b25119_cpi <-read_rds("data/b25119_cpi.rds") |> 
+  filter(NAME == name)
+
+ggplot(b25119_cpi, 
+       aes(x = year,
+           y = dollars20,
+           fill = tenure)) +
+  geom_col() +
+  facet_wrap(~tenure) +
+  scale_y_continuous(labels = dollar_format(), limits = c(0, NA)) +
+  labs(title = paste0(name, ": Median houshold income by tenure"), 
+       color = "Tenure",
+       subtitle = "2016 to 2020 | Adjusted to 2020 dollars",
+       caption = "Source: U.S. Census Bureau, American Community Survey") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        legend.position = "none") +
+  scale_fill_manual(values = tenure_colors)
+
+# 7 percent increase for renters
+# 5 percent increase for homeowners
+
+```
+
+### Persons with disabilities
+
+In Chesterfield County, the number of individuals with independent living difficulties has increased largely among the younger age group (18 to 34 years old). While older age groups saw new increases in individuals with living difficulties of less than 100, the 18 to 34 age group had an increase of 744 individuals.
+
+```{r ind-living, paste0(name, ": Net change in individuals with independent living difficulties by age"}
+
+# Add disability stat (probably independent living difficulty)
+
+b18107 <- read_rds("data/b18107_data.rds") |> 
+  filter(NAME == name) |> 
+  group_by(age) |> 
+  summarise(change = sum(change))
+
+ggplot(b18107,
+       aes(x = age,
+           y = change,
+           fill = age)) +
+  geom_col() +
+  labs(title=paste0(name, ": Net change in individuals with\nindependent living difficulties by age"),
+       subtitle="2016 to 2020",
+       caption="Source: U.S. Census Bureau, American Community Survey, Table B18107.") +
+  scale_y_continuous(labels = label_comma()) +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = "none",
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
+```
+
+## Housing supply and market changes
+
+### Homeownership
+
+Chesterfield County home prices continue to rise. In 2020, median home price for the county passed the \$300,000 mark. In spite of a brief decrease towards the end of 2020, home prices in the county have continued to increase amid the pandemic --- getting closer and closer to \$400,000.
+
+```{r sales, fig.cap=paste0(name, ": Median home sales price")}
+
+# Median sales price over time
+
+price <- read_csv("data/chesterfield_med_sales.csv") |> 
+  clean_names() |> 
+  mutate(geography = name) |> 
+  pivot_longer(cols = starts_with("sale"),
+    names_to = "label",
+    values_to = "med_price",
+    values_drop_na = TRUE) |> 
+  mutate(year = substr(label, 19,23)) |> 
+  select(geography, year, month, med_price)
+
+price$month <- match(price$month, month.abb)
+
+price <- price |> 
+  mutate(date = make_date(year, month)) |> 
+  mutate(med_price = parse_number(med_price))
+
+ggplot(price,
+       aes(x = date,
+           y = med_price,
+           color = med_price)) +
+  geom_line(stat = "identity", size = 1) +
+  scale_y_continuous(labels = label_dollar(), limits = c(0, NA)) +
+  scale_x_date(date_labels = "%Y", date_breaks = "1 year") +
+  labs(title = paste0(name, ": Median home sales price"),
+       subtitle = "January 2017 to June 2022",
+       caption = "Source: Central Virginia Regional Multiple Listing Service.") +
+  theme(axis.title = element_blank(),
+        panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        legend.title = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05)) +
+  scale_color_continuous(type = "viridis", label = dollar_format())
+
+
+```
+
+### Rental
+
+Rental demand has continued to grow over the past five years. As of Q3 2022, the average market asking rent in Chesterfield County was \$1,504 --- which would require a household to make just over \$60,000 to not be cost-burdened. Based on 2020 estimates on median renter household income, this would be a rent affordable to a large swath of the renter population.
+
+```{r rent, fig.cap=paste0(name, ": Average asking rent"}
+
+# Average asking rent over time
+
+rent <- read_csv("data/chesterfield_rent_avg.csv") |> 
+  clean_names() |> 
+  select(period, rent, rent_adj) |> 
+  mutate(period = as.Date(as.yearqtr(period, format = "%Y Q%q"), frac = 1)) |> 
+  pivot_longer(2:3,
+               names_to = "type",
+               values_to = "rent") |> 
+  mutate(type = case_when(
+    type == "rent" ~ "Nominal rent",
+    type == "rent_adj" ~ "Inflation-adjusted rent (2020 dollars)")) |> 
+  mutate(year = year(period)) |> 
+  filter(year >= 2016)
+
+
+ggplot(rent,
+       aes(x = period,
+           y = rent, 
+           color = type)) +
+  geom_line(stat = "identity") + 
+  labs(title = paste0(name, ": Average asking rent by submarket"),
+       subtitle = "2000 Q1 to 2022 Q3",
+       color = "Dollar value") +
+  scale_y_continuous(labels = label_dollar(), limits = c(0, NA), n.breaks = 7) +
+  scale_x_date(date_labels = "%Y", date_breaks = "2 years", limits = as.Date(c("2016-01-01", "2022-09-30"))) +
+  theme(axis.title = element_blank(),
+        panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
+```
+
+Based on CoStar geographic markets, the Midlothian area represents a distinct rental market from the rest of the county. As of Q3 2022 the average market asking rent for Midlothian was \$152 more than the rest of the county. The differences in rent can be attributed to the development of several **new** multifamily properties and the highly desirable location. With market rate rental development continuing to target this area, geographic disparities may continue.
+
+```{r rent-submarket, fig.cap=paste0(name, ": Average asking rent by submarket"}
+
+# Average asking rent over time (by submarket if applicable, maybe by bedroom if no submarkets)
+
+# Disaggregate by Richmond CoStar Submarket
+
+# CoStar Filters: Construction Status - Existing
+
+# Added locality field manually
+
+sub_rent <- read_csv("data/rr_submarket_data.csv") |> 
+  clean_names() |> 
+  separate(geography, into = c("region", "state", "submarket"), sep = " - ") |> 
+  select(period, locality, submarket, "rent" = market_asking_rent_unit, vacancy_rate) |> 
+  mutate(rent = parse_number(rent)) |> 
+  mutate(period = as.Date(as.yearqtr(period, format = "%Y Q%q"), frac = 1)) |> 
+  filter(locality == costar_name)
+
+# Issue with above is that rents are not inflation-adjusted. May need to revisit. I've requested from CoStar to allow for an inflation-adjusted average rent per unit pull, BUT who knows if they can add it. Might consider just having a table with most recent rents.
+
+ggplot(sub_rent,
+       aes(x = period,
+           y = rent, 
+           color = submarket)) +
+  geom_line(stat = "identity") + 
+  labs(title = paste0(name, ": Average asking rent by submarket"),
+       subtitle = "2000 Q1 to 2022 Q3 | Not adjusted for inflation",
+       color = "Submarket") +
+  scale_y_continuous(labels = label_dollar(), limits = c(0, NA), n.breaks = 7) +
+  scale_x_date(date_labels = "%Y", date_breaks = "2 years", limits = as.Date(c("2000-01-01", "2022-09-30"))) +
+  theme(axis.title = element_blank(),
+        panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
+```
+
+### Housing assistance
+
+    Change in number of assisted units (NHPD)
+
+### Naturally-occurring affordable housing
+
+As defined in this report, there are 19 rental properties in the Chesterfield County that qualify as naturally-occurring affordable housing. There are about 3,712 apartments across these properties, which make up approximately 23 percent of all multifamily (two or more units) rental housing in the county.
+
+The majority of these properties were constructed in the 1970s and 1980s. These properties command much higher rents than those built pre-1970. 
+
+```{r noah, fig.cap=paste0(name, ": Distribution of average asking rents\nin NOAH properties by year built")}
+
+# Add choice of NOAH stat (total number, change in rent, etc) 
+
+noah <- read_csv("data/pha_noah_81722.csv") |> 
+  clean_names() |> 
+  st_as_sf(coords = c("longitude", "latitude"), crs=4326, remove=FALSE) |> 
+  filter(property_name != "Sedgefield" | property_name != "Holidy Mobile Home Park") |> 
+  filter(county_name == "Chesterfield") |> 
+  mutate(period_built = case_when(
+    year_built < 1940 ~ "Before 1940",
+    year_built %in% 1940:1959 ~ "1940 to 1959",
+    year_built %in% 1960:1969 ~ "1960 to 1969",
+    year_built > 1969 ~ "1970 or after"
+  )) |> 
+  mutate(period_built = fct_relevel(period_built, "Before 1940"))
+
+sum(noah$number_of_units)
+
+ggplot(noah,
+       aes(x = period_built,
+           y = avg_asking_unit,
+           fill = period_built)) +
+  geom_boxplot() +
+  scale_y_continuous(labels = label_dollar()) +
+  labs(title = paste0(name, ": Distribution of average asking rents\nin NOAH properties by year built"),
+       caption = "Source: CoStar Group, Inc.") +
+  theme(legend.position = "none",
+        panel.background = element_blank(),
+        axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+  
+
+```
+
+This estimate does not include manufactured home communities which could also be considered NOAH properties because of their deep affordability without public subsidy. Chesterfield County still remains the region's foremost location for manufactured home communities --- with at least 1,543 homes spread out across 13 communities.
+
+Since the release of the Framework, Bermuda Estates, located along the county's Route 1 corridor, was purchased by project:HOMES. This initiative was taken upon by project:HOMES in order to stabilize the community and since the acquisition, they have made significant infrastructure improvements, replaced homes, conducted noteworthy community engagement, and placed a community center.
+
+This stands in contrast to private activity in some of Chesterfield County's largest manufactured home communities, Suburban Village and Shady Hill. Suburban Village was purchased in early 2021 by a real estate investment firm, while Shady Hill Mobile Home Park recently accepted a purchase offer in Summer 2022. Both acquisitions have raised concerns among residents and advocates for significant rent increases and potential redevelopment.
+
+```{r mhccv}
+
+library(kableExtra)
+library(formattable)
+
+mhc <- read_csv("data/mhccv_data.csv") |> 
+  filter(County == "Chesterfield") |> 
+  select(`Park Name`, Units) |> 
+  arrange(desc(Units))
+
+mhc |> 
+  kable(caption = "Manufactured Home Communities in Chesterfield County",
+        col.names = c("Community name", "Estimated units")) |> 
+  kableExtra::kable_styling(
+    bootstrap_options = c("condensed", "striped", "hover"))
+
+sum(mhc$Units)
+
+
+```
+
+## Gap analysis
+
+### Affordability of current housing stock
+
+In Chesterfield County, the median renter household income is just enough to afford the average market asking rent. In 2020, the rent affordable based on the median renter household income was \$1,328, while the average asking rent was \$\$1,265 --- meaning that the typical renter could afford \$63 more than the average asking rent.
+
+This difference between affordable rent and asking rent has been shrinking in recent years. From a difference of \$89 in 2016 to \$63 in 2020.
+
+```{r income-rent-gap, fig.cap=paste0(name, ": Average asking rent versus\nrent affordable to median renter income")}
+
+# Compare local median renter income to average asking rent
+
+b25119_cpi_rent <- read_rds("data/b25119_cpi.rds") |> 
+  filter(tenure == "Renter",
+         NAME == name)
+
+rent <- read_csv("data/rr_annual_rent.csv") |> 
+    pivot_longer(cols = 2:8,
+               names_to = "locality",
+               values_to = "rent_current") |> 
+  clean_names() |> 
+  filter(locality == costar_name)
+
+rent_gap <- b25119_cpi_rent |> 
+  left_join(rent, by = "year") |> 
+  mutate(rent_current = parse_number(rent_current)) |> 
+  mutate(affordable_rent = (cdollars/12)*.30) |> 
+  mutate(difference = rent_current - affordable_rent) |> 
+  select(year, rent_current, affordable_rent) |> 
+  pivot_longer(2:3,
+               names_to = "type",
+               values_to = "dollars") |> 
+  mutate(type = case_when(
+    type == "affordable_rent" ~ "Affordable rent",
+    type == "rent_current" ~ "Current rent"
+  ))
+
+ggplot(rent_gap,
+       aes(x = year,
+           y = dollars,
+           fill = type)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_y_continuous(labels = label_dollar()) +
+  labs(title = paste0(name, ": Average asking rent versus\nrent affordable to median renter income"),
+       subtitle = "2016 to 2020",
+       fill = "Nominal rent",
+       caption = "Sources: U.S. Census Bureau, American Community Survey, Table B25119\nand CoStar Group Inc.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
+
+```
+
+Although a typical renter can more easily find an affordable rental, if they are looking to move onto homeownership, they face a wider gap to cross.
+
+In Chesterfield County, median renter household incomes have not been enough to afford the median sales price in the county from 2016 to 2020. In 2020, the gap between renter income and the income needed to afford the median priced home was \$8,800. This is an increase of nearly \$800 from the gap in 2016.
+
+```{r income-own-gap, fig.cap=title = paste0(name, ": Income needed to afford median home price\nversus median renter income")}
+
+# Compare local renter income versus local home prices
+
+rr_sales_annual <- read_csv("data/rr_annual_sales.csv") |> 
+  pivot_longer(cols = 2:9,
+               names_to = "locality",
+               values_to = "price") |> 
+  clean_names() |> 
+  filter(locality == costar_name)
+
+int_annual <- read_csv("data/fredmac_int_annual.csv")
+
+downpayment <- 0.05 # 5% downpayment
+closingcosts <- 0.015 # 1.5% closing costs
+utilities <- 250 # Assume $250/month for utilities
+
+sale <- rr_sales_annual |> 
+  left_join(b25119_cpi_rent, by = "year") |> 
+  left_join(int_annual, by = "year") |> 
+  drop_na() |> 
+  mutate(principal = price - (price*downpayment)) |> 
+  mutate(loanamt = principal/(1-closingcosts)) |> 
+  mutate(mortgage = abs(PMT((annual_int/12), 360, loanamt)) + 250) |> 
+  mutate(inc_needed = ((mortgage*10)/2.8)*12) |> 
+  select(year, inc_needed, cdollars)
+
+slgap <- sale |> 
+  pivot_longer(2:3,
+               names_to = "data",
+               values_to = "value") |> 
+  mutate(data = case_when(
+    data == "cdollars" ~ "Renter median household income",
+    data == "inc_needed" ~ "Income needed to afford median home price"
+  ))
+
+ggplot(slgap,
+       aes(x = year,
+           y = value,
+           fill = str_wrap(data, 25))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_y_continuous(labels = label_dollar()) +
+  labs(title = paste0(name, ": Income needed to afford median home price\nversus median renter income"),
+       subtitle = "2016 to 2020",
+       fill = "Nominal income",
+       caption = "Sources: U.S. Census Bureau, American Community Survey, Table B25119\nand Central Virginia Regional Multiple Listing Service.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        legend.key.height=unit(1, "cm"))
+
+
+```
+
+Across renter households with incomes below 80 percent AMI, the gap in affordable housing has increased by 204 units from 2015 to 2018 --- for a total shortage of 7,569 rental units affordable to households making 80 percent AMI or less. This estimated gap is based on matching renter income to rental housing affordable to that income and should be considered with some caution. Household incomes matching housing costs does not necessarily reflect that a household is able to afford housing costs given the numerous other financial responsibilities held by individuals and families. Nonetheless, the estimated gap provides our closest assessment of a gap in housing at specific income-levels. For Chesterfield County, the gap has increased most significantly for households between 51 and 80 percent AMI --- suggesting a growing need for affordable housing for higher income households.
+
+```{r gap, fig.cap=paste0(name, ": Rental housing gap by AMI")}
+
+# Add choice of affordability stat (surplus/deficit, income vs prices, etc)
+
+gap <- read_rds("data/tb_18_match.rds") |> 
+  filter(county == name) |> 
+  group_by(year, household_income, gapcode) |>
+  summarise(estimate = sum(estimate)) |>
+  mutate(estimate = case_when(
+    gapcode == "Gap" ~ estimate * -1,
+    gapcode == "Matches or less than income" ~ estimate
+  )) |>
+  mutate(gapcode = case_when(
+    gapcode == "Gap" ~ "Shortage of units",
+    gapcode == "Matches or less than income" ~ "Households at or less than income"
+  )) |>
+  filter(household_income != "80 percent AMI or greater")
+
+ggplot(gap,
+       aes(x = year, 
+           y = estimate,
+           fill = gapcode)) +
+  geom_bar(stat = "identity") +
+  facet_grid(~household_income) +
+  scale_y_continuous(labels = label_comma()) +
+  labs(title = paste0(name, ": Rental housing gap by AMI"),
+       subtitle = "2015 to 2018",
+       caption = "Source: U.S. Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        legend.position = "bottom",
+        legend.title = element_blank())
+
+```
+
+### Impact of housing costs
+
+From 2015 to 2018, the number of cost burden homeowners has been in decline. By 2018, there was a total decline of 2,661 cost-burdened homeowners from 2015 estimates. But during this same timeframe, the number of cost-burdened renters has increased by 696. The disparate changes in cost burden in Chesterfield County speak to growing affordability issues for renters and greater stability for existing homeowners.
+
+```{r cb, fig.cap=paste0(name, ": Cumulative change in cost-burdened households by tenure")}
+
+cb <- read_rds("data/cb_7.rds") |> 
+  filter(county == name,
+         cb_group == "Cost-burdened") |> 
+  group_by(year, county, tenure) |> 
+  summarise(estimate = sum(estimate)) |> 
+  group_by(county, tenure) |> 
+  mutate(change = estimate - lag(estimate)) |> 
+  drop_na() |> 
+  mutate(run_diff = cumsum(change))
+
+ggplot(cb,
+       aes(x = year, y = run_diff, fill = tenure)) +
+  geom_col(position = "dodge") +
+  scale_y_continuous(labels = label_comma()) +
+  labs(title = paste0(name, ": Cumulative change in cost-burdened households by tenure"),
+       subtitle = "2015 to 2018",
+       fill = "Tenure",
+       caption = "Source: U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
+```
+
+Pre-pandemic eviction filings were typically above 500 each month, while eviction judgements were made were nearly half of those filings. The pandemic protections signficantly decreased filings to nearly a third of pre-pandemic numbers. Eviction judgements remained low throughout much of 2021, but filings and judgements saw increases in the early part of 2022 --- signalling the potential for greater renter instability as pandemic renter protections end.
+
+```{r evictions, fig.cap=paste0(name, ": Evictions filings and judgements")}
+
+evictions <- read_csv("data/evictions_17_22.csv") |> 
+  pivot_longer(3:128,
+               names_to = "data",
+               values_to = "value") |> 
+  mutate(type = case_when(
+    str_detect(data, "Filings") ~ "Filings",
+    str_detect(data,"Evictions") ~ "Eviction judgements"
+  )) |> 
+  mutate(date = str_sub(data, -7, -1)) |> 
+  mutate(date = ym(date)) |> 
+  mutate(year = year(date)) |> 
+  mutate(type = fct_relevel(type, "Filings", "Eviction judgements")) |> 
+  filter(Jurisdiction == "Chesterfield")
+
+eviction_colors <- setNames(c("#00BFC4", "#F8766D"),
+                            nm = c("Filings", "Eviction judgements"))
+
+ggplot(evictions,
+       aes(x = date,
+           y = value,
+           fill = type)) +
+  geom_col(position = "dodge") +
+  scale_x_date(labels = label_date_short(), breaks = breaks_width("6 months")) +
+  scale_y_continuous(labels = label_comma()) +
+  labs(title = paste0(name, ": Evictions filings and judgements"),
+       subtitle = "January 2017 to March 2022",
+       caption = "Source: RVA Eviction Lab") +
+  scale_fill_manual(values = eviction_colors) +
+  theme(legend.position = "bottom",
+        legend.title = element_blank(),
+        axis.title = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.ticks = element_blank())
+
+```

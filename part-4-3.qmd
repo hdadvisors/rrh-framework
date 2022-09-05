@@ -1,0 +1,625 @@
+# Henrico County {#part-4-3}
+
+This chapter is a summary of the major changes to the Henrico County's population and housing market in the past five years.
+
+```{r setup}
+
+library(tidyverse)
+library(sf)
+library(sp)
+library(plotly)
+library(simplevis)
+library(tidytext)
+library(scales)
+library(readxl)
+library(zoo)
+library(lubridate)
+library(janitor)
+
+years <- 2016:2020
+fips <- 51087
+name <- "Henrico County"
+costar_name <- "Henrico County"
+tenure <- c("Homeowner", "Renter")
+tenure_colors <-setNames(viridis(2), nm = tenure)
+
+```
+
+## Takeaways
+
+- Henrico County continues to grow --- largely due to international migration and natural increase (+767 between 2020 and 2021), but the county have consistently seen population loss due to domestic out-migration (-1,552 during that same time period). 
+- In recent years, renter households with children have been in decline in the county (-1,010). 
+- Median home prices in the county have surpassed the \$300,000 mark as of June 2022 --- continuing to leave median renter households further unable to reach homeownership.
+- In 2020, there was an over \$12,000 difference in the income needed to afford the median home price and the typical renter income. 
+
+
+## Demographic and socioeconomic changes
+
+### Population changes
+
+From 2010 to 2020, Henrico County has grown by 9 percent --- an increase of 27,454 residents. The increase has been greater than Chesterfield County (8 percent), but slightly less than the City (11 percent). 
+
+```{r pop, fig.cap=paste0(name, ": Total Population")}
+
+# Add choice of population stat (net change, components, etc)
+
+pop <- read_rds("data/rr_pop_data.rds") |> 
+  mutate(GEOID = parse_number(GEOID)) |> 
+  filter(counttype != "Forecast",
+         GEOID == fips)
+
+pop_bar <- ggplot(pop,
+                      aes(x = year,
+                          y = value,
+                          fill = value)) +
+  geom_col() +
+  scale_fill_continuous(viridis_pal()) +
+  labs(title = paste0(name, ": Total Population"),
+       subtitle = "2010 to 2020",
+       caption = "Source: U.S. Census Bureau Decennial Census and American Community Survey.") +
+  scale_y_continuous(labels = label_comma()) +
+  theme(axis.title = element_blank(),
+        legend.position = "none",
+        panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
+# ggplotly(pop_bar) |> 
+#   plotly_camera()
+
+# 2010 to 2020 increase of 27,454 -- 9 percent increase
+# 2019 TO 2020 decrease of 3,571 -- 1 percent increase
+
+pop_bar
+
+```
+Population increases in recent years have largely been the result of international migration and natural increases. But declines in the county have consistently been the result of residents moving elsewhere in the country. Domestic out-migration had been declining in the latter half of the 2010s, but between 2020 and 2021, 1,552 Henrico County residents moved elsewhere.
+
+```{r comp, fig.cap=paste0(name,": Components of population change"}
+
+change <- read_rds("data/rr_comp_change.rds") |> 
+  filter(year %in% as.character(years) | year == "2021") |> 
+  filter(NAMELSAD == name)
+
+ggplot(change,
+       aes(x = year,
+           y = value,
+           fill = component)) +
+  geom_col() +
+  facet_wrap(~component) +
+  labs(title = paste0(name,": Components of population change"), 
+       subtitle = "2016 through 2021",
+       fill = "Component of change",
+       caption = "Note: 2020 components of change data not available.\nSource: U.S. Census Bureau, Population Estimates Program.") +
+  theme(axis.title = element_blank(),
+        legend.position = "none",
+        panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05)) +
+  scale_y_continuous(labels = label_number(big.mark = ",", style_positive = "plus", style_negative = "minus"))
+
+```
+
+### Household characteristics
+
+Homeowner households of all types are increasing in the county --- especially homeowners without children. Between 2016 and 2020, homeowner households without children saw an increase of 2,061, while homeowner households with children only increased by 1,469. Renter households have seen significantly smaller increases among households without children and nonfamily households (i.e. single adults living alone or with roommates). But Henrico County household decrease between 2016 and 2020 was solely experienced by renter households with children. 
+
+```{r children, fig.cap=paste0(name, ": Change in households with children by tenure"}
+
+# Add choice of household stat (HHs with children, HHs with seniors, subfamilies, etc)
+
+b25115 <- read_rds("data/b25115_data.rds") |> 
+  filter(NAME == name)
+
+ggplot(b25115,
+       aes(x = children, y = change, fill = tenure)) +
+  geom_col(position = "dodge") + 
+  facet_wrap(~children, nrow = 1, scales = "free_x") +
+  scale_y_continuous(labels = label_number(style_positive = "plus", big.mark = ",")) +
+  labs(title = paste0(name, ": Change in households with children by tenure"),
+       subtitle = "2016 to 2020",
+       fill = "Tenure",
+       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25115.") +
+  theme(axis.title = element_blank(),
+        axis.text.x = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.ticks = element_blank()) +
+  scale_fill_manual(values = tenure_colors)
+
+```
+
+The Grey Wave continues in Henrico County, where there was a 6,603 increase in the senior population between 2016 and 2020. The majority of this growth was among seniors who were the head of family households (+2,821) and seniors living alone (+2,237).
+
+```{r seniors, fig.cap=paste0(name, ": Change in senior population by living arrangement"}
+
+b09020 <- read_rds("data/b09020_data.rds") |> 
+  filter(NAME == name) |> 
+  mutate(family = str_replace(family, "Group quarters", " "),
+         family = fct_relevel(family, "Family", "Nonfamily", " "))
+
+ggplot(b09020,
+       aes(y = reorder_within(relationship, change, family),
+           x = change,
+           fill = relationship)) +
+  geom_col(position = "dodge") +
+  scale_y_reordered() +
+  scale_x_continuous(labels = label_comma()) +
+  facet_grid(rows = vars(family), scales = "free_y", space = "free", switch = "y") +
+  #scale_y_discrete(labels = function(x) str_wrap(x, width = 10)) +
+  labs(title = paste0(name, ": Change in senior population by living arrangement"),
+       subtitle="2016 to 2020",
+       fill="Tenure",
+       caption = "Source: U.S. Census Bureau, American Community Survey, Table B09020.") +
+  theme(axis.title = element_blank(),
+        #axis.text.x = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_blank(),
+        legend.position = "none",
+        panel.grid.major.x = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.ticks = element_blank(),
+        strip.placement = "outside",
+        strip.text.y = element_text(angle = 0))
+
+# sum(b09020$change)
+
+```
+
+### Income and wages
+
+The disparity between homeowner and renter incomes in the county has continued between 2016 and 2020. As of 2020, the median homeowner household income was nearing \$100,000 at \$93,965. But median renter household income was \$48,081 --- nearly \$46,000 less than homeowners.
+
+During this timeframe, the median homeowner household income increased by 7 percent, while renter income only increased by 3 percent.
+
+```{r income, fig.cap=paste0(name, ": Median household income by tenure")}
+
+# Add choice of income stat (probably median household income of some kind)
+
+b25119_cpi <-read_rds("data/b25119_cpi.rds") |> 
+  filter(NAME == name)
+
+ggplot(b25119_cpi, 
+       aes(x = year,
+           y = dollars20,
+           fill = tenure)) +
+  geom_col() +
+  facet_wrap(~tenure) +
+  scale_y_continuous(labels = dollar_format(), limits = c(0, NA)) +
+  labs(title = paste0(name, ": Median houshold income by tenure"), 
+       color = "Tenure",
+       subtitle = "2016 to 2020 | Adjusted to 2020 dollars",
+       caption = "Source: U.S. Census Bureau, American Community Survey") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        legend.position = "none") +
+  scale_fill_manual(values = tenure_colors)
+
+
+```
+
+### Persons with disabilities
+
+Henrico County has seen a net increase of 665 individuals with independent living difficulties between 2016 and 2020. Most of this growth (+350) has been among the early senior population (65 to 74 year age group), but the 35 to 64 year age range is also seeing major increases as well (+257).
+
+```{r ind-living, paste0(name, ": Net change in individuals with independent living difficulties by age"}
+
+# Add disability stat (probably independent living difficulty)
+
+b18107 <- read_rds("data/b18107_data.rds") |> 
+  filter(NAME == name) |> 
+  group_by(age) |> 
+  summarise(change = sum(change))
+
+ggplot(b18107,
+       aes(x = age,
+           y = change,
+           fill = age)) +
+  geom_col() +
+  labs(title=paste0(name, ": Net change in individuals with\nindependent living difficulties by age"),
+       subtitle="2016 to 2020",
+       caption="Source: U.S. Census Bureau, American Community Survey, Table B18107.") +
+  scale_y_continuous(labels = label_comma()) +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = "none",
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
+# sum(b18107$change)
+
+```
+
+## Housing supply and market changes
+
+### Homeownership
+
+The median home sales price has steadily been trending upward in Henrico County, and reached a high of \$365,000 in May 2022. From 2017 to June 2022, the median home price in the county has increased by 67 percent.^[Median home prices are currently reflected in nominal dollar values and therefore do not fully capture the real dollar change.]
+
+```{r sales, fig.cap=paste0(name, ": Median home sales price")}
+
+# Median sales price over time
+
+price <- read_csv("data/henrico_med_sales.csv") |> 
+  clean_names() |> 
+  mutate(geography = name) |> 
+  pivot_longer(cols = starts_with("sale"),
+    names_to = "label",
+    values_to = "med_price",
+    values_drop_na = TRUE) |> 
+  mutate(year = substr(label, 19,23)) |> 
+  select(geography, year, month, med_price)
+
+price$month <- match(price$month, month.abb)
+
+price <- price |> 
+  mutate(date = make_date(year, month)) |> 
+  mutate(med_price = parse_number(med_price))
+
+ggplot(price,
+       aes(x = date,
+           y = med_price,
+           color = med_price)) +
+  geom_line(stat = "identity", size = 1) +
+  scale_y_continuous(labels = label_dollar(), limits = c(0, NA)) +
+  scale_x_date(date_labels = "%Y", date_breaks = "1 year") +
+  labs(title = paste0(name, ": Median home sales price"),
+       subtitle = "January 2017 to June 2022",
+       caption = "Source: Central Virginia Regional Multiple Listing Service.") +
+  theme(axis.title = element_blank(),
+        panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        legend.title = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05)) +
+  scale_color_continuous(type = "viridis", label = dollar_format())
+
+
+```
+
+### Rental
+
+Based on CoStar multifamily market geographies, Henrico County consists of two distinct rental submarkets: Eastern and Western Henrico County.
+
+As of Q3 2022, the average asking rent for Western Henrico (\$1,327) was \$302 greater than that of Eastern Henrico (\$1,225). Regardless of these differences, both submarkets experienced significant increases in average asking rent since the start of the pandemic. Eastern Henrico had a 27 percent increase, while Western Henrico had a 30 percent increase in average asking rent. 
+
+This major rental increase was no doubt a result of tightening rental market amid pandemic eviction protections, as well as an increasing desire to leave denser urban environments during the height of COVID-19.
+
+```{r rent-submarket, fig.cap=paste0(name, ": Average asking rent by submarket"}
+
+# Average asking rent over time (by submarket if applicable, maybe by bedroom if no submarkets)
+
+# Disaggregate by Richmond CoStar Submarket
+
+# CoStar Filters: Construction Status - Existing
+
+# Added locality field manually
+
+sub_rent <- read_csv("data/rr_submarket_data.csv") |> 
+  clean_names() |> 
+  separate(geography, into = c("region", "state", "submarket"), sep = " - ") |> 
+  select(period, locality, submarket, "rent" = market_asking_rent_unit, vacancy_rate) |> 
+  mutate(rent = parse_number(rent)) |> 
+  mutate(period = as.Date(as.yearqtr(period, format = "%Y Q%q"), frac = 1)) |> 
+  filter(locality == costar_name)
+
+# Issue with above is that rents are not inflation-adjusted. May need to revisit. I've requested from CoStar to allow for an inflation-adjusted average rent per unit pull, BUT who knows if they can add it. Might consider just having a table with most recent rents.
+
+ggplot(sub_rent,
+       aes(x = period,
+           y = rent, 
+           color = submarket)) +
+  geom_line(stat = "identity") + 
+  labs(title = paste0(name, ": Average asking rent by submarket"),
+       subtitle = "2000 Q1 to 2022 Q3 | Not adjusted for inflation",
+       color = "Submarket") +
+  scale_y_continuous(labels = label_dollar(), limits = c(0, NA), n.breaks = 7) +
+  scale_x_date(date_labels = "%Y", date_breaks = "2 years", limits = as.Date(c("2000-01-01", "2022-09-30"))) +
+  theme(axis.title = element_blank(),
+        panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
+
+# Q1 2020 E - 964
+# Q1 2020 W - 1146
+```
+
+### Housing assistance
+
+```
+Change in number of assisted units (NHPD)
+```
+
+### Naturally-occurring affordable housing
+
+As defined in this report, there are roughly 8,970 units of naturally-occurring affordable housing in Henrico County. These properties are spread out across 42 different buildings within the county. The majority of these properties are garden-style apartments --- typical among NOAH properties.
+
+NOAH properties built in the 1960s command slightly higher rents than those built in later decades. These 1960s NOAH properties are largely located in the highly desirable Tuckahoe area of Western Henrico. Pre-1960s NOAH properties are few and only account for three out of the 42 properties.
+
+```{r noah, fig.cap=paste0(name, ": Distribution of average asking rents\nin NOAH properties by year built")}
+
+# Add choice of NOAH stat (total number, change in rent, etc) 
+
+noah <- read_csv("data/pha_noah_81722.csv") |> 
+  clean_names() |> 
+  st_as_sf(coords = c("longitude", "latitude"), crs=4326, remove=FALSE) |> 
+  filter(property_name != "Sedgefield" | property_name != "Holidy Mobile Home Park") |> 
+  filter(county_name == "Henrico") |> 
+  mutate(period_built = case_when(
+    year_built < 1940 ~ "Before 1940",
+    year_built %in% 1940:1959 ~ "1940 to 1959",
+    year_built %in% 1960:1969 ~ "1960 to 1969",
+    year_built > 1969 ~ "1970 or after"
+  )) |> 
+  mutate(period_built = fct_relevel(period_built, "Before 1940"))
+  
+
+ggplot(noah,
+       aes(x = period_built,
+           y = avg_asking_unit,
+           fill = period_built)) +
+  geom_boxplot() +
+  scale_y_continuous(labels = label_dollar()) +
+  labs(title = paste0(name, ": Distribution of average asking rents\nin NOAH properties by year built"),
+       caption = "Source: CoStar Group, Inc.") +
+  theme(legend.position = "none",
+        panel.background = element_blank(),
+        axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+  
+# sum(noah$number_of_units)
+
+```
+
+## Gap analysis
+
+### Affordability of current housing stock
+
+In 2020, the median renter income estimate required a rent of \$1,202 to be considered affordable (not more than 30 percent of income). At this point in time, the average asking rent was \$1,222 --- only \$20 more. 
+
+The difference between rent affordable to the typical renter and the average rent in the county has been narrowing since 2016 --- when the difference was roughly \$65. 
+
+Although it may seem as Henrico County is becoming more and more affordable to renters, it is increasingly the trend that more and more higher income households are choosing to rent out of necessity or lifestyle preference. As rents continue to rise and wage increases slow, we may soon see that average rents are greater than the median renter household income in Henrico.
+```{r income-rent-gap, fig.cap=paste0(name, ": Average asking rent versus\nrent affordable to median renter income")}
+
+# Compare local median renter income to average asking rent
+
+b25119_cpi_rent <- b25119_cpi |> 
+  filter(tenure == "Renter")
+
+rent <- read_csv("data/rr_annual_rent.csv") |> 
+    pivot_longer(cols = 2:8,
+               names_to = "locality",
+               values_to = "rent_current") |> 
+  clean_names() |> 
+  filter(locality == costar_name)
+
+rent_gap <- b25119_cpi_rent |> 
+  left_join(rent, by = "year") |> 
+  mutate(rent_current = parse_number(rent_current)) |> 
+  mutate(affordable_rent = (cdollars/12)*.30) |> 
+  mutate(difference = rent_current - affordable_rent) |> 
+  select(year, rent_current, affordable_rent) |> 
+  pivot_longer(2:3,
+               names_to = "type",
+               values_to = "dollars") |> 
+  mutate(type = case_when(
+    type == "affordable_rent" ~ "Affordable rent",
+    type == "rent_current" ~ "Current rent"
+  ))
+
+ggplot(rent_gap,
+       aes(x = year,
+           y = dollars,
+           fill = type)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_y_continuous(labels = label_dollar()) +
+  labs(title = paste0(name, ": Average asking rent versus\nrent affordable to median renter income"),
+       subtitle = "2016 to 2020",
+       fill = "Nominal rent",
+       caption = "Sources: U.S. Census Bureau, American Community Survey, Table B25119\nand CoStar Group Inc.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
+
+```
+
+Attaining homeownership has generally been harder with the median renter incomes. In 2020, the income needed afford the median home price was \$60,189, but the median renter household income was \$48,081 --- \$12,108 less than what was needed with a 5 percent down payment. 
+
+This difference has fluctuated between 2016 and 2020, but the largest difference was in 2018 at \$17,241.
+
+```{r income-own-gap, fig.cap=title = paste0(name, ": Income needed to afford median home price\nversus median renter income")}
+
+# Compare local renter income versus local home prices
+
+rr_sales_annual <- read_csv("data/rr_annual_sales.csv") |> 
+  pivot_longer(cols = 2:9,
+               names_to = "locality",
+               values_to = "price") |> 
+  clean_names() |> 
+  filter(locality == costar_name)
+
+int_annual <- read_csv("data/fredmac_int_annual.csv")
+
+downpayment <- 0.05 # 5% downpayment
+closingcosts <- 0.015 # 1.5% closing costs
+utilities <- 250 # Assume $250/month for utilities
+
+sale <- rr_sales_annual |> 
+  left_join(b25119_cpi_rent, by = "year") |> 
+  left_join(int_annual, by = "year") |> 
+  drop_na() |> 
+  mutate(principal = price - (price*downpayment)) |> 
+  mutate(loanamt = principal/(1-closingcosts)) |> 
+  mutate(mortgage = abs(PMT((annual_int/12), 360, loanamt)) + 250) |> 
+  mutate(inc_needed = ((mortgage*10)/2.8)*12) |> 
+  select(year, inc_needed, cdollars)
+
+slgap <- sale |> 
+  pivot_longer(2:3,
+               names_to = "data",
+               values_to = "value") |> 
+  mutate(data = case_when(
+    data == "cdollars" ~ "Renter median household income",
+    data == "inc_needed" ~ "Income needed to afford median home price"
+  ))
+
+ggplot(slgap,
+       aes(x = year,
+           y = value,
+           fill = str_wrap(data, 25))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_y_continuous(labels = label_dollar()) +
+  labs(title = paste0(name, ": Income needed to afford median home price\nversus median renter income"),
+       subtitle = "2016 to 2020",
+       fill = "Nominal income",
+       caption = "Sources: U.S. Census Bureau, American Community Survey, Table B25119\nand Central Virginia Regional Multiple Listing Service.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        legend.key.height=unit(1, "cm"))
+
+
+```
+The shortage of rental housing for households making 80 percent AMI and below has grown between 2015 and 2018 --- from 12,030 in 2016 to 12,184 in 2020. This deficit increase by 154 rental homes was largely among rental housing between 31 to 80 percent AMI. However, below 30 percent AMI rental housing remains the largest need in the county.
+
+```{r gap, fig.cap=paste0(name, ": Rental housing gap by AMI")}
+
+# Add choice of affordability stat (surplus/deficit, income vs prices, etc)
+
+gap <- read_rds("data/tb_18_match.rds") |> 
+  filter(county == name) |> 
+  group_by(year, household_income, gapcode) |>
+  summarise(estimate = sum(estimate)) |>
+  mutate(estimate = case_when(
+    gapcode == "Gap" ~ estimate * -1,
+    gapcode == "Matches or less than income" ~ estimate
+  )) |>
+  mutate(gapcode = case_when(
+    gapcode == "Gap" ~ "Shortage of units",
+    gapcode == "Matches or less than income" ~ "Households at or less than income"
+  )) |>
+  filter(household_income != "80 percent AMI or greater")
+
+ggplot(gap,
+       aes(x = year, 
+           y = estimate,
+           fill = gapcode)) +
+  geom_bar(stat = "identity") +
+  facet_grid(~household_income) +
+  scale_y_continuous(labels = label_comma()) +
+  labs(title = paste0(name, ": Rental housing gap by AMI"),
+       subtitle = "2015 to 2018",
+       caption = "Source: U.S. Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        legend.position = "bottom",
+        legend.title = element_blank())
+
+
+
+```
+
+### Impact of housing costs
+
+From 2015 to 2018, the number of cost burdened homeowners has been on a steady decline --- an overall decrease of 1,706 cost burdened homeowners. For renters, there has been an overall increase in cost-burdened renters; a net increase of 163 cost-burdened renters since 2015, but from year-to-year there have been fewer and fewer cost-burdened renters in the county.
+
+```{r cb, fig.cap=paste0(name, ": Cumulative change in cost-burdened households by tenure")}
+
+cb <- read_rds("data/cb_7.rds") |> 
+  filter(county == name,
+         cb_group == "Cost-burdened") |> 
+  group_by(year, county, tenure) |> 
+  summarise(estimate = sum(estimate)) |> 
+  group_by(county, tenure) |> 
+  mutate(change = estimate - lag(estimate)) |> 
+  drop_na() |> 
+  mutate(run_diff = cumsum(change))
+
+ggplot(cb,
+       aes(x = year, y = run_diff, fill = tenure)) +
+  geom_col(position = "dodge") +
+  scale_y_continuous(labels = label_comma()) +
+  labs(title = paste0(name, ": Cumulative change in cost-burdened households by tenure"),
+       subtitle = "2015 to 2018",
+       fill = "Tenure",
+       caption = "Source: U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05)) +
+  scale_fill_manual(values = tenure_colors)
+
+```
+Pre-pandemic eviction filings in Henrico County averaged 933 each month, but since the pandemic eviction filings have dropped to an average of 271 each month. Eviction protections throughout the pandemic led to a 74 percent decrease in the average eviction judgements --- from 361 to 93 per month. 
+
+Compared to other localities in recent months, Henrico County eviction filings and judgements have remained low in recent months. But as eviction protections are lifted, Henrico County should be wary of any significant increases in filings.
+```{r evictions, fig.cap=paste0(name, ": Evictions filings and judgements")}
+
+evictions <- read_csv("data/evictions_17_22.csv") |> 
+  pivot_longer(3:128,
+               names_to = "data",
+               values_to = "value") |> 
+  mutate(type = case_when(
+    str_detect(data, "Filings") ~ "Filings",
+    str_detect(data,"Evictions") ~ "Eviction judgements"
+  )) |> 
+  mutate(date = str_sub(data, -7, -1)) |> 
+  mutate(date = ym(date)) |> 
+  mutate(year = year(date)) |> 
+  mutate(type = fct_relevel(type, "Filings", "Eviction judgements")) |> 
+  filter(Jurisdiction == "Henrico")
+
+eviction_colors <- setNames(c("#00BFC4", "#F8766D"),
+                            nm = c("Filings", "Eviction judgements"))
+
+ggplot(evictions,
+       aes(x = date,
+           y = value,
+           fill = type)) +
+  geom_col(position = "dodge") +
+  scale_x_date(labels = label_date_short(), breaks = breaks_width("6 months")) +
+  scale_y_continuous(labels = label_comma()) +
+  labs(title = paste0(name, ": Evictions filings and judgements"),
+       subtitle = "January 2017 to March 2022",
+       caption = "Source: RVA Eviction Lab") +
+  scale_fill_manual(values = eviction_colors) +
+  theme(legend.position = "bottom",
+        legend.title = element_blank(),
+        axis.title = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.ticks = element_blank())
+
+evictions <- evictions |> 
+  filter(year >= 2020, 
+         type == "Filings")
+
+mean(evictions$value)
+```

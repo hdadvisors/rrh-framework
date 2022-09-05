@@ -1,0 +1,56 @@
+project: 
+  type: book
+  execute-dir: file
+  output-dir: docs
+
+book:
+  title: "Richmond Regional Housing Framework Data Update"
+  description: "Prepared by HDAdvisors for the Partnership for Housing Affordability."
+  repo-url: https://github.com/hdadvisors/rrh-framework
+  author:
+    - name: HDAdvisors
+      url: https://www.hdadvisors.net
+#  downloads: pdf
+  date: today
+  chapters:
+    - index.qmd
+    - part: "PART 1: Demographic and socioeconomic changes"
+      chapters:
+        - part-1-1.qmd
+        - part-1-2.qmd
+        - part-1-3.qmd
+        - part-1-4.qmd
+    - part: "PART 2: Housing supply and market changes"
+      chapters:
+        - part-2-1.qmd
+#        - part-2-2.qmd
+#        - part-2-3.qmd
+#        - part-2-4.qmd
+    - part: "PART 3: Gap analysis"
+      chapters:
+#        - part-3-1.qmd
+        - part-3-2.qmd
+    - part: "PART 4: Local summaries"
+      chapters:
+        - part-4-1.qmd
+#        - part-4-2.qmd
+#        - part-4-3.qmd
+#        - part-4-4.qmd
+#        - part-4-5.qmd
+#        - part-4-6.qmd
+#        - part-4-7.qmd
+#        - part-4-8.qmd
+
+knitr:
+  opts_chunk: 
+    echo: true
+    warning: false
+    message: false
+
+format:
+  html:
+    theme: cosmo
+  pdf:
+    documentclass: scrreprt
+
+
