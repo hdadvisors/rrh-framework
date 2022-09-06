@@ -22,7 +22,7 @@ book:
     - part: "PART 2: Housing supply and market changes"
       chapters:
         - part-2-1.qmd
-#        - part-2-2.qmd
+        - part-2-2.qmd
 #        - part-2-3.qmd
 #        - part-2-4.qmd
     - part: "PART 3: Gap analysis"
