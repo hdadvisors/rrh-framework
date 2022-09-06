@@ -5,7 +5,6 @@ project:
 
 book:
   title: "Richmond Regional Housing Framework Data Update"
-  description: "Prepared by HDAdvisors for the Partnership for Housing Affordability."
   repo-url: https://github.com/hdadvisors/rrh-framework
   author:
     - name: HDAdvisors

@@ -1,6 +1,6 @@
 # About {.unnumbered}
 
-::: callout-warning
+::: callout-note
 This report is currently in development. It was last updated on **`r Sys.Date()`**.
 :::
 

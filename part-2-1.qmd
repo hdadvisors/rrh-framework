@@ -93,7 +93,8 @@ b25127_data <- b25127_raw |>
   ) |> 
   mutate(change = `2020` - `2016`) |> 
   mutate(structure = fct_relevel(structure, "Single-family", "2 to 4 units", "5 to 19 units",
-                                 "20 or more units", "Other"))
+                                 "20 or more units", "Other")) |>
+  ungroup()
 
 write_rds(b25127_data, "data/b25127_data.rds")
 

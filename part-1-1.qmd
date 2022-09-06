@@ -1,6 +1,7 @@
 # Population changes {#part-1-1}
 
-```{r setup}
+```{r}
+#| label: setup
 
 library(tidycensus)
 library(tidyverse)
@@ -36,7 +37,9 @@ pal <-colorFactor(palette = c("#440154FF", "#31688EFF","#35B779FF", "#FDE725FF")
 
 The Richmond region has continued to grow between 2016 and 2020---adding a net of 41,457 residents across the four major localities. The most populous locality, Chesterfield County, experienced a near eight percent increase in its population during this timeframe.
 
-```{r total-pop-data, eval=FALSE}
+```{r}
+#| label: total-pop-data
+#| eval: false
 
 pep_total_raw <- get_estimates(
   geography = "county",
@@ -121,7 +124,9 @@ write_rds(rr_pop, "data/rr_pop.rds")
 
 ```
 
-```{r total-pop-plot, fig.cap="Percent change in population by locality"}
+```{r}
+#| label: fig-total-pop-plot
+#| fig.cap: "Percent change in population by locality"
 
 pha_pop <- read_rds("data/rr_pop.rds") |> 
   filter(NAMELSAD %in% pha_names)
@@ -164,7 +169,9 @@ In recent years, nearly two thirds of growth could be attributed to either domes
 
 The region's growth continues to be driven primarily by new people coming from other parts of the state and nation (64 percent of growth between 2020 and 2021).
 
-```{r components-data, eval=FALSE}
+```{r}
+#| label: components-data
+#| eval: FALSE
 
 # PEP does not have data available for 2020 and 2021. There is a gap between 2019 and 2021 because Census uses 2020 as a baseline. 
 
@@ -229,7 +236,9 @@ write_rds(pep_comp_change, "data/rr_comp_change.rds")
 
 ```
 
-```{r components-plot, fig.cap="Components of population change"}
+```{r}
+#| label: fig-components-plot
+#| fig.cap: "Components of population change"
 
 pha_comp_change <- read_rds("data/rr_comp_change.rds") |> 
   filter(NAMELSAD %in% pha_names)
@@ -265,7 +274,9 @@ ggplot(comp_chg_summary,
 
 Between 2020 and 2050, the region is expected to grow by nearly a third (29 percent)---reaching 1,338,306 residents.
 
-```{r forecasts-region-plot, fig.cap="Population projections"}
+```{r}
+#| label: fig-forecasts-region-plot
+#| fig.cap: "Population projections"
 
 forecasts <- pha_pop |> 
   filter(year %in% c("2020", "2030", "2040", "2050")) |> 
@@ -302,7 +313,9 @@ Over the next 30 years, Chesterfield County will continue to lead growth across 
 
 Population growth trends will largely continue as they have with Hanover County experiencing the second greatest growth from their 2020 estimates (27 percent increase). Henrico County follows with a 26 percent increase (+88,565), while the City of Richmond will only increase by about a fifth (20 percent) over 30 years.
 
-```{r forecasts-locality-plot, fig.cap="Population projections by locality"}
+```{r}
+#| label: fig-forecasts-locality-plot
+#| fig.cap: "Population projections by locality"
 
 forecasts_locality <- pha_pop |> 
   filter(year %in% c("2020", "2030", "2040", "2050")) |> 

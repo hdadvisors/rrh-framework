@@ -1,6 +1,7 @@
 # Incomes and wages {#part-1-3}
 
-```{r setup}
+```{r}
+#| label: setup
 
 library(tidyverse)
 library(tidycensus)
@@ -43,7 +44,9 @@ From 2016 to 2020, the region saw large increases in the number of six-figure in
 
 There was also a minor increase in the number of middle-income renters earning between \$50,000 and \$100,000, reflecting continued demand for new market-rate apartments---along with affordable starter homes.
 
-```{r hh-inc-data, eval=FALSE}
+```{r}
+#| label: hh-inc-data
+#| eval: FALSE
 
 b25118_vars <- load_variables(2020, "acs5") |> 
   filter(str_sub(name, end = 6) %in% "B25118")
@@ -99,7 +102,9 @@ write_rds(b25118_data, "data/b25118_data.rds")
 
 ```
 
-```{r hh-inc-plot, fig.cap="Change households by tenure and income level"}
+```{r}
+#| label: fig-hh-inc-plot
+#| fig.cap: "Change households by tenure and income level"
 
 b25118_data <-read_rds("data/b25118_data.rds") |> 
   filter(NAME %in% pha_names) |>
@@ -137,7 +142,9 @@ ggplot(b25118_data,
 
 Average homeowner incomes continue to be well above average renter incomes across the region. When adjusted for inflation, incomes across tenures for each locality show very minor to modest growth. Incomes in the city---for both homeowners and renters---remain significantly below those in the surrounding counties. The average household income for homeowners in the counties is around three times that of renters in Richmond.
 
-```{r med-income-data, eval=FALSE}
+```{r}
+#| label: med-income-data
+#| eval: FALSE
 
 b25119_vars <- load_variables(2020, "acs5") |> 
   filter(str_sub(name, end = 6) %in% "B25119")
@@ -189,7 +196,9 @@ write_rds(b25119_cpi, "data/b25119_cpi.rds")
 
 ```
 
-```{r med-income-plot, fig.cap="Median houshold income by tenure and locality"}
+```{r}
+#| label: fig-med-income-plot
+#| fig.cap: "Median houshold income by tenure and locality"
 
 b25119_cpi <-read_rds("data/b25119_cpi.rds") |> 
   filter(NAME %in% pha_names)
@@ -220,7 +229,9 @@ ggplot(b25119_cpi,
 
 Average incomes in the region remain unequal by race and ethnicity. Households with the highest incomes include Asian and white, non-Hispanic residents in the counties---earning well above \$75,000. Black and Hispanic households consistently have the lowest average incomes, along with multiracial households in Henrico and Richmond.
 
-```{r inc-race-data, eval=FALSE}
+```{r}
+#| label: inc-race-data
+#| eval: FALSE
 
 b19013 <- paste0("B19013", LETTERS[2:9])
 
@@ -291,7 +302,9 @@ write_rds(b19013_data, "data/b19013_data.rds")
 
 ```
 
-```{r inc-race-plot, fig.cap="Median household income by race and ethnicity"}
+```{r}
+#| label: fig-inc-race-plot
+#| fig.cap: "Median household income by race and ethnicity"
 
 b19013_data <- read_rds("data/b19013_data.rds") |> 
   filter(NAME %in% pha_names) |> 
@@ -326,7 +339,9 @@ ggplot(b19013_data,
 
 Household incomes also vary by the presence of children or other related individuals. Throughout the region, non-family households (i.e., persons living alone or with unrelated persons) consistently have average incomes below \$50,000. In Henrico and Chesterfield counties, families living with and without children under 18 have very similar income levels. This trend is different in Hanover, where families with children have much higher incomes, as well as Richmond, where they have much lower incomes.
 
-```{r inc-child-data, eval=FALSE}
+```{r}
+#| label: inc-child-data
+#| eval: FALSE
 
 # Table B19125: Median Family Income by Presence of Own Children
 
@@ -398,7 +413,9 @@ write_rds(b19125_b19202_cpi, "data/b19125_b19202_cpi.rds")
 
 ```
 
-```{r inc-child-plot, fig.cap="Median household income by family type"}
+```{r}
+#| label: fig-inc-child-plot
+#| fig.cap: "Median household income by family type"
 
 b19125_b19202_cpi <-  read_rds("data/b19125_b19202_cpi.rds") |> 
   filter(NAME %in% pha_names)
@@ -429,7 +446,7 @@ ggplot(b19125_b19202_cpi,
 
 ## Wages
 
-:::{.rmdnote}
+::: callout-note
 Wage data in this section is sourced from the Occupational Employment and Wage Statistics (OEWS) program of the Bureau of Labor Statistics. OEWS is updated annually, most recently for 2021 data. This dataset provides a rich look into wage distribution by industry and occupation. 
 
 However, OEWS is only available at the national, state, and metro levels. Therefore, the data below covers the full Richmond, Virginia Metropolitan Statistical Area (MSA) rather than the (smaller) PHA region.
@@ -439,13 +456,15 @@ However, OEWS is only available at the national, state, and metro levels. Theref
 
 While regional wages increased across the board from May 2019 to May 2021, the largest percent increases in average wages were among jobs that paid at and below the median wage. In fact, the largest growth occurred in the lowest 10th percentile of wages, due in large part to state lawmakers adopting incremental increases to Virginia's minimum wage in 2020. The first increase from \$7.25 to \$9.50 per hour took effect in 2021.
 
-:::{.rmdnote}
+::: callout-note
 Today, state minimum wage is \$11.00 per hour. Under [current law](https://lis.virginia.gov/cgi-bin/legp604.exe?201+sum+SB7), it will increase again to \$12.00 in 2023. Lawmakers must reenact the measure by July 2024 to initiative further increases to \$15.00 per hour by 2026.
 :::
 
 Another factor in this low-end wage growth is likely the [increased pay](https://www.bls.gov/opub/ted/2022/24-percent-of-establishments-increased-pay-or-paid-bonuses-because-of-covid-19-pandemic.htm) offered by many businesses, especially in the food, retail, and accommodation sectors, to encourage workers to return during the COVID-19 recovery.
 
-```{r wage-pct-data, eval=FALSE}
+```{r}
+#| label: wage-pct-data
+#| eval: FALSE
 
 # Load OEWS files already filtered to Richmond, VA MSA
 
@@ -495,7 +514,9 @@ write_rds(percentiles, "data/oews_pct.rds")
 
 ```
 
-```{r wage-pct-plot, fig.cap="Percent change in annual wage in Richmond, VA MSA"}
+```{r}
+#| label: fig-wage-pct-plot
+#| fig.cap: "Percent change in annual wage in Richmond, VA MSA"
 
 oews_pct <- read_rds("data/oews_pct.rds")
 
@@ -527,7 +548,9 @@ Over this same period, wages in the region grew for four of the five most common
 
 Jobs in Food Preparation and Serving, Sales, and Business and Financial Operations sectors---totaling more than 162,000 workers in the region as of May 2021---also saw wage growth, but less than the 13.3 percent average increase. Meanwhile, wages among Office and Administrative Support positions remained nearly the same (-0.2 percent) from 2019 to 2021.
 
-```{r wage-occ-data, eval=FALSE}
+```{r}
+#| label: wage-occ-data
+#| eval: FALSE
 
 # Find 5 most common major occupation categories from 2021
 
@@ -552,7 +575,9 @@ write_rds(oews_occ, "data/oews_occ.rds")
 
 ```
 
-```{r wage-occ-plot, fig.cap="Percent change in annual wage for top 5 most common occupation categories"}
+```{r}
+#| label: fig-wage-occ-plot
+#| fig.cap: "Percent change in annual wage for top 5 most common occupation categories"
 
 oews_occ <- read_rds("data/oews_occ.rds")
 
