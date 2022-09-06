@@ -84,7 +84,9 @@ knitr::include_url("maps/nhpd_map.html", height = "500px")
 
 ```
 
-```{r subsidy-overall}
+```{r}
+#| label: subsidy-overall
+#| fig-cap: "Share of federally assisted units by subsidy"
 
 nhpd_coded_rr <- read_rds("data/nhpd_rr.csv")
 
@@ -110,7 +112,9 @@ ggplot(subsidy,
 
 ```
 
-```{r subsidy-location}
+```{r}
+#| label: subsidy-location
+#| fig-cap: "Federally assisted units by subsidy and locality"
 
 nhpd_coded_rr <- read_rds("data/nhpd_rr.csv")
 
@@ -138,7 +142,9 @@ ggplot(subsidy_local,
 
 ```
 By 2040, a large portion of active LIHTC units will be outside the 30 year commitment period --- even far more will be outside the 15 year compliance period. Just over 13,000 LIHTC units will be beyond the 30 year commitment period by 2040, which accounts for over 80 perceent of active LIHTC units as of early 2022.
-```{r lihtc}
+```{r}
+#| label: lihtc
+#| fig-cap: "LIHTC units by 30 year commitment expiration date"
 
 nhpd_coded_rr <- read_rds("data/nhpd_rr.csv")
 
@@ -167,7 +173,9 @@ The redevelopment of public housing in the City of Richmond has begun to take sh
 
 RRHA's next focus area will be Gilpin Court, north of Jackson Ward, where about 780 public housing units reside. In November 2021, RRHA and the City of Richmond were awarded a Choice Neighborhoods Planning Grant by the U.S. Department of Housing and Urban Development for \$450,000. This planning grant is being utilized to facilitate the community planning process around not only Gilpin Court, but the Jackson Ward community --- including strategies to undo the negative impacts of interstate development on the historically Black communities of Jackson Ward and North Jackson Ward.
 
-```{r public-housing}
+```{r}
+#| label: public-housing
+#| figc-cap: "Location of Richmond Redevelopment and Housing Authority properties"
 
 nhpd_coded_rr <- read_rds("data/nhpd_rr.csv")
 
@@ -179,7 +187,6 @@ leaflet(ph) |>
   addCircleMarkers(
     radius = ~assisted_units/100
   )
-
 
 ```
 
@@ -273,13 +280,33 @@ ggplot(rrp,
 
 *Data requested from housing partners*
 
-```{r aff-ho}
+```{r}
+#| label: fig-pha-homeownership
+#| fig-cap: "Richmond region nonprofit homeownership production"
+
+pha_ho <- read_csv("data/pha_homeownership.csv") |> 
+  clean_names() |>  
+  select(1:7)
+
+ho_production <- pha_ho |> 
+  filter(data_type == "Number of homes completed and sold in calendar year") |> 
+  pivot_longer(3:7,
+               names_to = "year",
+               values_to = "homes") |> 
+  mutate(year = parse_number(year))
 
 # MWCLT, BHC, project:HOMES, Southside, Habitat - WAITING ON DATA
 
 # Ask for number of units produced each year from 2019 to now
 
 # Average home price each year?
+
+ggplot(ho_production,
+       aes(x = year,
+           y = homes,
+           fill = organization)) +
+  geom_col() +
+  
 
 ```
 
