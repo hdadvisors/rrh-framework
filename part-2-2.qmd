@@ -25,6 +25,17 @@ pha <- c("51085", "51760", "51087", "51041")
 
 pha_names_costar <- c("Richmond City", "Henrico County", "Hanover County", "Chesterfield County")
 
+submarkets <- c("Midlothian" = "#2ca25f",
+                "Chesterfield County" = "#99d8c9",
+                "Hanover County" = "#8856a7",
+                "Western Henrico County" = "#f03b20",
+                "Eastern Henrico County" = "#feb24c",
+                "West End" = "#253494",
+                "Downtown Richmond" = "#2c7fb8",
+                "East End" = "#41b6c4",
+                "South Richmond" = "#7fcdbb",
+                "Northside" = "#c7e9b4")
+
 ```
 
 ## Supply
@@ -364,20 +375,7 @@ ggplot(rr_sub_rent,
         panel.grid.major.x = element_blank(),
         panel.grid.major.y = element_line(color = "grey95",
                                           size = 0.05)) +
-  scale_color_manual(
-    values = c(
-      "Midlothian" = "#2ca25f",
-      "Chesterfield County" = "#99d8c9",
-      "Hanover County" = "#8856a7",
-      "Western Henrico County" = "#f03b20",
-      "Eastern Henrico County" = "#feb24c",
-      "West End" = "#253494",
-      "Downtown Richmond" = "#2c7fb8",
-      "East End" = "#41b6c4",
-      "South Richmond" = "#7fcdbb",
-      "Northside" = "#c7e9b4"
-    )
-  )
+  scale_color_manual(values = submarkets)
   
 ```
 
@@ -507,38 +505,41 @@ ggplot(pha_built_rent,
 
 ## Rental vacancy
 
-For much of the past two decades, vacancy rates have fluctuated seasonally as new people enter and leave the rental housing market. Across the region, submarkets have largely had vacancy rates below ten percent. In 2022, the average vacancy rate was 5 percent. 
+For much of the past two decades, vacancy rates have fluctuated seasonally as new people enter and leave the rental housing market. Across the region, submarkets have largely had vacancy rates below ten percent. In 2022, the regional average vacancy rate to-date was five percent. 
 
-But some submarkets in the region have lower than average vacancy rates; Hanover County (1 percent), Eastern Henrico (3 percent), Northside (3 percent), and East End (4 percent) have significantly lower vacancy rates.  
+However, some submarkets in the region have lower than average vacancy rates; Hanover County (1 percent), Eastern Henrico (3 percent), Northside (3 percent), and East End (4 percent) have significantly lower vacancy rates.  
 
-Vacancy rates dropped across the board at the height of the pandemic in 2020 --- except for in the West End, where there was a significant jump in rental vacancies in Q1 2021. 
-
-```{r vacancy}
+```{r}
+#| label: fig-vacancy
+#| fig.cap: "Vacancy rates by submarket"
 
 rr_sub_vacancy <- rr_sub_rent |> 
-  select(period, locality, submarket, vacancy_rate) |> 
+  select(-rent) |> 
   mutate(vacancy_rate = parse_number(vacancy_rate)/100) |> 
-  mutate(year = year(period)) |> 
-  filter(year >= 2015)
+  mutate(vacancy_rate = replace(vacancy_rate, vacancy_rate > 0.15, NA))
 
-
-rr_sub_vacancy_20 <- rr_sub_vacancy |> 
-  filter(year == 2022)
-
-mean(rr_sub_vacancy_20$vacancy_rate)
-
-
-sub_vacancy <- ggplot(rr_sub_vacancy,
-                      aes(x = period,
-                          y = vacancy_rate,
-                          color = submarket)) +
-  geom_line(stat = "identity", size = 1) +
+ggplot(rr_sub_vacancy,
+       aes(x = period,
+           y = vacancy_rate, 
+           color = submarket)) +
+  geom_line(size = 1) + 
+  scale_x_yearqtr(format = "%Y") +
+  scale_y_continuous(labels = label_percent(),
+                     n.breaks = 7) +
+  labs(title = "Vacancy rates by submarket",
+       subtitle = "2010 Q1 to 2022 Q2",
+       caption = "Source: CoStar Group, Inc.\nNote: Outlier values above 15% omitted.") +
   facet_wrap(~locality) +
-  scale_y_continuous(labels = percent_format()) +
-  theme(axis.title = element_blank()) + 
-  labs(title = "Rental vacancy by Richmond region submarket", color = "Submarket")
-
-ggplotly(sub_vacancy) |> 
-  plotly_camera()
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text.x = element_text(angle = 90),
+        legend.title = element_blank(),
+        legend.key = element_blank(),
+        legend.justification = "top",
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05)) +
+  scale_color_manual(values = submarkets)
 
 ```
