@@ -39,7 +39,9 @@ tenure_colors <-setNames(viridis(2), nm = tenure)
 
 From 2010 to 2020, Henrico County has grown by 9 percent --- an increase of 27,454 residents. The increase has been greater than Chesterfield County (8 percent), but slightly less than the City (11 percent). 
 
-```{r pop, fig.cap=paste0(name, ": Total Population")}
+```{r}
+#| label: fig-pop
+#| fig-cap: paste0(name, ": Total Population")
 
 # Add choice of population stat (net change, components, etc)
 
@@ -76,7 +78,10 @@ pop_bar
 ```
 Population increases in recent years have largely been the result of international migration and natural increases. But declines in the county have consistently been the result of residents moving elsewhere in the country. Domestic out-migration had been declining in the latter half of the 2010s, but between 2020 and 2021, 1,552 Henrico County residents moved elsewhere.
 
-```{r comp, fig.cap=paste0(name,": Components of population change"}
+```{r}
+#| label: fig-comp
+#| fig-cap: paste0(name,": Components of population change"
+
 
 change <- read_rds("data/rr_comp_change.rds") |> 
   filter(year %in% as.character(years) | year == "2021") |> 
@@ -106,7 +111,10 @@ ggplot(change,
 
 Homeowner households of all types are increasing in the county --- especially homeowners without children. Between 2016 and 2020, homeowner households without children saw an increase of 2,061, while homeowner households with children only increased by 1,469. Renter households have seen significantly smaller increases among households without children and nonfamily households (i.e. single adults living alone or with roommates). But Henrico County household decrease between 2016 and 2020 was solely experienced by renter households with children. 
 
-```{r children, fig.cap=paste0(name, ": Change in households with children by tenure"}
+```{r}
+#| label: fig-children
+#| fig-cap: paste0(name, ": Change in households with children by tenure")
+
 
 # Add choice of household stat (HHs with children, HHs with seniors, subfamilies, etc)
 
@@ -135,7 +143,9 @@ ggplot(b25115,
 
 The Grey Wave continues in Henrico County, where there was a 6,603 increase in the senior population between 2016 and 2020. The majority of this growth was among seniors who were the head of family households (+2,821) and seniors living alone (+2,237).
 
-```{r seniors, fig.cap=paste0(name, ": Change in senior population by living arrangement"}
+```{r}
+#| label: fig-seniors
+#| fig-cap: paste0(name, ": Change in senior population by living arrangement")
 
 b09020 <- read_rds("data/b09020_data.rds") |> 
   filter(NAME == name) |> 
@@ -176,7 +186,9 @@ The disparity between homeowner and renter incomes in the county has continued b
 
 During this timeframe, the median homeowner household income increased by 7 percent, while renter income only increased by 3 percent.
 
-```{r income, fig.cap=paste0(name, ": Median household income by tenure")}
+```{r}
+#| label: fig-income
+#| fig-cap: paste0(name, ": Median houshold income by tenure")
 
 # Add choice of income stat (probably median household income of some kind)
 
@@ -209,7 +221,9 @@ ggplot(b25119_cpi,
 
 Henrico County has seen a net increase of 665 individuals with independent living difficulties between 2016 and 2020. Most of this growth (+350) has been among the early senior population (65 to 74 year age group), but the 35 to 64 year age range is also seeing major increases as well (+257).
 
-```{r ind-living, paste0(name, ": Net change in individuals with independent living difficulties by age"}
+```{r}
+#| label: fig-ind-living
+#| fig-cap: paste0(name, ": Net change in individuals with independent living difficulties by age")
 
 # Add disability stat (probably independent living difficulty)
 
@@ -245,7 +259,9 @@ ggplot(b18107,
 
 The median home sales price has steadily been trending upward in Henrico County, and reached a high of \$365,000 in May 2022. From 2017 to June 2022, the median home price in the county has increased by 67 percent.^[Median home prices are currently reflected in nominal dollar values and therefore do not fully capture the real dollar change.]
 
-```{r sales, fig.cap=paste0(name, ": Median home sales price")}
+```{r}
+#| label: fig-sales
+#| fig-cap: paste0(name, ": Median home sales price")
 
 # Median sales price over time
 
@@ -295,7 +311,9 @@ As of Q3 2022, the average asking rent for Western Henrico (\$1,327) was \$302 g
 
 This major rental increase was no doubt a result of tightening rental market amid pandemic eviction protections, as well as an increasing desire to leave denser urban environments during the height of COVID-19.
 
-```{r rent-submarket, fig.cap=paste0(name, ": Average asking rent by submarket"}
+```{r}
+#| label: fig-rent-submarket
+#| fig-cap: paste0(name, ": Average asking rent by submarket")
 
 # Average asking rent over time (by submarket if applicable, maybe by bedroom if no submarkets)
 
@@ -339,9 +357,18 @@ ggplot(sub_rent,
 
 ### Housing assistance
 
+```{r}
+#| label: tbl-nhpd
+#| eval: false
+
+
+
+
 ```
-Change in number of assisted units (NHPD)
-```
+
+
+*Change in number of assisted units (NHPD)*
+
 
 ### Naturally-occurring affordable housing
 
@@ -349,7 +376,9 @@ As defined in this report, there are roughly 8,970 units of naturally-occurring 
 
 NOAH properties built in the 1960s command slightly higher rents than those built in later decades. These 1960s NOAH properties are largely located in the highly desirable Tuckahoe area of Western Henrico. Pre-1960s NOAH properties are few and only account for three out of the 42 properties.
 
-```{r noah, fig.cap=paste0(name, ": Distribution of average asking rents\nin NOAH properties by year built")}
+```{r}
+#| label: fig-noah
+#| fig-cap: paste0(name, ": Distribution of average asking rents in NOAH properties by year built")
 
 # Add choice of NOAH stat (total number, change in rent, etc) 
 
@@ -395,7 +424,10 @@ In 2020, the median renter income estimate required a rent of \$1,202 to be cons
 The difference between rent affordable to the typical renter and the average rent in the county has been narrowing since 2016 --- when the difference was roughly \$65. 
 
 Although it may seem as Henrico County is becoming more and more affordable to renters, it is increasingly the trend that more and more higher income households are choosing to rent out of necessity or lifestyle preference. As rents continue to rise and wage increases slow, we may soon see that average rents are greater than the median renter household income in Henrico.
-```{r income-rent-gap, fig.cap=paste0(name, ": Average asking rent versus\nrent affordable to median renter income")}
+
+```{r}
+#| label: fig-income-rent-gap
+#| fig-cap: paste0(name, ": Average asking rent versus rent affordable to median renter income")
 
 # Compare local median renter income to average asking rent
 
@@ -446,7 +478,9 @@ Attaining homeownership has generally been harder with the median renter incomes
 
 This difference has fluctuated between 2016 and 2020, but the largest difference was in 2018 at \$17,241.
 
-```{r income-own-gap, fig.cap=title = paste0(name, ": Income needed to afford median home price\nversus median renter income")}
+```{r}
+#| label: fig-income-own-gap
+#| fig-cap: paste0(name, ": Income needed to afford median home price versus median renter income")
 
 # Compare local renter income versus local home prices
 
@@ -503,7 +537,9 @@ ggplot(slgap,
 ```
 The shortage of rental housing for households making 80 percent AMI and below has grown between 2015 and 2018 --- from 12,030 in 2016 to 12,184 in 2020. This deficit increase by 154 rental homes was largely among rental housing between 31 to 80 percent AMI. However, below 30 percent AMI rental housing remains the largest need in the county.
 
-```{r gap, fig.cap=paste0(name, ": Rental housing gap by AMI")}
+```{r}
+#| label: fig-gap
+#| fig-cap: paste0(name, ": Rental housing gap by AMI")
 
 # Add choice of affordability stat (surplus/deficit, income vs prices, etc)
 
@@ -547,7 +583,9 @@ ggplot(gap,
 
 From 2015 to 2018, the number of cost burdened homeowners has been on a steady decline --- an overall decrease of 1,706 cost burdened homeowners. For renters, there has been an overall increase in cost-burdened renters; a net increase of 163 cost-burdened renters since 2015, but from year-to-year there have been fewer and fewer cost-burdened renters in the county.
 
-```{r cb, fig.cap=paste0(name, ": Cumulative change in cost-burdened households by tenure")}
+```{r}
+#| label: fig-cb
+#| fig-cap: paste0(name, ": Cumulative change in cost-burdened households by tenure")
 
 cb <- read_rds("data/cb_7.rds") |> 
   filter(county == name,
@@ -578,7 +616,10 @@ ggplot(cb,
 Pre-pandemic eviction filings in Henrico County averaged 933 each month, but since the pandemic eviction filings have dropped to an average of 271 each month. Eviction protections throughout the pandemic led to a 74 percent decrease in the average eviction judgements --- from 361 to 93 per month. 
 
 Compared to other localities in recent months, Henrico County eviction filings and judgements have remained low in recent months. But as eviction protections are lifted, Henrico County should be wary of any significant increases in filings.
-```{r evictions, fig.cap=paste0(name, ": Evictions filings and judgements")}
+
+```{r}
+#| label: fig-evictions
+#| fig-cap: paste0(name, ": Evictions filings and judgements")
 
 evictions <- read_csv("data/evictions_17_22.csv") |> 
   pivot_longer(3:128,
