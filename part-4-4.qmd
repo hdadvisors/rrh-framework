@@ -38,7 +38,9 @@ Add short bullet points summarizing major changes
 
 Between 2011 and 2012, Hanover County passed the 100,000 mark and has continued to grow ever since. From 2010 to 2020, the county has grown by 10 percent --- an increase of 10,116 residents. 
 
-```{r pop, fig.cap=paste0(name, ": Total Population")}
+```{r}
+#| label: fig-pop
+#| fig-cap: paste0(name, ": Total Population")
 
 # Add choice of population stat (net change, components, etc)
 
@@ -76,7 +78,9 @@ pop_bar
 
 The overwhelming reason for population increases in the last several years has been due to domestic migration. From 2020 to 2021, 1,747 new residents moved into Hanover County from some other part of the region, state, or country. From 2016 to 2019, international migration and natural increases made up a small portion of change compared to domestic migration. But during the 2020 to 2021 period, Hanover County experienced a loss of 271 due to natural decreases (i.e. deaths outpacing births in the county). 
 
-```{r comp, fig.cap=paste0(name,": Components of population change"}
+```{r}
+#| label: fig-comp
+#| fig-cap: paste0(name,": Components of population change"
 
 change <- read_rds("data/rr_comp_change.rds") |> 
   filter(year %in% as.character(years) | year == "2021") |> 
@@ -106,7 +110,9 @@ ggplot(change,
 
 Households with children, both homeowners and renters, have been on the decline in Hanover County. Between 2016 and 2020, there was an overall decrease of 725 households with children. Nonfamily renter households also saw a decline (-226), but nonfamily homeowner households saw the greatest increase of household types during this time period (+1,278).
 
-```{r children, fig.cap=paste0(name, ": Change in households with children by tenure"}
+```{r}
+#| label: fig-children
+#| fig-cap: paste0(name, ": Change in households with children by tenure")
 
 # Add choice of household stat (HHs with children, HHs with seniors, subfamilies, etc)
 
@@ -133,7 +139,9 @@ ggplot(b25115,
 ```
 As with most of the region, the senior population in Hanover County has seen major growth. From 2016 to 2020, the senior population increased by 3,154. Most of this growth has been among seniors living with a spouse (+1,167), followed by seniors living alone (+888).
 
-```{r seniors, fig.cap=paste0(name, ": Change in senior population by living arrangement"}
+```{r}
+#| label: fig-seniors
+#| fig-cap: paste0(name, ": Change in senior population by living arrangement")
 
 b09020 <- read_rds("data/b09020_data.rds") |> 
   filter(NAME == name) |> 
@@ -172,7 +180,9 @@ ggplot(b09020,
 
 In Hanover County, there was a \$45,460 difference between median homeowner household income and renter household income. The disparity in income has remained steady between 2016 and 2020. But in the county, renter median household income has increased by 19 percent from 2016 to 2020, while homeowners income has only increased by 2 percent. 
 
-```{r income, fig.cap=paste0(name, ": Median houshold income by tenure")}
+```{r}
+#| label: fig-income
+#| fig-cap: paste0(name, ": Median houshold income by tenure")
 
 # Add choice of income stat (probably median household income of some kind)
 
@@ -203,7 +213,9 @@ ggplot(b25119_cpi,
 ```
 The growth in median renter household income in the county can be shown to be due to a large decrease in renter households making less than \$75,000 and an increase in renters with higher incomes. 
 
-```{r hh-inc-plot, fig.cap="Change households by tenure and income level"}
+```{r}
+#| label: fig-income-change
+#| fig-cap: paste0(name, ": Change households by tenure and income level")
 
 b25118_data <-read_rds("data/b25118_data.rds") |> 
   filter(NAME %in% "Hanover County") |>
@@ -242,7 +254,9 @@ ggplot(b25118_data,
 
 While other localities have seen significant increases in adults below 65 years old with independent living difficulties, Hanover County has seen the greatest growth among those aged 75 years and older. With a growing number of aging seniors unable to live with comfortably without assistance, there will be a growing need for assisted living facilities and resources to support aging-in-place.
 
-```{r ind-living, paste0(name, ": Net change in individuals with independent living difficulties by age"}
+```{r}
+#| label: fig-ind-living
+#| fig-cap: paste0(name, ": Net change in individuals with independent living difficulties by age")
 
 # Add disability stat (probably independent living difficulty)
 
@@ -276,7 +290,9 @@ ggplot(b18107,
 
 During the early part of 2022, median home price in Hanover County passed into the \$400,000s. From March 2020 to June 2022, there has been a 32 percent increase in the median home price for the county. 
 
-```{r sales, fig.cap=paste0(name, ": Median home sales price")}
+```{r}
+#| label: fig-sales
+#| fig-cap: paste0(name, ": Median home sales price")
 
 # Median sales price over time
 
@@ -322,7 +338,9 @@ ggplot(price,
 
 Rental properties across Hanover County are largely located in the Town of Ashland and along the Hanover-Henrico border near Route 1 and Mechanicsville. The Hanover County rental market has been seen continual average asking rent increases since 2016. From the end of Q3 2021 to Q3 2022, rents in Hanover County grew significantly from \$1,272 to \$1,492 --- a 17 percent increase. During this time, the Hanover County rental vacancy rate dropped well-below 1 percent.
 
-```{r rent-submarket, fig.cap=paste0(name, ": Average asking rent by submarket"}
+```{r}
+#| label: fig-rent-submarket
+#| fig-cap: paste0(name, ": Average asking rent by submarket")
 
 # Average asking rent over time (by submarket if applicable, maybe by bedroom if no submarkets)
 
@@ -362,7 +380,11 @@ ggplot(sub_rent,
                                           size = 0.05))
 
 ```
-```{r vacancy, fig.cap=paste0(name, ": Rental vacancy rate"}
+
+
+```{r}
+#| label: fig-vacancy
+#| fig-cap: paste0(name, ": Rental vacancy rate")
 
 
 vacancy <- sub_rent  |> 
@@ -401,7 +423,9 @@ Change in number of assisted units (NHPD)
 
 As defined by this report, there are only five NOAH multifamily properties located in Hanover County. Across these five properties there is a total of 492 rental units. NOAH properties in Hanover County were built between 1966 and 1987.
 
-```{r noah, fig.cap=paste0(name, ": Distribution of average asking rents\nin NOAH properties by year built")}
+```{r}
+#| label: fig-noah
+#| fig-cap: paste0(name, ": Distribution of average asking rents in NOAH properties by year built")
 
 # Add choice of NOAH stat (total number, change in rent, etc) 
 
@@ -435,7 +459,9 @@ noah_tbl
 
 This estimate does not include four manufactured home communities located in the county --- which include a total of 497 homes. Based on the Manufactured Home Community Coalition of Virginia's assessment of manufactured home communities in Central Virginia, these four communities are relatively stable. 
 
-```{r mhccv}
+```{r}
+#| label: tbl-mhccv
+#| tbl-cap: "Manufactured home communities in Hanover County"
 
 library(kableExtra)
 library(formattable)
@@ -461,7 +487,9 @@ sum(mhc$Units)
 
 In 2020, median renter household income was \$53,832. A household at this income would need an estimated rent of \$1,345 to not be cost-burdened. In comparison to average asking rent in the county, the typical renter could afford the the average rent by more than \$200. This could be a reflection of the growing number of higher income renters coming into the county as previously noted.
 
-```{r income-rent-gap, fig.cap=paste0(name, ": Average asking rent versus\nrent affordable to median renter income")}
+```{r}
+#| label: fig-income-rent-gap
+#| fig-cap: paste0(name, ": Average asking rent versus rent affordable to median renter income")
 
 # Compare local median renter income to average asking rent
 
@@ -509,7 +537,9 @@ ggplot(rent_gap,
 ```
 Although median renter income has increased, the gap between income needed to afford the median home sales price has remained. In 2020, there was a \$15,370 difference between a renter median income and the income needed to afford the median home price of \$330,950. Even though this gap remains large, it has narrowed from the 2016 gap when it was \$17,897.
 
-```{r income-own-gap, fig.cap=title = paste0(name, ": Income needed to afford median home price\nversus median renter income")}
+```{r}
+#| label: fig-income-own-gap
+#| fig-cap: paste0(name, ": Income needed to afford median home price versus median renter income")
 
 # Compare local renter income versus local home prices
 
@@ -568,8 +598,9 @@ In spite of growing income among renters in the county, there was a shortage of 
 
 The deficit has decreased across all income levels below 80 percent AMI, but the below 30 percent AMI income group remains the most in need of new affordable rental options.
 
-```{r gap, fig.cap=paste0(name, ": Rental housing gap by AMI")}
-
+```{r}
+#| label: fig-gap
+#| fig-cap: paste0(name, ": Rental housing gap by AMI")
 # Add choice of affordability stat (surplus/deficit, income vs prices, etc)
 
 gap <- read_rds("data/tb_18_match.rds") |> 
@@ -610,7 +641,9 @@ ggplot(gap,
 
 In spite of the continuous increase in housing costs in Hanover County, there has been an overall decreaes in the number of cost-burdened households from 2015 to 2018. As of 2018, there were 1,061 fewer cost-burdened homeowners and 325 fewer cost-burdened renters.
 
-```{r cb, fig.cap=paste0(name, ": Cumulative change in cost-burdened households by tenure")}
+```{r}
+#| label: fig-cb
+#| fig-cap: paste0(name, ": Cumulative change in cost-burdened households by tenure")
 
 cb <- read_rds("data/cb_7.rds") |> 
   filter(county == name,
@@ -642,7 +675,9 @@ With fewer renters in the county, there have also been fewer eviction filings an
 
 During eviction protections of the pandemic, filings dropped below 20 a month, while eviction judgements dropped below 10. As new data is released, Hanover County should watch carefully for sudden increases. 
 
-```{r evictions, fig.cap=paste0(name, ": Evictions filings and judgements")}
+```{r}
+#| label: fig-evictions
+#| fig-cap: paste0(name, ": Evictions filings and judgements")
 
 evictions <- read_csv("data/evictions_17_22.csv") |> 
   pivot_longer(3:128,

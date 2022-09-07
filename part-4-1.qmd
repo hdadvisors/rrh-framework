@@ -27,18 +27,16 @@ costar_name <- "Richmond City"
 tenure <- c("Homeowner", "Renter")
 tenure_colors <-setNames(viridis(2), nm = tenure)
 
-
 ```
 
 ## Takeaways
 
-- The City of Richmond has largely grown as a result of international migration and natural increase (+817 between 2020 and 2021).
-- Growth in renter households in the city has been the direct result of nonfamily households --- while renters with children have significantly decreased (-2,192).
-- Rents across the city have grown substantially, especially the Northside and Southside rental markets (growing by nearly 40 percent, respectively since 2016). 
-- The typical renter household still has an income unable to afford the average asking rent, as well as the median home price in the city.
-- Renter cost burden has increased 1,107 households from 2015 to 2018.
-- The greatest need still remains for households making below 30 percent AMI; there was a shortage of nearly 11,000 rental homes for extremely low-income households.
-
+-   The City of Richmond has largely grown as a result of international migration and natural increase (+817 between 2020 and 2021).
+-   Growth in renter households in the city has been the direct result of nonfamily households --- while renters with children have significantly decreased (-2,192).
+-   Rents across the city have grown substantially, especially the Northside and Southside rental markets (growing by nearly 40 percent, respectively since 2016).
+-   The typical renter household still has an income unable to afford the average asking rent, as well as the median home price in the city.
+-   Renter cost burden has increased 1,107 households from 2015 to 2018.
+-   The greatest need still remains for households making below 30 percent AMI; there was a shortage of nearly 11,000 rental homes for extremely low-income households.
 
 ## Demographic and socioeconomic changes
 
@@ -46,9 +44,9 @@ tenure_colors <-setNames(viridis(2), nm = tenure)
 
 Between 2010 and 2020, the U.S. Census Bureau has estimated that the City of Richmond has grown by 11 percent --- an increase of 22,396 residents. Throughout much of the decade the city has been on a slow upward trend until 2020. The 2020 Census estimate shows a slight decline from the 2019 estimate --- a loss of 3,826 residents. This change could be a result of the difficulties associated with [undercounts during the 2020 Census](https://censuscounts.org/whats-at-stake/will-you-count-renters-in-the-2020-census/).
 
-```{r pop, fig.cap=paste0(name, ": Total Population")}
-
-# Add choice of population stat (net change, components, etc)
+```{r}
+#| label: fig-pop
+#| fig-cap: paste0(name, ": Total Population")
 
 pop <- read_rds("data/rr_pop_data.rds") |> 
   mutate(GEOID = parse_number(GEOID)) |> 
@@ -84,7 +82,9 @@ pop_bar
 
 Census estimates from 2016 show Richmond gaining more than 2,000 net persons that year who moved from somewhere else in the state or country. However, the city has experienced a net loss in domestic migration since then. The majority of the city's population growth over the past five years has been due to migration from abroad along with natural increases through new births.
 
-```{r comp, fig.cap=paste0(name,": Components of population change")}
+```{r}
+#| label: fig-comp
+#| fig-cap: paste0(name,": Components of population change"
 
 change <- read_rds("data/rr_comp_change.rds") |> 
   filter(year %in% as.character(years) | year == "2021") |> 
@@ -112,13 +112,15 @@ ggplot(change,
 
 ### Household characteristics
 
-Between 2016 and 2020, there have been distinct changes between homeowner and renter households in the city. The city has seen a 2,555 increase in homeowner households with no children, while the number of renter household with no children has decreased by 607. At the other end of the spectrum, there has been a significant decrease in renter households with children (-2,192), while there are only 162 fewer homeowner households with children in the city. These trends seem to suggest affordability challenges in the homeownership and rental markets of the city. 
+Between 2016 and 2020, there have been distinct changes between homeowner and renter households in the city. The city has seen a 2,555 increase in homeowner households with no children, while the number of renter household with no children has decreased by 607. At the other end of the spectrum, there has been a significant decrease in renter households with children (-2,192), while there are only 162 fewer homeowner households with children in the city. These trends seem to suggest affordability challenges in the homeownership and rental markets of the city.
 
 New homeowners without children (and with fewer financial responsibilities) often find it easier to afford a home, while renters with children are finding it difficulty to afford even a rental --- most likely due to lack of larger rental options, as well as increasing costs.
 
 Nonfamily households have seen an increase for both homeowners and renters, but especially for renters (+1,874). This is likely a result of the student population, as well as young professionals, needing additional roommates to afford increasing rents in the city.
 
-```{r children, fig.cap=paste0(name, ": Change in households with children by tenure")}
+```{r}
+#| label: fig-children
+#| fig-cap: paste0(name, ": Change in households with children by tenure")
 
 # Add choice of household stat (HHs with children, HHs with seniors, subfamilies, etc)
 
@@ -144,9 +146,12 @@ ggplot(b25115,
   scale_fill_manual(values = tenure_colors)
 
 ```
-Since 2016, the number of seniors (65 years and over) has been on the rise in the city --- especially among seniors living alone (+1,695). The rise in seniors living alone is a result of the ongoing [desire of older adults to age in place.](https://www.aarp.org/home-family/your-home/info-2021/home-and-community-preferences-survey.html) As this trend continues, so do concerns for senior ability to age in place comfortably with ongoing home maintenance needs or rising rent on fixed incomes. 
 
-```{r seniors, fig.cap=paste0(name, ": Change in senior population by living arrangement")}
+Since 2016, the number of seniors (65 years and over) has been on the rise in the city --- especially among seniors living alone (+1,695). The rise in seniors living alone is a result of the ongoing [desire of older adults to age in place.](https://www.aarp.org/home-family/your-home/info-2021/home-and-community-preferences-survey.html) As this trend continues, so do concerns for senior ability to age in place comfortably with ongoing home maintenance needs or rising rent on fixed incomes.
+
+```{r}
+#| label: fig-seniors
+#| fig-cap: paste0(name, ": Change in senior population by living arrangement")
 
 b09020 <- read_rds("data/b09020_data.rds") |> 
   filter(NAME == name) |> 
@@ -181,9 +186,11 @@ ggplot(b09020,
 
 ### Income and wages
 
-There are wide disparities between homeowner and renter incomes in the City of Richmond. The median homeowner household income (\$79,858) is over double that of the median renter household income (\$36,249). This gap has been persistent in spite of a 16 percent increase in median household income for renters between 2016 and 2020. 
+There are wide disparities between homeowner and renter incomes in the City of Richmond. The median homeowner household income (\$79,858) is over double that of the median renter household income (\$36,249). This gap has been persistent in spite of a 16 percent increase in median household income for renters between 2016 and 2020.
 
-```{r income, fig.cap=paste0(name, ": Median houshold income by tenure")}
+```{r}
+#| label: fig-income
+#| fig-cap: paste0(name, ": Median houshold income by tenure")
 
 # Add choice of income stat (probably median household income of some kind)
 
@@ -218,9 +225,11 @@ ggplot(b25119_cpi,
 
 Independent living difficulties make it necessary for many individuals to seek assisted living facilities or significant modifications to their home to continue to live comfortably. However, both options can be costly --- increasing the need for funding of home accessibility rehabilitation or new accessible housing construction.
 
-Since 2016, there are now over 500 more persons in the city with independent living difficulties. This growth has been among younger adults (under 35) and "young" seniors (65 to 74). The latter group's growth is likely the result of middle-age adults with these difficulties (which saw a large decline) aging into this category in the last five years. 
+Since 2016, there are now over 500 more persons in the city with independent living difficulties. This growth has been among younger adults (under 35) and "young" seniors (65 to 74). The latter group's growth is likely the result of middle-age adults with these difficulties (which saw a large decline) aging into this category in the last five years.
 
-```{r ind-living, fig.cap=paste0(name, ": Net change in individuals with independent living difficulties by age")}
+```{r}
+#| label: fig-ind-living
+#| fig-cap: paste0(name, ": Net change in individuals with independent living difficulties by age")
 
 # Add disability stat (probably independent living difficulty)
 
@@ -254,7 +263,9 @@ ggplot(b18107,
 
 From the start of 2017 to June 2022, the median home price in the city has increased by 85 percent --- going from \$210,500 to \$389,950.
 
-```{r sales, fig.cap=paste0(name, ": Median home sales price")}
+```{r}
+#| label: fig-sales
+#| fig-cap: paste0(name, ": Median home sales price")
 
 # Median sales price over time
 
@@ -300,7 +311,9 @@ ggplot(price,
 
 Rents across the city have steadily risen over the last ten years, accelerating most rapidly in the pandemic's wake since 2020. This trend is present across all of CoStar's five submarkets for the city, especially for Northside and South Richmond. These submarkets have seen some of the largest average rent increases over time, each growing around 40 percent since 2016.
 
-```{r rent-submarket, fig.cap=paste0(name, ": Average asking rent by submarket")}
+```{r}
+#| label: fig-rent-submarket
+#| fig-cap: paste0(name, ": Average asking rent by submarket")
 
 # Average asking rent over time (by submarket if applicable, maybe by bedroom if no submarkets)
 
@@ -339,7 +352,9 @@ ggplot(sub_rent,
 
 ```
 
-```{r submarket-table}
+```{r}
+#| label: tbl-submarket-table
+#| tbl-cap: paste0(name, ": Submarket rents")
 
 library(kableExtra)
 library(formattable)
@@ -372,11 +387,21 @@ sub_tbl |>
 ```
 
 
-```{r nhpd, eval=FALSE}
+
 ### Housing assistance
 
-#Change in number of assisted units (NHPD)
+```{r}
+#| label: tbl-nhpd
+#| eval: false
+
+
+
+
 ```
+
+
+*Change in number of assisted units (NHPD)*
+
 
 ### Naturally-occurring affordable housing
 
@@ -384,7 +409,9 @@ As defined in this report, there are 128 rental properties in the City of Richmo
 
 Older NOAH properties command slightly higher rents than those built in 1960 and beyond. Most of the pre-1960 properties are located in the city's older neighborhoods north of the river, such as Shockoe Bottom and The Fan, and have average rents between \$1,000 and \$1,400. "Newer" NOAH units built in the 1960s and afterward are generally located in the Northside and Southside areas of the city and have average rents between \$750 and \$1,000.
 
-```{r noah, fig.cap=paste0(name, ": Distribution of average asking rents in NOAH properties by year built")}
+```{r}
+#| label: fig-noah
+#| fig-cap: paste0(name, ": Distribution of average asking rents in NOAH properties by year built")
 
 # Add choice of NOAH stat (total number, change in rent, etc) 
 
@@ -426,7 +453,9 @@ ggplot(rva_noah,
 
 Based on the 2020 median renter income estimate, the affordable rent for an average renting household is around \$900. This was several hundred dollars below what the average asking rent for an apartment was in 2020. Although low-end wage growth has increased the purchasing power of working class households, extra take-home pay is likely to be used up for higher costs of goods---and accelerating rents.
 
-```{r income-rent-gap, fig.cap=paste0(name, ": Average asking rent versus rent affordable to median renter income")}
+```{r}
+#| label: fig-income-rent-gap
+#| fig-cap: paste0(name, ": Average asking rent versus rent affordable to median renter income")
 
 # Compare local median renter income to average asking rent
 
@@ -473,9 +502,12 @@ ggplot(rent_gap,
 
 
 ```
+
 The average renter in the city would also be very challenged to find an affordable home to purchase. This gap does not even factor in downpayment savings, credit worthiness, and other important factors.
 
-```{r income-own-gap, fig.cap=paste0(name, ": Income needed to afford median home price versus median renter income")}
+```{r}
+#| label: fig-income-own-gap
+#| fig-cap: paste0(name, ": Income needed to afford median home price versus median renter income")
 
 # Compare local renter income versus local home prices
 
@@ -530,11 +562,14 @@ ggplot(slgap,
 
 
 ```
+
 Based on HUD Comprehensive Housing Affordability Strategy (CHAS) data, there was a shortage of 17,834 rental homes for households making less than 80 percent AMI. This was a deficit increase of 300 homes from 2015 when the shortage was 17,534. The most severe shortage in the City of Richmond is among deeply affordable rentals for households at 30 percent AMI or less.
 
 But there has been a growing shortage among higher income households between 31 and 80 percent AMI.
 
-```{r gap, eval=FALSE, fig.cap=paste0(name, ": Rental housing gap by AMI"), include=FALSE}
+```{r}
+#| label: fig-gap
+#| fig-cap: paste0(name, ": Rental housing gap by AMI")
 
 # Add choice of affordability stat (surplus/deficit, income vs prices, etc)
 
@@ -576,7 +611,9 @@ ggplot(gap,
 
 Rising rents have continued to increase the number of renters with cost burden in the city, although there are possible signs of decelerating growth. Meanwhile, cost burden among homeowners is become much less common.
 
-```{r cb, fig.cap=paste0(name, ": Cumulative change in cost-burdened households by tenure")}
+```{r}
+#| label: fig-cb
+#| fig-cap: paste0(name, ": Cumulative change in cost-burdened households by tenure")
 
 cb <- read_rds("data/cb_7.rds") |> 
   filter(county == name,
@@ -604,9 +641,12 @@ ggplot(cb,
   scale_fill_manual(values = tenure_colors)
 
 ```
+
 Federal and state eviction protections during the pandemic significantly reduced the number of eviction filings and judgements processed by Richmond City District Court. However, these measures have now expired---along with the state's rent relief program. This data does not include the summer months of 2022, when many observers have started to notice an increase in filings.
 
-```{r evictions, fig.cap=paste0(name, ": Evictions filings and judgements")}
+```{r}
+#| label: fig-evictions
+#| fig-cap: paste0(name, ": Evictions filings and judgements")
 
 evictions <- read_csv("data/evictions_17_22.csv") |> 
   pivot_longer(3:128,

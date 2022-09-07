@@ -42,7 +42,9 @@ tenure_colors <-setNames(viridis(2), nm = tenure)
 
 Chesterfield County's population has been on a continual rise since 2010. Between 2016 and 2020, county population experienced an 8 percent increase --- just over 26,000 new residents. As of the 2020 Census, Chesterfield County was the fourth-most populous locality in Virginia --- falling only behind the Northern Virginia counties of Fairfax, Prince William, and Loudoun.
 
-```{r pop, fig.cap=paste0(name, ": Total Population")}
+```{r}
+#| label: fig-pop
+#| fig-cap: paste0(name, ": Total Population")
 
 # Add choice of population stat (net change, components, etc)
 
@@ -82,7 +84,9 @@ pop_bar
 
 The county's substantial growth in recent years has been directly tied to domestic migration (i.e. people living in the region, state, or nation moving into the county). Between 2020 and 2021, the county increased by 4,402 due to domestic migration. International migration and natural increases pale in comparison and have otherwise been in decline.
 
-```{r comp, fig.cap=paste0(name,": Components of population change"}
+```{r}
+#| label: fig-comp
+#| fig-cap: paste0(name,": Components of population change"
 
 change <- read_rds("data/rr_comp_change.rds") |> 
   filter(year %in% as.character(years) | year == "2021") |> 
@@ -112,7 +116,9 @@ ggplot(change,
 
 The increasing number of homeowners in the county has been outpacing renters since 2016. Homeowner household increases have been across all types of households --- especially those with no children (+3,068). On the other hand, renter increases have mainly been among households with children (+617), while the major decrease in households was among nonfamily renter households (-289).
 
-```{r children, fig.cap=paste0(name, ": Change in households with children by tenure"}
+```{r}
+#| label: fig-children
+#| fig-cap: paste0(name, ": Change in households with children by tenure")
 
 # Add choice of household stat (HHs with children, HHs with seniors, subfamilies, etc)
 
@@ -141,7 +147,9 @@ ggplot(b25115,
 
 As with much of the region, the senior population in the county has continued to see major growth. In the county, this growth has mainly been among seniors in family households (mainly those living with a spouse or are the head of household) (+6,566). Growth has also been significant among seniors living alone (+2,687). But declines have only been seen among seniors living with other relatives, which could include a child.
 
-```{r seniors, fig.cap=paste0(name, ": Change in senior population by living arrangement"}
+```{r}
+#| label: fig-seniors
+#| fig-cap: paste0(name, ": Change in senior population by living arrangement")
 
 b09020 <- read_rds("data/b09020_data.rds") |> 
   filter(NAME == name) |> 
@@ -178,7 +186,9 @@ ggplot(b09020,
 
 Between 2016 and 2020, the median renter household income increased by 7 percent, while the median homeowner household income increased 5 percent. In spite of those gains among the typical renter household in the county, renter incomes are nearly half that of a homeowner. The wide gap between between renter and homeowner incomes continues to speak to not only the greater wealth provided by homeownership, but also the continuing affordability challenges faced by renters seeking homeownership opportunities.
 
-```{r income, fig.cap=paste0(name, ": Median household income by tenure")}
+```{r}
+#| label: fig-income
+#| fig-cap: paste0(name, ": Median houshold income by tenure")
 
 # Add choice of income stat (probably median household income of some kind)
 
@@ -213,7 +223,9 @@ ggplot(b25119_cpi,
 
 In Chesterfield County, the number of individuals with independent living difficulties has increased largely among the younger age group (18 to 34 years old). While older age groups saw new increases in individuals with living difficulties of less than 100, the 18 to 34 age group had an increase of 744 individuals.
 
-```{r ind-living, paste0(name, ": Net change in individuals with independent living difficulties by age"}
+```{r}
+#| label: fig-ind-living
+#| fig-cap: paste0(name, ": Net change in individuals with independent living difficulties by age")
 
 # Add disability stat (probably independent living difficulty)
 
@@ -247,7 +259,9 @@ ggplot(b18107,
 
 Chesterfield County home prices continue to rise. In 2020, median home price for the county passed the \$300,000 mark. In spite of a brief decrease towards the end of 2020, home prices in the county have continued to increase amid the pandemic --- getting closer and closer to \$400,000.
 
-```{r sales, fig.cap=paste0(name, ": Median home sales price")}
+```{r}
+#| label: fig-sales
+#| fig-cap: paste0(name, ": Median home sales price")
 
 # Median sales price over time
 
@@ -293,7 +307,9 @@ ggplot(price,
 
 Rental demand has continued to grow over the past five years. As of Q3 2022, the average market asking rent in Chesterfield County was \$1,504 --- which would require a household to make just over \$60,000 to not be cost-burdened. Based on 2020 estimates on median renter household income, this would be a rent affordable to a large swath of the renter population.
 
-```{r rent, fig.cap=paste0(name, ": Average asking rent"}
+```{r}
+#| label: fig-rent
+#| fig-cap: paste0(name, ": Average asking rent")
 
 # Average asking rent over time
 
@@ -332,7 +348,9 @@ ggplot(rent,
 
 Based on CoStar geographic markets, the Midlothian area represents a distinct rental market from the rest of the county. As of Q3 2022 the average market asking rent for Midlothian was \$152 more than the rest of the county. The differences in rent can be attributed to the development of several **new** multifamily properties and the highly desirable location. With market rate rental development continuing to target this area, geographic disparities may continue.
 
-```{r rent-submarket, fig.cap=paste0(name, ": Average asking rent by submarket"}
+```{r}
+#| label: fig-rent-submarket
+#| fig-cap: paste0(name, ": Average asking rent by submarket")
 
 # Average asking rent over time (by submarket if applicable, maybe by bedroom if no submarkets)
 
@@ -373,7 +391,16 @@ ggplot(sub_rent,
 
 ### Housing assistance
 
-    Change in number of assisted units (NHPD)
+```{r}
+#| label: tbl-nhpd
+#| eval: false
+
+
+
+
+```
+
+*Change in number of assisted units (NHPD)*
 
 ### Naturally-occurring affordable housing
 
@@ -381,7 +408,9 @@ As defined in this report, there are 19 rental properties in the Chesterfield Co
 
 The majority of these properties were constructed in the 1970s and 1980s. These properties command much higher rents than those built pre-1970. 
 
-```{r noah, fig.cap=paste0(name, ": Distribution of average asking rents\nin NOAH properties by year built")}
+```{r}
+#| label: fig-noah
+#| fig-cap: paste0(name, ": Distribution of average asking rents in NOAH properties by year built")
 
 # Add choice of NOAH stat (total number, change in rent, etc) 
 
@@ -424,7 +453,9 @@ Since the release of the Framework, Bermuda Estates, located along the county's 
 
 This stands in contrast to private activity in some of Chesterfield County's largest manufactured home communities, Suburban Village and Shady Hill. Suburban Village was purchased in early 2021 by a real estate investment firm, while Shady Hill Mobile Home Park recently accepted a purchase offer in Summer 2022. Both acquisitions have raised concerns among residents and advocates for significant rent increases and potential redevelopment.
 
-```{r mhccv}
+```{r}
+#| label: tbl-mhccv
+#| tbl-cap: "Manufactured home communities in Chesterfield County"
 
 library(kableExtra)
 library(formattable)
@@ -453,7 +484,9 @@ In Chesterfield County, the median renter household income is just enough to aff
 
 This difference between affordable rent and asking rent has been shrinking in recent years. From a difference of \$89 in 2016 to \$63 in 2020.
 
-```{r income-rent-gap, fig.cap=paste0(name, ": Average asking rent versus\nrent affordable to median renter income")}
+```{r}
+#| label: fig-income-rent-gap
+#| fig-cap: paste0(name, ": Average asking rent versus rent affordable to median renter income")
 
 # Compare local median renter income to average asking rent
 
@@ -505,7 +538,10 @@ Although a typical renter can more easily find an affordable rental, if they are
 
 In Chesterfield County, median renter household incomes have not been enough to afford the median sales price in the county from 2016 to 2020. In 2020, the gap between renter income and the income needed to afford the median priced home was \$8,800. This is an increase of nearly \$800 from the gap in 2016.
 
-```{r income-own-gap, fig.cap=title = paste0(name, ": Income needed to afford median home price\nversus median renter income")}
+```{r}
+#| label: fig-income-own-gap
+#| fig-cap: paste0(name, ": Income needed to afford median home price versus median renter income")
+
 
 # Compare local renter income versus local home prices
 
@@ -563,7 +599,9 @@ ggplot(slgap,
 
 Across renter households with incomes below 80 percent AMI, the gap in affordable housing has increased by 204 units from 2015 to 2018 --- for a total shortage of 7,569 rental units affordable to households making 80 percent AMI or less. This estimated gap is based on matching renter income to rental housing affordable to that income and should be considered with some caution. Household incomes matching housing costs does not necessarily reflect that a household is able to afford housing costs given the numerous other financial responsibilities held by individuals and families. Nonetheless, the estimated gap provides our closest assessment of a gap in housing at specific income-levels. For Chesterfield County, the gap has increased most significantly for households between 51 and 80 percent AMI --- suggesting a growing need for affordable housing for higher income households.
 
-```{r gap, fig.cap=paste0(name, ": Rental housing gap by AMI")}
+```{r}
+#| label: fig-gap
+#| fig-cap: paste0(name, ": Rental housing gap by AMI")
 
 # Add choice of affordability stat (surplus/deficit, income vs prices, etc)
 
@@ -605,7 +643,9 @@ ggplot(gap,
 
 From 2015 to 2018, the number of cost burden homeowners has been in decline. By 2018, there was a total decline of 2,661 cost-burdened homeowners from 2015 estimates. But during this same timeframe, the number of cost-burdened renters has increased by 696. The disparate changes in cost burden in Chesterfield County speak to growing affordability issues for renters and greater stability for existing homeowners.
 
-```{r cb, fig.cap=paste0(name, ": Cumulative change in cost-burdened households by tenure")}
+```{r}
+#| label: fig-cb
+#| fig-cap: paste0(name, ": Cumulative change in cost-burdened households by tenure")
 
 cb <- read_rds("data/cb_7.rds") |> 
   filter(county == name,
@@ -635,7 +675,9 @@ ggplot(cb,
 
 Pre-pandemic eviction filings were typically above 500 each month, while eviction judgements were made were nearly half of those filings. The pandemic protections signficantly decreased filings to nearly a third of pre-pandemic numbers. Eviction judgements remained low throughout much of 2021, but filings and judgements saw increases in the early part of 2022 --- signalling the potential for greater renter instability as pandemic renter protections end.
 
-```{r evictions, fig.cap=paste0(name, ": Evictions filings and judgements")}
+```{r}
+#| label: fig-evictions
+#| fig-cap: paste0(name, ": Evictions filings and judgements")
 
 evictions <- read_csv("data/evictions_17_22.csv") |> 
   pivot_longer(3:128,
