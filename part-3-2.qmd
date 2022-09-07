@@ -1,6 +1,7 @@
 # Impact of housing costs on household budgets {#part-3-2}
 
-```{r setup}
+```{r}
+#| label: setup
 
 library(tidyverse)
 library(httr)
@@ -16,7 +17,9 @@ library(viridis)
 
 ```
 
-```{r chas-pull, eval=FALSE}
+```{r}
+#| label: chas-pull
+#| eval: false
 
 years <- 2015:2018
 
@@ -115,7 +118,9 @@ walk(tables, function(table) {
 
 ```
 
-```{r chas-data, eval=FALSE}
+```{r}
+#| label: chas-data
+#| eval: false
 
 cb_7 <- read_csv("data/Table7_2015to2018.csv") |>
   clean_names() |>
@@ -169,7 +174,9 @@ The number of cost-burdened homeowners across the region has declined significan
 
 Meanwhile, the total number of cost-burdened renter households increased by almost 1,500, with only Hanover County seeing a small decline. Much of this growth was focused in Chesterfield County and Richmond city.
 
-```{r cb-locality, fig.cap="Cumulative change in cost-burdened households by tenure"}
+```{r}
+#| label: fig-cb-locality
+#| fig.cap: "Cumulative change in cost-burdened households by tenure"
 
 cb_7 <- read_rds("data/cb_7.rds")
 
@@ -207,7 +214,9 @@ ggplot(cb_locality,
 
 Homeowners above 80 percent AMI saw the largest declines in cost burden since 2016. This is likely due to rising incomes among homeowners with relatively fixed housing costs. Renters with cost burdens shifted up the income spectrum, as the number of cost-burdened renters below 30 percent AMI decreased by more than 1,400, but increased more than 2,705 among those between 30 and 100 percent AMI.
 
-```{r cb-income, fig.cap="Cumulative change in cost-burdened households by income and tenure"}
+```{r}
+#| label: fig-cb-income
+#| fig.cap: "Cumulative change in cost-burdened households by income and tenure"
 
 cb_income <- cb_7 |> 
   filter(county %in% pha_localities,
@@ -248,7 +257,9 @@ However, the significant and unexpected drop among cost-burdened renters below 3
 
 The plot below shows the ACS estimates of renter households by cost burden from 2016 to 2020. There is a steady decline in the number of cost-burdened low-income renters (under \$35,000); however, this corresponds to an increasing number of cost-burdened renters with incomes between \$35,000 and \$75,000.
 
-```{r cb-income-acs-data, eval=FALSE}
+```{r}
+#| label: cb-income-acs-data
+#| eval: false
 
 years_acs <- 2015:2020
 
@@ -304,7 +315,9 @@ write_rds(b25074_data, "data/b25074_data.rds")
 
 ```
 
-```{r cb-income-acs-est, fig.cap="Renter households by income and cost burden"}
+```{r}
+#| label: fig-cb-income-acs-est
+#| fig.cap: "Renter households by income and cost burden"
 
 b25074_data <- read_rds("data/b25074_data.rds")
 
@@ -331,7 +344,9 @@ ggplot(b25074_data,
 
 Nearly all cost-burdened renter households have incomes below \$75,000. Filtering for just those estimates, the plot below shows the net annual change from 2016 to 2020. The significant decrease from 2019 to 2020 (1,057) is well beyond the range from previous changes, and may also be due in part to lower ACS response rates among lower-income households during the COVID-19 pandemic.
 
-```{r cb-income-acs-yoy, fig.cap="Year-over-year change in cost-burdened renter households"}
+```{r}
+#| label: fig-cb-income-acs-yoy
+#| fig.cap: "Year-over-year change in cost-burdened renter households"
 
 b25074_yoy <- b25074_data |>
   group_by(year, inc, cb_group) |> 
@@ -370,7 +385,9 @@ Small families and non-elderly, non-family homeowner households saw the largest 
 
 Net increases in cost-burden were almost entirely contained to elderly non-family and elderly family households. There are now more than 3,000 additional cost-burdened households in these groups, including both homeowners and renters.
 
-```{r cb-hh, fig.cap="Change in cost-burdened households by household type"}
+```{r}
+#| label: fig-cb-hh
+#| fig.cap: "Change in cost-burdened households by household type"
 
 cb_hh_pha <- cb_7 |> 
   subset(county %in% pha_localities) |> 
@@ -412,7 +429,9 @@ Since the Great Recession, mortgage delinquency of 90 days or more has been on a
 
 According to some researchers, this program also led to loans in delinquency prior to the pandemic entering into forbearance as well.^[[(Haughwout, Lee, Scally, and van der Klaauw, 2020)](https://libertystreeteconomics.newyorkfed.org/2020/11/following-borrowers-through-forbearance/)] Interestingly, Hanover County saw a spike in mortgage delinquency during 2018, but has since declined to the lowest rate (0.2 percent) among all localities as of December 2021.
 
-```{r mort-del, fig.cap="Mortgage delinquency rate by locality"}
+```{r}
+#| label: fig-mort-del
+#| fig.cap: "Mortgage delinquency rate by locality"
 
 mort_del <- read_csv("data/mortgage_del.csv") |> 
   pivot_longer(
@@ -460,7 +479,9 @@ For this section, we define eviction *filings* as the number of lawsuits generat
 
 The eviction landscape changed dramatically during the COVID-19 pandemic when the Centers for Disease Control imposed a nationwide federal moratorium on residential evictions in September 2020. In Virginia, Governor Northam requested from the state's Supreme Court a stay on evictions preceding the nationwide moratorium several times. 
 
-```{r evictions, fig.cap="Evictions filings and judgements by locality"}
+```{r}
+#| label: fig-evictions
+#| fig.cap: "Evictions filings and judgements by locality"
 
 evictions <- read_csv("data/evictions_17_22.csv") |> 
   pivot_longer(3:128,
@@ -502,7 +523,9 @@ ggplot(evictions,
 
 These measures led to dramatic decreases in both the number of filings and eviction judgements across the region. However, the eviction moratorium's official end in Virginia on June 30, 2022, brings about concerns among advocates and service providers over a potential wave of evictions and homelessness in the coming months.
 
-```{r evict-avg, fig.cap="Average annual eviction filings and orders by locality"}
+```{r}
+#| label: fig-evict-avg
+#| fig.cap: "Average annual eviction filings and orders by locality"
 
 eviction_avg <- evictions |> 
   group_by(Jurisdiction, year, type) |> 
@@ -540,7 +563,9 @@ On September 1, 2020, PHA launched the Housing Resource Line to help residents a
 
 Call volume has remained steady over since the line's launch. Call volume has not dropped below 500 calls per month since March 2021.
 
-```{r call-vol, fig.cap="Housing Resource Line monthly call volume"}
+```{r}
+#| label: fig-call-vol
+#| fig.cap: "Housing Resource Line monthly call volume"
 
 call_vol <- read_csv("data/hrl_vol.csv") |> 
   mutate(date = ym(date))
@@ -569,7 +594,9 @@ ggplot(call_vol,
 
 The majority of calls (56 percent) were for rental options (36 percent) and financial assistance (20 percent). The two other largest share of calls were for an option not listed (17 percent) and homelessness (13 percent).
 
-```{r call-topic, fig.cap="Housing Resource Line volume by call topic"}
+```{r}
+#| label: call-topic
+#| fig.cap: "Housing Resource Line volume by call topic"
 
 call_top <- read_csv("data/hrl_need.csv") |> 
   mutate(need = case_when(
@@ -612,7 +639,9 @@ The [Urban Institute recently highlighted](https://www.urban.org/sites/default/f
 
 But the challenges of reducing homelessness during the pandemic were laid bare. With an eviction moratorium, rental vacancy rates reached record lows---leaving many seeking rental options with little to none. In addition, providers have also referenced landlords setting high security deposits.
 
-```{r pit-data, eval=FALSE}
+```{r}
+#| label: pit-data
+#| eval: false
 
 years_pit <- as.character(2007:2021)
 
@@ -665,7 +694,9 @@ write_rds(rva_pit, "data/rva_pit.rds")
 
 ```
 
-```{r pit-plot, fig.cap="Greater Richmond CoC Point-in-Time count"}
+```{r}
+#| label: fig-pit-plot
+#| fig.cap: "Greater Richmond CoC Point-in-Time count"
 
 rva_pit <- read_rds("data/rva_pit.rds")
 
@@ -685,17 +716,20 @@ ggplot(rva_pit,
         axis.ticks = element_blank())
 
 ```
+
 ### Students experiencing homelessness
 
 The McKinney-Vento Education for Homeless Children and Youth (EHCY) Program collects data on students experiencing homelessness, which often can paint a different picture of homelessness when compared to the Point-in-Time counts. In the region, school divisions have been seeing varying numbers, but between the 2018-2019 and 2019-2020 school years students experiencing homelessness have declined across all school divisions.
 
-:::{.rmdinfo}
+::: callout-tip
 Homeless children counted under the McKinney-Vento program are defined as “individuals who lack a fixed, regular, and adequate nighttime residence.” This includes children who are doubled-up with another households or living in motels, along with those living in shelters, vehicles, public areas, and other unsuitable places. This is more expansive than the definition used for PIT counts.
 :::
 
 The most notable declines in student homelessness have been seen in the Richmond Public School system, where the number of students experiencing homelessness have declined by 40 percent from 2017-2018 to 2019-2020. Given the pandemic and virtual learning environments, upcoming McKinney-Vento data through the 2021-2022 school year may need require extra context.
 
-```{r mkv, fig.cap="Enrolled students experiencing homelessness by school year"}
+```{r}
+#| label: fig-mkv
+#| fig.cap: "Enrolled students experiencing homelessness by school year"
 
 div <- c(21, 42, 43, 123)
 

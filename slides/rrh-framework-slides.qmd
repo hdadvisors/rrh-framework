@@ -21,6 +21,8 @@ date: 2022-09-08
 
 library(tidyverse)
 library(scales)
+library(janitor)
+library(zoo)
 library(viridis)
 
 pha_names <- c("Richmond city", "Hanover County", "Henrico County", "Chesterfield County")
@@ -182,6 +184,8 @@ ggplot(oews_pct,
 
 ## Racial homeownership gaps remain the status quo.
 
+<br>
+
 ```{r}
 #| label: ho-race-plot
 #| echo: false
@@ -223,15 +227,111 @@ ggplot(b25003_race_data,
 
 ## A tight supply is pushing existing home prices closer to new build prices.
 
-\[Median price of new construction and resale\]
+```{r}
+#| label: comp-price-plot
+#| echo: false
+
+pha_price_comp <-  read_rds("../data/pha_price_comp.rds")
+
+ggplot(pha_price_comp,
+       aes(x = date, y = med_price, color = type)) +
+  geom_line(size = 1) +
+  scale_y_continuous(labels = label_dollar()) +
+  scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
+  labs(title = "Median price of new construction and resale",
+       subtitle = "January 2017 to June 2022",
+       caption = "Source: Central Virginia Regional Multiple Listing Service.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        legend.position = "bottom",
+        legend.key = element_blank(),
+        legend.title = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
+```
 
 ## The supply of 2- and 3-bedroom apartments *decreased*.
 
-\[Change in renter-occupied housing units by number of bedrooms\]
+```{r}
+#| label: ro-bedrooms
+#| echo: false
+
+b25042_data <- read_rds("../data/b25042_data.rds") |> 
+  filter(GEOID %in% pha,
+         tenure == "Renter") |> 
+  group_by(br) |> 
+  summarise(change = sum(change))
+
+ggplot(b25042_data,
+       aes(x = br,
+           y = change,
+           fill = br)) +
+  geom_col() + 
+  labs(title = "Change in renter-occupied housing units by number of bedrooms",
+       subtitle = "2016 to 2020",
+       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25042.") +
+  theme(panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = "none") +
+  scale_y_continuous(labels = label_comma()) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 16))
+
+```
 
 ## Rising prices for 2- and 3-bedroom apartments reflect higher demand.
 
-\[Average asking rent by bedroom\]
+```{r}
+#| label: avg-rent-br
+#| echo: false
+
+# Aggregated average market asking rent per unit for Chesterfield, Hanover, Henrico, and Richmond City.
+
+# CoStar Filters: Construction Status - Existing
+
+# As of mid-JULY; inflation-adjusted
+
+pha_rent_br <- read_csv("../data/pha_rent_br.csv") |> 
+  clean_names() |> 
+  mutate(period = case_when(
+    period == "2022 Q3 QTD" ~ "2022 Q3",
+    TRUE ~ period)) |> 
+  mutate(period = as.Date(as.yearqtr(period, format = "%Y Q%q"), frac = 1)) |>
+  pivot_longer(cols = 2:5,
+               names_to = "br",
+               values_to = "rent") |> 
+  mutate(br = case_when(
+    br == "studio" ~ "Studio",
+    br == "x1_bed" ~ "One bedroom",
+    br == "x2_beds" ~ "Two bedrooms",
+    br == "x3_beds" ~ "Three bedrooms")) |> 
+  mutate(rent = parse_number(rent),
+         br = fct_reorder(br, rent, .desc = TRUE)) |> 
+  filter(between(period, as.Date("2010-03-31"), as.Date("2022-06-30"))) |> 
+  mutate(period = as.yearqtr(period))
+  
+ggplot(pha_rent_br,
+       aes(x = period, y = rent, color = br)) +
+  geom_line(size = 1) +
+  scale_y_continuous(labels = label_dollar(),
+                     n.breaks = 9) +
+  scale_x_yearqtr(format = "%Y Q%q") +
+  labs(title = "Average asking rent by bedroom",
+       subtitle = "2019 Q1 to 2022 Q2 (inflation-adjusted)",
+       caption = "Source: CoStar Group, Inc.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        legend.title = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
+```
 
 ## Housing assistance slide
 
@@ -247,9 +347,45 @@ ggplot(b25003_race_data,
 
 ...
 
-## Impact slide
+## Rent burdens may be shifting up the income scale.
 
-...
+```{r}
+#| label: cb-income-acs-est
+#| echo: false
+#| fig-asp: 0.4
+
+b25074_data <- read_rds("../data/b25074_data.rds")
+
+ggplot(b25074_data,
+       aes(x = year, y = estimate, fill = cb_group)) +
+  geom_col(position = "dodge") +
+  facet_wrap(~inc, nrow = 1, labeller = label_wrap_gen(width = 12, multi_line = TRUE)) +
+  labs(title = "Renter households by income and cost burden",
+       subtitle = "2016 to 2020",
+       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25074.") +
+  scale_y_continuous(labels = label_comma()) +
+  theme(axis.title = element_blank(),
+        axis.text.x = element_text(size = 8, angle = 90, vjust = 0.5),
+        legend.position = "bottom",
+        legend.title = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.ticks = element_blank()) +
+  scale_fill_manual(values = c("#d8b365", "#018571", "#80cdc1"))
+
+```
+
+. . .
+
+::: callout-warning
+
+### Use with caution
+
+Estimates for 2020 (the 2016-2020 5-year ACS release) may be impacted by lower survey response rates during the COVID-19 pandemic.
+
+:::
 
 # Local summaries
 
