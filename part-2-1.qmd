@@ -247,7 +247,7 @@ From 2010 onward, every locality has seen increasing single-family home construc
 
 ```{r bps-data, eval=FALSE}
 
-bps_years <- 2000:2020
+bps_years <- 2000:2021
 
 header_rows <- read_csv("https://www2.census.gov/econ/bps/County/co2020a.txt", 
                         col_names = FALSE,
@@ -264,7 +264,7 @@ column_names <- header_rows %>%
   pull(names)
 
 cbps_raw <- map_df(bps_years, ~{
-  raw <- read_csv(glue("https://www2.census.gov/econ/bps/County/co{.x}a.txt"), skip = 2, 
+  raw <- read_csv(glue("https://www2.census.gov/econ/bps/County/co{.x}a.txt"), skip = 2,
                     col_names = FALSE) %>%
     select(X1:X18) %>%
     set_names(column_names)
@@ -273,7 +273,17 @@ cbps_raw <- map_df(bps_years, ~{
   
 })
 
+# Read in latest 2020 cumulative data (through July)
+
+cbps_ytd <- read_csv("https://www2.census.gov/econ/bps/County/co2207y.txt", 
+                     col_names = FALSE,
+                     skip = 2) |> 
+  select(X1:X18) |> 
+  set_names(column_names) |> 
+  mutate(`Survey: Date` = 2022)
+
 cbps_data <- cbps_raw %>% 
+  bind_rows(cbps_ytd) |> 
   mutate(year = `Survey: Date`,
          GEOID = paste0(`FIPS: State`, `FIPS: County`)) %>%
   select(`1-unit: Bldgs`:GEOID) %>%
