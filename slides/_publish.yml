@@ -1,0 +1,4 @@
+- source: rrh-framework-slides.qmd
+  quarto-pub:
+    - id: 29cb1d3f-2dcb-491b-942e-39671f3bc4dd
+      url: 'https://quartopub.com/sites/jtknopf/richmond-regional-housing-framework-data-update'
