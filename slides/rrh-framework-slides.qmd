@@ -24,12 +24,15 @@ library(scales)
 library(janitor)
 library(zoo)
 library(viridis)
+library(lubridate)
 
 pha_names <- c("Richmond city", "Hanover County", "Henrico County", "Chesterfield County")
 
 pha <- c("51085", "51760", "51087", "51041")
 
 geo_colors <- setNames(viridis(4), nm = pha_names)
+tenure <- c("Homeowner", "Renter")
+tenure_colors <-setNames(viridis(2), nm = tenure)
 
 ```
 
@@ -391,6 +394,78 @@ Estimates for 2020 (the 2016-2020 5-year ACS release) may be impacted by lower s
 
 ## Richmond City
 
+:::: {.columns .nonincremental}
+
+::: {.column width="70%"}
+
+```{r}
+#| label: rva-eviction
+#| echo: false
+#| fig-asp: 0.75
+
+evictions <- read_csv("../data/evictions_17_22.csv") |> 
+  pivot_longer(3:128,
+               names_to = "data",
+               values_to = "value") |> 
+  mutate(type = case_when(
+    str_detect(data, "Filings") ~ "Filings",
+    str_detect(data,"Evictions") ~ "Eviction judgements"
+  )) |> 
+  mutate(date = str_sub(data, -7, -1)) |> 
+  mutate(date = ym(date)) |> 
+  mutate(year = year(date)) |> 
+  mutate(type = fct_relevel(type, "Filings", "Eviction judgements")) |> 
+  filter(Jurisdiction == "Richmond City")
+
+eviction_colors <- setNames(c("#00BFC4", "#F8766D"),
+                            nm = c("Filings", "Eviction judgements"))
+
+ggplot(evictions,
+       aes(x = date,
+           y = value,
+           fill = type)) +
+  geom_col(position = "dodge") +
+  scale_x_date(labels = label_date_short(), breaks = breaks_width("6 months")) +
+  scale_y_continuous(labels = label_comma()) +
+  labs(title = "City of Richmond: Evictions filings and judgements",
+       subtitle = "January 2017 to March 2022",
+       caption = "Source: RVA Eviction Lab") +
+  scale_fill_manual(values = eviction_colors) +
+  theme(legend.position = "bottom",
+        legend.title = element_blank(),
+        axis.title = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.ticks = element_blank())
+
+
+evictions_post <- evictions |> 
+  filter(year >= 2020) |> 
+  group_by(year, type) |> 
+  summarise(mean = mean(value))
+
+evictions_pre <- evictions |> 
+  filter(year < 2020) |> 
+  group_by(year, type) |> 
+  summarise(mean = mean(value))
+```
+
+:::
+
+::: {.column width="30%"}
+
+-   State and federal eviction protections reduced City eviction filings and judgements to a fraction of what they were pre-pandemic
+
+-   Average eviction judgements per month in 2022 were 62 --- an 89 percent reduction from the 2019 average of 576
+
+-   As rent relief and eviction protections have ended, eviction rates should be monitored closely
+
+:::
+
+::::
+
 ## Chesterfield County
 
 :::: {.columns .nonincremental}
@@ -415,7 +490,6 @@ gap <- read_rds("../data/tb_18_match.rds") |>
     gapcode == "Matches or less than income" ~ "Households at or less than income"
   )) |>
   filter(household_income != "80 percent AMI or greater")
-
 ggplot(gap,
        aes(x = year, 
            y = estimate,
@@ -433,7 +507,6 @@ ggplot(gap,
                                           size = 0.05),
         legend.position = "bottom",
         legend.title = element_blank())
-
 ```
 
 :::
@@ -452,7 +525,111 @@ ggplot(gap,
 
 ## Hanover County
 
+:::: {.columns .nonincremental}
+
+::: {.column width="70%"}
+
+```{r}
+#| label: hanover-income
+#| echo: false
+#| fig-asp: 0.75
+
+b25118_data <-read_rds("../data/b25118_data.rds") |> 
+  filter(NAME == "Hanover County") |>
+  group_by(tenure, income) |> 
+  summarise(`2016` = sum(`2016`),
+            `2020` = sum(`2020`)) |> 
+  mutate(change = `2020`-`2016`,
+         pct_change = change/`2016`)
+
+ggplot(b25118_data, 
+       aes(y = income,
+           x = change,
+           fill = tenure)) +
+  geom_col(position = "dodge") +
+  facet_grid(~tenure) +
+  scale_x_continuous(labels = label_comma()) +
+  scale_y_discrete(limits = c("Less than $15,000","$15,000 to $24,999",
+                              "$25,000 to $49,999", "$50,000 to $74,999",
+                              "$75,000 to $99,999", "$100,000 to $149,999",
+                              "$150,000 or more"),
+                   labels = function(x) str_wrap(x, width = 12)) +
+  labs(title = "Hanover County: Change households by tenure and income level",
+       subtitle="2016 to 2020",
+       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25118.") +
+  theme(axis.title = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_blank(),
+        legend.position = "none",
+        panel.grid.major.x = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.ticks = element_blank()) +
+  scale_fill_manual(values = tenure_colors)
+
+```
+
+:::
+
+::: {.column width="30%"}
+
+-   Between 2016 and 2020, Hanover County has seen an overall decrease in households making less than $100,000
+
+-   The decrease in lower income households is reflected in the loss of lower income households and increases in median household incomes among homeowners **and** renters
+
+- Higher incomes have correlated with higher housing prices (with median home prices well into the $400,000s)
+
+:::
+
+::::
+
 ## Henrico County
+
+:::: {.columns .nonincremental}
+
+::: {.column width="70%"}
+
+```{r}
+#| label: hen-children
+#| echo: false
+#| fig-asp: 0.75
+
+
+# Add choice of household stat (HHs with children, HHs with seniors, subfamilies, etc)
+
+b25115 <- read_rds("../data/b25115_data.rds") |> 
+  filter(NAME == "Henrico County")
+
+ggplot(b25115,
+       aes(x = children, y = change, fill = tenure)) +
+  geom_col(position = "dodge") + 
+  facet_wrap(~children, nrow = 1, scales = "free_x") +
+  scale_y_continuous(labels = label_number(style_positive = "plus", big.mark = ",")) +
+  labs(title = "Henrico County: Change in households with children by tenure",
+       subtitle = "2016 to 2020",
+       fill = "Tenure",
+       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25115.") +
+  theme(axis.title = element_blank(),
+        axis.text.x = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.ticks = element_blank()) +
+  scale_fill_manual(values = tenure_colors)
+
+```
+
+:::
+
+::: {.column width="30%"}
+
+-   In stark contrast to homeowners, renter households are not seeing large increases
+
+-   Most notably, there’s been a decrease in renter households with children by 1,010
+
+:::
+
+::::
 
 ## Next steps
 

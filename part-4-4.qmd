@@ -250,6 +250,7 @@ ggplot(b25118_data,
   scale_fill_manual(values = tenure_colors)
 
 ```
+
 ### Persons with disabilities
 
 While other localities have seen significant increases in adults below 65 years old with independent living difficulties, Hanover County has seen the greatest growth among those aged 75 years and older. With a growing number of aging seniors unable to live with comfortably without assistance, there will be a growing need for assisted living facilities and resources to support aging-in-place.
