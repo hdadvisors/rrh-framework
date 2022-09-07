@@ -2,6 +2,11 @@
 format:
   revealjs:
     incremental: true
+    self-contained: true
+    theme: simple
+    height: 900
+    width: 1400
+    slide-number: true
 title: "Richmond Regional Housing Framework Data Update"
 subtitle: "Selected draft findings"
 author: "HDAdvisors"
@@ -12,6 +17,8 @@ date: 2022-09-08
 
 *How have housing needs changed across the region since the original Framework release?*
 
+. . .
+
 Four parts:
 
 1.  Demographic and socioeconomic changes
@@ -19,18 +26,107 @@ Four parts:
 3.  Gap analysis
 4.  Local summaries
 
-## Data source updates {.smaller}
+## Data source updates
 
-+----------------------------------------------+----------------------------+---------------------------------------+
 | Source                                       | Original                   | Current                               |
-+==============================================+============================+=======================================+
+|-----------------------------|------------------|-------------------------|
 | American Community Survey                    | 2013-2017 5-year estimates | 2016-2020 5-year estimates            |
-+----------------------------------------------+----------------------------+---------------------------------------+
 | Comprehensive Housing Affordability Strategy | 2012-2016 5-year estimates | 2014-2018 5-year estimates            |
-+----------------------------------------------+----------------------------+---------------------------------------+
 | Census Population Estimates Program          | 2018                       | 2021, including 2020 Decennial Census |
-+----------------------------------------------+----------------------------+---------------------------------------+
 | Census Building Permits Survey               | 2018                       | 2022, through July                    |
-+----------------------------------------------+----------------------------+---------------------------------------+
 | MLS                                          | 2019                       | 2022, through August                  |
-+----------------------------------------------+----------------------------+---------------------------------------+
+| CoStar                                       | *Not used*                 | 2022, through August                  |
+
+: {tbl-colwidths="\[40, 30, 30\]"}
+
+. . .
+
+::: callout-tip
+### Other updated datasets
+
+National Housing Preservation Database, BLS Occupational Employment and Wage Statistics, and district court eviction filings and judgments.
+:::
+
+# Demographic and socioeconomic changes
+
+## More people come here than are born here.
+
+\[Components of population change\]
+
+## Young adults are shacking up.
+
+\[Change in 18-34 year old population by living arrangement\]
+
+## Lowest-payed workers saw the biggest (relative) pay bumps.
+
+\[Percent change in annual wage in Richmond, VA MSA\]
+
+# Housing supply and market changes
+
+## Racial homeownership gaps remain the status quo.
+
+\[Homeownership rate by race and ethnicity\]
+
+## A tight supply is pushing existing home prices closer to new build prices.
+
+\[Median price of new construction and resale\]
+
+## The supply of 2- and 3-bedroom apartments *decreased*.
+
+\[Change in renter-occupied housing units by number of bedrooms\]
+
+## Rising prices for 2- and 3-bedroom apartments reflect higher demand.
+
+\[Average asking rent by bedroom\]
+
+## Housing assistance slide
+
+...
+
+## NOAH slide
+
+...
+
+# Gap analysis
+
+## Affordability slide
+
+...
+
+## Impact slide
+
+...
+
+# Local summaries
+
+## Chesterfield County
+
+::: columns
+::: {.column width="30%"}
+-   Fact 1
+
+-   Fact 2
+:::
+
+::: {.column width="70%"}
+\[add plot here\]
+:::
+:::
+
+## Hanover County
+
+## Henrico County
+
+## Richmond City
+
+## Next steps
+
+-   Feedback from PHA Board and staff
+
+-   Complete final updates on report (incorporating edits and suggestions)
+
+-   Consistent branding and visualizations
+
+-   Provide updates to data based on timing
+
+# Discussion
