@@ -15,6 +15,24 @@ date: 2022-09-08
 
 ## Research scope
 
+```{r}
+#| label: setup
+#| include: false
+
+library(tidyverse)
+library(scales)
+library(viridis)
+
+pha_names <- c("Richmond city", "Hanover County", "Henrico County", "Chesterfield County")
+
+pha <- c("51085", "51760", "51087", "51041")
+
+geo_colors <- setNames(viridis(4), nm = pha_names)
+
+```
+
+
+
 *How have housing needs changed across the region since the original Framework release?*
 
 . . .
@@ -37,25 +55,98 @@ Four parts:
 | MLS                                          | 2019                       | 2022, through August                  |
 | CoStar                                       | *Not used*                 | 2022, through August                  |
 
-: {tbl-colwidths="\[40, 30, 30\]"}
+## Other updated datasets
 
-. . .
+Additional sources used for this refresh include:
 
-::: callout-tip
-### Other updated datasets
-
-National Housing Preservation Database, BLS Occupational Employment and Wage Statistics, and district court eviction filings and judgments.
-:::
+-   National Housing Preservation Database
+-   BLS Occupational Employment and Wage Statistics
+-   CFPB Mortgage Performance Trends
+-   Point-in-Time homelessness counts and McKinney-Vento student homelessness statistics
+-   District court eviction filings and judgments
 
 # Demographic and socioeconomic changes
 
 ## More people come here than are born here.
 
-\[Components of population change\]
+<br>
+
+```{r}
+#| label: components-plot
+#| echo: false
+
+pha_comp_change <- read_rds("../data/rr_comp_change.rds") |> 
+  filter(NAMELSAD %in% pha_names)
+
+comp_chg_summary <- pha_comp_change |> 
+  group_by(year, component) |> 
+  summarise(value = sum(value)) |> 
+  mutate(year = as.numeric(year),
+         percent = value/sum(value)) |> 
+  filter(year >= 2016 & year != 2020) |> 
+  mutate(year = as.character(year))
+
+ggplot(comp_chg_summary,
+       aes(x=year,
+           y=percent,
+           fill=component)) + 
+  geom_bar(stat="identity", position = "stack") +
+  labs(title="Components of population change",
+       subtitle = "Share of regional population growth by source",
+       caption = "Note: Data not available for 2020.\nSource: U.S. Census Bureau, Population Estimates Program.") +
+  theme(axis.title = element_blank(),
+        panel.background = element_blank(),
+        legend.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05)) +
+  scale_y_continuous(labels = percent_format()) +
+  scale_fill_manual(values = viridis(3))
+
+```
+
 
 ## Young adults are shacking up.
 
-\[Change in 18-34 year old population by living arrangement\]
+<br>
+
+```{r}
+#| label: hh-adultchild-plot
+#| echo: false
+
+b09021_data <- read_rds("../data/b09021_data.rds") |> 
+  filter(NAME %in% pha_names) |>
+  group_by(arrangement) |> 
+  summarise(`2016` = sum(`2016`),
+            `2020` = sum(`2020`)) |> 
+  mutate(pct_change = (`2020`-`2016`)/`2016`)
+
+ggplot(b09021_data,
+       aes(x = reorder(arrangement, pct_change),
+           y = pct_change,
+           fill = arrangement,
+           color = arrangement,
+           label = label_percent()(pct_change))) +
+  geom_col(position = "dodge") +
+  geom_text(aes(y = pct_change + sign(pct_change)/75,
+                label = label_percent(accuracy = 0.1)(pct_change)),
+            size = 4) +
+  scale_y_continuous(labels = label_percent(),
+                     breaks = c(-0.075,-0.05, -0.025, 0, 0.025, 0.05, 0.075, 0.1, 0.125, 0.15, 0.175),
+                     limits = c(-0.08,0.18)) + 
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) +
+  labs(title = "Change in 18-34 year old population by living arrangement",
+       subtitle="2016 to 2020",
+       caption = "Source: U.S. Census Bureau, American Community Survey, Table B09021.") +
+  theme(axis.title = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        legend.position = "none",
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.ticks = element_blank())
+
+```
 
 ## Lowest-payed workers saw the biggest (relative) pay bumps.
 
