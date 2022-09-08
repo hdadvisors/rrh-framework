@@ -378,17 +378,52 @@ ggplot(subsidy_local,
 
 ```{r}
 #| label: fig-change
-#| fig.cap: ""
+#| fig.cap: "Additions and removals of subsidized rental units"
 
-change <- nhpd_coded_rr |> 
-  mutate(across(c(6,7), ~ as.Date(.x, "%m/%d/%Y"))) |> 
+change <- nhpd_clean_rr |> 
   mutate(change_type = case_when(
     start_date > '2019-12-31' ~ "Added",
-    end_date > '2019-12-31' ~ "Removed",
+    end_date < '2022-09-01' & end_date > '2019-12-31' ~ "Removed",
     TRUE ~ "No change")) |> 
   group_by(subsidy_name, change_type) |> 
-  summarise(units = sum(assisted_units))
+  summarise(units = sum(assisted_units)) |> 
+  filter(change_type != "No change") |> 
+  mutate(units = if_else(change_type == "Removed", units*-1, units)) |> 
+  pivot_wider(
+    names_from = change_type,
+    values_from = units) |> 
+  mutate(Added = replace_na(Added, 0),
+         `Net change` = Removed + Added) |> 
+  pivot_longer(
+    cols = 2:4,
+    names_to = "change_type",
+    values_to = "units") |> 
+  mutate(subsidy_name = fct_reorder(subsidy_name, units, .desc = TRUE),
+         change_type = fct_relevel(change_type, "Added", "Removed", "Net change"),
+         subsidy_name = str_wrap(subsidy_name, width = 10))
 
+ggplot(change,
+       aes(x = reorder_within(subsidy_name, units, change_type),
+           y = units,
+           fill = subsidy_name,
+           color = subsidy_name,
+           label = label_comma()(units))) +
+  geom_col(position = "dodge") +
+  geom_text(aes(y = units + sign(units)/0.003)) +
+  facet_wrap(~change_type, scales = "free_x") +
+  scale_x_reordered() +
+  scale_y_continuous(labels = label_comma(),
+                     limits = c(-2000, 3500),
+                     n.breaks = 10) +
+  labs(title = "Additions and removals of subsidized rental unit contracts",
+       subtitle = "January 2020 through August 2022",
+       caption = "Source: National Housing Preservation Database and Virginia Housing.") +
+  theme(legend.position = "none",
+        panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                  size = 0.05))
 
 ```
 

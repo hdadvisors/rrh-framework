@@ -25,6 +25,7 @@ library(janitor)
 library(zoo)
 library(viridis)
 library(lubridate)
+library(tidytext)
 
 pha_names <- c("Richmond city", "Hanover County", "Henrico County", "Chesterfield County")
 
@@ -257,6 +258,8 @@ ggplot(pha_price_comp,
 
 ## The supply of 2- and 3-bedroom apartments *decreased*.
 
+<br>
+
 ```{r}
 #| label: ro-bedrooms
 #| echo: false
@@ -287,6 +290,8 @@ ggplot(b25042_data,
 ```
 
 ## Rising prices for 2- and 3-bedroom apartments reflect higher demand.
+
+<br>
 
 ```{r}
 #| label: avg-rent-br
@@ -336,21 +341,187 @@ ggplot(pha_rent_br,
 
 ```
 
-## Housing assistance slide
+## Our supply of dedicated affordable rentals increased by 2,700.
 
-...
+<br>
 
-## NOAH slide
+```{r}
+#| label: subsidized-change
+#| echo: false
 
-...
+nhpd_clean_rr <- read_rds("../data/nhpd_clean_rr.rds")
+
+change <- nhpd_clean_rr |> 
+  mutate(change_type = case_when(
+    start_date > '2019-12-31' ~ "Added",
+    end_date < '2022-09-01' & end_date > '2019-12-31' ~ "Removed",
+    TRUE ~ "No change")) |> 
+  group_by(subsidy_name, change_type) |> 
+  summarise(units = sum(assisted_units)) |> 
+  filter(change_type != "No change") |> 
+  mutate(units = if_else(change_type == "Removed", units*-1, units)) |> 
+  pivot_wider(
+    names_from = change_type,
+    values_from = units) |> 
+  mutate(Added = replace_na(Added, 0),
+         `Net change` = Removed + Added) |> 
+  pivot_longer(
+    cols = 2:4,
+    names_to = "change_type",
+    values_to = "units") |> 
+  mutate(subsidy_name = fct_reorder(subsidy_name, units, .desc = TRUE),
+         change_type = fct_relevel(change_type, "Added", "Removed", "Net change"),
+         subsidy_name = str_wrap(subsidy_name, width = 10))
+
+ggplot(change,
+       aes(x = reorder_within(subsidy_name, units, change_type),
+           y = units,
+           fill = subsidy_name,
+           color = subsidy_name,
+           label = label_comma()(units))) +
+  geom_col(position = "dodge") +
+  geom_text(aes(y = units + sign(units)/0.003)) +
+  facet_wrap(~change_type, scales = "free_x") +
+  scale_x_reordered() +
+  scale_y_continuous(labels = label_comma(),
+                     limits = c(-2000, 3500),
+                     n.breaks = 10) +
+  labs(title = "Additions and removals of subsidized rental unit contracts",
+       subtitle = "January 2020 through August 2022",
+       caption = "Source: National Housing Preservation Database and Virginia Housing.") +
+  theme(legend.position = "none",
+        panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                  size = 0.05))
+
+```
+
+
+## Rents are skyrocketing in "naturally-occurring" affordable multifamily properties.
+
+<br>
+
+::::: {.columns}
+
+:::: {.column width="75%"}
+
+```{r}
+#| label: noah
+#| echo: false
+#| fig-asp: 0.6
+
+noah_rent <- read_csv("../data/pha_noah_rent_81722.csv") |> 
+  mutate(period = as.Date(as.yearqtr(period, format = "%Y Q%q"), frac = 1)) |> 
+  pivot_longer(cols = 2:3,
+               names_to = "type",
+               values_to = "rent") |> 
+  mutate(type = case_when(
+    type == "inf_adj" ~ "Inflation-adjusted",
+    type == "rent" ~ "Nominal"
+  )) |> 
+  mutate(rent = parse_number(rent)) |> 
+  filter(between(period, as.Date("2014-03-31"), as.Date("2022-09-30"))) |> 
+  mutate(period = as.yearqtr(period))
+
+ggplot(noah_rent,
+       aes(x = period, y = rent, color = type)) +
+  geom_line(size = 1) +
+  scale_y_continuous(labels = label_dollar(),
+                     n.breaks = 9) +
+  scale_x_yearqtr(format = "%Y Q%q") +
+  labs(title = "Average asking rent for market-affordable multifamily",
+       subtitle = "2014 Q1 to 2022 Q3 (to-date)",
+       color = "Rent value",
+       caption = "Source: CoStar Group, Inc.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
+```
+
+::::
+
+:::: {.column width="25%"}
+
+::: callout-tip
+
+### Defining NOAH
+
+We use CoStar's definition for naturally-occurring affordable housing (NOAH):
+  
+Non-subsidized rents, one or two star rating, built before 2000, Class B or C (or unclassified).
+
+:::
+
+::::
+
+:::::
 
 # Gap analysis
 
-## Affordability slide
+## On average, renters in the counties face the largest affordability gaps.
 
-...
+<br>
+
+::::: {.columns}
+
+:::: {.column width="75%"}
+
+```{r}
+#| label: costs
+#| echo: false
+#| fig.asp: 0.6
+
+costs_income_change <- read_rds("../data/costs_income_change.rds")
+  
+ggplot(costs_income_change,
+       aes(x = year,
+           y = pct_chg,
+           color = type)) +
+  geom_line(size = 1) +
+  facet_wrap(~locality) +
+  scale_y_continuous(labels = label_percent()) +
+  labs(title = "Cumulative percent change in median renter income and average rent",
+       subtitle="2016 to 2022",
+       color = "Percent change",
+       caption = "Sources: U.S. Census Bureau, American Community Survey, Table B25119,\nCentral Virginia MLS, and CoStar Group, Inc.") +
+  theme(axis.title = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        legend.position = "right",
+        axis.text.x = element_text(angle = 90),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.ticks = element_blank())
+
+```
+
+::::
+
+:::: {.column width="25%"}
+
+::: callout-warning
+
+### Data limitation
+
+Median renter income data only available through 2020.
+  
+Data for 1-year 2021 ACS estimates to be released this month; 2017-2021 5-year estimates (more reliable) due early 2023.
+
+:::
+
+::::
+
+:::::
 
 ## Rent burdens may be shifting up the income scale.
+
+<br>
 
 ```{r}
 #| label: cb-income-acs-est
@@ -379,8 +550,6 @@ ggplot(b25074_data,
   scale_fill_manual(values = c("#d8b365", "#018571", "#80cdc1"))
 
 ```
-
-. . .
 
 ::: callout-warning
 
@@ -440,7 +609,6 @@ ggplot(evictions,
                                           size = 0.05),
         axis.ticks = element_blank())
 
-
 evictions_post <- evictions |> 
   filter(year >= 2020) |> 
   group_by(year, type) |> 
@@ -450,17 +618,18 @@ evictions_pre <- evictions |>
   filter(year < 2020) |> 
   group_by(year, type) |> 
   summarise(mean = mean(value))
+
 ```
 
 :::
 
 ::: {.column width="30%"}
 
--   State and federal eviction protections reduced City eviction filings and judgements to a fraction of what they were pre-pandemic
+-   State and federal eviction protections significantly cut down on evictions
 
 -   Average eviction judgements per month in 2022 were 62 --- an 89 percent reduction from the 2019 average of 576
 
--   As rent relief and eviction protections have ended, eviction rates should be monitored closely
+-   Data only through March --- 16,000 eviction hearings scheduled in August statewide
 
 :::
 
@@ -572,11 +741,11 @@ ggplot(b25118_data,
 
 ::: {.column width="30%"}
 
--   Between 2016 and 2020, Hanover County has seen an overall decrease in households making less than $100,000
+-   Between 2016 and 2020, overall decrease in households making less than $100,000
 
--   The decrease in lower income households is reflected in the loss of lower income households and increases in median household incomes among homeowners **and** renters
+-   Due to loss of lower income households and increases in household incomes among homeowners **and** renters
 
-- Higher incomes have correlated with higher housing prices (with median home prices well into the $400,000s)
+-   Home prices following suit --- median home price now over $400,000
 
 :::
 
@@ -633,6 +802,8 @@ ggplot(b25115,
 
 ## Next steps
 
+-   Share slides and draft report
+
 -   Feedback from PHA Board and staff
 
 -   Complete final updates on report (incorporating edits and suggestions)
@@ -640,5 +811,7 @@ ggplot(b25115,
 -   Consistent branding and visualizations
 
 -   Provide updates to data based on timing
+
+-   Assist PHA with creating additional collateral
 
 # Discussion

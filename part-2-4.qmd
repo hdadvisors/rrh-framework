@@ -1,6 +1,4 @@
-# (PART)Housing supply and market changes {.unnumbered}
-
-## Assessment of naturally-occurring affordable housing (NOAH){#part-2-4}
+# Assessment of naturally-occurring affordable housing {#part-2-4}
 
 ```{r setup}
 
@@ -126,19 +124,29 @@ noah_rent <- read_csv("data/pha_noah_rent_81722.csv") |>
                names_to = "type",
                values_to = "rent") |> 
   mutate(type = case_when(
-    type == "inf_adj" ~ "Inflation-adjusted rent",
-    type == "rent" ~ "Rent (Current dollars)"
+    type == "inf_adj" ~ "Inflation-adjusted",
+    type == "rent" ~ "Nominal"
   )) |> 
-  mutate(rent = parse_number(rent))
+  mutate(rent = parse_number(rent)) |> 
+  filter(between(period, as.Date("2014-03-31"), as.Date("2022-09-30"))) |> 
+  mutate(period = as.yearqtr(period))
 
-noah_rent_line <- ggplot(noah_rent,
-                         aes(x = period,
-                             y = rent,
-                             color = type)) +
-  geom_line(stat = "identity", size = 1)
-
-ggplotly(noah_rent_line) |> 
-  plotly_camera()
+ggplot(noah_rent,
+       aes(x = period, y = rent, color = type)) +
+  geom_line(size = 1) +
+  scale_y_continuous(labels = label_dollar(),
+                     n.breaks = 9) +
+  scale_x_yearqtr(format = "%Y Q%q") +
+  labs(title = "Average asking rent for market-affordable multifamily",
+       subtitle = "2014 Q1 to 2022 Q3 (to-date)",
+       color = "Rent value",
+       caption = "Source: CoStar Group, Inc.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
 
 
 ```

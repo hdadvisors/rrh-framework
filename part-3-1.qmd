@@ -3,6 +3,7 @@
 ```{r setup}
 
 library(tidyverse)
+library(tidycensus)
 library(janitor)
 library(optiRum)
 library(scales)
@@ -162,7 +163,8 @@ b25119_vars <- load_variables(2020, "acs5") |>
 
 b25119_raw <- map_dfr(years, function(yr){
   b25119_pull <- get_acs(
-    geography = "metropolitan statistical area/micropolitan statistical area",
+    geography = "county",
+    state = "VA",
     table = "B25119",
     year = yr,
     survey = "acs5",
@@ -172,7 +174,8 @@ b25119_raw <- map_dfr(years, function(yr){
   })
 
 b25119_raw <- b25119_raw |> 
-  filter(NAME == "Richmond, VA Metro Area")
+  mutate(NAME = str_remove_all(NAME, ", Virginia")) |> 
+  filter(NAME %in% pha_names)
 
 b25119_vars_cleaned <- b25119_vars |> 
   separate(label, into = c("est", "income", "total", "tenure"), sep = "!!") |>  
@@ -193,12 +196,99 @@ rr_rent_annual <- read_csv("data/rr_annual_rent.csv") |>
     pivot_longer(cols = 2:8,
                names_to = "locality",
                values_to = "rent_current") |> 
-  clean_names()
+  clean_names() |> 
+  mutate(NAME = str_replace(locality, "City", "city"))
 
-rent_income <- rr_rent_annual |> 
-  left_join(renter_income, by = "year") |> 
-  mutate(rent_current = parse_number(rent_current))
+```
+
+```{r}
+
+rr_sales_annual <- read_csv("data/rr_annual_sales.csv") |> 
+  pivot_longer(cols = 2:9,
+               names_to = "locality",
+               values_to = "price") |> 
+  clean_names() |> 
+  mutate(locality = str_replace(locality, "City", "city")) |> 
+  filter(locality %in% pha_names) 
+
+```
+
+
+```{r}
+
+costs_income <- rr_rent_annual |> 
+  left_join(renter_income, by = c("NAME", "year")) |> 
+  mutate(rent = parse_number(rent_current)) |> 
+  filter(NAME %in% pha_names,
+         year > 2015) |> 
+  select(4,1,6,7) |>
+  select(locality=1,2,income=3,4) |> 
+  left_join(rr_sales_annual, by = c("locality", "year"))
+
+```
+
+
+```{r}
+
+costs_income_change <- costs_income |> 
+  group_by(locality) |> 
+  arrange(year, .by_group = TRUE) |> 
+  mutate(rent_chg = (rent - lag(rent)),
+         price_chg = (price - lag(price)),
+         inc_chg = (income - lag(income)),
+         across(.cols = everything(), ~replace_na(.x, 0))) |> 
+  mutate(across(.cols = c(rent_chg, price_chg, inc_chg), ~ cumsum(.x)),
+         rent_pct = rent_chg/first(rent),
+         price_pct = price_chg/first(price),
+         inc_pct = inc_chg/first(income)) |> 
+  select(1,2,9:11) |> 
+  pivot_longer(cols = 3:5,
+               names_to = "type",
+               values_to = "pct_chg") |> 
+  mutate(pct_chg = case_when(
+    year > 2020 & type == "inc_pct" ~ NA_real_,
+    TRUE ~ pct_chg)) |> 
+  mutate(type = case_when(
+    type == "inc_pct" ~ "Income",
+    type == "price_pct" ~ "Home price",
+    type == "rent_pct" ~ "Rent"
+  ))
+
+write_rds(costs_income_change, "data/costs_income_change.rds")
+
+```
+
+
+
+
+
+```{r}
+
+costs_income_change <- read_rds("data/costs_income_change.rds")
   
+ggplot(costs_income_change,
+       aes(x = year,
+           y = pct_chg,
+           color = type)) +
+  geom_line(size = 1) +
+  facet_wrap(~locality) +
+  scale_y_continuous(labels = label_percent()) +
+  labs(title = "Cumulative percent change in median renter income and average rent",
+       subtitle="2016 to 2022",
+       color = "Percent change",
+       caption = "Sources: U.S. Census Bureau, American Community Survey, Table B25119,\nCentral Virginia MLS, and CoStar Group, Inc.") +
+  theme(axis.title = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        legend.position = "right",
+        axis.text.x = element_text(angle = 90),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.ticks = element_blank())
+
+```
+
+```{r}
 
 rent_income_gap <- rent_income |> 
   mutate(affordable_rent = (estimate/12)*.30) |> 
@@ -217,7 +307,7 @@ rent_gap <- rent_income_gap |>
     type == "affordable_rent" ~ "Rent affordable to typical renter"
   ))
   
-rent_income_line <- ggplot(rent_gap,
+ggplot(rent_gap,
        aes(x = year,
            y = dollars,
            color = type
@@ -228,9 +318,7 @@ rent_income_line <- ggplot(rent_gap,
   theme(axis.title = element_blank(),
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 1)) +
   labs(title = "Market asking rent versus rent affordable to typical renter in the region", color = "Nominal rent")
-  
-ggplotly(rent_income_line) |> 
-  plotly_camera()
+
 
 ```
 For the typical renter household in the region wanting to enter homeownership, the income needed to afford local home prices remains wide. In every locality, the gap between income needed to afford the median home price and the regional renter income is over \$10,000. Renters are especially hard pressed to afford a home in Hanover County, where the gap is over \$25,000. 
@@ -271,7 +359,7 @@ sale_income_gap <- sale_income |>
   )) |> 
   subset(locality %in% pha_names)
 
-sale_income_line <- ggplot(sale_income_gap,
+ggplot(sale_income_gap,
        aes(x = year, 
            y = value,
            color = data)) +
@@ -281,8 +369,6 @@ sale_income_line <- ggplot(sale_income_gap,
   theme(axis.title = element_blank()) +
   scale_y_continuous(labels = dollar_format())
 
-ggplotly(sale_income_line) |> 
-  plotly_camera()
 
 ```
 
