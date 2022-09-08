@@ -37,7 +37,7 @@ Add short bullet points summarizing major changes
 
 ### Population changes
 
-.....
+In Charles City, populations has been decreasing between 2010 and 2020. 
 
 ```{r pop, fig.cap=paste0(name, ": Total Population")}
 
@@ -284,76 +284,9 @@ ggplot(price,
 
 ### Rental
 
-.....
 
-```{r rent-submarket, fig.cap=paste0(name, ": Average asking rent by submarket"}
 
-# Average asking rent over time (by submarket if applicable, maybe by bedroom if no submarkets)
 
-# Disaggregate by Richmond CoStar Submarket
-
-# CoStar Filters: Construction Status - Existing
-
-# Added locality field manually
-
-sub_rent <- read_csv("data/rr_submarket_data.csv") |> 
-  clean_names() |> 
-  separate(geography, into = c("region", "state", "submarket"), sep = " - ") |> 
-  select(period, locality, submarket, "rent" = market_asking_rent_unit, vacancy_rate) |> 
-  mutate(rent = parse_number(rent)) |> 
-  mutate(period = as.Date(as.yearqtr(period, format = "%Y Q%q"), frac = 1)) |> 
-  filter(locality == costar_name)
-
-# Issue with above is that rents are not inflation-adjusted. May need to revisit. I've requested from CoStar to allow for an inflation-adjusted average rent per unit pull, BUT who knows if they can add it. Might consider just having a table with most recent rents.
-
-ggplot(sub_rent,
-       aes(x = period,
-           y = rent, 
-           color = submarket)) +
-  geom_line(stat = "identity") + 
-  labs(title = paste0(name, ": Average asking rent by submarket"),
-       subtitle = "2000 Q1 to 2022 Q3 | Not adjusted for inflation",
-       color = "Submarket") +
-  scale_y_continuous(labels = label_dollar(), limits = c(0, NA), n.breaks = 7) +
-  scale_x_date(date_labels = "%Y", date_breaks = "2 years", limits = as.Date(c("2000-01-01", "2022-09-30"))) +
-  theme(axis.title = element_blank(),
-        panel.background = element_blank(),
-        axis.ticks = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
-
-```
-
-```{r submarket-table, fig.cap="Change in average rents by Richmond submarket"}
-
-library(kableExtra)
-library(formattable)
-
-sub_rent_tbl <- read_csv("data/rr_submarket_data.csv") |> 
-  clean_names() |> 
-  separate(geography, into = c("region", "state", "submarket"), sep = " - ") |> 
-  select(period, locality, submarket, "rent" = market_asking_rent_unit) |> 
-  mutate(rent = parse_number(rent)) |> 
-  mutate(period = as.Date(as.yearqtr(period, format = "%Y Q%q"), frac = 1)) |> 
-  filter(locality == costar_name) |> 
-  filter(period == "2022-09-30" | period == "2016-03-31") |> 
-  pivot_wider(names_from = period,
-              values_from = rent)
-
-sub_tbl <- sub_rent_tbl |> 
-  select(2:4) |> 
-  mutate(pct_change = (`2022-09-30`-`2016-03-31`)/`2016-03-31`) |> 
-  mutate(across(c(2,3), ~currency(.x, digits = 0)),
-         pct_change = percent(pct_change, digits = 0)) |> 
-  arrange(desc(pct_change))
-
-sub_tbl |> 
-  kbl(col.names = c("Richmond submarket", "2016 Q1 Rent", "2022 Q3 Rent", "Percent change")) |> 
-  kable_material(c("striped", "hover")) |> 
-  footnote(general = "2016 Q1 Rent has not been adjusted for inflation")
-
-```
 
 ### Housing assistance
 

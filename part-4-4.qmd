@@ -15,6 +15,7 @@ library(readxl)
 library(zoo)
 library(lubridate)
 library(viridis)
+library(janitor)
 
 years <- 2016:2020
 fips <- 51085
@@ -28,9 +29,10 @@ tenure_colors <-setNames(viridis(2), nm = tenure)
 
 ## Takeaways
 
-```
-Add short bullet points summarizing major changes
-```
+- More and more people are moving into Hanover County from other parts of the region, state, or nation (+1,747), while deaths are outpacing births (-271) from 2020 to 2021.
+- Hanover County is losing households with children --- both homeowners and renters (-725 between 2016 and 2020).
+- There has been a net decrease in households making less than \$100,000 --- especially among renters (-950).
+
 
 ## Demographic and socioeconomic changes
 
