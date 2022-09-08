@@ -1,12 +1,11 @@
-# (PART)Housing supply and market changes {.unnumbered}
-
-## Housing assistance {#part-2-3}
+# Housing assistance {#part-2-3}
 
 ```{r setup}
 
 library(tidyverse)
 library(tidygeocoder)
 library(leaflet)
+library(mapview)
 library(sf)
 library(sp)
 library(janitor)
@@ -14,136 +13,394 @@ library(viridis)
 library(htmlwidgets)
 library(scales)
 library(lubridate)
+library(tidytext)
+library(knitr)
+library(kableExtra)
+library(formattable)
+library(readxl)
 
 ```
 
-### Assisted income-restricted rental
+```{r}
+#| label: nhpd-data
+#| eval: false
 
-Federal housing assistance programs such as Low-Income Housing Tax Credits (LIHTC) help low-income residents across the region with rental housing opportunities. In an effort to maximize assistance, these rental subsidy programs are often layered --- meaning that a rental unit may be supported by both LIHTC and project-based Section 8 vouchers. LIHTC accounts for over half (56 percent) of federally assisted rental housing in the region, followed by Section 8 project-based rental assistance (21 percent), which includes various programs found [here](https://preservationdatabase.org/documentation/program-descriptions/).
+nhpd <- read_csv("data/nhpd_va_subsidies_7_2022.csv") |>
+  clean_names()
+
+nhpd_clean <- nhpd |>
+  transform(fulladdress = paste(nhpd$street_address, nhpd$city, nhpd$state, nhpd$zip_code, sep= ", ")) |>
+  select(nhpd_property_id, nhpd_subsidy_id, subsidy_name, subsidy_status,
+         subsidy_subname, start_date, end_date, assisted_units, known_total_units,
+         property_name, fulladdress, owner_name, owner_type, target_population, city)
+
+localities <- c("CHARLES CITY", "CHESTER", "CHESTERFIELD", "GLEN ALLEN", "HENRICO", "HIGHLAND SPRINGS", "MIDLOTHIAN", "NORTH CHESTERFIELD", "Richmond", "RICHMOND", "RICHMOND CITY", "SANDSTON", "ASHLAND", "MECHANICSVILLE")
+
+nhpd_clean_rr <- nhpd_clean |>
+  subset(city %in% localities) |> 
+  mutate(across(c(6,7), ~ as.Date(.x, "%m/%d/%Y"))) |> 
+  mutate(property_name = case_when(
+    str_detect(fulladdress, "^5409 HULL") ~ "STUDIOS AT SOUTH RICHMOND",
+    fulladdress == "707 N HARRISON ST, RICHMOND, VA, 23220" ~ "THE NEW CLAY HOUSE",
+    fulladdress == "1611 N 31ST ST, RICHMOND, VA, 23223" ~ "ARMSTRONG RENAISSANCE",
+    fulladdress == "1517 JEFFERSON DAVIS HWY, RICHMOND, VA, 23224" ~ "JAMES RIVER APARTMENTS",
+    fulladdress == "2023 W CARY ST, RICHMOND, VA, 23220" ~ "REDEVELOPMENT AND HOMEOWNERSHIP PROGRAM",
+    fulladdress == "1910 4TH AVE, RICHMOND, VA, 23222" ~ "HOUSING REDEVEL-1910 4TH AV #1",
+    TRUE ~ property_name))
+
+```
+
+```{r}
+#| label: vh-lihtc
+#| eval: false
+
+rr_names <- c("Richmond City", "Hanover County", "Henrico County", "Chesterfield County",
+              "Powhatan County", "Goochland County", "New Kent County", "Charles City County")
+
+vh_lihtc_recent <- read_xlsx("data/vh-lihtc-2022-01.xlsx",
+                      range = "A2:L1384",
+                      trim_ws = TRUE) |> 
+  clean_names() |> 
+  filter(jurisdiction %in% rr_names) |> 
+  separate(cycle_name, into = c("cycle_year", "cycle_type"), sep = "\\s", extra = "merge") |> 
+  mutate(subsidy_name = "LIHTC",
+         subsidy_status = "Active",
+         start_date = lubridate::ymd(cycle_year, truncated = 2L)) |> 
+  filter(start_date > '2010-01-01') |> 
+  mutate(cycle_type = str_squish(cycle_type),
+         cycle_type = str_replace(cycle_type, "Hsg", "Housing")) |> 
+  mutate(fulladdress = str_to_upper(paste0(street_address, ", ", city, ", VA", " ", zip))) |> 
+  mutate(subsidy_subname = case_when(
+    str_detect(cycle_type, "9%") &  duplicated(vhda_number) ~ "9% Tax Credit and maybe 4%",
+    str_detect(cycle_type, "4%") ~ "4% Tax Credit",
+    TRUE ~ "TCEP")) |> 
+  select(nhpd_property_id = vhda_number, subsidy_name, subsidy_status,
+         subsidy_subname, start_date, assisted_units = tax_credit_units,
+         known_total_units = total_units, property_name, fulladdress,
+         address_components.county = jurisdiction) |> 
+  filter(!property_name %in% c("Ashland Woods", "Audubon Village II", "Bellevue",
+                               "Belle Summit", "Brook Creek Crossings",
+                               "Cary West", "Eggleston Plaza", "Goodwyn at Union Hill",
+                               "Greens at Virginia Center", "Hatcher Tobacco Flats",
+                               "Highland Grove I", "Highland Grove II", "Iron Bridge Road",
+                               "Jefferson Mews", "Kingsridge I", "Miller Lofts",
+                               "New Clay House II", "North Oak", "Oakmeade",
+                               "Somanath Seniors at Beckstoffers",
+                               "Studios at South Richmond", "Townhomes at Warwick Place",
+                               "Tuscany Townhomes")) |> 
+  mutate(nhpd_property_id = case_when(
+    str_detect(property_name, "Armstrong Renaissance") ~ 1155578,
+    property_name == "Audubon Village I" ~ 1095212,
+    property_name == "Baker School" ~ 1154801,
+    property_name == "Belt Atlantic" ~ 1095423,
+    property_name == "Brookland Park" ~ 1094671,
+    property_name == "Chickahominy Bluff" ~ 1094869,
+    property_name == "Creekside Manor" ~ 1095227,
+    property_name == "Harbour Square  CLP" ~ 1094615,
+    property_name == "Henrico Arms" ~ 1106924,
+    property_name == "Hope Village" ~ 1094544,
+    property_name == "Newbridge Village" ~ 1094390,
+    property_name == "Omni Park Place" ~ 1103488,
+    property_name == "Place One" ~ 1094568,
+    property_name == "Shockoe Hill I" ~ 1094312,
+    property_name == "St. Luke" ~ 1021344,
+    property_name == "Village South" ~ 1094687,
+    property_name == "William Byrd" ~ 1094904,
+    property_name == "Woodland Crossing" ~ 1107114,
+    TRUE ~ nhpd_property_id
+  ))
+
+nhpd_clean_rr <- nhpd_clean_rr |> 
+  bind_rows(vh_lihtc_recent) |> 
+  group_by(nhpd_property_id, subsidy_status) |> 
+  add_count(nhpd_property_id, name = "subsidies") |> 
+  mutate(subsidy_type = case_when(
+      subsidies > 1 ~ "Multiple",
+      TRUE ~ subsidy_name
+  )) |> 
+  ungroup() |> 
+  mutate(known_total_units = case_when(
+    nhpd_property_id == 1155578 ~ 186,
+    TRUE ~ known_total_units
+  ))
+
+write_rds(nhpd_clean_rr, "data/nhpd_clean_rr.rds")
+
+```
+
+```{r}
+#| label: nhpd-geocode
+#| eval: false
+
+nhpd_coded <- nhpd_clean_rr |>
+  geocode(address = fulladdress,
+          method = 'geocodio',
+          full_results = TRUE,
+          unique_only = FALSE,
+          lat = Latitude,
+          long = Longitude)
+
+nhpd_coded_rr <- nhpd_coded |>
+  mutate(Latitude = case_when(
+    property_name == "NEW MANCHESTER FLATS IX" ~ 37.517602,
+    property_name == "KINGSRIDGE I" ~ 37.551666,
+    property_name == "GRAND OAKS SENIORS" ~ 37.353614,
+    property_name == "IRON BRIDGE ROAD" ~ 37.361812,
+    TRUE ~ Latitude)) |>
+  mutate(Longitude = case_when(
+    property_name == "NEW MANCHESTER FLATS IX" ~ -77.432408,
+    property_name == "KINGSRIDGE I" ~ -77.375593,
+    property_name == "GRAND OAKS SENIORS" ~ -77.457398,
+    property_name == "IRON BRIDGE ROAD" ~ -77.495881,
+    TRUE ~ Longitude))
+
+write_rds(nhpd_coded_rr, "data/nhpd_coded_rr.rds")
+
+```
+
+## Affordable rental housing
+
+An array of federal housing assistance programs help low-income residents across the region with rental housing opportunities. In an effort to maximize assistance, these rental subsidy programs are often layered --- meaning that a rental unit may be supported by both LIHTC and Project Based Vouchers. 
+
+::: callout-tip
+In the Richmond region, many affordable rental properties also receive assistance from the Virginia Housing Trust Fund, as well as local sources such as CDBG and HOME grants. The City of Richmond also awards funding to affordable rental projects with its own trust fund.
+:::
+
+### Locations
+
+The map below shows the locations of the 21,887 dedicated affordable rental homes found across 253 properties in the Richmond area. Each color corresponds to the property's subsidy as recorded in the National Housing Preservation Database, or if multiple subsidies are currently active. These properties include units currently occupied and in development.
+
+```{r}
+#| label: nhpd-map
+#| eval: false
+
+nhpd_mapped_rr <- read_rds("data/nhpd_coded_rr.rds") |> 
+  st_as_sf(coords = c("Longitude", "Latitude"), crs=4326, remove = FALSE) |> 
+  filter(fulladdress != "PO BOX 8585, RICHMOND, VA, 23226")
+
+write_rds(nhpd_mapped_rr, "data/nhpd_mapped_rr.rds")
+
+```
+
+```{r}
+#| label: fig-nhpd-map
+#| fig.cap: "Federally-assisted rental housing properties"
+
+nhpd_map <- read_rds("data/nhpd_mapped_rr.rds") |> 
+  filter(subsidy_status != "Inactive") |> 
+  group_by(subsidy_type, nhpd_property_id) |> 
+  summarise(units = max(known_total_units))
+
+subsidyPal <- colorFactor(viridis(8), nhpd_map$subsidy_name)
+
+mapview(
+  nhpd_map,
+  zcol = "subsidy_type",
+  legend = T,
+  popup = F,
+  burst = F,
+  layer.name = "Subsidy type"
+)
+
+```
+
+::: callout-note
+Descriptions of each rental assistance program are available on the [NHPD website](https://preservationdatabase.org/documentation/program-descriptions/).
+:::
+
+### Subsidy types
+
+Over half (55 percent) of all affordable rental homes in the region rely *solely* on the LIHTC program. Another 27 percent have layered multiple subsidies together, reflecting the capital and funding requirements needed to develop new affordable housing.
+
+The other significant source of dedicated affordable housing continues to be more than 3,600 Public Housing units managed by Richmond Redevelopment and Housing Authority.
+
+```{r}
+#| label: fig-subsidy-overall
+#| fig-cap: "Share of federally assisted units by subsidy"
+
+nhpd_clean_rr <- read_rds("data/nhpd_clean_rr.rds")
+
+subsidy <- nhpd_clean_rr |> 
+  filter(subsidy_status != "Inactive") |> 
+  group_by(subsidy_type, nhpd_property_id) |> 
+  summarise(units = max(known_total_units)) |> 
+  group_by(subsidy_type) |> 
+  summarise(units = sum(units)) |> 
+  mutate(percent = units/sum(units))
+  
+ggplot(subsidy,
+       aes(y = reorder(subsidy_type, units),
+           x = percent,
+           fill = subsidy_type,
+           color = subsidy_type,
+           label = label_comma()(units))) +
+  geom_col() +
+  geom_text(aes(x = percent + 0.03),
+            size = 4) +
+  scale_x_continuous(labels = percent_format(), n.breaks = 10) +
+  labs(title = "Share of federally assisted units by subsidy type",
+       subtitle = "Data as of July 2022",
+       caption = "Source: National Housing Preservation Database.") +
+  theme(panel.background = element_blank(),
+        axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = "none",
+        panel.grid.major.x = element_line(color = "grey95",
+                                  size = 0.05))
+
+```
+
+Among the 7,445 units with multiple subsidies, nearly all (98 percent) use LIHTC, and another 69 percent have an active Section 8 contract.
+
+```{r}
+#| label: tbl-multiple
+#| tbl-cap: "Active subsidies in units with mutiple subsidies"
+
+multiple <- nhpd_clean_rr |> 
+  filter(subsidy_status != "Inactive",
+         subsidy_type == "Multiple") |> 
+  group_by(subsidy_name, subsidy_subname) |> 
+  summarise(units = sum(assisted_units)) |> 
+  ungroup() |> 
+  mutate(detail = case_when(
+    subsidy_name == "LIHTC" ~ subsidy_subname,
+    subsidy_name %in% c("HOME", "RHS 515", "Project Based Vouchers", "Section 202") ~ subsidy_name,
+    units < 400 ~ " ",
+    TRUE ~ subsidy_subname)) |> 
+  mutate(subsidy_name = case_when(
+    subsidy_name %in% c("HOME", "RHS 515", "Project Based Vouchers", "Section 202") ~ "Other",
+    TRUE ~ subsidy_name)) |> 
+  mutate(detail = case_when(
+    subsidy_subname == "4% and 9% Tax Credit" ~ subsidy_subname,
+    subsidy_name == "Section 8" & units < 400 ~ "Other",
+    subsidy_subname == "207/ 223(F) PUR/ REFIN HSG" ~ "207/223(F)",
+    subsidy_subname == "221(D)(4) MKT RATE MOD INC/ DISP FAMS" ~ "221(D)(4)",
+    subsidy_name == "HUD Insured" & units < 600 ~ "Other",
+    TRUE ~ detail
+  )) |> 
+  mutate(subsidy_name = fct_reorder(subsidy_name, units, .fun = sum, .desc = TRUE),
+         detail = str_wrap(detail, width = 10))
+
+multiple |> 
+  group_by(subsidy_name) |> 
+  summarise(units = sum(units)) |> 
+  mutate(pct = units / 16357,
+         pct = percent(pct, digits = 1),
+         units = comma(units, digits = 0)) |> 
+  kable(align = "lrr",
+        col.names = c("Subsidy type", "Units with subsidy", "Percent of total")) |> 
+  kableExtra::kable_styling(bootstrap_options = c("condensed")) |> 
+  kableExtra::footnote(general = "Sources: National Housing Preservation Database and Virginia Housing.",
+                       general_title = "")
+
+```
+
+Units with multiple subsidies are more likely to overlap the 9% tax credit, Section 8 Loan Management Set-Aside (LMSA), and Section 8 Housing Finance and Development Agency (HFDA) programs.
+
+```{r}
+#| label: fig-multiple-detail
+#| fig.cap: "Detailed subsidy type for units with multiple subsidies"
+
+ggplot(multiple,
+       aes(y = reorder_within(detail, units, subsidy_name),
+           x = units,
+           fill = subsidy_name)) +
+  geom_col(position = "dodge") +
+  facet_wrap(~subsidy_name, ncol = 2, nrow = 2, scales = "free_y") +
+  scale_y_reordered() +
+  scale_x_continuous(labels = label_comma()) +
+  labs(title = "Detailed subsidy type for units with multiple subsidies",
+       subtitle = "Data as of July 2022",
+       caption = "Source: National Housing Preservation Database.") +
+  theme(legend.position = "none",
+        panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank(),
+        panel.grid.major.x = element_line(color = "grey95",
+                                  size = 0.05))
+
+```
+
+
+```{r}
+#| label: fig-subsidy-location
+#| fig-cap: "Federally assisted units by subsidy and locality"
+
+subsidy_local <- nhpd_clean_rr |> 
+  select(nhpd_property_id, subsidy_type, known_total_units,
+         subsidy_status, locality = address_components.county) |> 
+  filter(subsidy_status != "Inactive",
+         locality != "Charles City County") |> 
+  group_by(locality, subsidy_type, nhpd_property_id) |> 
+  summarise(units = max(known_total_units)) |> 
+  group_by(locality, subsidy_type) |> 
+  summarise(units = sum(units)) |> 
+  filter(units > 1)
+
+ggplot(subsidy_local,
+       aes(x = reorder(subsidy_type, -units),
+           y = units,
+           fill = subsidy_type)) +
+  geom_col() +
+  facet_wrap(~locality, scales = "free_x") +
+  scale_y_continuous(labels = label_comma()) +
+  labs(title="Federally assisted units by subsidy and locality",
+       subtitle = "Data as of July 2022",
+       caption = "Source: National Housing Preservation Database.") +
+  theme(axis.title = element_blank(),
+        panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
+ggplot(subsidy_local,
+       aes(y = reorder_within(subsidy_type, units, locality),
+           x = units,
+           fill = subsidy_type)) +
+  geom_col(position = "dodge") +
+  facet_wrap(~locality, ncol = 2, nrow = 2, scales = "free_y") +
+  scale_y_reordered() +
+  scale_x_continuous(labels = label_comma()) +
+  labs(title = "Federally assisted units by subsidy type and locality",
+       subtitle = "Data as of July 2022",
+       caption = "Source: National Housing Preservation Database.") +
+  theme(legend.position = "none",
+        panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank(),
+        panel.grid.major.x = element_line(color = "grey95",
+                                  size = 0.05))
+
+```
+
+### Changes since 2020
+
+```{r}
+#| label: fig-change
+#| fig.cap: ""
+
+change <- nhpd_coded_rr |> 
+  mutate(across(c(6,7), ~ as.Date(.x, "%m/%d/%Y"))) |> 
+  mutate(change_type = case_when(
+    start_date > '2019-12-31' ~ "Added",
+    end_date > '2019-12-31' ~ "Removed",
+    TRUE ~ "No change")) |> 
+  group_by(subsidy_name, change_type) |> 
+  summarise(units = sum(assisted_units))
+
+
+```
+
+
+### LIHTC
 
 LIHTC properties have a 30 year commitment to affordability, but only a 15 year compliance period, wherein property owners can increase rents. Nonprofit developers will often seek new allocation of tax credits before their commitment period ends, but there is often little incentive for for-profit developers to maintain affordability restrictions past the compliance period.
 
-
-```{r nhpd}
-
-# nhpd <- read_csv("data/nhpd_va_subsidies_7_2022.csv") |>
-#   clean_names()
-# 
-# nhpd_clean <- nhpd |>
-#   transform(fulladdress = paste(nhpd$street_address, nhpd$city, nhpd$state, nhpd$zip_code, sep= ", ")) |>
-#   select(subsidy_name, subsidy_status, subsidy_subname, start_date, end_date, assisted_units, property_name, fulladdress, owner_name, owner_type, target_population, city)
-# 
-# localities <- c("CHARLES CITY", "CHESTER", "CHESTERFIELD", "GLEN ALLEN", "HENRICO", "HIGHLAND SPRINGS", "MIDLOTHIAN", "NORTH CHESTERFIELD", "Richmond", "RICHMOND", "RICHMOND CITY", "SANDSTON", "ASHLAND", "MECHANICSVILLE")
-# 
-# nhpd_clean_rr <- nhpd_clean |>
-#   subset(city %in% localities)
-# 
-# nhpd_coded <- nhpd_clean_rr |>
-#   geocode(address = fulladdress,
-#           method = 'geocodio',
-#           full_results = TRUE,
-#           unique_only = FALSE,
-#           lat = Latitude,
-#           long = Longitude)
-# 
-# nhpd_coded_rr <- nhpd_coded |>
-#   mutate(Latitude = case_when(
-#     property_name == "NEW MANCHESTER FLATS IX" ~ 37.517602,
-#     property_name == "KINGSRIDGE I" ~ 37.551666,
-#     property_name == "GRAND OAKS SENIORS" ~ 37.353614,
-#     property_name == "IRON BRIDGE ROAD" ~ 37.361812,
-#     TRUE ~ Latitude)) |>
-#     mutate(Longitude = case_when(
-#       property_name == "NEW MANCHESTER FLATS IX" ~ -77.432408,
-#       property_name == "KINGSRIDGE I" ~ -77.375593,
-#       property_name == "GRAND OAKS SENIORS" ~ -77.457398,
-#       property_name == "IRON BRIDGE ROAD" ~ -77.495881,
-#       TRUE ~ Longitude))
-# 
-# write_rds(nhpd_coded_rr, "data/nhpd_rr.csv")
-
-# nhpd_coded_rr <- read_rds("data/nhpd_rr.csv")
-
-# nhpd_coded_rr <- nhpd_coded_rr |>
-#   st_as_sf(coords = c("Longitude", "Latitude"), crs=4326, remove = FALSE) |>
-#   filter(subsidy_status != "Inactive")|>
-#   filter(fulladdress != "PO BOX 8585, RICHMOND, VA, 23226")
-# 
-# subsidyPal <- colorFactor(viridis(8), nhpd_coded_rr$subsidy_name)
-# 
-# nhpd_map <- leaflet(nhpd_coded_rr) |>
-#   addTiles() |>
-#   addCircleMarkers(
-#     radius = 5,
-#     color = ~subsidyPal(subsidy_name),
-#     stroke = FALSE, fillOpacity = 0.5)
-# 
-# saveWidget(nhpd_map, "maps/nhpd_map.html")
-# 
-knitr::include_url("maps/nhpd_map.html", height = "500px")
-
-```
-
-```{r}
-#| label: subsidy-overall
-#| fig-cap: "Share of federally assisted units by subsidy"
-
-nhpd_coded_rr <- read_rds("data/nhpd_rr.csv")
-
-subsidy <- nhpd_coded_rr |> 
-  select(subsidy_name, assisted_units, subsidy_status, locality = address_components.county) |> 
-  filter(locality != "Charles City County") |> 
-  filter(subsidy_status != "Inactive") |> 
-  group_by(subsidy_name) |> 
-  summarise(units = sum(assisted_units)) |> 
-  transform(percent = ave(units, FUN = prop.table))
-
-
-ggplot(subsidy,
-       aes(x = reorder(subsidy_name, units),
-           y = percent,
-           fill = subsidy_name)) +
-  geom_bar(stat = "identity") +
-  theme(axis.title = element_blank(),
-        axis.ticks.x = element_blank()) +
-  labs(title = "Share of federally assisted units by subsidy", fill = "Subsidy name") +
-  scale_y_continuous(labels = percent_format()) +
-  coord_flip()
-
-```
-
-```{r}
-#| label: subsidy-location
-#| fig-cap: "Federally assisted units by subsidy and locality"
-
-nhpd_coded_rr <- read_rds("data/nhpd_rr.csv")
-
-subsidy_local <- nhpd_coded_rr |> 
-  select(subsidy_name, assisted_units, subsidy_status, locality = address_components.county) |> 
-  filter(subsidy_status != "Inactive") |> 
-  filter(locality != "Charles City County") |> 
-  group_by(locality, subsidy_name) |> 
-  summarise(units = sum(assisted_units)) |> 
-  transform(percent = ave(units, locality, FUN = prop.table))
-
-
-ggplot(subsidy_local,
-       aes(x = reorder(subsidy_name, -units),
-           y = units,
-           fill = subsidy_name)) +
-  geom_bar(stat = "identity") +
-  facet_wrap(~locality) +
-  theme(axis.title = element_blank(),
-        axis.text.x = element_blank(),
-        axis.ticks.x = element_blank()) +
-  labs(title = "Federally assisted units by subsidy and locality", fill = "Subsidy name") +
-  scale_y_continuous(labels = number_format(big.mark = ","))
-
-
-```
 By 2040, a large portion of active LIHTC units will be outside the 30 year commitment period --- even far more will be outside the 15 year compliance period. Just over 13,000 LIHTC units will be beyond the 30 year commitment period by 2040, which accounts for over 80 perceent of active LIHTC units as of early 2022.
+
 ```{r}
-#| label: lihtc
+#| label: fig-lihtc
 #| fig-cap: "LIHTC units by 30 year commitment expiration date"
 
 nhpd_coded_rr <- read_rds("data/nhpd_rr.csv")
@@ -168,29 +425,33 @@ ggplotly(lihtc_end) |>
   plotly_camera()
 
 ```
-## Public Housing
-The redevelopment of public housing in the City of Richmond has begun to take shape at the first of the "Big Six" public housing courts --- Creighton Court. This public housing property located in Richmond's far East End consisted of 503 public housing units. As part of their first phase of redevelopment, Richmond Redevelopment and Housing Authority's (RRHA) has begun demolition of Creighton Court, with plans to develop roughly 700 units of mixed-income housing. Construction on Phase 1 is expected to begin in Winter 2022 with the entire redevelopment process expected to last ten years.
 
-RRHA's next focus area will be Gilpin Court, north of Jackson Ward, where about 780 public housing units reside. In November 2021, RRHA and the City of Richmond were awarded a Choice Neighborhoods Planning Grant by the U.S. Department of Housing and Urban Development for \$450,000. This planning grant is being utilized to facilitate the community planning process around not only Gilpin Court, but the Jackson Ward community --- including strategies to undo the negative impacts of interstate development on the historically Black communities of Jackson Ward and North Jackson Ward.
+### Public Housing
 
-```{r}
-#| label: public-housing
-#| figc-cap: "Location of Richmond Redevelopment and Housing Authority properties"
+The redevelopment of public housing in the City of Richmond has begun to take shape at the first of the "Big Six" public housing courts --- **Creighton Court**. This public housing property located in Richmond's far East End consisted of 504 public housing units.
 
-nhpd_coded_rr <- read_rds("data/nhpd_rr.csv")
+As part of their first phase of redevelopment, RRHA has begun demolition of Creighton Court, with plans to develop roughly 700 units of mixed-income housing. Construction on Phase 1 is expected to begin in Winter 2022 with the entire redevelopment process expected to last ten years.
 
-ph <- nhpd_coded_rr |> 
-  filter(subsidy_name == "Public Housing") 
+RRHA's next focus area will be **Gilpin Court**, north of Jackson Ward, where about 780 public housing units reside. In November 2021, RRHA and the City of Richmond were awarded a Choice Neighborhoods Planning Grant by the U.S. Department of Housing and Urban Development for \$450,000.
 
-leaflet(ph) |> 
-  addTiles() |> 
-  addCircleMarkers(
-    radius = ~assisted_units/100
-  )
+This planning grant is being utilized to facilitate the community planning process around not only Gilpin Court, but the Jackson Ward community --- including strategies to undo the negative impacts of interstate development on the historically Black communities of Jackson Ward and North Jackson Ward.
 
-```
+| Public housing community | Original units | Replacement units | Net change |
+|--------------------------|---------------:|------------------:|-----------:|
+| Creighton Court          |         504    |           700     |    +196    |
+| Gilpin Court             |         780    |           TBD     |     TBD    |
 
-## Housing Choice Vouchers
+: Net change in units for public housing redevelopment
+
+::: callout-tip
+
+Federal housing policy has guided public housing authorities to use newer funding streams to redevelop older public housing communities. For these efforts, RRHA and its partners will use LIHTC, Tenant Protection Vouchers, Project-Based Vouchers, and other federal, state, and local sources. 
+
+:::
+
+## Rental assistance
+
+### Housing Choice Vouchers
 
 Section 8 Housing Choice Vouchers (HCV) are tenant-based rental assistance that allows recipients to find housing on the open market. This provides household with greater choice in where they want to live, but historically many HCV recipients have faced discrimination from landlords unwilling to accept HCV.
 
