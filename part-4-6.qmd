@@ -37,7 +37,7 @@ Add short bullet points summarizing major changes
 
 ### Population changes
 
-.....
+Despite an initial decline in the early 2010s, Goochland County's population has been on a steady increase since 2012. From 2012 to 2020, the population has increased by 16 percent to reach 24,727 residents. Much of this growth can be tied to development in the eastern part of the county, where development activity Goochland-Henrico border has been increasing.
 
 ```{r pop, fig.cap=paste0(name, ": Total Population")}
 
@@ -74,8 +74,7 @@ pop_bar <- ggplot(pop,
 pop_bar
 
 ```
-
-.....
+The growth in population is due in large part to domestic migration. Between 2020 and 2021, 738 new residents arrived in the county from somewhere else in the region, state, or nation. 
 
 ```{r comp, fig.cap=paste0(name,": Components of population change"}
 
@@ -105,7 +104,8 @@ ggplot(change,
 
 ### Household characteristics
 
-.....
+All types of households are seeing an increase in the county --- especially homeowner households. Renter households have also seen a net increase in the county between 2016 and 2020, but that growth has mainly been among nonfamily renter households (+119), which typically refers to households that live alone or with a roommate.
+
 
 ```{r children, fig.cap=paste0(name, ": Change in households with children by tenure"}
 
@@ -133,7 +133,7 @@ ggplot(b25115,
 
 ```
 
-.....
+The senior population has been growing in the county (+996). Although much of that growth has occurred among seniors living with family, 27 percent of the increase was among seniors living alone.
 
 ```{r seniors, fig.cap=paste0(name, ": Change in senior population by living arrangement"}
 
@@ -170,7 +170,7 @@ ggplot(b09020,
 
 ### Income and wages
 
-.....
+Median homeowner household income has been growing in Goochland County. From 2016 to 2020, the typical homeowner household income increased by 14 percent. Renter households saw some initial increases in median household income from 2016 to 2019, but between 2019 and 2020, median renter household income actually decreased by 18 percent (-\$10,291). 
 
 ```{r income, fig.cap=paste0(name, ": Median houshold income by tenure")}
 
@@ -197,14 +197,11 @@ ggplot(b25119_cpi,
                                           size = 0.05),
         legend.position = "none")
 
-# 16 percent increase for renters
-# 10 percent increase for homeowners
-
 ```
 
 ### Persons with disabilities
 
-.....
+Individuals with independent living difficulties have generally been decreasing in the county --- particularly among individuals under 75 years old. But there has been a slight increase in individuals 75 years old and older with independent living difficulties. The net decrease in individuals with independent living difficulties could be a signal of limited accommodations and resources for adults in the county and subsequent departure of those individuals from the county.
 
 ```{r ind-living, paste0(name, ": Net change in individuals with independent living difficulties by age"}
 
@@ -238,7 +235,7 @@ ggplot(b18107,
 
 ### Homeownership
 
-.....
+As with all other localities in the region, home prices in the county have followed seasonal trends. In January 2017, the median home price in the county was \$473,901 and by July 2022 reached \$534,441 --- a 13 percent increase. Goochland County saw some spikes in median home price during the pandemic, but clearly those spikes did not exceed previous trends in the county.
 
 ```{r sales, fig.cap=paste0(name, ": Median home sales price")}
 
@@ -260,15 +257,27 @@ price <- price |>
   mutate(date = make_date(year, month)) |> 
   mutate(med_price = parse_number(med_price))
 
-ggplot(price,
+cpi <- read_csv("data/CPIAUCSL.csv") |> 
+  select(date = DATE, cpi = CPIAUCSL)
+
+price_adj <- price |> 
+  left_join(cpi, by = "date") |> 
+  mutate(dollars = ((295.271/cpi)*med_price)) |> 
+  select(date, med_price, dollars) |> 
+  pivot_longer(2:3,
+               names_to = "type",
+               values_to = "dollars") |> 
+  filter(type == "dollars")
+
+ggplot(price_adj,
        aes(x = date,
-           y = med_price,
-           color = med_price)) +
+           y = dollars,
+           color = dollars)) +
   geom_line(stat = "identity", size = 1) +
   scale_y_continuous(labels = label_dollar(), limits = c(0, NA)) +
   scale_x_date(date_labels = "%Y", date_breaks = "1 year") +
-  labs(title = paste0(name, ": Median home sales price"),
-       subtitle = "January 2017 to June 2022",
+  labs(title = paste0(name, ": Median home sales price (adjusted for inflation)"),
+       subtitle = "January 2017 to July 2022",
        caption = "Source: Central Virginia Regional Multiple Listing Service.") +
   theme(axis.title = element_blank(),
         panel.background = element_blank(),
@@ -276,82 +285,53 @@ ggplot(price,
         legend.title = element_blank(),
         panel.grid.major.x = element_blank(),
         panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05)) +
-  scale_color_continuous(type = "viridis", label = dollar_format())
-
+                                          size = 0.05)) + 
+  scale_color_continuous(type = "viridis", label = dollar_format()) +
+  geom_smooth(method=lm)
 
 ```
 
 ### Rental
 
-.....
+The rental market in Goochland County has largely grown in the past five years. The development of West Creek Business Park and with it the headquarters for major employers such as CarMax and Capital One has led to increasing demand for housing at the eastern edge of the county. The market has responded with luxury multifamily developments such as The Retreat at West Creek and Tuckahoe Pines and there are at least 1,700 more units on the way.
 
-```{r rent-submarket, fig.cap=paste0(name, ": Average asking rent by submarket"}
+The increasing rental demand has been apparent in high average asking rent in Goochland County. As of 2022 Q3, average asking rent in the county was \$2,208. Adjusting for inflation shows despite what appears to be a 24 percent increase in rent from 2016 Q1 to 2022 Q3, the value of the dollar has changed in such a way that rent then and now has changed very little. Nonetheless, an average asking rent of \$2,208 remains a steep price for low- and even moderate-income households.
 
-# Average asking rent over time (by submarket if applicable, maybe by bedroom if no submarkets)
+```{r rent, fig.cap=paste0(name, ": Average asking rent"}
 
-# Disaggregate by Richmond CoStar Submarket
+# Pull in Goochland Rent manually
 
-# CoStar Filters: Construction Status - Existing
-
-# Added locality field manually
-
-sub_rent <- read_csv("data/rr_submarket_data.csv") |> 
+rent <- read_csv("data/goochland_rent.csv") |> 
   clean_names() |> 
-  separate(geography, into = c("region", "state", "submarket"), sep = " - ") |> 
-  select(period, locality, submarket, "rent" = market_asking_rent_unit, vacancy_rate) |> 
-  mutate(rent = parse_number(rent)) |> 
+  pivot_longer(2:3,
+               names_to = "rent",
+               values_to = "value") |> 
+  mutate(value = parse_number(value)) |> 
   mutate(period = as.Date(as.yearqtr(period, format = "%Y Q%q"), frac = 1)) |> 
-  filter(locality == costar_name)
+  mutate(year = year(period)) |> 
+  filter(year >= 2016) |> 
+  mutate(rent = case_when(
+    rent == "rent" ~ "Nominal rent",
+    rent == "rent_adj" ~ "Inflation-adjusted rent"
+  ))
 
-# Issue with above is that rents are not inflation-adjusted. May need to revisit. I've requested from CoStar to allow for an inflation-adjusted average rent per unit pull, BUT who knows if they can add it. Might consider just having a table with most recent rents.
 
-ggplot(sub_rent,
+ggplot(rent,
        aes(x = period,
-           y = rent, 
-           color = submarket)) +
-  geom_line(stat = "identity") + 
+           y = value, 
+           color = rent)) +
+  geom_line(stat = "identity", size = 1) + 
   labs(title = paste0(name, ": Average asking rent by submarket"),
-       subtitle = "2000 Q1 to 2022 Q3 | Not adjusted for inflation",
-       color = "Submarket") +
-  scale_y_continuous(labels = label_dollar(), limits = c(0, NA), n.breaks = 7) +
-  scale_x_date(date_labels = "%Y", date_breaks = "2 years", limits = as.Date(c("2000-01-01", "2022-09-30"))) +
+       subtitle = "2016 Q1 to 2022 Q3",
+       color = "Dollar value") +
+  scale_y_continuous(labels = label_dollar()) +
+  scale_x_date(date_labels = "%Y", date_breaks = "2 years", limits = as.Date(c("2016-01-01", "2022-09-30"))) +
   theme(axis.title = element_blank(),
         panel.background = element_blank(),
         axis.ticks = element_blank(),
         panel.grid.major.x = element_blank(),
         panel.grid.major.y = element_line(color = "grey95",
                                           size = 0.05))
-
-```
-
-```{r submarket-table, fig.cap="Change in average rents by Richmond submarket"}
-
-library(kableExtra)
-library(formattable)
-
-sub_rent_tbl <- read_csv("data/rr_submarket_data.csv") |> 
-  clean_names() |> 
-  separate(geography, into = c("region", "state", "submarket"), sep = " - ") |> 
-  select(period, locality, submarket, "rent" = market_asking_rent_unit) |> 
-  mutate(rent = parse_number(rent)) |> 
-  mutate(period = as.Date(as.yearqtr(period, format = "%Y Q%q"), frac = 1)) |> 
-  filter(locality == costar_name) |> 
-  filter(period == "2022-09-30" | period == "2016-03-31") |> 
-  pivot_wider(names_from = period,
-              values_from = rent)
-
-sub_tbl <- sub_rent_tbl |> 
-  select(2:4) |> 
-  mutate(pct_change = (`2022-09-30`-`2016-03-31`)/`2016-03-31`) |> 
-  mutate(across(c(2,3), ~currency(.x, digits = 0)),
-         pct_change = percent(pct_change, digits = 0)) |> 
-  arrange(desc(pct_change))
-
-sub_tbl |> 
-  kbl(col.names = c("Richmond submarket", "2016 Q1 Rent", "2022 Q3 Rent", "Percent change")) |> 
-  kable_material(c("striped", "hover")) |> 
-  footnote(general = "2016 Q1 Rent has not been adjusted for inflation")
 
 ```
 
@@ -363,47 +343,59 @@ Change in number of assisted units (NHPD)
 
 ### Naturally-occurring affordable housing
 
-.....
+CoStar does not list any one- or two-star rental properties in Goochland County, therefore the number of NOAH properties in the county is largely unknown. However, the U.S. Census Bureau may provide clues as to where NOAH may be generally located in the county by determining what type of structures renters reside in.
 
-```{r noah, fig.cap=paste0(name, ": Distribution of average asking rents\nin NOAH properties by year built")}
+As of 2020, the majority of renters reside in single-family homes (71 percent). The share of renters residing single-family homes has decreased as the number of multifamily properties has increased, but there has also been a raw decrease in single-family renters (from 935 in 2016 to 838 in 2020). The large share of single-family rentals could potentially be a large source of NOAH in the county.
 
-# Add choice of NOAH stat (total number, change in rent, etc) 
+```{r}
+#| label: fig-ro-structure-percent
+#| fig.cap: "Change in share of renter-occupied housing units by structure type"
 
-rva_noah <- read_csv("data/pha_noah_81722.csv") |> 
-  clean_names() |> 
-  st_as_sf(coords = c("longitude", "latitude"), crs=4326, remove=FALSE) |> 
-  filter(property_name != "Sedgefield" | property_name != "Holidy Mobile Home Park") |> 
-  filter(county_name == costar_name) |> 
-  mutate(period_built = case_when(
-    year_built < 1940 ~ "Before 1940",
-    year_built %in% 1940:1959 ~ "1940 to 1959",
-    year_built %in% 1960:1969 ~ "1960 to 1969",
-    year_built > 1969 ~ "1970 or after"
-  )) |> 
-  mutate(period_built = fct_relevel(period_built, "Before 1940"))
-  
 
-ggplot(rva_noah,
-       aes(x = period_built,
-           y = avg_asking_unit,
-           fill = period_built)) +
-  geom_boxplot() +
-  scale_y_continuous(labels = label_dollar()) +
-  labs(title = paste0(name, ": Distribution of average asking rents\nin NOAH properties by year built"),
-       caption = "Source: CoStar Group, Inc.") +
-  theme(legend.position = "none",
-        panel.background = element_blank(),
+b25127_data <- read_rds("data/b25127_data.rds") |> 
+  filter(GEOID %in% fips,
+         tenure == "Renter") |> 
+  ungroup()
+
+ro_structure_percent <- b25127_data |> 
+  filter(structure != "Other") |>
+  select(5, 6, 10) |> 
+  pivot_longer(
+    cols = 2:3,
+    names_to = "year",
+    values_to = "estimate") |> 
+  group_by(structure, year) |> 
+  summarise(estimate = sum(estimate)) |> 
+  group_by(year) |> 
+  mutate(pct = estimate/sum(estimate))
+
+ggplot(ro_structure_percent,
+       aes(x = structure,
+           y = pct,
+           fill = year,
+           label = label_percent(accuracy = 0.1)(pct))) +
+  geom_col(position = "dodge") +
+  geom_text(vjust = 1.5,
+            color = "white",
+            position = position_dodge(width = 0.9)) +
+  labs(title = "Change in share of renter-occupied housing units by structure type",
+       subtitle = "2016 to 2020",
+      caption = "Source: U.S. Census Bureau, American Community Survey, Table B25127.") +
+  theme(panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
         axis.title = element_blank(),
         axis.ticks = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
-  
+        legend.title = element_blank()) +
+  scale_y_continuous(labels = label_percent())
 
 ```
 
 ## Gap analysis
 
 ### Affordability of current housing stock
+
+When comparing renter income to the average asking rent in a year, Goochland County has seen a persistent gap between what is on the market and what is affordable to the typical renter. The gap between median renter household income and average asking rent in 2016 was \$752. By 2020, that gap had increased by \$10 --- continuing to leave the typical renter hundreds of dollars short of affording the typical rent.
 
 ```{r income-rent-gap, fig.cap=paste0(name, ": Average asking rent versus\nrent affordable to median renter income")}
 

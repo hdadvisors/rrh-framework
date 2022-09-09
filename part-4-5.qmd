@@ -2,7 +2,8 @@
 
 This chapter is a summary of the major changes to the Charles City County's population and housing market in the past five years.
 
-```{r setup}
+```{r}
+# label: setup
 
 library(tidyverse)
 library(tidycensus)
@@ -29,9 +30,10 @@ costar_name <- "Charles City County"
 
 ## Takeaways
 
-```
-Add short bullet points summarizing major changes
-```
+- Population decline in the last decade in Charles City County has largely been the result of natural decreases.
+- Although there are fewer renters in the county than there were in 2016, affordability challenges remain.
+- Median renter income has decreased by 22 percent between 2016 and 2020, while the income needed to afford the median home price has only increased.
+- There is now a nearly $17,000 gap between the typical renter household income and the income needed to afford the typical home price.
 
 ## Demographic and socioeconomic changes
 
@@ -70,6 +72,7 @@ pop_bar <- ggplot(pop,
 pop_bar
 
 ```
+
 The components of population change for Charles City County showed that, in 2016 and 2017, people were moving to the county from other parts of the state or country. But natural decreases have consistently outpaced any and all growth within the county until 2021, when domestic migration joined natural decreases in contributing to the county's population loss.
 
 ```{r}
@@ -209,9 +212,11 @@ ggplot(b25119_cpi,
 
 ### Persons with disabilities
 
-.....
+Individuals with independent living difficulties have increased largely among the 65 year and older age group. In total, there has been an increase of 67 individuals with independent living difficulties at this age between 2016 and 2020. Although this may seem like a small portion of the population, these individuals will increasingly require home aide assistance, accessibility modifcations, or an assisted living facility.
 
-```{r} ind-living, paste0(name, ": Net change in individuals with independent living difficulties by age"}
+```{r}
+#| label: ind-living
+#| fig-cap:paste0(name, ": Net change in individuals with independent living difficulties by age")
 
 # Add disability stat (probably independent living difficulty)
 
@@ -238,39 +243,12 @@ ggplot(b18107,
                                           size = 0.05))
 
 ```
-```{r}
-#| label: fig-vets-plot
-#| fig.cap: "Net change in veterans with service-connected disability by disability rating"
 
-b21100_data <- read_rds("data/b21100_data.rds") |> 
-  filter(NAME %in% name) |> 
-  group_by(rating) |> 
-  summarise(change = sum(change))
- 
-ggplot(b21100_data,
-       aes(x = rating,
-           y = change,
-           fill = rating)) +
-  geom_col() +
-  labs(title="Net change in veterans with service-connected disability by disability rating",
-       subtitle="2016 to 2020",
-       caption="Source: U.S. Census Bureau, American Community Survey, Table B21100.") +
-  scale_x_discrete(labels = function(x) str_wrap(x, width = 15)) +
-  scale_y_continuous(labels = label_comma()) +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        legend.position = "none",
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
-
-```
 ## Housing supply and market changes
 
 ### Homeownership
 
-From 2017 to June 2022, median home price in the county has been on a general increase. In January 2017 the median home price was \$142,000
+From 2017 to June 2022, median home price in the county has been on a general increase. In January 2017 the median home price was \$142,000 and by July 2022 was \$200,000. Between this time, monthly median sales price have fluctuated seasonally. But home sales in the county have not typically numbered beyond ten closed sales during this time frame. In fact, it was only in August 2019 that Charles City County so a five year high of ten total sales. With low sales and lower median prices, the loss of population is generally reflected in the for-sale home market.
 
 ```{r}
 #| label: fig-sales
@@ -332,111 +310,84 @@ ggplot(price_adj,
 
 ### Rental
 
+Less than one in five households in the county are renters as of 2020 (15.6 percent). From 2016 to 2020, renter households have been declining in the county --- going from 504 in 2016 to 467 in 2020. With few multifamily properties in the county, there is no doubt a large number of renters who are renting single-family homes across the county.
 
+```{r}
+#| label: fig-renters
+#| fig-cap: "Renter households in Charles City County"
 
+b25003_vars <- load_variables(2020, "acs5") |> 
+  filter(str_sub(name, end = 7) %in% "B25003_")
 
+b25003_raw <- map_dfr(years, function(yr){
+   b25003_pull <- get_acs(
+    geography = "county",
+    state = "VA",
+    table = "B25003",
+    year = yr,
+    survey = "acs5"
+  ) |> 
+    mutate(year = yr)
+})
 
-### Housing assistance
-
-```
-Change in number of assisted units (NHPD)
-```
-
-### Naturally-occurring affordable housing
-
-.....
-
-```{r noah, fig.cap=paste0(name, ": Distribution of average asking rents\nin NOAH properties by year built")}
-
-# Add choice of NOAH stat (total number, change in rent, etc) 
-
-rva_noah <- read_csv("data/pha_noah_81722.csv") |> 
-  clean_names() |> 
-  st_as_sf(coords = c("longitude", "latitude"), crs=4326, remove=FALSE) |> 
-  filter(property_name != "Sedgefield" | property_name != "Holidy Mobile Home Park") |> 
-  filter(county_name == costar_name) |> 
-  mutate(period_built = case_when(
-    year_built < 1940 ~ "Before 1940",
-    year_built %in% 1940:1959 ~ "1940 to 1959",
-    year_built %in% 1960:1969 ~ "1960 to 1969",
-    year_built > 1969 ~ "1970 or after"
+b25003_vars_cleaned <- b25003_vars |> 
+  separate(label, into = c("est", "total", "tenure"), sep = "!!") |> 
+  select(variable = name, tenure) |> 
+  mutate(tenure = case_when(
+    tenure == "Owner occupied" ~ "Homeowner",
+    tenure == "Renter occupied" ~ "Renter"
   )) |> 
-  mutate(period_built = fct_relevel(period_built, "Before 1940"))
-  
+  drop_na()
 
-ggplot(rva_noah,
-       aes(x = period_built,
-           y = avg_asking_unit,
-           fill = period_built)) +
-  geom_boxplot() +
-  scale_y_continuous(labels = label_dollar()) +
-  labs(title = paste0(name, ": Distribution of average asking rents\nin NOAH properties by year built"),
-       caption = "Source: CoStar Group, Inc.") +
-  theme(legend.position = "none",
-        panel.background = element_blank(),
-        axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
-  
+b25003_raw <- b25003_raw |> 
+  filter(GEOID %in% fips)
+
+b25003_data <- b25003_raw |> 
+  right_join(b25003_vars_cleaned, by = "variable") |> 
+  select(NAME, GEOID, year, tenure, estimate) |> 
+  mutate(NAME = str_remove_all(NAME, ", Virginia")) |>
+  group_by(NAME, year) |> 
+  mutate(pct = (estimate/sum(estimate))) |> 
+  filter(tenure == "Renter")
+
+ggplot(b25003_data,
+       aes(x = year,
+           y = pct,
+           fill = pct)) +
+  geom_col() +
+  theme(axis.title = element_blank(),
+        legend.position = "none") +
+  scale_y_continuous(labels = percent_format()) +
+  labs(title = "Percent of renter households in Charles City County", 
+       fill = "Percent of total households",
+       subtitle = "From 2016 to 2020",
+       caption = "Source: U.S Census Bureau. American Community Survey 2016-2020 5-Year Estimates. Table B25003.") +
+  geom_text(aes(label = percent(pct, accuracy = .1)),
+            color = "white",
+            vjust = 1) +
+  scale_fill_continuous(labels = percent_format())
+
 
 ```
+
+The rental market in Charles City County is small to non-existent. Apartments.com shows no available rental listings in the county, although CoStar lists at least one multifamily property in the county, Sign Post Estates. This 36 unit apartment complex was built in 1992 utilizing USDA Rural Rental Housing Loans and then utilized 9% Competitive Low-Income Housing Tax Credit program in 2004.
+
 
 ## Gap analysis
 
 ### Affordability of current housing stock
 
-```{r income-rent-gap, fig.cap=paste0(name, ": Average asking rent versus\nrent affordable to median renter income")}
+For the few hundred renters in the county, reaching homeownership has becoming more and more difficult in the county. In 2016, the income needed to afford the median home price was \$34,539, while the median renter household income was \$40,152. Since 2016, the ability of a renter to afford homeownership has quickly slipped away. By 2017, the median renter household was a few thousand dollars short of being able to afford homeownership. And by 2020, the gap between renter income and income needed had grown to nearly \$17,000.
 
-# Compare local median renter income to average asking rent
+```{r}
+#| label: fig-income-own-gap
+#| fig-cap: paste0(name, ": Income needed to afford median home price\nversus median renter income")
+
+# Compare local renter income versus local home prices
 
 b25119_cpi_rent <- b25119_cpi |> 
   filter(tenure == "Renter")
 
-rent <- read_csv("data/rr_annual_rent.csv") |> 
-    pivot_longer(cols = 2:8,
-               names_to = "locality",
-               values_to = "rent_current") |> 
-  clean_names() |> 
-  filter(locality == costar_name)
-
-rent_gap <- b25119_cpi_rent |> 
-  left_join(rent, by = "year") |> 
-  mutate(rent_current = parse_number(rent_current)) |> 
-  mutate(affordable_rent = (cdollars/12)*.30) |> 
-  mutate(difference = rent_current - affordable_rent) |> 
-  select(year, rent_current, affordable_rent) |> 
-  pivot_longer(2:3,
-               names_to = "type",
-               values_to = "dollars") |> 
-  mutate(type = case_when(
-    type == "affordable_rent" ~ "Affordable rent",
-    type == "rent_current" ~ "Current rent"
-  ))
-
-ggplot(rent_gap,
-       aes(x = year,
-           y = dollars,
-           fill = type)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  scale_y_continuous(labels = label_dollar()) +
-  labs(title = paste0(name, ": Average asking rent versus\nrent affordable to median renter income"),
-       subtitle = "2016 to 2020",
-       fill = "Nominal rent",
-       caption = "Sources: U.S. Census Bureau, American Community Survey, Table B25119\nand CoStar Group Inc.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
-
-
-```
-...
-
-```{r income-own-gap, fig.cap=title = paste0(name, ": Income needed to afford median home price\nversus median renter income")}
-
-# Compare local renter income versus local home prices
 
 rr_sales_annual <- read_csv("data/rr_annual_sales.csv") |> 
   pivot_longer(cols = 2:9,
@@ -489,7 +440,8 @@ ggplot(slgap,
 
 
 ```
-...
+
+In spite of the low number of renters in the county, there is still a shortage of affordable rentals for households making less than 80 percent AMI. That shortage has shrunk since 2015, from 104 rental units to 83 in 2018. With the county's declining population, a likely explanation is the departure of lower income renter households to other parts of the region.
 
 ```{r gap, fig.cap=paste0(name, ": Rental housing gap by AMI")}
 
@@ -531,27 +483,24 @@ ggplot(gap,
 
 ### Impact of housing costs
 
-...
+From 2015 to 2018, there has been little change in the percent of households experiencing cost burden. Although there has been a slight decline in the number of cost-burdened homeowners, the share of cost-burdened homeowners has remained largely unchanged (24 percent in 2018). For renters, the number of cost-burdened renters has remained unchanged (180).
 
-```{r cb, fig.cap=paste0(name, ": Cumulative change in cost-burdened households by tenure")}
+```{r cb, fig.cap=paste0(name, ": Cost-burdened households by tenure")}
 
 cb <- read_rds("data/cb_7.rds") |> 
-  filter(county == name,
-         cb_group == "Cost-burdened") |> 
-  group_by(year, county, tenure) |> 
+  filter(county == name) |> 
+  group_by(year, tenure, cb_group) |> 
   summarise(estimate = sum(estimate)) |> 
-  group_by(county, tenure) |> 
-  mutate(change = estimate - lag(estimate)) |> 
-  drop_na() |> 
-  mutate(run_diff = cumsum(change))
+  mutate(pct = estimate/sum(estimate))
 
 ggplot(cb,
-       aes(x = year, y = run_diff, fill = tenure)) +
-  geom_col(position = "dodge") +
-  scale_y_continuous(labels = label_comma()) +
+       aes(x = year, y = pct, fill = cb_group)) +
+  facet_wrap(~tenure) +
+  geom_col(position = position_fill(reverse = TRUE)) +
+  scale_y_continuous(labels = percent_format()) +
   labs(title = paste0(name, ": Cumulative change in cost-burdened households by tenure"),
        subtitle = "2015 to 2018",
-       fill = "Tenure",
+       fill = "Cost burden",
        caption = "Source: U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
   theme(axis.title = element_blank(),
         axis.ticks = element_blank(),
@@ -560,7 +509,7 @@ ggplot(cb,
                                           size = 0.05))
 
 ```
-...
+McKinney-Vento Act data provides an estimate of enrolled students who are experiencing homelessness. This data is contrast to HUD Point-in-Time (PIT) counts because it utilizes a [different definition of homelessness](https://nche.ed.gov/mckinney-vento-definition/). In Charles City County, the number of enrolled students has remained below 30 from the 2016-2017 to 2019-2020 school years. During the 2018-2019 school year, Charles City County had a lower count of 16, but experiences a slight increase to 22 in 2019-2020.
 
 ```{r mkv, fig.cap="Enrolled students experiencing homelessness by school year"}
 
