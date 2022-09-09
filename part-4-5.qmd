@@ -37,9 +37,11 @@ Add short bullet points summarizing major changes
 
 ### Population changes
 
-In Charles City, populations has been decreasing between 2010 and 2020. 
+In Charles City, population has been decreasing between 2010 and 2020 --- going from 7,256 to 6,773, a loss of 483 residents. These changes reflect a trend among many Virginia rural localities as job opportunities leave and fewer and fewer adults have children.
 
-```{r pop, fig.cap=paste0(name, ": Total Population")}
+```{r}
+#| label: fig-pop
+#| fig-cap: paste0(name, ": Total Population")
 
 # Add choice of population stat (net change, components, etc)
 
@@ -65,19 +67,14 @@ pop_bar <- ggplot(pop,
         panel.grid.major.y = element_line(color = "grey95",
                                           size = 0.05))
 
-# ggplotly(pop_bar) |> 
-#   plotly_camera()
-
-# 2010 to 2020 increase of 22,396 
-# 2019 TO 2020 decrease of 3,826
-
 pop_bar
 
 ```
+The components of population change for Charles City County showed that, in 2016 and 2017, people were moving to the county from other parts of the state or country. But natural decreases have consistently outpaced any and all growth within the county until 2021, when domestic migration joined natural decreases in contributing to the county's population loss.
 
-.....
-
-```{r comp, fig.cap=paste0(name,": Components of population change"}
+```{r}
+#| label: fig-comp
+#| fig-cap: paste0(name,": Components of population change")
 
 change <- read_rds("data/rr_comp_change.rds") |> 
   filter(year %in% as.character(years) | year == "2021") |> 
@@ -105,9 +102,11 @@ ggplot(change,
 
 ### Household characteristics
 
-.....
+The changes in household types in Charles City County have been only a fraction of the overall population. But from 2016 to 2020, there has been an overall decrease in households with children in the county --- both among homeowners and renters (-48). The only major increaes has been among nonfamily homeowner households (+146). This is most likely attributable to an increasing number of seniors living alone.
 
-```{r children, fig.cap=paste0(name, ": Change in households with children by tenure"}
+```{r}
+#| label: fig-children
+#| fig-cap: paste0(name, ": Change in households with children by tenure")
 
 # Add choice of household stat (HHs with children, HHs with seniors, subfamilies, etc)
 
@@ -133,9 +132,11 @@ ggplot(b25115,
 
 ```
 
-.....
+The senior population in the county increased by 251 between 2016 and 2020. Much of that growth occurred among seniors who were the head of their family household (+130), followed by seniors living alone (+49).
 
-```{r seniors, fig.cap=paste0(name, ": Change in senior population by living arrangement"}
+```{r}
+#| label: fig-seniors
+#| fig-cap: paste0(name, ": Change in senior population by living arrangement")
 
 b09020 <- read_rds("data/b09020_data.rds") |> 
   filter(NAME == name) |> 
@@ -170,9 +171,13 @@ ggplot(b09020,
 
 ### Income and wages
 
-.....
+For homeowners in the county, there has been very little change in median household income. When adjusted for inflation, homeowner median household income has only increased by 2 percent --- from \$65,077 in 2016 to \$66,719 in 2020.
 
-```{r income, fig.cap=paste0(name, ": Median houshold income by tenure")}
+Renters in the county have seen a decrease in median household income by 22 percent --- falling nearly \$10,000 to \$33,661 in 2020.
+
+```{r}
+#| label: fig-income
+#| fig-cap: paste0(name, ": Median houshold income by tenure")
 
 # Add choice of income stat (probably median household income of some kind)
 
@@ -206,7 +211,7 @@ ggplot(b25119_cpi,
 
 .....
 
-```{r ind-living, paste0(name, ": Net change in individuals with independent living difficulties by age"}
+```{r} ind-living, paste0(name, ": Net change in individuals with independent living difficulties by age"}
 
 # Add disability stat (probably independent living difficulty)
 
@@ -233,14 +238,43 @@ ggplot(b18107,
                                           size = 0.05))
 
 ```
+```{r}
+#| label: fig-vets-plot
+#| fig.cap: "Net change in veterans with service-connected disability by disability rating"
 
+b21100_data <- read_rds("data/b21100_data.rds") |> 
+  filter(NAME %in% name) |> 
+  group_by(rating) |> 
+  summarise(change = sum(change))
+ 
+ggplot(b21100_data,
+       aes(x = rating,
+           y = change,
+           fill = rating)) +
+  geom_col() +
+  labs(title="Net change in veterans with service-connected disability by disability rating",
+       subtitle="2016 to 2020",
+       caption="Source: U.S. Census Bureau, American Community Survey, Table B21100.") +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 15)) +
+  scale_y_continuous(labels = label_comma()) +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = "none",
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
+```
 ## Housing supply and market changes
 
 ### Homeownership
 
-.....
+From 2017 to June 2022, median home price in the county has been on a general increase. In January 2017 the median home price was \$142,000
 
-```{r sales, fig.cap=paste0(name, ": Median home sales price")}
+```{r}
+#| label: fig-sales
+#| fig-cap: paste0(name, ": Median home sales price (adjusted for inflation")
 
 # Median sales price over time
 
@@ -260,14 +294,26 @@ price <- price |>
   mutate(date = make_date(year, month)) |> 
   mutate(med_price = parse_number(med_price))
 
-ggplot(price,
+cpi <- read_csv("data/CPIAUCSL.csv") |> 
+  select(date = DATE, cpi = CPIAUCSL)
+
+price_adj <- price |> 
+  left_join(cpi, by = "date") |> 
+  mutate(dollars = ((295.271/cpi)*med_price)) |> 
+  select(date, med_price, dollars) |> 
+  pivot_longer(2:3,
+               names_to = "type",
+               values_to = "dollars") |> 
+  filter(type == "dollars")
+
+ggplot(price_adj,
        aes(x = date,
-           y = med_price,
-           color = med_price)) +
+           y = dollars,
+           color = dollars)) +
   geom_line(stat = "identity", size = 1) +
   scale_y_continuous(labels = label_dollar(), limits = c(0, NA)) +
   scale_x_date(date_labels = "%Y", date_breaks = "1 year") +
-  labs(title = paste0(name, ": Median home sales price"),
+  labs(title = paste0(name, ": Median home sales price (adjusted for inflation)"),
        subtitle = "January 2017 to June 2022",
        caption = "Source: Central Virginia Regional Multiple Listing Service.") +
   theme(axis.title = element_blank(),
@@ -276,8 +322,10 @@ ggplot(price,
         legend.title = element_blank(),
         panel.grid.major.x = element_blank(),
         panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05)) +
-  scale_color_continuous(type = "viridis", label = dollar_format())
+                                          size = 0.05)) + 
+  scale_color_continuous(type = "viridis", label = dollar_format()) +
+  geom_smooth(method=lm)
+  
 
 
 ```

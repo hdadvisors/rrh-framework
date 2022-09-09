@@ -680,7 +680,7 @@ ggplot(pha_sales,
   scale_y_continuous(labels = label_comma()) +
   scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
   labs(title = "Monthly home sales by locality",
-       subtitle = "January 2017 to June 2022",
+       subtitle = "January 2017 to August 2022",
        caption = "Source: Central Virginia Regional Multiple Listing Service.") +
   theme(axis.title = element_blank(),
         axis.ticks = element_blank(),
@@ -720,9 +720,9 @@ ggplot(avg_sales,
 
 ### Sales price
 
-Median home prices have continued to climb in the Richmond Region---reaching over \$300,000 in all four major localities. The greatest price increases have occurred in the City of Richmond during 2022, where the median home price went from \$292,000 in February to \$389,950 in June, a 33 percent increase. Home prices are continuing to trend upward in spite of rising mortgage interest rates. 
+Median home prices have continued to climb in the Richmond Region---reaching over \$300,000 in all four major localities. The greatest price increases have occurred in the City of Richmond during 2022, where the median home price went from \$303,941 in February to \$389,950 in June, a 28 percent increase. Home prices are continuing to trend upward in spite of rising mortgage interest rates. 
 
-Hanover County remains the most expensive locality in the region with a median home price of \$431,020 in June 2020, followed by the City of Richmond (\$389,950), Chesterfield County (\$380,000), and Henrico County (\$350,000).
+Hanover County remains the most expensive locality in the region with a median home price of \$464,000 in July 2022, followed by the Chesterfield County (\$378,671), Henrico County (\$370,000), and the City of Richmond (\$352,500).
 
 ```{r sales-price-data, eval=FALSE}
 
@@ -770,7 +770,15 @@ pha_price <- pha_price |>
   mutate(date = make_date(year, month)) |> 
   mutate(med_price = parse_number(med_price))
 
-write_rds(pha_price, "data/pha_price.rds")
+cpi <- read_csv("data/CPIAUCSL.csv") |> 
+  select(date = DATE, cpi = CPIAUCSL)
+
+pha_price_adj <- pha_price |> 
+  left_join(cpi, by = "date") |> 
+  mutate(dollars = ((295.271/cpi)*med_price)) |> 
+  select(geography, date, med_price, dollars, cpi)
+
+write_rds(pha_price_adj, "data/pha_price.rds")
 
 ```
 
@@ -779,13 +787,13 @@ write_rds(pha_price, "data/pha_price.rds")
 pha_price <- read_rds("data/pha_price.rds")
 
 ggplot(pha_price,
-       aes(x = date, y = med_price, color = geography)) +
+       aes(x = date, y = dollars, color = geography)) +
   geom_line(size = 1) +
   facet_wrap(~geography) +
   scale_y_continuous(labels = label_dollar()) +
   scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
   labs(title = "Monthly median sales price by locality",
-       subtitle = "January 2017 to June 2022",
+       subtitle = "January 2017 to July 2022",
        caption = "Source: Central Virginia Regional Multiple Listing Service.") +
   theme(axis.title = element_blank(),
         axis.ticks = element_blank(),
@@ -801,7 +809,7 @@ ggplot(pha_price,
 
 The inventory of for-sale housing before the pandemic typically sat at two months or more---meaning that it would take two or more months to sell at current prices. A healthy level of supply has said to be five or six months worth, but in recent years the region has been below that, which indicates a strong seller's market. 
 
-When pandemic began in March 2020, months supply dropped to two months and then by June 2020 hit a low of one month and has sat squarely there ever since. Even amid rising interest rates in 2022 and talks of a housing recession, months supply continues to remain low.
+When pandemic began in March 2020, months supply dropped to two months and then by June 2020 hit a low of one month and has sat squarely there ever since. Even amid rising interest rates in 2022 and talks of a housing slump, months supply continues to remain low.
 
 ```{r supply-data}
 
@@ -894,7 +902,7 @@ ggplot(st_homes,
 
 ### Sales price
 
-The affordability of resale homes compared to new construction has often made them the first rung on the homeownership ladder. But since the start of the pandemic, the median resale home price has risen above the \$300,000 mark and in June 2022 reached a high of \$371,000.
+The affordability of resale homes compared to new construction has often made them the first rung on the homeownership ladder. But since the start of the pandemic, the median resale home price has risen above the \$300,000 mark and in June 2022 reached a high of \$371,250.
 
 During this timeframe, new construction median home prices have remained above \$350,000 and throughout 2022 so far have stayed above \$400,000. On average, there is a \$89,127 difference between new construction and resale sales price---leaving new construction significantly out of reach for lower income households.
 
@@ -936,13 +944,16 @@ write_rds(pha_price_comp, "data/pha_price_comp.rds")
 
 pha_price_comp <-  read_rds("data/pha_price_comp.rds")
 
+comp_diff <- pha_price_comp |> 
+  
+
 ggplot(pha_price_comp,
        aes(x = date, y = med_price, color = type)) +
   geom_line(size = 1) +
   scale_y_continuous(labels = label_dollar()) +
   scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
   labs(title = "Median price of new construction and resale",
-       subtitle = "January 2017 to June 2022",
+       subtitle = "January 2017 to August 2022",
        caption = "Source: Central Virginia Regional Multiple Listing Service.") +
   theme(axis.title = element_blank(),
         axis.ticks = element_blank(),
