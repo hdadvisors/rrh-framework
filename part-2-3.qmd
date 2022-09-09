@@ -141,6 +141,7 @@ nhpd_coded <- nhpd_clean_rr |>
           long = Longitude)
 
 nhpd_coded_rr <- nhpd_coded |>
+  rename(locality = address_components.county...30) |> 
   mutate(Latitude = case_when(
     property_name == "NEW MANCHESTER FLATS IX" ~ 37.517602,
     property_name == "KINGSRIDGE I" ~ 37.551666,
@@ -160,59 +161,21 @@ write_rds(nhpd_coded_rr, "data/nhpd_coded_rr.rds")
 
 ## Affordable rental housing
 
-An array of federal housing assistance programs help low-income residents across the region with rental housing opportunities. In an effort to maximize assistance, these rental subsidy programs are often layered --- meaning that a rental unit may be supported by both LIHTC and Project Based Vouchers. 
+An array of federal housing assistance programs help low-income residents across the region with rental housing opportunities. Today, there are approximately 25,969 dedicated affordable rental homes found across 240 properties in the Richmond area. These include units both currently occupied and in development.
 
 ::: callout-tip
 In the Richmond region, many affordable rental properties also receive assistance from the Virginia Housing Trust Fund, as well as local sources such as CDBG and HOME grants. The City of Richmond also awards funding to affordable rental projects with its own trust fund.
 :::
 
-### Locations
+### Subsidy types
 
-The map below shows the locations of the 21,887 dedicated affordable rental homes found across 253 properties in the Richmond area. Each color corresponds to the property's subsidy as recorded in the National Housing Preservation Database, or if multiple subsidies are currently active. These properties include units currently occupied and in development.
+Over half (51 percent) of all affordable rental homes in the region rely *solely* on the LIHTC program. Another 31 percent have layered multiple subsidies together, reflecting the capital and funding requirements needed to develop new affordable housing.
 
-```{r}
-#| label: nhpd-map
-#| eval: false
-
-nhpd_mapped_rr <- read_rds("data/nhpd_coded_rr.rds") |> 
-  st_as_sf(coords = c("Longitude", "Latitude"), crs=4326, remove = FALSE) |> 
-  filter(fulladdress != "PO BOX 8585, RICHMOND, VA, 23226")
-
-write_rds(nhpd_mapped_rr, "data/nhpd_mapped_rr.rds")
-
-```
-
-```{r}
-#| label: fig-nhpd-map
-#| fig.cap: "Federally-assisted rental housing properties"
-
-nhpd_map <- read_rds("data/nhpd_mapped_rr.rds") |> 
-  filter(subsidy_status != "Inactive") |> 
-  group_by(subsidy_type, nhpd_property_id) |> 
-  summarise(units = max(known_total_units))
-
-subsidyPal <- colorFactor(viridis(8), nhpd_map$subsidy_name)
-
-mapview(
-  nhpd_map,
-  zcol = "subsidy_type",
-  legend = T,
-  popup = F,
-  burst = F,
-  layer.name = "Subsidy type"
-)
-
-```
+The other significant source of dedicated affordable housing continues to be more than 3,600 Public Housing units managed by Richmond Redevelopment and Housing Authority.
 
 ::: callout-note
 Descriptions of each rental assistance program are available on the [NHPD website](https://preservationdatabase.org/documentation/program-descriptions/).
 :::
-
-### Subsidy types
-
-Over half (55 percent) of all affordable rental homes in the region rely *solely* on the LIHTC program. Another 27 percent have layered multiple subsidies together, reflecting the capital and funding requirements needed to develop new affordable housing.
-
-The other significant source of dedicated affordable housing continues to be more than 3,600 Public Housing units managed by Richmond Redevelopment and Housing Authority.
 
 ```{r}
 #| label: fig-subsidy-overall
@@ -250,7 +213,11 @@ ggplot(subsidy,
 
 ```
 
-Among the 7,445 units with multiple subsidies, nearly all (98 percent) use LIHTC, and another 69 percent have an active Section 8 contract.
+### Layered subsidies
+
+In an effort to maximize assistance, rental subsidy programs are often layered together into single projects. Among the 8,061 units with multiple subsidies, over half have either a 4% or 9% LIHTC tax credit---or both "twinned" together. Section 8 Housing Finance and Development Agency (HFDA) New Construction and Loan Management Set-Aside (LMSA) programs are also common types.
+
+"Other" subsidies generally include HUD insurance programs and other, less common, Section 8 programs. Still, these minor assistance packages nevertheless provide helping subsidy to almost three-in-four units with multiple affordability contracts.
 
 ```{r}
 #| label: tbl-multiple
@@ -278,28 +245,28 @@ multiple <- nhpd_clean_rr |>
     subsidy_name == "HUD Insured" & units < 600 ~ "Other",
     TRUE ~ detail
   )) |> 
-  mutate(subsidy_name = fct_reorder(subsidy_name, units, .fun = sum, .desc = TRUE),
+  mutate(subsidy_name_ext = paste(subsidy_name, detail),
+         subsidy_name_ext = fct_lump_n(subsidy_name_ext, n = 4, w = units),
          detail = str_wrap(detail, width = 10))
 
 multiple |> 
-  group_by(subsidy_name) |> 
+  group_by(subsidy_name_ext) |> 
   summarise(units = sum(units)) |> 
-  mutate(pct = units / 16357,
+  mutate(pct = units / 8061,
          pct = percent(pct, digits = 1),
          units = comma(units, digits = 0)) |> 
   kable(align = "lrr",
-        col.names = c("Subsidy type", "Units with subsidy", "Percent of total")) |> 
+        col.names = c("Detailed subsidy type", "Units with subsidy", "Percent of total")) |> 
   kableExtra::kable_styling(bootstrap_options = c("condensed")) |> 
-  kableExtra::footnote(general = "Sources: National Housing Preservation Database and Virginia Housing.",
+  kableExtra::footnote(general = "Note: Totals do not add to 100% because units are percent of all 8,061 units with multiple subsidies.\nSources: National Housing Preservation Database and Virginia Housing.",
                        general_title = "")
 
 ```
 
-Units with multiple subsidies are more likely to overlap the 9% tax credit, Section 8 Loan Management Set-Aside (LMSA), and Section 8 Housing Finance and Development Agency (HFDA) programs.
-
 ```{r}
 #| label: fig-multiple-detail
 #| fig.cap: "Detailed subsidy type for units with multiple subsidies"
+#| eval: false
 
 ggplot(multiple,
        aes(y = reorder_within(detail, units, subsidy_name),
@@ -321,14 +288,53 @@ ggplot(multiple,
 
 ```
 
+### Locations
+
+The map below shows the locations of affordable rental properties in the Richmond region. Each color corresponds to the property's subsidy as recorded in the National Housing Preservation Database, or if multiple subsidies are currently active.
+
+```{r}
+#| label: nhpd-map
+#| eval: false
+
+nhpd_mapped_rr <- read_rds("data/nhpd_coded_rr.rds") |> 
+  st_as_sf(coords = c("Longitude", "Latitude"), crs=4326, remove = FALSE) |> 
+  filter(fulladdress != "PO BOX 8585, RICHMOND, VA, 23226")
+
+write_rds(nhpd_mapped_rr, "data/nhpd_mapped_rr.rds")
+
+```
+
+```{r}
+#| label: fig-nhpd-map
+#| fig.cap: "Federally-assisted rental housing properties"
+
+nhpd_map <- read_rds("data/nhpd_mapped_rr.rds") |> 
+  filter(subsidy_status != "Inactive") |> 
+  group_by(subsidy_type, nhpd_property_id) |> 
+  summarise(units = max(known_total_units))
+
+subsidyPal <- colorFactor(viridis(8), nhpd_map$subsidy_name)
+
+mapview(
+  nhpd_map,
+  zcol = "subsidy_type",
+  legend = T,
+  popup = F,
+  burst = F,
+  layer.name = "Subsidy type"
+)
+
+```
+
+Richmond continues to support the majority of affordable rentals in the region (about 60 percent---more than 15,200). While Chesterfield and Henrico counties both have similar amounts of LIHTC-only units, Henrico has nearly 2,900 additional units supported by multiple subsidies---generally combinations of LIHTC and a Section 8 program.
 
 ```{r}
 #| label: fig-subsidy-location
 #| fig-cap: "Federally assisted units by subsidy and locality"
 
-subsidy_local <- nhpd_clean_rr |> 
+subsidy_local <- nhpd_coded_rr |> 
   select(nhpd_property_id, subsidy_type, known_total_units,
-         subsidy_status, locality = address_components.county) |> 
+         subsidy_status, locality) |> 
   filter(subsidy_status != "Inactive",
          locality != "Charles City County") |> 
   group_by(locality, subsidy_type, nhpd_property_id) |> 
@@ -338,84 +344,117 @@ subsidy_local <- nhpd_clean_rr |>
   filter(units > 1)
 
 ggplot(subsidy_local,
-       aes(x = reorder(subsidy_type, -units),
+       aes(x = reorder(locality, units),
            y = units,
-           fill = subsidy_type)) +
+           fill = reorder(subsidy_type, units))) +
   geom_col() +
-  facet_wrap(~locality, scales = "free_x") +
   scale_y_continuous(labels = label_comma()) +
-  labs(title="Federally assisted units by subsidy and locality",
-       subtitle = "Data as of July 2022",
-       caption = "Source: National Housing Preservation Database.") +
-  theme(axis.title = element_blank(),
-        panel.background = element_blank(),
-        axis.ticks = element_blank(),
-        axis.text.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
-
-ggplot(subsidy_local,
-       aes(y = reorder_within(subsidy_type, units, locality),
-           x = units,
-           fill = subsidy_type)) +
-  geom_col(position = "dodge") +
-  facet_wrap(~locality, ncol = 2, nrow = 2, scales = "free_y") +
-  scale_y_reordered() +
-  scale_x_continuous(labels = label_comma()) +
   labs(title = "Federally assisted units by subsidy type and locality",
        subtitle = "Data as of July 2022",
+       fill = "Subsidy type",
        caption = "Source: National Housing Preservation Database.") +
-  theme(legend.position = "none",
+  theme(legend.position = "right",
         panel.background = element_blank(),
         axis.ticks = element_blank(),
         axis.title = element_blank(),
-        panel.grid.major.x = element_line(color = "grey95",
+        panel.grid.major.y = element_line(color = "grey95",
                                   size = 0.05))
+
+# ggplot(subsidy_local,
+#        aes(y = reorder_within(subsidy_type, units, locality),
+#            x = units,
+#            fill = subsidy_type)) +
+#   geom_col(position = "dodge") +
+#   facet_wrap(~locality, ncol = 2, nrow = 2, scales = "free_y") +
+#   scale_y_reordered() +
+#   scale_x_continuous(labels = label_comma()) +
+#   labs(title = "Federally assisted units by subsidy type and locality",
+#        subtitle = "Data as of July 2022",
+#        caption = "Source: National Housing Preservation Database.") +
+#   theme(legend.position = "none",
+#         panel.background = element_blank(),
+#         axis.ticks = element_blank(),
+#         axis.title = element_blank(),
+#         panel.grid.major.x = element_line(color = "grey95",
+#                                   size = 0.05))
 
 ```
 
 ### Changes since 2020
 
+Since January 2020, the region has seen 57 new rental subsidies added, which increased the number of active affordability contracts on units by 4,393. Over that same period, 17 subsidies ended, affecting 1,633 units. Some properties had multiple subsidies either added or expired. In all, there was a net addition of 2,760 rental affordability contracts.
+
+```{r}
+#| label: tbl-change
+#| tbl-cap: "Added and removed affordable rental contracts since 2020"
+
+change <- nhpd_coded_rr |> 
+  mutate(change_type = case_when(
+    start_date > '2019-12-31' ~ "Added",
+    end_date < '2022-09-01' & end_date > '2019-12-31' ~ "Removed",
+    TRUE ~ "No change"))
+
+change_table <- change |> 
+  group_by(change_type) |> 
+  summarise(subsidies = n(),
+            properties = n_distinct(nhpd_property_id),
+            units = sum(assisted_units)) |> 
+  filter(change_type != "No change") |> 
+  mutate(across(where(is.numeric), ~ ifelse(change_type == "Removed", (.x * -1), .x))) |> 
+  adorn_totals(name = "Net change")
+
+change_table |> 
+  mutate(across(where(is.numeric), ~ comma(.x, digits = 0))) |> 
+  kable(align = "lrrr",
+        col.names = c("", "Subsidies", "Properties affected", "Units included")) |> 
+  kableExtra::kable_styling(bootstrap_options = c("condensed")) |> 
+  kableExtra::row_spec(3, bold = TRUE) |> 
+  kableExtra::footnote(general = "Sources: National Housing Preservation Database and Virginia Housing.",
+                       general_title = "")
+
+```
+
+New LIHTC units (net 2,129) comprised the majority of added affordable rentals, followed by Section 8 contracts (net 1,132). Net losses of affordable rental contracts occurred in projects supported by HOME funding and HUD insurance.
+
 ```{r}
 #| label: fig-change
 #| fig.cap: "Additions and removals of subsidized rental units"
 
-change <- nhpd_clean_rr |> 
-  mutate(change_type = case_when(
-    start_date > '2019-12-31' ~ "Added",
-    end_date < '2022-09-01' & end_date > '2019-12-31' ~ "Removed",
-    TRUE ~ "No change")) |> 
-  group_by(subsidy_name, change_type) |> 
+change_subsidy <- change |> 
+  group_by(locality, subsidy_name, change_type) |> 
   summarise(units = sum(assisted_units)) |> 
   filter(change_type != "No change") |> 
   mutate(units = if_else(change_type == "Removed", units*-1, units)) |> 
   pivot_wider(
     names_from = change_type,
     values_from = units) |> 
-  mutate(Added = replace_na(Added, 0),
+  mutate(across(where(is.numeric), ~ replace_na(.x, 0)),
          `Net change` = Removed + Added) |> 
   pivot_longer(
-    cols = 2:4,
+    cols = 3:5,
     names_to = "change_type",
     values_to = "units") |> 
   mutate(subsidy_name = fct_reorder(subsidy_name, units, .desc = TRUE),
          change_type = fct_relevel(change_type, "Added", "Removed", "Net change"),
          subsidy_name = str_wrap(subsidy_name, width = 10))
 
-ggplot(change,
-       aes(x = reorder_within(subsidy_name, units, change_type),
+change_region <- change_subsidy |> 
+  filter(change_type == "Net change") |> 
+  group_by(subsidy_name) |> 
+  summarise(units = sum(units))
+
+ggplot(change_region,
+       aes(x = reorder(subsidy_name, units),
            y = units,
            fill = subsidy_name,
            color = subsidy_name,
            label = label_comma()(units))) +
-  geom_col(position = "dodge") +
+  geom_col() +
   geom_text(aes(y = units + sign(units)/0.003)) +
-  facet_wrap(~change_type, scales = "free_x") +
-  scale_x_reordered() +
   scale_y_continuous(labels = label_comma(),
-                     limits = c(-2000, 3500),
+                     limits = c(-1750, 3100),
                      n.breaks = 10) +
-  labs(title = "Additions and removals of subsidized rental unit contracts",
+  labs(title = "Net change in subsidized rental unit contracts",
        subtitle = "January 2020 through August 2022",
        caption = "Source: National Housing Preservation Database and Virginia Housing.") +
   theme(legend.position = "none",
@@ -427,37 +466,103 @@ ggplot(change,
 
 ```
 
+While LIHTC additions drove new affordable supply in Richmond and Chesterfield, new (or renewed) Section 8 contracts covered more than 400 units in Henrico. Over 500 units in Richmond and Henrico saw HUD insurance contracts expire; however, many of these are in projects with another form of rental assistance that has not expired. 
 
-### LIHTC
+```{r}
+#| label: fig-change
+#| fig.cap: "Net change in subsidized rental unit contracts by locality"
+
+change_subsidy <- change |> 
+  group_by(locality, subsidy_name, change_type) |> 
+  summarise(units = sum(assisted_units)) |> 
+  filter(change_type != "No change") |> 
+  mutate(units = if_else(change_type == "Removed", units*-1, units)) |> 
+  pivot_wider(
+    names_from = change_type,
+    values_from = units) |> 
+  mutate(across(where(is.numeric), ~ replace_na(.x, 0)),
+         `Net change` = Removed + Added) |> 
+  pivot_longer(
+    cols = 3:5,
+    names_to = "change_type",
+    values_to = "units") |> 
+  mutate(subsidy_name = fct_reorder(subsidy_name, units, .desc = TRUE),
+         change_type = fct_relevel(change_type, "Added", "Removed", "Net change"),
+         subsidy_name = str_wrap(subsidy_name, width = 10))
+
+change_locality <- change_subsidy |> 
+  filter(change_type == "Net change",
+         locality != "Charles City County")
+
+ggplot(change_locality,
+       aes(x = reorder(subsidy_name, units),
+           y = units,
+           fill = subsidy_name,
+           color = subsidy_name)) +
+  geom_col() +
+  facet_wrap(~locality) +
+  scale_y_continuous(labels = label_comma()) +
+  labs(title = "Net change in subsidized rental unit contracts by locality",
+       subtitle = "January 2020 through August 2022",
+       caption = "Sources: National Housing Preservation Database and Virginia Housing.") +
+  theme(legend.position = "none",
+        panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                  size = 0.05))
+
+```
+
+### LIHTC preservation
 
 LIHTC properties have a 30 year commitment to affordability, but only a 15 year compliance period, wherein property owners can increase rents. Nonprofit developers will often seek new allocation of tax credits before their commitment period ends, but there is often little incentive for for-profit developers to maintain affordability restrictions past the compliance period.
 
-By 2040, a large portion of active LIHTC units will be outside the 30 year commitment period --- even far more will be outside the 15 year compliance period. Just over 13,000 LIHTC units will be beyond the 30 year commitment period by 2040, which accounts for over 80 perceent of active LIHTC units as of early 2022.
+By 2040, a large portion of active LIHTC units will be outside the 30 year commitment period --- even far more will be outside the 15 year compliance period. Just over 13,000 LIHTC units will be beyond the 30 year commitment period by 2040, which accounts for well over half of all active LIHTC units as of early 2022.
 
 ```{r}
 #| label: fig-lihtc
-#| fig-cap: "LIHTC units by 30 year commitment expiration date"
-
-nhpd_coded_rr <- read_rds("data/nhpd_rr.csv")
+#| fig-cap: "Percent of active LIHTC units by end of commitment period"
 
 lihtc <- nhpd_coded_rr |> 
   filter(subsidy_name == "LIHTC") |> 
-  select(property_name, subsidy_subname, subsidy_status, owner_type, end_date, assisted_units, county = address_components.county) |> 
-  mutate(date = mdy(end_date)) |> 
-  filter(subsidy_status != "Inactive") |> 
-  group_by(date) |> 
-  summarise(units = sum(assisted_units))
+  select(nhpd_property_id, property_name, subsidy_name, subsidy_type, subsidy_status, owner_type, start_date, end_date, known_total_units, assisted_units, locality) |> 
+  mutate(end_date = case_when(
+    is.na(end_date) ~ as.Date(start_date %m+% years(30)),
+    TRUE ~ end_date)) |> 
+  filter(subsidy_status == "Active") |> 
+  group_by(nhpd_property_id) |> 
+  summarise(start_date = min(start_date),
+            end_date = max(end_date),
+            units = max(known_total_units)) |> 
+  ungroup() |> 
+  group_by(end_year = ceiling_date(end_date, "5 years")) |> 
+  summarise(units = sum(units)) |> 
+  mutate(pct = units/sum(units),
+         sum = cumsum(units),
+         pct_cum = sum/sum(units),
+         date = as.character(year(end_year)))
 
-lihtc_end <- ggplot(lihtc,
-                    aes(x = date,
-                        y = units)) +
-                      geom_col(fill = "dark blue") +
-  labs(title = "LIHTC units by 30 year commitment expiration date") +
-  theme(axis.title = element_blank()) +
-  scale_y_continuous(labels = number_format(big.mark = ","))
+ggplot(lihtc,
+       aes(x = date,
+           y = pct)) +
+  geom_col(fill = "#c77cff") +
+  scale_y_continuous(labels = label_percent(),
+                     n.breaks = 6) +
+  labs(title = "Percent of active LIHTC units by end of commitment period",
+       subtitle = "Included properties with multiple subsidies",
+       caption = "Sources: National Housing Preservation Database and Virginia Housing.") +
+  theme(
+    axis.ticks = element_blank(),
+    axis.title = element_blank(),
+    panel.background = element_blank(),
+    panel.grid.major.y = element_line(color = "grey95",
+                                  size = 0.05)
+  )
 
-ggplotly(lihtc_end) |> 
-  plotly_camera()
+  
+
+
 
 ```
 
