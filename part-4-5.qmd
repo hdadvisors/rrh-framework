@@ -43,7 +43,7 @@ In Charles City, population has been decreasing between 2010 and 2020 --- going 
 
 ```{r}
 #| label: fig-pop
-#| fig-cap: paste0(name, ": Total Population")
+#| fig-cap: !expr "paste0(name, ": Total Population")"
 
 # Add choice of population stat (net change, components, etc)
 
@@ -77,7 +77,7 @@ The components of population change for Charles City County showed that, in 2016
 
 ```{r}
 #| label: fig-comp
-#| fig-cap: paste0(name,": Components of population change")
+#| fig-cap: !expr "paste0(name,": Components of population change")"
 
 change <- read_rds("data/rr_comp_change.rds") |> 
   filter(year %in% as.character(years) | year == "2021") |> 
@@ -109,7 +109,7 @@ The changes in household types in Charles City County have been only a fraction 
 
 ```{r}
 #| label: fig-children
-#| fig-cap: paste0(name, ": Change in households with children by tenure")
+#| fig-cap: !expr "paste0(name, ": Change in households with children by tenure")"
 
 # Add choice of household stat (HHs with children, HHs with seniors, subfamilies, etc)
 
@@ -139,7 +139,7 @@ The senior population in the county increased by 251 between 2016 and 2020. Much
 
 ```{r}
 #| label: fig-seniors
-#| fig-cap: paste0(name, ": Change in senior population by living arrangement")
+#| fig-cap: !expr "paste0(name, ": Change in senior population by living arrangement")"
 
 b09020 <- read_rds("data/b09020_data.rds") |> 
   filter(NAME == name) |> 
@@ -180,7 +180,7 @@ Renters in the county have seen a decrease in median household income by 22 perc
 
 ```{r}
 #| label: fig-income
-#| fig-cap: paste0(name, ": Median houshold income by tenure")
+#| fig-cap: !expr "paste0(name, ": Median houshold income by tenure")"
 
 # Add choice of income stat (probably median household income of some kind)
 
@@ -215,8 +215,9 @@ ggplot(b25119_cpi,
 Individuals with independent living difficulties have increased largely among the 65 year and older age group. In total, there has been an increase of 67 individuals with independent living difficulties at this age between 2016 and 2020. Although this may seem like a small portion of the population, these individuals will increasingly require home aide assistance, accessibility modifcations, or an assisted living facility.
 
 ```{r}
-#| label: ind-living
-#| fig-cap:paste0(name, ": Net change in individuals with independent living difficulties by age")
+#| label: fig-ind-living
+#| fig-cap: !expr "paste0(name, ": Net change in individuals with independent living difficulties by age")"
+
 
 # Add disability stat (probably independent living difficulty)
 
@@ -252,7 +253,7 @@ From 2017 to June 2022, median home price in the county has been on a general in
 
 ```{r}
 #| label: fig-sales
-#| fig-cap: paste0(name, ": Median home sales price (adjusted for inflation")
+#| fig-cap: !expr "paste0(name, ": Median home sales price")"
 
 # Median sales price over time
 
@@ -381,7 +382,7 @@ For the few hundred renters in the county, reaching homeownership has becoming m
 
 ```{r}
 #| label: fig-income-own-gap
-#| fig-cap: paste0(name, ": Income needed to afford median home price\nversus median renter income")
+#| fig-cap: !expr "paste0(name, ": Income needed to afford median home price\nversus median renter income")"
 
 # Compare local renter income versus local home prices
 
@@ -443,7 +444,9 @@ ggplot(slgap,
 
 In spite of the low number of renters in the county, there is still a shortage of affordable rentals for households making less than 80 percent AMI. That shortage has shrunk since 2015, from 104 rental units to 83 in 2018. With the county's declining population, a likely explanation is the departure of lower income renter households to other parts of the region.
 
-```{r gap, fig.cap=paste0(name, ": Rental housing gap by AMI")}
+```{r}
+#| label: fig-gap
+#| fig-cap: !expr "paste0(name, ": Rental housing gap by AMI")"
 
 # Add choice of affordability stat (surplus/deficit, income vs prices, etc)
 
@@ -485,7 +488,9 @@ ggplot(gap,
 
 From 2015 to 2018, there has been little change in the percent of households experiencing cost burden. Although there has been a slight decline in the number of cost-burdened homeowners, the share of cost-burdened homeowners has remained largely unchanged (24 percent in 2018). For renters, the number of cost-burdened renters has remained unchanged (180).
 
-```{r cb, fig.cap=paste0(name, ": Cost-burdened households by tenure")}
+```{r}
+#| label: fig-cb
+#| fig-cap: !expr "paste0(name, ": Cost-burdened households by tenure")"
 
 cb <- read_rds("data/cb_7.rds") |> 
   filter(county == name) |> 
@@ -511,7 +516,9 @@ ggplot(cb,
 ```
 McKinney-Vento Act data provides an estimate of enrolled students who are experiencing homelessness. This data is contrast to HUD Point-in-Time (PIT) counts because it utilizes a [different definition of homelessness](https://nche.ed.gov/mckinney-vento-definition/). In Charles City County, the number of enrolled students has remained below 30 from the 2016-2017 to 2019-2020 school years. During the 2018-2019 school year, Charles City County had a lower count of 16, but experiences a slight increase to 22 in 2019-2020.
 
-```{r mkv, fig.cap="Enrolled students experiencing homelessness by school year"}
+```{r}
+#| label: fig-mkv
+#| fig-cap: !expr "paste0(name, "Enrolled students experiencing homelessness by school year")"
 
 div <- 19
 

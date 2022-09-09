@@ -39,7 +39,9 @@ Add short bullet points summarizing major changes
 
 Despite an initial decline in the early 2010s, Goochland County's population has been on a steady increase since 2012. From 2012 to 2020, the population has increased by 16 percent to reach 24,727 residents. Much of this growth can be tied to development in the eastern part of the county, where development activity Goochland-Henrico border has been increasing.
 
-```{r pop, fig.cap=paste0(name, ": Total Population")}
+```{r}
+#| label: fig-pop
+#| fig-cap: !expr "paste0(name, ": Total Population")"
 
 # Add choice of population stat (net change, components, etc)
 
@@ -76,7 +78,9 @@ pop_bar
 ```
 The growth in population is due in large part to domestic migration. Between 2020 and 2021, 738 new residents arrived in the county from somewhere else in the region, state, or nation. 
 
-```{r comp, fig.cap=paste0(name,": Components of population change"}
+```{r}
+#| label: fig-comp
+#| fig-cap: !expr "paste0(name,": Components of population change")"
 
 change <- read_rds("data/rr_comp_change.rds") |> 
   filter(year %in% as.character(years) | year == "2021") |> 
@@ -107,7 +111,9 @@ ggplot(change,
 All types of households are seeing an increase in the county --- especially homeowner households. Renter households have also seen a net increase in the county between 2016 and 2020, but that growth has mainly been among nonfamily renter households (+119), which typically refers to households that live alone or with a roommate.
 
 
-```{r children, fig.cap=paste0(name, ": Change in households with children by tenure"}
+```{r}
+#| label: fig-children
+#| fig-cap: !expr "paste0(name, ": Change in households with children by tenure")"
 
 # Add choice of household stat (HHs with children, HHs with seniors, subfamilies, etc)
 
@@ -135,7 +141,9 @@ ggplot(b25115,
 
 The senior population has been growing in the county (+996). Although much of that growth has occurred among seniors living with family, 27 percent of the increase was among seniors living alone.
 
-```{r seniors, fig.cap=paste0(name, ": Change in senior population by living arrangement"}
+```{r}
+#| label: fig-seniors
+#| fig-cap: !expr "paste0(name, ": Change in senior population by living arrangement")"
 
 b09020 <- read_rds("data/b09020_data.rds") |> 
   filter(NAME == name) |> 
@@ -172,7 +180,9 @@ ggplot(b09020,
 
 Median homeowner household income has been growing in Goochland County. From 2016 to 2020, the typical homeowner household income increased by 14 percent. Renter households saw some initial increases in median household income from 2016 to 2019, but between 2019 and 2020, median renter household income actually decreased by 18 percent (-\$10,291). 
 
-```{r income, fig.cap=paste0(name, ": Median houshold income by tenure")}
+```{r}
+#| label: fig-income
+#| fig-cap: !expr "paste0(name, ": Median houshold income by tenure")"
 
 # Add choice of income stat (probably median household income of some kind)
 
@@ -203,7 +213,9 @@ ggplot(b25119_cpi,
 
 Individuals with independent living difficulties have generally been decreasing in the county --- particularly among individuals under 75 years old. But there has been a slight increase in individuals 75 years old and older with independent living difficulties. The net decrease in individuals with independent living difficulties could be a signal of limited accommodations and resources for adults in the county and subsequent departure of those individuals from the county.
 
-```{r ind-living, paste0(name, ": Net change in individuals with independent living difficulties by age"}
+```{r}
+#| label: fig-ind-living
+#| fig-cap: !expr "paste0(name, ": Net change in individuals with independent living difficulties by age")"
 
 # Add disability stat (probably independent living difficulty)
 
@@ -237,7 +249,9 @@ ggplot(b18107,
 
 As with all other localities in the region, home prices in the county have followed seasonal trends. In January 2017, the median home price in the county was \$473,901 and by July 2022 reached \$534,441 --- a 13 percent increase. Goochland County saw some spikes in median home price during the pandemic, but clearly those spikes did not exceed previous trends in the county.
 
-```{r sales, fig.cap=paste0(name, ": Median home sales price")}
+```{r}
+#| label: fig-sales
+#| fig-cap: !expr "paste0(name, ": Median home sales price")"
 
 # Median sales price over time
 
@@ -297,7 +311,9 @@ The rental market in Goochland County has largely grown in the past five years. 
 
 The increasing rental demand has been apparent in high average asking rent in Goochland County. As of 2022 Q3, average asking rent in the county was \$2,208. Adjusting for inflation shows despite what appears to be a 24 percent increase in rent from 2016 Q1 to 2022 Q3, the value of the dollar has changed in such a way that rent then and now has changed very little. Nonetheless, an average asking rent of \$2,208 remains a steep price for low- and even moderate-income households.
 
-```{r rent, fig.cap=paste0(name, ": Average asking rent"}
+```{r}
+#| label: fig-rent
+#| fig-cap: !expr "paste0(name, ": Average asking rent")"
 
 # Pull in Goochland Rent manually
 
@@ -349,7 +365,7 @@ As of 2020, the majority of renters reside in single-family homes (71 percent). 
 
 ```{r}
 #| label: fig-ro-structure-percent
-#| fig.cap: "Change in share of renter-occupied housing units by structure type"
+#| fig.cap: !expr "paste0(name, ": Change in share of renter-occupied housing units by structure type")"
 
 
 b25127_data <- read_rds("data/b25127_data.rds") |> 
@@ -397,7 +413,9 @@ ggplot(ro_structure_percent,
 
 When comparing renter income to the average asking rent in a year, Goochland County has seen a persistent gap between what is on the market and what is affordable to the typical renter. The gap between median renter household income and average asking rent in 2016 was \$752. By 2020, that gap had increased by \$10 --- continuing to leave the typical renter hundreds of dollars short of affording the typical rent.
 
-```{r income-rent-gap, fig.cap=paste0(name, ": Average asking rent versus\nrent affordable to median renter income")}
+```{r}
+#| label: fig-income-rent-gap
+#| fig-cap: !expr "paste0(name, ": Average asking rent versus\nrent affordable to median renter income")"
 
 # Compare local median renter income to average asking rent
 
@@ -443,9 +461,12 @@ ggplot(rent_gap,
 
 
 ```
-...
+.
+For renters to afford homeownership, the income needed to afford the the median priced home is a steep economic climb. In 2016, a household needed to make roughly \$87,483 to afford the median sales price, but a renter's median household income was only \$40,915. By 2020, the gap had only narrowed slightly to \$39,448.
 
-```{r income-own-gap, fig.cap=title = paste0(name, ": Income needed to afford median home price\nversus median renter income")}
+```{r}
+#| label: fig-income-own-gap
+#| fig-cap: !expr "paste0(name, ": Income needed to afford median home price\nversus median renter income")"
 
 # Compare local renter income versus local home prices
 
@@ -500,9 +521,11 @@ ggplot(slgap,
 
 
 ```
-...
+The latest data from HUD shows that there was a shortage of 160 rental homes affordable to households making less than 80 percent AMI in 2018. This was a deficit decrease from 2015 when the shortage was 274. For Goochland County, the shortage among renters below 30 percent AMI has been declining slightly. But the major shortage exists among renters between 31 and 50 percent AMI.
 
-```{r gap, fig.cap=paste0(name, ": Rental housing gap by AMI")}
+```{r}
+#| label: fig-gap
+#| fig-cap: !expr "paste0(name, ": Rental housing gap by AMI")"
 
 # Add choice of affordability stat (surplus/deficit, income vs prices, etc)
 
@@ -542,27 +565,26 @@ ggplot(gap,
 
 ### Impact of housing costs
 
-...
+Cost burden in the county has declined in the county for both homeowners and renters. In 2015, 22 percent of homeowners were cost-burdened, but by 2018 that estimate had declined to 18 percent. Renters also saw declines --- from roughly 32 percent to 25 percent during this same time period. 
 
-```{r cb, fig.cap=paste0(name, ": Cumulative change in cost-burdened households by tenure")}
+```{r}
+#| label: fig-cb
+#| fig-cap: !expr "paste0(name, ": Cost-burdened households by tenure")"
 
 cb <- read_rds("data/cb_7.rds") |> 
-  filter(county == name,
-         cb_group == "Cost-burdened") |> 
-  group_by(year, county, tenure) |> 
+  filter(county == name) |> 
+  group_by(year, tenure, cb_group) |> 
   summarise(estimate = sum(estimate)) |> 
-  group_by(county, tenure) |> 
-  mutate(change = estimate - lag(estimate)) |> 
-  drop_na() |> 
-  mutate(run_diff = cumsum(change))
+  mutate(pct = estimate/sum(estimate))
 
 ggplot(cb,
-       aes(x = year, y = run_diff, fill = tenure)) +
-  geom_col(position = "dodge") +
-  scale_y_continuous(labels = label_comma()) +
+       aes(x = year, y = pct, fill = cb_group)) +
+  facet_wrap(~tenure) +
+  geom_col(position = position_fill(reverse = TRUE)) +
+  scale_y_continuous(labels = percent_format()) +
   labs(title = paste0(name, ": Cumulative change in cost-burdened households by tenure"),
        subtitle = "2015 to 2018",
-       fill = "Tenure",
+       fill = "Cost burden",
        caption = "Source: U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
   theme(axis.title = element_blank(),
         axis.ticks = element_blank(),
@@ -571,9 +593,11 @@ ggplot(cb,
                                           size = 0.05))
 
 ```
-...
+McKinney-Vento Act data shows small changes in the number of enrolled students experiencing homelessness. Although there was a decline from the 2016-2017 school year, the number of students experiencing homelessness increased in the most recent year of 2019-2020. In rural communities like Goochland County, homelessness can often be invisible and difficult to assess. In some cases, substandard housing is a just as critical issue for those extremely low-income individuals and households.
 
-```{r mkv, fig.cap="Enrolled students experiencing homelessness by school year"}
+```{r}
+#| label: fig-mkv
+#| fig-cap: !expr "paste0(name, "Enrolled students experiencing homelessness by school year")"
 
 div <- 37
 

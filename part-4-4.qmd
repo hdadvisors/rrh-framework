@@ -31,7 +31,10 @@ tenure_colors <-setNames(viridis(2), nm = tenure)
 
 - More and more people are moving into Hanover County from other parts of the region, state, or nation (+1,747), while deaths are outpacing births (-271) from 2020 to 2021.
 - Hanover County is losing households with children --- both homeowners and renters (-725 between 2016 and 2020).
-- There has been a net decrease in households making less than \$100,000 --- especially among renters (-950).
+- There has been a net decrease in households making less than \$100,000 --- especially among renters (-950) --- suggesting growing unaffordability in the county.
+- Median home price in the county has increased to well over \$400,000 --- becoming one of the most expensive localities in the region.
+- Rents in the county rose steeply amid the pandemic and record low vacancy rates.
+- A household needs to earn nearly \$70,000 to afford the median home price in the county in 2020 --- roughly \$17,000 more than what the typical renter earns.
 
 
 ## Demographic and socioeconomic changes
@@ -42,7 +45,7 @@ Between 2011 and 2012, Hanover County passed the 100,000 mark and has continued 
 
 ```{r}
 #| label: fig-pop
-#| fig-cap: paste0(name, ": Total Population")
+#| fig-cap: !expr "paste0(name, ": Total Population")"
 
 # Add choice of population stat (net change, components, etc)
 
@@ -82,7 +85,7 @@ The overwhelming reason for population increases in the last several years has b
 
 ```{r}
 #| label: fig-comp
-#| fig-cap: paste0(name,": Components of population change"
+#| fig-cap: !expr "paste0(name,": Components of population change")"
 
 change <- read_rds("data/rr_comp_change.rds") |> 
   filter(year %in% as.character(years) | year == "2021") |> 
@@ -143,7 +146,7 @@ As with most of the region, the senior population in Hanover County has seen maj
 
 ```{r}
 #| label: fig-seniors
-#| fig-cap: paste0(name, ": Change in senior population by living arrangement")
+#| fig-cap: !expr "paste0(name, ": Change in senior population by living arrangement")"
 
 b09020 <- read_rds("data/b09020_data.rds") |> 
   filter(NAME == name) |> 
@@ -184,7 +187,7 @@ In Hanover County, there was a \$45,460 difference between median homeowner hous
 
 ```{r}
 #| label: fig-income
-#| fig-cap: paste0(name, ": Median houshold income by tenure")
+#| fig-cap: !expr "paste0(name, ": Median houshold income by tenure")"
 
 # Add choice of income stat (probably median household income of some kind)
 
@@ -217,7 +220,7 @@ The growth in median renter household income in the county can be shown to be du
 
 ```{r}
 #| label: fig-income-change
-#| fig-cap: paste0(name, ": Change households by tenure and income level")
+#| fig-cap: !expr "paste0(name, ": Change households by tenure and income level")"
 
 b25118_data <-read_rds("data/b25118_data.rds") |> 
   filter(NAME %in% "Hanover County") |>
@@ -259,7 +262,7 @@ While other localities have seen significant increases in adults below 65 years 
 
 ```{r}
 #| label: fig-ind-living
-#| fig-cap: paste0(name, ": Net change in individuals with independent living difficulties by age")
+#| fig-cap: !expr "paste0(name, ": Net change in individuals with independent living difficulties by age")"
 
 # Add disability stat (probably independent living difficulty)
 
@@ -295,7 +298,7 @@ During the early part of 2022, median home price in Hanover County passed into t
 
 ```{r}
 #| label: fig-sales
-#| fig-cap: paste0(name, ": Median home sales price")
+#| fig-cap: !expr "paste0(name, ": Median home sales price")"
 
 # Median sales price over time
 
@@ -343,7 +346,7 @@ Rental properties across Hanover County are largely located in the Town of Ashla
 
 ```{r}
 #| label: fig-rent-submarket
-#| fig-cap: paste0(name, ": Average asking rent by submarket")
+#| fig-cap: !expr "paste0(name, ": Average asking rent by submarket")"
 
 # Average asking rent over time (by submarket if applicable, maybe by bedroom if no submarkets)
 
@@ -370,24 +373,25 @@ ggplot(sub_rent,
            y = rent, 
            color = submarket)) +
   geom_line(stat = "identity") + 
-  labs(title = paste0(name, ": Average asking rent by submarket"),
+  labs(title = paste0(name, ": Average asking rent"),
        subtitle = "2016 Q1 to 2022 Q3 | Not adjusted for inflation",
        color = "Submarket") +
-  scale_y_continuous(labels = label_dollar(), limits = c(0, NA), n.breaks = 7) +
+  scale_y_continuous(labels = label_dollar()) +
   scale_x_date(date_labels = "%Y", date_breaks = "2 years", limits = as.Date(c("2016-01-01", "2022-09-30"))) +
   theme(axis.title = element_blank(),
         panel.background = element_blank(),
         axis.ticks = element_blank(),
         panel.grid.major.x = element_blank(),
         panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+                                          size = 0.05),
+        legend.position = "none")
 
 ```
 
 
 ```{r}
 #| label: fig-vacancy
-#| fig-cap: paste0(name, ": Rental vacancy rate")
+#| fig-cap: !expr "paste0(name, ": Rental vacancy rate")"
 
 
 vacancy <- sub_rent  |> 
@@ -428,7 +432,7 @@ As defined by this report, there are only five NOAH multifamily properties locat
 
 ```{r}
 #| label: fig-noah
-#| fig-cap: paste0(name, ": Distribution of average asking rents in NOAH properties by year built")
+#| fig-cap: !expr "paste0(name, ": Distribution of average asking rents in NOAH properties by year built")"
 
 # Add choice of NOAH stat (total number, change in rent, etc) 
 
@@ -492,7 +496,7 @@ In 2020, median renter household income was \$53,832. A household at this income
 
 ```{r}
 #| label: fig-income-rent-gap
-#| fig-cap: paste0(name, ": Average asking rent versus rent affordable to median renter income")
+#| fig-cap: !expr "paste0(name, ": Average asking rent versus rent affordable to median renter income")"
 
 # Compare local median renter income to average asking rent
 
@@ -542,7 +546,7 @@ Although median renter income has increased, the gap between income needed to af
 
 ```{r}
 #| label: fig-income-own-gap
-#| fig-cap: paste0(name, ": Income needed to afford median home price versus median renter income")
+#| fig-cap: !expr "paste0(name, ": Income needed to afford median home price versus median renter income")"
 
 # Compare local renter income versus local home prices
 
@@ -603,7 +607,8 @@ The deficit has decreased across all income levels below 80 percent AMI, but the
 
 ```{r}
 #| label: fig-gap
-#| fig-cap: paste0(name, ": Rental housing gap by AMI")
+#| fig-cap: !expr "paste0(name, ": Rental housing gap by AMI")"
+
 # Add choice of affordability stat (surplus/deficit, income vs prices, etc)
 
 gap <- read_rds("data/tb_18_match.rds") |> 
@@ -680,7 +685,7 @@ During eviction protections of the pandemic, filings dropped below 20 a month, w
 
 ```{r}
 #| label: fig-evictions
-#| fig-cap: paste0(name, ": Evictions filings and judgements")
+#| fig-cap: !expr "paste0(name, ": Evictions filings and judgements")"
 
 evictions <- read_csv("data/evictions_17_22.csv") |> 
   pivot_longer(3:128,

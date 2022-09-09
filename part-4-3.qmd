@@ -31,6 +31,8 @@ tenure_colors <-setNames(viridis(2), nm = tenure)
 - In recent years, renter households with children have been in decline in the county (-1,010). 
 - Median home prices in the county have surpassed the \$300,000 mark as of June 2022 --- continuing to leave median renter households further unable to reach homeownership.
 - In 2020, there was an over \$12,000 difference in the income needed to afford the median home price and the typical renter income. 
+- There continue to be stark differences between rental markets in Eastern and Western Henrico --- with Western Henrico commanding rents several hundred dollars higher.
+- In 2018, there still remained a rental shortage of over 12,000 for households making less than 80 percent AMI.
 
 
 ## Demographic and socioeconomic changes
@@ -41,7 +43,7 @@ From 2010 to 2020, Henrico County has grown by 9 percent --- an increase of 27,4
 
 ```{r}
 #| label: fig-pop
-#| fig-cap: paste0(name, ": Total Population")
+#| fig-cap: !expr "paste0(name, ": Total Population")"
 
 # Add choice of population stat (net change, components, etc)
 
@@ -80,7 +82,7 @@ Population increases in recent years have largely been the result of internation
 
 ```{r}
 #| label: fig-comp
-#| fig-cap: paste0(name,": Components of population change"
+#| fig-cap: !expr "paste0(name,": Components of population change")"
 
 
 change <- read_rds("data/rr_comp_change.rds") |> 
@@ -113,7 +115,7 @@ Homeowner households of all types are increasing in the county --- especially ho
 
 ```{r}
 #| label: fig-children
-#| fig-cap: paste0(name, ": Change in households with children by tenure")
+#| fig-cap: !expr "paste0(name, ": Change in households with children by tenure")"
 
 
 # Add choice of household stat (HHs with children, HHs with seniors, subfamilies, etc)
@@ -145,7 +147,7 @@ The Grey Wave continues in Henrico County, where there was a 6,603 increase in t
 
 ```{r}
 #| label: fig-seniors
-#| fig-cap: paste0(name, ": Change in senior population by living arrangement")
+#| fig-cap: !expr "paste0(name, ": Change in senior population by living arrangement")"
 
 b09020 <- read_rds("data/b09020_data.rds") |> 
   filter(NAME == name) |> 
@@ -188,7 +190,7 @@ During this timeframe, the median homeowner household income increased by 7 perc
 
 ```{r}
 #| label: fig-income
-#| fig-cap: paste0(name, ": Median houshold income by tenure")
+#| fig-cap: !expr "paste0(name, ": Median houshold income by tenure")"
 
 # Add choice of income stat (probably median household income of some kind)
 
@@ -223,7 +225,7 @@ Henrico County has seen a net increase of 665 individuals with independent livin
 
 ```{r}
 #| label: fig-ind-living
-#| fig-cap: paste0(name, ": Net change in individuals with independent living difficulties by age")
+#| fig-cap: !expr "paste0(name, ": Net change in individuals with independent living difficulties by age")"
 
 # Add disability stat (probably independent living difficulty)
 
@@ -261,7 +263,7 @@ The median home sales price has steadily been trending upward in Henrico County,
 
 ```{r}
 #| label: fig-sales
-#| fig-cap: paste0(name, ": Median home sales price")
+#| fig-cap: !expr "paste0(name, ": Median home sales price")"
 
 # Median sales price over time
 
@@ -313,7 +315,7 @@ This major rental increase was no doubt a result of tightening rental market ami
 
 ```{r}
 #| label: fig-rent-submarket
-#| fig-cap: paste0(name, ": Average asking rent by submarket")
+#| fig-cap: !expr "paste0(name, ": Average asking rent by submarket")"
 
 # Average asking rent over time (by submarket if applicable, maybe by bedroom if no submarkets)
 
@@ -378,7 +380,7 @@ NOAH properties built in the 1960s command slightly higher rents than those buil
 
 ```{r}
 #| label: fig-noah
-#| fig-cap: paste0(name, ": Distribution of average asking rents in NOAH properties by year built")
+#| fig-cap: !expr "paste0(name, ": Distribution of average asking rents in NOAH properties by year built")"
 
 # Add choice of NOAH stat (total number, change in rent, etc) 
 
@@ -427,7 +429,7 @@ Although it may seem as Henrico County is becoming more and more affordable to r
 
 ```{r}
 #| label: fig-income-rent-gap
-#| fig-cap: paste0(name, ": Average asking rent versus rent affordable to median renter income")
+#| fig-cap: !expr "paste0(name, ": Average asking rent versus rent affordable to median renter income")"
 
 # Compare local median renter income to average asking rent
 
@@ -480,7 +482,7 @@ This difference has fluctuated between 2016 and 2020, but the largest difference
 
 ```{r}
 #| label: fig-income-own-gap
-#| fig-cap: paste0(name, ": Income needed to afford median home price versus median renter income")
+#| fig-cap: !expr "paste0(name, ": Income needed to afford median home price versus median renter income")"
 
 # Compare local renter income versus local home prices
 
@@ -535,11 +537,11 @@ ggplot(slgap,
 
 
 ```
-The shortage of rental housing for households making 80 percent AMI and below has grown between 2015 and 2018 --- from 12,030 in 2016 to 12,184 in 2020. This deficit increase by 154 rental homes was largely among rental housing between 31 to 80 percent AMI. However, below 30 percent AMI rental housing remains the largest need in the county.
+The shortage of rental housing for households making 80 percent AMI and below has grown between 2015 and 2018 --- from 12,030 in 2015 to 12,184 in 2018. This deficit increase by 154 rental homes was largely among rental housing between 31 to 80 percent AMI. However, below 30 percent AMI rental housing remains the largest need in the county.
 
 ```{r}
 #| label: fig-gap
-#| fig-cap: paste0(name, ": Rental housing gap by AMI")
+#| fig-cap: !expr "paste0(name, ": Rental housing gap by AMI")"
 
 # Add choice of affordability stat (surplus/deficit, income vs prices, etc)
 
@@ -585,7 +587,7 @@ From 2015 to 2018, the number of cost burdened homeowners has been on a steady d
 
 ```{r}
 #| label: fig-cb
-#| fig-cap: paste0(name, ": Cumulative change in cost-burdened households by tenure")
+#| fig-cap: !expr "paste0(name, ": Cumulative change in cost-burdened households by tenure")"
 
 cb <- read_rds("data/cb_7.rds") |> 
   filter(county == name,
@@ -619,7 +621,7 @@ Compared to other localities in recent months, Henrico County eviction filings a
 
 ```{r}
 #| label: fig-evictions
-#| fig-cap: paste0(name, ": Evictions filings and judgements")
+#| fig-cap: !expr "paste0(name, ": Evictions filings and judgements")"
 
 evictions <- read_csv("data/evictions_17_22.csv") |> 
   pivot_longer(3:128,

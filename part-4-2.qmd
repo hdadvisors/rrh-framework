@@ -44,7 +44,7 @@ Chesterfield County's population has been on a continual rise since 2010. Betwee
 
 ```{r}
 #| label: fig-pop
-#| fig-cap: paste0(name, ": Total Population")
+#| fig-cap: !expr "paste0(name, ": Total Population")"
 
 # Add choice of population stat (net change, components, etc)
 
@@ -86,7 +86,7 @@ The county's substantial growth in recent years has been directly tied to domest
 
 ```{r}
 #| label: fig-comp
-#| fig-cap: paste0(name,": Components of population change"
+#| fig-cap: !expr "paste0(name,": Components of population change")"
 
 change <- read_rds("data/rr_comp_change.rds") |> 
   filter(year %in% as.character(years) | year == "2021") |> 
@@ -118,7 +118,7 @@ The increasing number of homeowners in the county has been outpacing renters sin
 
 ```{r}
 #| label: fig-children
-#| fig-cap: paste0(name, ": Change in households with children by tenure")
+#| fig-cap: !expr "paste0(name, ": Change in households with children by tenure")"
 
 # Add choice of household stat (HHs with children, HHs with seniors, subfamilies, etc)
 
@@ -149,7 +149,7 @@ As with much of the region, the senior population in the county has continued to
 
 ```{r}
 #| label: fig-seniors
-#| fig-cap: paste0(name, ": Change in senior population by living arrangement")
+#| fig-cap: !expr "paste0(name, ": Change in senior population by living arrangement")"
 
 b09020 <- read_rds("data/b09020_data.rds") |> 
   filter(NAME == name) |> 
@@ -188,7 +188,7 @@ Between 2016 and 2020, the median renter household income increased by 7 percent
 
 ```{r}
 #| label: fig-income
-#| fig-cap: paste0(name, ": Median houshold income by tenure")
+#| fig-cap: !expr "paste0(name, ": Median houshold income by tenure")"
 
 # Add choice of income stat (probably median household income of some kind)
 
@@ -225,7 +225,7 @@ In Chesterfield County, the number of individuals with independent living diffic
 
 ```{r}
 #| label: fig-ind-living
-#| fig-cap: paste0(name, ": Net change in individuals with independent living difficulties by age")
+#| fig-cap: !expr "paste0(name, ": Net change in individuals with independent living difficulties by age")"
 
 # Add disability stat (probably independent living difficulty)
 
@@ -261,7 +261,7 @@ Chesterfield County home prices continue to rise. In 2020, median home price for
 
 ```{r}
 #| label: fig-sales
-#| fig-cap: paste0(name, ": Median home sales price")
+#| fig-cap: !expr "paste0(name, ": Median home sales price")"
 
 # Median sales price over time
 
@@ -309,7 +309,7 @@ Rental demand has continued to grow over the past five years. As of Q3 2022, the
 
 ```{r}
 #| label: fig-rent
-#| fig-cap: paste0(name, ": Average asking rent")
+#| fig-cap: !expr "paste0(name, ": Average asking rent")"
 
 # Average asking rent over time
 
@@ -350,7 +350,7 @@ Based on CoStar geographic markets, the Midlothian area represents a distinct re
 
 ```{r}
 #| label: fig-rent-submarket
-#| fig-cap: paste0(name, ": Average asking rent by submarket")
+#| fig-cap: !expr "paste0(name, ": Average asking rent by submarket")"
 
 # Average asking rent over time (by submarket if applicable, maybe by bedroom if no submarkets)
 
@@ -410,7 +410,7 @@ The majority of these properties were constructed in the 1970s and 1980s. These 
 
 ```{r}
 #| label: fig-noah
-#| fig-cap: paste0(name, ": Distribution of average asking rents in NOAH properties by year built")
+#| fig-cap: !expr "paste0(name, ": Distribution of average asking rents in NOAH properties by year built")"
 
 # Add choice of NOAH stat (total number, change in rent, etc) 
 
@@ -486,7 +486,7 @@ This difference between affordable rent and asking rent has been shrinking in re
 
 ```{r}
 #| label: fig-income-rent-gap
-#| fig-cap: paste0(name, ": Average asking rent versus rent affordable to median renter income")
+#| fig-cap: !expr "paste0(name, ": Average asking rent versus rent affordable to median renter income")"
 
 # Compare local median renter income to average asking rent
 
@@ -540,7 +540,7 @@ In Chesterfield County, median renter household incomes have not been enough to 
 
 ```{r}
 #| label: fig-income-own-gap
-#| fig-cap: paste0(name, ": Income needed to afford median home price versus median renter income")
+#| fig-cap: !expr "paste0(name, ": Income needed to afford median home price versus median renter income")"
 
 
 # Compare local renter income versus local home prices
@@ -601,7 +601,7 @@ Across renter households with incomes below 80 percent AMI, the gap in affordabl
 
 ```{r}
 #| label: fig-gap
-#| fig-cap: paste0(name, ": Rental housing gap by AMI")
+#| fig-cap: !expr "paste0(name, ": Rental housing gap by AMI")"
 
 # Add choice of affordability stat (surplus/deficit, income vs prices, etc)
 
@@ -645,7 +645,7 @@ From 2015 to 2018, the number of cost burden homeowners has been in decline. By 
 
 ```{r}
 #| label: fig-cb
-#| fig-cap: paste0(name, ": Cumulative change in cost-burdened households by tenure")
+#| fig-cap: !expr "paste0(name, ": Cumulative change in cost-burdened households by tenure")"
 
 cb <- read_rds("data/cb_7.rds") |> 
   filter(county == name,
@@ -677,7 +677,7 @@ Pre-pandemic eviction filings were typically above 500 each month, while evictio
 
 ```{r}
 #| label: fig-evictions
-#| fig-cap: paste0(name, ": Evictions filings and judgements")
+#| fig-cap: !expr "paste0(name, ": Evictions filings and judgements")"
 
 evictions <- read_csv("data/evictions_17_22.csv") |> 
   pivot_longer(3:128,
