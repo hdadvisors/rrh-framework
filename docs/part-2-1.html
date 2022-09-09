@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.0.36">
+<meta name="generator" content="quarto-1.1.168">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -11,10 +11,15 @@
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-span.underline{text-decoration: underline;}
-div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
 </style>
 
 
@@ -144,6 +149,11 @@ ul.task-list{list-style: none;}
   <a href="./part-2-2.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Rental homes</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./part-2-3.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Housing assistance</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -156,22 +166,7 @@ ul.task-list{list-style: none;}
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./part-3-2.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Impact of housing costs on household budgets</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">PART 4: Local summaries</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./part-4-1.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Richmond City</span></a>
+  <a href="./part-3-2.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Impact of housing costs on household budgets</span></a>
   </div>
 </li>
       </ul>
@@ -181,35 +176,35 @@ ul.task-list{list-style: none;}
 </nav>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc">
+        <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#supply" id="toc-supply" class="nav-link active" data-scroll-target="#supply"> <span class="header-section-number">5.1</span> Supply</a>
+  <li><a href="#supply" id="toc-supply" class="nav-link active" data-scroll-target="#supply"><span class="toc-section-number">5.1</span>  Supply</a>
   <ul class="collapse">
-  <li><a href="#change-in-stock" id="toc-change-in-stock" class="nav-link" data-scroll-target="#change-in-stock"> <span class="header-section-number">5.1.1</span> Change in stock</a></li>
-  <li><a href="#age-of-stock" id="toc-age-of-stock" class="nav-link" data-scroll-target="#age-of-stock"> <span class="header-section-number">5.1.2</span> Age of stock</a></li>
-  <li><a href="#bedrooms" id="toc-bedrooms" class="nav-link" data-scroll-target="#bedrooms"> <span class="header-section-number">5.1.3</span> Bedrooms</a></li>
-  <li><a href="#production" id="toc-production" class="nav-link" data-scroll-target="#production"> <span class="header-section-number">5.1.4</span> Production</a></li>
+  <li><a href="#change-in-stock" id="toc-change-in-stock" class="nav-link" data-scroll-target="#change-in-stock"><span class="toc-section-number">5.1.1</span>  Change in stock</a></li>
+  <li><a href="#age-of-stock" id="toc-age-of-stock" class="nav-link" data-scroll-target="#age-of-stock"><span class="toc-section-number">5.1.2</span>  Age of stock</a></li>
+  <li><a href="#bedrooms" id="toc-bedrooms" class="nav-link" data-scroll-target="#bedrooms"><span class="toc-section-number">5.1.3</span>  Bedrooms</a></li>
+  <li><a href="#production" id="toc-production" class="nav-link" data-scroll-target="#production"><span class="toc-section-number">5.1.4</span>  Production</a></li>
   </ul></li>
-  <li><a href="#homeownership-rate" id="toc-homeownership-rate" class="nav-link" data-scroll-target="#homeownership-rate"> <span class="header-section-number">5.2</span> Homeownership rate</a>
+  <li><a href="#homeownership-rate" id="toc-homeownership-rate" class="nav-link" data-scroll-target="#homeownership-rate"><span class="toc-section-number">5.2</span>  Homeownership rate</a>
   <ul class="collapse">
-  <li><a href="#by-locality" id="toc-by-locality" class="nav-link" data-scroll-target="#by-locality"> <span class="header-section-number">5.2.1</span> By locality</a></li>
-  <li><a href="#by-age" id="toc-by-age" class="nav-link" data-scroll-target="#by-age"> <span class="header-section-number">5.2.2</span> By age</a></li>
-  <li><a href="#by-race-and-ethnicity" id="toc-by-race-and-ethnicity" class="nav-link" data-scroll-target="#by-race-and-ethnicity"> <span class="header-section-number">5.2.3</span> By race and ethnicity</a></li>
+  <li><a href="#by-locality" id="toc-by-locality" class="nav-link" data-scroll-target="#by-locality"><span class="toc-section-number">5.2.1</span>  By locality</a></li>
+  <li><a href="#by-age" id="toc-by-age" class="nav-link" data-scroll-target="#by-age"><span class="toc-section-number">5.2.2</span>  By age</a></li>
+  <li><a href="#by-race-and-ethnicity" id="toc-by-race-and-ethnicity" class="nav-link" data-scroll-target="#by-race-and-ethnicity"><span class="toc-section-number">5.2.3</span>  By race and ethnicity</a></li>
   </ul></li>
-  <li><a href="#for-sale-market" id="toc-for-sale-market" class="nav-link" data-scroll-target="#for-sale-market"> <span class="header-section-number">5.3</span> For-sale market</a>
+  <li><a href="#for-sale-market" id="toc-for-sale-market" class="nav-link" data-scroll-target="#for-sale-market"><span class="toc-section-number">5.3</span>  For-sale market</a>
   <ul class="collapse">
-  <li><a href="#closed-sales" id="toc-closed-sales" class="nav-link" data-scroll-target="#closed-sales"> <span class="header-section-number">5.3.1</span> Closed sales</a></li>
-  <li><a href="#sales-price" id="toc-sales-price" class="nav-link" data-scroll-target="#sales-price"> <span class="header-section-number">5.3.2</span> Sales price</a></li>
-  <li><a href="#supply-1" id="toc-supply-1" class="nav-link" data-scroll-target="#supply-1"> <span class="header-section-number">5.3.3</span> Supply</a></li>
-  <li><a href="#starter-homes" id="toc-starter-homes" class="nav-link" data-scroll-target="#starter-homes"> <span class="header-section-number">5.3.4</span> Starter homes</a></li>
+  <li><a href="#closed-sales" id="toc-closed-sales" class="nav-link" data-scroll-target="#closed-sales"><span class="toc-section-number">5.3.1</span>  Closed sales</a></li>
+  <li><a href="#sales-price" id="toc-sales-price" class="nav-link" data-scroll-target="#sales-price"><span class="toc-section-number">5.3.2</span>  Sales price</a></li>
+  <li><a href="#supply-1" id="toc-supply-1" class="nav-link" data-scroll-target="#supply-1"><span class="toc-section-number">5.3.3</span>  Supply</a></li>
+  <li><a href="#starter-homes" id="toc-starter-homes" class="nav-link" data-scroll-target="#starter-homes"><span class="toc-section-number">5.3.4</span>  Starter homes</a></li>
   </ul></li>
-  <li><a href="#new-construction-versus-resale" id="toc-new-construction-versus-resale" class="nav-link" data-scroll-target="#new-construction-versus-resale"> <span class="header-section-number">5.4</span> New construction versus resale</a>
+  <li><a href="#new-construction-versus-resale" id="toc-new-construction-versus-resale" class="nav-link" data-scroll-target="#new-construction-versus-resale"><span class="toc-section-number">5.4</span>  New construction versus resale</a>
   <ul class="collapse">
-  <li><a href="#sales-price-1" id="toc-sales-price-1" class="nav-link" data-scroll-target="#sales-price-1"> <span class="header-section-number">5.4.1</span> Sales price</a></li>
-  <li><a href="#bedrooms-1" id="toc-bedrooms-1" class="nav-link" data-scroll-target="#bedrooms-1"> <span class="header-section-number">5.4.2</span> Bedrooms</a></li>
-  <li><a href="#size" id="toc-size" class="nav-link" data-scroll-target="#size"> <span class="header-section-number">5.4.3</span> Size</a></li>
+  <li><a href="#sales-price-1" id="toc-sales-price-1" class="nav-link" data-scroll-target="#sales-price-1"><span class="toc-section-number">5.4.1</span>  Sales price</a></li>
+  <li><a href="#bedrooms-1" id="toc-bedrooms-1" class="nav-link" data-scroll-target="#bedrooms-1"><span class="toc-section-number">5.4.2</span>  Bedrooms</a></li>
+  <li><a href="#size" id="toc-size" class="nav-link" data-scroll-target="#size"><span class="toc-section-number">5.4.3</span>  Size</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -392,8 +387,8 @@ ul.task-list{list-style: none;}
 </section>
 <section id="sales-price" class="level3" data-number="5.3.2">
 <h3 data-number="5.3.2" class="anchored" data-anchor-id="sales-price"><span class="header-section-number">5.3.2</span> Sales price</h3>
-<p>Median home prices have continued to climb in the Richmond Region—reaching over $300,000 in all four major localities. The greatest price increases have occurred in the City of Richmond during 2022, where the median home price went from $292,000 in February to $389,950 in June, a 33 percent increase. Home prices are continuing to trend upward in spite of rising mortgage interest rates.</p>
-<p>Hanover County remains the most expensive locality in the region with a median home price of $431,020 in June 2020, followed by the City of Richmond ($389,950), Chesterfield County ($380,000), and Henrico County ($350,000).</p>
+<p>Median home prices have continued to climb in the Richmond Region—reaching over $300,000 in all four major localities. The greatest price increases have occurred in the City of Richmond during 2022, where the median home price went from $303,941 in February to $389,950 in June, a 28 percent increase. Home prices are continuing to trend upward in spite of rising mortgage interest rates.</p>
+<p>Hanover County remains the most expensive locality in the region with a median home price of $464,000 in July 2022, followed by the Chesterfield County ($378,671), Henrico County ($370,000), and the City of Richmond ($352,500).</p>
 <div class="cell">
 
 </div>
@@ -411,7 +406,7 @@ ul.task-list{list-style: none;}
 <section id="supply-1" class="level3" data-number="5.3.3">
 <h3 data-number="5.3.3" class="anchored" data-anchor-id="supply-1"><span class="header-section-number">5.3.3</span> Supply</h3>
 <p>The inventory of for-sale housing before the pandemic typically sat at two months or more—meaning that it would take two or more months to sell at current prices. A healthy level of supply has said to be five or six months worth, but in recent years the region has been below that, which indicates a strong seller’s market.</p>
-<p>When pandemic began in March 2020, months supply dropped to two months and then by June 2020 hit a low of one month and has sat squarely there ever since. Even amid rising interest rates in 2022 and talks of a housing recession, months supply continues to remain low.</p>
+<p>When pandemic began in March 2020, months supply dropped to two months and then by June 2020 hit a low of one month and has sat squarely there ever since. Even amid rising interest rates in 2022 and talks of a housing slump, months supply continues to remain low.</p>
 <div class="cell">
 
 </div>
@@ -451,7 +446,7 @@ ul.task-list{list-style: none;}
 <h2 data-number="5.4" class="anchored" data-anchor-id="new-construction-versus-resale"><span class="header-section-number">5.4</span> New construction versus resale</h2>
 <section id="sales-price-1" class="level3" data-number="5.4.1">
 <h3 data-number="5.4.1" class="anchored" data-anchor-id="sales-price-1"><span class="header-section-number">5.4.1</span> Sales price</h3>
-<p>The affordability of resale homes compared to new construction has often made them the first rung on the homeownership ladder. But since the start of the pandemic, the median resale home price has risen above the $300,000 mark and in June 2022 reached a high of $371,000.</p>
+<p>The affordability of resale homes compared to new construction has often made them the first rung on the homeownership ladder. But since the start of the pandemic, the median resale home price has risen above the $300,000 mark and in June 2022 reached a high of $371,250.</p>
 <p>During this timeframe, new construction median home prices have remained above $350,000 and throughout 2022 so far have stayed above $400,000. On average, there is a $89,127 difference between new construction and resale sales price—leaving new construction significantly out of reach for lower income households.</p>
 <div class="cell">
 
@@ -577,7 +572,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   for (var i=0; i<noterefs.length; i++) {
     const ref = noterefs[i];
     tippyHover(ref, function() {
-      let href = ref.getAttribute('href');
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.0.36">
+<meta name="generator" content="quarto-1.1.168">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -11,10 +11,15 @@
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-span.underline{text-decoration: underline;}
-div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
 </style>
 
 
@@ -144,6 +149,11 @@ ul.task-list{list-style: none;}
   <a href="./part-2-2.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Rental homes</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./part-2-3.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Housing assistance</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -156,22 +166,7 @@ ul.task-list{list-style: none;}
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./part-3-2.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Impact of housing costs on household budgets</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">PART 4: Local summaries</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./part-4-1.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Richmond City</span></a>
+  <a href="./part-3-2.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Impact of housing costs on household budgets</span></a>
   </div>
 </li>
       </ul>
@@ -181,20 +176,20 @@ ul.task-list{list-style: none;}
 </nav>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc">
+        <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#household-incomes" id="toc-household-incomes" class="nav-link active" data-scroll-target="#household-incomes"> <span class="header-section-number">3.1</span> Household incomes</a>
+  <li><a href="#household-incomes" id="toc-household-incomes" class="nav-link active" data-scroll-target="#household-incomes"><span class="toc-section-number">3.1</span>  Household incomes</a>
   <ul class="collapse">
-  <li><a href="#incomes-by-tenure" id="toc-incomes-by-tenure" class="nav-link" data-scroll-target="#incomes-by-tenure"> <span class="header-section-number">3.1.1</span> Incomes by tenure</a></li>
-  <li><a href="#incomes-by-race-and-ethnicity" id="toc-incomes-by-race-and-ethnicity" class="nav-link" data-scroll-target="#incomes-by-race-and-ethnicity"> <span class="header-section-number">3.1.2</span> Incomes by race and ethnicity</a></li>
-  <li><a href="#incomes-by-family-type" id="toc-incomes-by-family-type" class="nav-link" data-scroll-target="#incomes-by-family-type"> <span class="header-section-number">3.1.3</span> Incomes by family type</a></li>
+  <li><a href="#incomes-by-tenure" id="toc-incomes-by-tenure" class="nav-link" data-scroll-target="#incomes-by-tenure"><span class="toc-section-number">3.1.1</span>  Incomes by tenure</a></li>
+  <li><a href="#incomes-by-race-and-ethnicity" id="toc-incomes-by-race-and-ethnicity" class="nav-link" data-scroll-target="#incomes-by-race-and-ethnicity"><span class="toc-section-number">3.1.2</span>  Incomes by race and ethnicity</a></li>
+  <li><a href="#incomes-by-family-type" id="toc-incomes-by-family-type" class="nav-link" data-scroll-target="#incomes-by-family-type"><span class="toc-section-number">3.1.3</span>  Incomes by family type</a></li>
   </ul></li>
-  <li><a href="#wages" id="toc-wages" class="nav-link" data-scroll-target="#wages"> <span class="header-section-number">3.2</span> Wages</a>
+  <li><a href="#wages" id="toc-wages" class="nav-link" data-scroll-target="#wages"><span class="toc-section-number">3.2</span>  Wages</a>
   <ul class="collapse">
-  <li><a href="#wage-change-by-percentile" id="toc-wage-change-by-percentile" class="nav-link" data-scroll-target="#wage-change-by-percentile"> <span class="header-section-number">3.2.1</span> Wage change by percentile</a></li>
-  <li><a href="#wage-change-by-occupation" id="toc-wage-change-by-occupation" class="nav-link" data-scroll-target="#wage-change-by-occupation"> <span class="header-section-number">3.2.2</span> Wage change by occupation</a></li>
+  <li><a href="#wage-change-by-percentile" id="toc-wage-change-by-percentile" class="nav-link" data-scroll-target="#wage-change-by-percentile"><span class="toc-section-number">3.2.1</span>  Wage change by percentile</a></li>
+  <li><a href="#wage-change-by-occupation" id="toc-wage-change-by-occupation" class="nav-link" data-scroll-target="#wage-change-by-occupation"><span class="toc-section-number">3.2.2</span>  Wage change by occupation</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -235,7 +230,7 @@ ul.task-list{list-style: none;}
 <div id="fig-hh-inc-plot" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="part-1-3_files/figure-html/fig-hh-inc-plot-1.png" class="img-fluid figure-img" width="672"></p>
-<p></p><figcaption class="figure-caption">Figure 3.1: Change households by tenure and income level</figcaption><p></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;3.1: Change households by tenure and income level</figcaption><p></p>
 </figure>
 </div>
 </div>
@@ -249,7 +244,7 @@ ul.task-list{list-style: none;}
 <div id="fig-med-income-plot" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="part-1-3_files/figure-html/fig-med-income-plot-1.png" class="img-fluid figure-img" width="672"></p>
-<p></p><figcaption class="figure-caption">Figure 3.2: Median houshold income by tenure and locality</figcaption><p></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;3.2: Median houshold income by tenure and locality</figcaption><p></p>
 </figure>
 </div>
 </div>
@@ -266,7 +261,7 @@ ul.task-list{list-style: none;}
 <div id="fig-inc-race-plot" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="part-1-3_files/figure-html/fig-inc-race-plot-1.png" class="img-fluid figure-img" width="672"></p>
-<p></p><figcaption class="figure-caption">Figure 3.3: Median household income by race and ethnicity</figcaption><p></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;3.3: Median household income by race and ethnicity</figcaption><p></p>
 </figure>
 </div>
 </div>
@@ -283,7 +278,7 @@ ul.task-list{list-style: none;}
 <div id="fig-inc-child-plot" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="part-1-3_files/figure-html/fig-inc-child-plot-1.png" class="img-fluid figure-img" width="672"></p>
-<p></p><figcaption class="figure-caption">Figure 3.4: Median household income by family type</figcaption><p></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;3.4: Median household income by family type</figcaption><p></p>
 </figure>
 </div>
 </div>
@@ -331,7 +326,7 @@ Note
 <div id="fig-wage-pct-plot" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="part-1-3_files/figure-html/fig-wage-pct-plot-1.png" class="img-fluid figure-img" width="672"></p>
-<p></p><figcaption class="figure-caption">Figure 3.5: Percent change in annual wage in Richmond, VA MSA</figcaption><p></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;3.5: Percent change in annual wage in Richmond, VA MSA</figcaption><p></p>
 </figure>
 </div>
 </div>
@@ -349,7 +344,7 @@ Note
 <div id="fig-wage-occ-plot" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="part-1-3_files/figure-html/fig-wage-occ-plot-1.png" class="img-fluid figure-img" width="672"></p>
-<p></p><figcaption class="figure-caption">Figure 3.6: Percent change in annual wage for top 5 most common occupation categories</figcaption><p></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;3.6: Percent change in annual wage for top 5 most common occupation categories</figcaption><p></p>
 </figure>
 </div>
 </div>
@@ -429,7 +424,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   for (var i=0; i<noterefs.length; i++) {
     const ref = noterefs[i];
     tippyHover(ref, function() {
-      let href = ref.getAttribute('href');
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);

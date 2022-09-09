@@ -46,7 +46,7 @@ Between 2010 and 2020, the U.S. Census Bureau has estimated that the City of Ric
 
 ```{r}
 #| label: fig-pop
-#| fig-cap: paste0(name, ": Total Population")
+#| fig-cap: !expr "paste0(name, \": Total Population\")"
 
 pop <- read_rds("data/rr_pop_data.rds") |> 
   mutate(GEOID = parse_number(GEOID)) |> 
@@ -84,7 +84,7 @@ Census estimates from 2016 show Richmond gaining more than 2,000 net persons tha
 
 ```{r}
 #| label: fig-comp
-#| fig-cap: paste0(name,": Components of population change"
+#| fig-cap: !expr "paste0(name, \": Components of population change\")
 
 change <- read_rds("data/rr_comp_change.rds") |> 
   filter(year %in% as.character(years) | year == "2021") |> 

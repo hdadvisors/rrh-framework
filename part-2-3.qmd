@@ -21,6 +21,10 @@ library(readxl)
 
 ```
 
+This chapter covers the range of housing assistance in the region supported by federal, state, and local programs.
+
+## Affordable rental housing
+
 ```{r}
 #| label: nhpd-data
 #| eval: false
@@ -159,8 +163,6 @@ write_rds(nhpd_coded_rr, "data/nhpd_coded_rr.rds")
 
 ```
 
-## Affordable rental housing
-
 An array of federal housing assistance programs help low-income residents across the region with rental housing opportunities. Today, there are approximately 25,969 dedicated affordable rental homes found across 240 properties in the Richmond area. These include units both currently occupied and in development.
 
 ::: callout-tip
@@ -182,6 +184,8 @@ Descriptions of each rental assistance program are available on the [NHPD websit
 #| fig-cap: "Share of federally assisted units by subsidy"
 
 nhpd_clean_rr <- read_rds("data/nhpd_clean_rr.rds")
+
+nhpd_coded_rr <- read_rds("data/nhpd_coded_rr.rds")
 
 subsidy <- nhpd_clean_rr |> 
   filter(subsidy_status != "Inactive") |> 
@@ -469,7 +473,7 @@ ggplot(change_region,
 While LIHTC additions drove new affordable supply in Richmond and Chesterfield, new (or renewed) Section 8 contracts covered more than 400 units in Henrico. Over 500 units in Richmond and Henrico saw HUD insurance contracts expire; however, many of these are in projects with another form of rental assistance that has not expired. 
 
 ```{r}
-#| label: fig-change
+#| label: fig-change-locality
 #| fig.cap: "Net change in subsidized rental unit contracts by locality"
 
 change_subsidy <- change |> 
@@ -599,8 +603,9 @@ This changed significantly in early 2020, when the Virginia General Assembly pas
 
 HCV utilization across the region is concentrated in the East End and Southside of Richmond, but can also be found throughout the counties, as well as the Town of Ashland. Higher HCV utilization (above 20 percent) is seen in areas near Fulton Hill, Oakwood, Manchester, and Bellwood in Chesterfield County.
 
-
-```{r hcv}
+```{r}
+#| label: fig-hcv
+#| fig.cap: "Percent of renters with Housing Choice Vouchers by tract"
 
 # Download HCV geojson from HUD - 7.28.22
 
@@ -610,22 +615,17 @@ pha <- c("041", "760", "085", "087")
 
 hcv <- st_read("data/va_hcv_tract.geojson") |> 
   clean_names() |> 
-  subset(county %in% pha)
+  subset(county %in% pha) |> 
+  filter(!is.na(hcv_public_pct))
 
-hcv_use <- mapview::mapview(hcv, 
-                            zcol= "hcv_public_pct",
-                            legend = T,
-                            layer.name = "Percent of renter-occupied housing with HCV")
-
-saveWidget(hcv_use@map, "maps/hcv_use.html")
-
-knitr::include_url("maps/hcv_use.html", height = "500px")
-
-
+mapview(hcv, 
+        zcol= "hcv_public_pct",
+        legend = T,
+        layer.name = "Percent renters with HCVs")
 
 ```
 
-## Rent relief and mortgage relief
+### Rent relief and mortgage relief
 
 In response to the COVID-19 pandemic's impact on renters across the nation, Congress created a \$25 billion Emergency Rental Assistance (ERA) program that was funded through the CARES Act in 2021. The program was implemented through the U.S. Treasury Department and resulted in a total of $1 billion being allocated to the Commonwealth of Virginia and eligible local governments. 
 
@@ -633,9 +633,15 @@ With this funding, the Virginia Department of Housing and Community Development 
 
 Through DHCD, a total of 32,029 payments were made to households across Richmond, Henrico, and Hanover. Both Richmond and Henrico saw increasing households receiving rental assistance with slight dips during the early part of 2022. Few households in Hanover County sought rental relief from DHCD.
 
-[*Awaiting Chesterfield County Data*]
+::: callout-warning
 
-```{r rmrp}
+Chesterfield County rent relief data has not been received yet.
+
+:::
+
+```{r}
+#| label: fig-rrp
+#| fig.cap: "Rent relief payments by locality"
 
 # Email gabriella.vazquez@dhcd.virginia.gov for data on RRP - breakdown of households helped in Hanover, Henrico, and Richmond --- consider including other localities
 
@@ -655,7 +661,8 @@ ggplot(rrp,
   theme(axis.title = element_blank(),
         axis.text.x = element_text(angle = 90, vjust = 1, hjust = 1)) +
   labs(title = "Rent relief payments by locality") +
-  scale_y_continuous(labels = number_format(big.mark = ","))
+  scale_y_continuous(labels = number_format(big.mark = ",")) +
+  theme(legend.position = "none")
 
 # https://crsreports.congress.gov/product/pdf/R/R46688
 
@@ -663,7 +670,9 @@ ggplot(rrp,
 ```
 Average payments per household across the three localities was well into the above \$4,000 for most of the program's duration, with the highest payments being made in Hanover County.
 
-```{r rrp-payment}
+```{r}
+#| label: fig-rrp-payment
+#| fig.cap: "Average assistance by month and locality"
 
 ggplot(rrp,
        aes(x = date,
@@ -674,12 +683,19 @@ ggplot(rrp,
   theme(axis.title = element_blank(),
         axis.text.x = element_text(angle = 90, vjust = 1, hjust = 1)) +
   labs(title = "Average assistance by month and locality") +
-  scale_y_continuous(labels = dollar_format())
+  scale_y_continuous(labels = dollar_format()) +
+  theme(legend.position = "none")
 
 ```
 ## Affordable homeownership
 
-*Data requested from housing partners*
+Since 2010, nonprofit developers in the region have averaged about 50 affordable homes sold to low-income buyers. Most of this production in attributable to Southside Community Development, project:HOMES, and the Maggie Walker Community Land Trust.
+
+::: callout-warning
+
+Production numbers for Habitat for Humanity not yet received.
+
+:::
 
 ```{r}
 #| label: fig-pha-homeownership
@@ -705,10 +721,19 @@ ho_production <- pha_ho |>
 ggplot(ho_production,
        aes(x = year,
            y = homes,
-           fill = organization)) +
+           fill = reorder(organization, homes))) +
   geom_col() +
+  labs(title = "Richmond region nonprofit homeownership production",
+       subtitle = "Numbers for 2022 are current through August",
+       caption = "Source: Survey of nonprofit organizations.") +
+  theme(legend.title = element_blank(),
+        legend.position = "bottom",
+        axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                  size = 0.05)) +
+  guides(fill = guide_legend(nrow = 2))
   
 
 ```
-
-Changes in assisted housing since 2019

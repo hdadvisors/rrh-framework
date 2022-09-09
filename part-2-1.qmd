@@ -944,9 +944,6 @@ write_rds(pha_price_comp, "data/pha_price_comp.rds")
 
 pha_price_comp <-  read_rds("data/pha_price_comp.rds")
 
-comp_diff <- pha_price_comp |> 
-  
-
 ggplot(pha_price_comp,
        aes(x = date, y = med_price, color = type)) +
   geom_line(size = 1) +
