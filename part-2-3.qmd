@@ -166,7 +166,11 @@ write_rds(nhpd_coded_rr, "data/nhpd_coded_rr.rds")
 An array of federal housing assistance programs help low-income residents across the region with rental housing opportunities. Today, there are approximately 25,969 dedicated affordable rental homes found across 240 properties in the Richmond area. These include units both currently occupied and in development.
 
 ::: callout-tip
-In the Richmond region, many affordable rental properties also receive assistance from the Virginia Housing Trust Fund, as well as local sources such as CDBG and HOME grants. The City of Richmond also awards funding to affordable rental projects with its own trust fund.
+
+### Funding sources
+
+In the Richmond region, many affordable rental properties also receive assistance from the Virginia Housing Trust Fund, as well as local sources such as CDBG and HOME grants. The City of Richmond also awards funding to affordable rental projects with its own trust fund. These awards often fill a financing "gap" and do not provide a majority of the total assistance for a development; as a result, they are not specifically reflected in the data.
+
 :::
 
 ### Subsidy types
@@ -261,7 +265,7 @@ multiple |>
          units = comma(units, digits = 0)) |> 
   kable(align = "lrr",
         col.names = c("Detailed subsidy type", "Units with subsidy", "Percent of total")) |> 
-  kableExtra::kable_styling(bootstrap_options = c("condensed")) |> 
+  kableExtra::kable_styling(bootstrap_options = c("condensed", "striped")) |> 
   kableExtra::footnote(general = "Note: Totals do not add to 100% because units are percent of all 8,061 units with multiple subsidies. \n Sources: National Housing Preservation Database and Virginia Housing.",
                        general_title = "")
 
@@ -411,7 +415,7 @@ change_table |>
   mutate(across(where(is.numeric), ~ comma(.x, digits = 0))) |> 
   kable(align = "lrrr",
         col.names = c("", "Subsidies", "Properties affected", "Units included")) |> 
-  kableExtra::kable_styling(bootstrap_options = c("condensed")) |> 
+  kableExtra::kable_styling(bootstrap_options = c("condensed", "striped")) |> 
   kableExtra::row_spec(3, bold = TRUE) |> 
   kableExtra::footnote(general = "Sources: National Housing Preservation Database and Virginia Housing.",
                        general_title = "")
@@ -589,6 +593,8 @@ This planning grant is being utilized to facilitate the community planning proce
 
 ::: callout-tip
 
+#### Funding for Public Housing redevelopment
+
 Federal housing policy has guided public housing authorities to use newer funding streams to redevelop older public housing communities. For these efforts, RRHA and its partners will use LIHTC, Tenant Protection Vouchers, Project-Based Vouchers, and other federal, state, and local sources. 
 
 :::
@@ -599,7 +605,9 @@ Federal housing policy has guided public housing authorities to use newer fundin
 
 Section 8 Housing Choice Vouchers (HCV) are tenant-based rental assistance that allows recipients to find housing on the open market. This provides household with greater choice in where they want to live, but historically many HCV recipients have faced discrimination from landlords unwilling to accept HCV.
 
-This changed significantly in early 2020, when the Virginia General Assembly passed new fair housing legislation that made it illegal to discriminate based on source of income --- defined as "any source that lawfully provides funds to or on behalf of a renter or buyer of housing, including any assistance, benefit, or subsidy program, whether such program is administered by a governmental or nongovernmental entity.”
+This changed significantly in early 2020, when the Virginia General Assembly passed new fair housing legislation that made it illegal to discriminate based on source of income --- defined as:
+
+> *"any source that lawfully provides funds to or on behalf of a renter or buyer of housing, including any assistance, benefit, or subsidy program, whether such program is administered by a governmental or nongovernmental entity."*
 
 HCV utilization across the region is concentrated in the East End and Southside of Richmond, but can also be found throughout the counties, as well as the Town of Ashland. Higher HCV utilization (above 20 percent) is seen in areas near Fulton Hill, Oakwood, Manchester, and Bellwood in Chesterfield County.
 
@@ -635,6 +643,8 @@ With this funding, the Virginia Department of Housing and Community Development 
 Through DHCD, a total of 32,029 payments were made to households across Richmond, Henrico, and Hanover. Both Richmond and Henrico saw increasing households receiving rental assistance with slight dips during the early part of 2022. Few households in Hanover County sought rental relief from DHCD.
 
 ::: callout-warning
+
+#### All data not available
 
 Chesterfield County rent relief data has not been received yet.
 
@@ -693,6 +703,8 @@ ggplot(rrp,
 Since 2010, nonprofit developers in the region have averaged about 50 affordable homes sold to low-income buyers. Most of this production in attributable to Southside Community Development, project:HOMES, and the Maggie Walker Community Land Trust.
 
 ::: callout-warning
+
+#### All data not available
 
 Production numbers for Habitat for Humanity not yet received.
 

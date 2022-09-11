@@ -512,6 +512,7 @@ Chesterfield County has the largest supply of homes in MHCs (1,543), which is ab
 
 ### Locations
 
+The majority of manufactured home community units are located along the Route 1 corridor. In areas where commercial and mixed-use development has accelerated, many of these properties are well-positioned for a change to a "higher and better" use. This redevelopment potential, while often in line with broader planning goals, is a threat to the long-term stability of MHCs.
 
 ```{r}
 #| label: mhc-map
@@ -545,8 +546,14 @@ mapview(
 
 ```
 
-The majority of manufactured home community units are located along the Route 1 corridor. 
+::: callout-tip
 
-But since the Framework was released several large MHCs in Chesterfield County were purchased by real estate investors --- leading to major concerns about increasing rents and redevelopment. Suburban Village, the county's third largest MHC at 226 units, was purchased by a Maryland-based company in August 2021 for \$22.5 million, while Shady Hill Mobile Home Park (an at least 110 unit community) received an offer of \$7.6 million in Spring 2022.
+### Notable changes since 2020
 
-Manufactured homes --- often located along major corridors --- 
+In September 2020, project:HOMES, [acquired](https://www.projecthomes.org/bermuda-estates) a 52 unit manufactured home community called Bermuda Estates in Chesterfield County. Since acquiring the community, project:HOMES has made significant infrastructure improvements, replaced some units in disrepair, and constructed a community center. The nonprofit plans to continue investments and preserve the park as a high-quality, low-cost neighborhood.
+
+Suburban Village, Chesterfield County's third largest MHC with almost 250 units, was [purchased](https://richmond.com/news/local/maryland-based-investment-firm-buys-chesterfield-mobile-home-park-for-22-5-million/article_41bd2656-0466-5643-9285-2715e88fee40.html) by Maryland-based Horizon Land Management in August 2021 for \$22.5 million. The park was previously under the same local ownership since 1986. More than 35 potential buyers expressed interest.
+
+Shady Hill Mobile Home Park, home to more than 100 families, was purchased by a Charlottesville-based development firm for \$5.1 million in August 2022. While complete redevelopment is likely, exact plans and timing are not known.
+
+:::

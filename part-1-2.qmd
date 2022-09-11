@@ -56,7 +56,11 @@ years <- 2016:2020
 According to Census estimates, the region gained more than 15,000 households from 2016 to 2020. This growth was driven entirely by new homeowners (17,436). Renter households, instead, saw much slower increases from 2016 to 2019; from 2019 to 2020, the estimated number of renters dropped more than 2,000 for a net loss of 609 over the full period.
 
 ::: callout-warning
+
+### Pandemic impacts on data reliability
+
 This anomalous data should be treated with caution. Lower American Community Survey response rates during COVID-19 were most common among lower-income and lower-educated households most likely to rent. Across the Richmond region, overall ACS response rates [declined nearly 10 percent](https://www.prb.org/articles/capturing-covids-impact-on-the-american-community-survey-across-counties/) from the 2015-2019 to 2016-2020 collection period.
+
 :::
 
 ```{r}

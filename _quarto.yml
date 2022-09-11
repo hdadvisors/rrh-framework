@@ -4,7 +4,7 @@ project:
   output-dir: docs
 
 execute: 
-  freeze: true
+  freeze: auto
 
 book:
   title: "Richmond Regional Housing Framework Data Update"
@@ -27,12 +27,11 @@ book:
         - part-2-1.qmd
         - part-2-2.qmd
         - part-2-3.qmd
-#        - part-2-4.qmd
+        - part-2-4.qmd
     - part: "PART 3: Gap analysis"
       chapters:
 #        - part-3-1.qmd
         - part-3-2.qmd
-
 #    - part: "PART 4: Local summaries"
 #      chapters:
 #        - part-4-1.qmd
@@ -52,8 +51,6 @@ knitr:
 
 format:
   html:
-    theme: cosmo
+    theme: lumen
   pdf:
     documentclass: scrreprt
-
-

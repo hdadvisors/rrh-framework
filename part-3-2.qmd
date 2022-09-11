@@ -722,7 +722,11 @@ ggplot(rva_pit,
 The McKinney-Vento Education for Homeless Children and Youth (EHCY) Program collects data on students experiencing homelessness, which often can paint a different picture of homelessness when compared to the Point-in-Time counts. In the region, school divisions have been seeing varying numbers, but between the 2018-2019 and 2019-2020 school years students experiencing homelessness have declined across all school divisions.
 
 ::: callout-tip
+
+#### Defining student homelessness
+
 Homeless children counted under the McKinney-Vento program are defined as “individuals who lack a fixed, regular, and adequate nighttime residence.” This includes children who are doubled-up with another households or living in motels, along with those living in shelters, vehicles, public areas, and other unsuitable places. This is more expansive than the definition used for PIT counts.
+
 :::
 
 The most notable declines in student homelessness have been seen in the Richmond Public School system, where the number of students experiencing homelessness have declined by 40 percent from 2017-2018 to 2019-2020. Given the pandemic and virtual learning environments, upcoming McKinney-Vento data through the 2021-2022 school year may need require extra context.
