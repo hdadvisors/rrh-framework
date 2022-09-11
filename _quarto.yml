@@ -3,6 +3,9 @@ project:
   execute-dir: file
   output-dir: docs
 
+execute: 
+  freeze: true
+
 book:
   title: "Richmond Regional Housing Framework Data Update"
   repo-url: https://github.com/hdadvisors/rrh-framework

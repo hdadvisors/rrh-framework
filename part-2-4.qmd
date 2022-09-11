@@ -1,12 +1,12 @@
 # Assessment of naturally-occurring affordable housing {#part-2-4}
 
-```{r setup}
+```{r}
+#| label: setup
 
 library(tidyverse)
-library(simplevis)
 library(leaflet)
+library(mapview)
 library(htmlwidgets)
-library(ggplot2)
 library(janitor)
 library(sf)
 library(sp)
@@ -15,6 +15,7 @@ library(plotly)
 library(scales)
 library(zoo)
 library(lubridate)
+library(patchwork)
 
 # Utilize the same filters as the Chesterfield County Rental Market Analysis. I've changed the star rating to two or less, which coincides with CoStar's analysis.
 
@@ -24,17 +25,28 @@ library(lubridate)
 
 # There are about 80 properties that do not have a listed style. Some may be manufactured home parks. Consider removing property_name == Sedgefield, Holiday Mobile Home Park
 
-
 # Append data from MHCCV report for manufactured home communities.
 
 pha <- c("51085", "51760", "51087", "51041")
 
+pha_names <- c("Richmond City", "Hanover", "Henrico", "Chesterfield")
+
+geo_colors <- setNames(viridis(4), nm = pha_names)
+
+pal <-colorFactor(palette = c("#440154FF", "#31688EFF","#35B779FF", "#FDE725FF"),
+                  levels = c("Richmond City", "Hanover", "Henrico", "Chesterfield"))
+
 ```
+
 ## Naturally-occurring affordable housing
 
 Not all affordable housing is supported by public subsidy. In fact, a large share of affordable housing is privately-owned and receives no government assistance. Widely referred to as naturally occurring affordable housing (NOAH), or market-affordable housing, these properties are a growing concern for communities facing housing affordability challenges.
 
 The preservation of NOAH properties has been a growing strategy to support affordable housing in communities as the ability to quickly develop new units has been stifled by labor shortages, rising land prices, and supply chain issues. NOAH is at great risk of being lost because it often requires greater investment to maintain and more likely to be redeveloped---in turn contributing to a loss of affordable housing units.
+
+::: callout-note
+
+### Defining NOAH
 
 For analysis purposes, we define NOAH properties as:
 
@@ -44,77 +56,225 @@ For analysis purposes, we define NOAH properties as:
 * *CoStar Building Rating* of two or fewer stars out of five;^[Per CoStar, this is rating for the building relative to other buildings of the same type throughout the country.] and
 * Built before 2000
 
+:::
+
+### Locations
+
 Based on this criteria, NOAH properties are located all across the region, especially in the City of Richmond and along the borders of the city and counties, where older multifamily properties exist.
 
-```{r noah-map, fig.cap="Map of NOAH properties in region. Source: CoStar Group, Inc.}
+```{r}
+#| label: fig-noah-map
+#| fig.cap: "Map of NOAH properties in region."
 
 noah <- read_csv("data/pha_noah_81722.csv") |> 
   clean_names() |> 
   st_as_sf(coords = c("longitude", "latitude"), crs=4326, remove=FALSE) |> 
-  filter(property_name != "Sedgefield" | property_name != "Holidy Mobile Home Park")
+  filter(!property_name %in% c("Sedgefield", "Holiday Mobile Home Park")) |> 
+  mutate(property_name = fct_reorder(property_name, avg_asking_unit, .desc = TRUE))
 
-pha_names <- c("Richmond City", "Hanover", "Henrico", "Chesterfield")
+mapview(
+  noah,
+  zcol = "avg_asking_unit",
+  legend = T,
+  popup = F,
+  burst = F,
+  layer.name = "Average asking rent ($)"
+)
 
-geo_colors <- setNames(viridis(4), nm = pha_names)
-
-pal <-colorFactor(palette = c("#440154FF", "#31688EFF","#35B779FF", "#FDE725FF"),
-                  levels = c("Richmond City", "Hanover", "Henrico", "Chesterfield"))
-
-# noah_map <- leaflet(noah) |>
-#   addProviderTiles(providers$OpenStreetMap.Mapnik) |>
-#   addCircleMarkers(
-#     radius = 5,
-#     color = ~pal(county_name),
-#     stroke = TRUE, fillOpacity = 1)
-# 
-# saveWidget(noah_map, "maps/noah_map.html")
-
-knitr::include_url("maps/noah_map.html")
 ```
 
-The large share of NOAH is located in the City of Richmond (11,310 units or 45 percent of all NOAH units). This is no doubt due to the large amount of older multifamily properties within city limits --- most of which is located in smaller buildings. Henrico County has the second largest share of NOAH in the region with 8,820 units, followed by Chesterfield County at 3,963 and Hanover County well below 1,000 units.
+The large share of NOAH is located in the City of Richmond (11,253 units or 45 percent of all NOAH units). This is no doubt due to the large amount of older multifamily properties within city limits --- most of which is located in smaller buildings. Henrico County has the second largest share of NOAH in the region with 8,983 units, followed by Chesterfield County at 3,667 and Hanover County below 500 units.
 
 In total, there are nearly 25,000 NOAH units across 194 properties in the region. This makes up a significant amount of rental inventory, as well as a valuable source of unsubsidized affordable housing. The aging of these properties, as well as the increasing demand for rental housing, puts significant pressure on these properties and their owners. For smaller landlords, the cost to renovate can be far too great --- leading to worsening deferred maintenance and pressure to sell, which both can negatively impact renters.
 
-```{r noah-cnt, fig.cap="NOAH units by locality"}
+```{r}
+#| label: fig-noah-cnt
+#| fig.cap: "NOAH units by locality"
+
+# Total units is 24,395
 
 noah_cnt <- noah |> 
+  st_drop_geometry() |> 
   group_by(county_name) |> 
   summarise(n = sum(number_of_units))
 
-noah_cnt_bar <- ggplot(noah_cnt,
-                       aes(x= reorder(county_name, n),
-                           y=n,
-                           fill=county_name)) +
-  geom_bar(stat="identity") +
-  coord_flip() +
-  labs(title= "NOAH units by locality") +
-  theme(axis.title = element_blank(),
-        legend.position = "none") +
+ggplot(noah_cnt,
+       aes(x = reorder(county_name, n),
+           y = n,
+           fill = county_name,
+           color = county_name,
+           label = label_comma()(n))) +
+  geom_col() +
+  geom_text(aes(y = n + 500)) +
+  scale_color_manual(values = geo_colors) +
   scale_fill_manual(values = geo_colors) +
-  scale_y_continuous(labels = number_format(big.mark = ","))
-
-ggplotly(noah_cnt_bar) |> 
-  plotly_camera()
-
-# Total units is 24,847
-
-```
-
-```{r noah-type, eval=FALSE}
-
-
-noah_type <- read_csv("data/pha_noah_72822.csv") |> 
-  clean_names() |> 
-  select(property_address, county_name, property_name, number_of_units, style, year_built) 
+  scale_y_continuous(labels = label_comma()) +
+  labs(title= "NOAH units by locality",
+       subtitle = "Data through August 2022",
+       caption = "Source: CoStar Group, Inc.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        legend.position = "none",
+        panel.grid.major.y = element_line(color = "grey95",
+                          size = 0.05))
 
 
 ```
+### Building style
+
+CoStar places buildings into style categories based on the following definitions:
+
+| Style     | Stories      | Buildings           |
+|-----------|--------------|---------------------|
+| Garden    | 1-3 Stories  | 4 or more buildings |
+| Low-Rise  | 1-3 Stories  | 1-3 buildings       |
+| Mid-Rise  | 4-14 Stories | 1 or more buildings |
+| High Rise | 15+ Stories  | 1 or more buildings |
+
+While not traditional multifamily properties, CoStar does track some single-family and townhome rentals that are included in this data.
+
+Roughly four out of five NOAH units are part of garden style properties, which are clusters of smaller one- to three-story buildings. Another 3,200 units in low-rise properties, which have similar but fewer buildings per community, round out nearly all of the NOAH supply in the region.
+
+However, garden style properties have more than 210 units on average, while low-rise properties have just 12. As a result, there more than twice as many low-rise properties (273) than garden properties (95).
+
+```{r}
+#| label: fig-noah-style
+#| fig.cap: "NOAH units by building style"
+
+noah_style <- noah |> 
+  st_drop_geometry() |> 
+  mutate(style = replace_na(style, "Not listed")) |> 
+  group_by(style) |> 
+  summarise(units = sum(number_of_units),
+            props = n()) |> 
+  mutate(avg = units/props)
+
+style_units <- ggplot(noah_style,
+                      aes(x = reorder(style, units),
+                          y = units,
+                          fill = style)) +
+                 geom_col() +
+                 scale_y_continuous(labels = label_comma()) +
+                 labs(subtitle = "Number of units") +
+                 theme(axis.title = element_blank(),
+                       axis.text.x = element_blank(),
+                       axis.ticks = element_blank(),
+                       panel.background = element_blank(),
+                       legend.position = "none",
+                       panel.grid.major.y = element_line(color = "grey95",
+                                         size = 0.05))
+
+style_bldgs <- ggplot(noah_style,
+                      aes(x = reorder(style, props),
+                          y = props,
+                          fill = style)) +
+                 geom_col() +
+                 scale_y_continuous(labels = label_comma()) +
+                 labs(subtitle = "Number of properties") +
+                 theme(axis.title = element_blank(),
+                       axis.text.x = element_blank(),
+                       axis.ticks = element_blank(),
+                       panel.background = element_blank(),
+                       legend.position = "right",
+                       legend.title = element_blank(),
+                       panel.grid.major.y = element_line(color = "grey95",
+                                         size = 0.05))
+
+
+style_units + style_bldgs +
+  plot_annotation(
+    title = "NOAH units and properties by building style",
+    caption = "Source: CoStar Group, Inc."
+  )
+  
+
+```
+
+The map below shows NOAH properties by building style across the region. Most of the low-rise properties are within Richmond, reflecting the early 20th century small-scale apartment buildings found across many historic neighborhoods in the city---especially the Fan and Museum District.
+
+Garden style properties, on the other hand, are more commonly found in the counties' inner suburbs, and reflect development trends prevalent during those areas' growth in the mid 20th century.
+
+```{r}
+#| label: fig-noah-style-map
+#| fig.cap: "Map of NOAH properties by building style"
+
+mapview(
+  noah,
+  zcol = "style",
+  legend = T,
+  popup = F,
+  burst = F,
+  layer.name = "Building style"
+)
+
+```
+
+### Age
+
+With the exception of Richmond's low-rise apartments from the 1910s to 1930s, most of the region's NOAH units were built between 1960 and 1980. CoStar also tracks property renovations, which began for NOAH properties in the 2000s, especially closer to 2020 in Richmond and Chesterfield.
+
+::: callout-tip
+
+#### Substantial versus minor renovations
+
+CoStar only marks a property as renovated if it:
+
+"...*has been completely restored so that the existing space becomes 'new' space again. [...] Minor renovations, such as the improvement of a building's lobby or exterior are not considered full building renovations.*"
+
+:::
+
+```{r}
+#| label: fig-noah-age
+#| fig.cap: "NOAH properties by year built"
+
+noah_age <- noah |> 
+  st_drop_geometry() |> 
+  mutate(year = case_when(
+    is.na(year_renovated) ~ year_built,
+    TRUE ~ year_renovated
+  )) |> 
+  mutate(status = case_when(
+    is.na(year_renovated) ~ "Original",
+    TRUE ~ "Renovated",
+  )) |> 
+  filter(year > 1900)
+
+ggplot(noah_age,
+       aes(x = year,
+           y = number_of_units,
+           fill = status)) +
+  geom_col() +
+  facet_wrap(~county_name, nrow = 4, scales = "free_x") +
+  scale_x_continuous(limits = c(1900, 2022),
+                     breaks = c(1900, 1925, 1950, 1975, 2000, 2010, 2020)) +
+  scale_y_continuous(labels = label_comma(),
+                     breaks = c(500,1000)) +
+  labs(title= "NOAH units by year built or renovated",
+       subtitle = "Data through August 2022",
+       caption = "Source: CoStar Group, Inc.") +
+  geom_hline(aes(yintercept = 0),
+             color = "grey70",
+             size = 0.05) +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        legend.position = "right",
+        legend.title = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                          size = 0.05))
+
+```
+
+### Rents
+
 NOAH properties have not been immune from the rapid rises in rent. As of Q3 2022, the average asking rent for NOAH properties was \$1,173. This is about \$200 less than the average asking rent across all rental properties. Although this seems like a small difference, an extra \$200 a month means more money saved for childcare or transportation costs.
 
 From the beginning of the pandemic to Q3 2022, NOAH rent has increased by \$104 --- a 10 percent increase. 
 
-```{r noah-rents}
+```{r}
+#| label: fig-noah-rents
+#| fig-cap: "Average asking rent for market-affordable multifamily"
 
 # Pulled at end of July; hesitant to re-pull because the data keeps changing on CoStar's side. 
 
@@ -150,8 +310,11 @@ ggplot(noah_rent,
 
 
 ```
+### Sales
 
-```{r noah-sales}
+```{r}
+#| label: noah-sales-date
+#| eval: false
 
 # Search CoStar SALES: 
 # NOAH --- Location: Richmond city, Henrico County, Chesterfield County, Hanover County
@@ -161,97 +324,161 @@ ggplot(noah_rent,
 
 noah_sales <- read_csv("data/noah_sales_82322.csv") |> 
   clean_names() |> 
-  mutate(category = "NOAH")
+  mutate(category = "NOAH", .before = 1)
 
 all_sales <- read_csv("data/all_sales_82322.csv") |> 
   clean_names() |> 
-  mutate(category = "All")
+  mutate(category = "All", .before = 1)
 
 mf_sales <- rbind(noah_sales, all_sales) |> 
-  subset(period != "Search") |> 
-  subset(period != "2017 Q2") |> 
-  subset(period != "2017 Q1") |> 
+  filter(!period %in% c("Search", "2017 Q2", "2017 Q1")) |> 
   mutate(period = case_when(
     period == "2022 Q3 QTD" ~ "2022 Q3",
     TRUE ~ period
   )) |> 
-  select(period, category, sales = number_of_transactions, avg_sales = average_sale_price, sold_units, average_price_per_unit) |> 
-  mutate(period = as.Date(as.yearqtr(period, format = "%Y Q%q"), frac = 1)) |> 
-  mutate(average_price_per_unit = parse_number(average_price_per_unit)) |> 
-  mutate(sales = parse_number(sales))
+  mutate(across(.cols = 3:26, ~ parse_number(.x))) |> 
+  select(category, period, sales = number_of_transactions, volume = sales_volume,
+         avg_price = average_sale_price, avg_price_sf = average_price_per_bldg_sf,
+         med_price_sf = median_price_per_bldg_sf, sold_units,
+         avg_price_unit = average_price_per_unit, med_price_unit = median_price_per_unit) |> 
+  mutate(period = as.yearqtr(period, format = "%Y Q%q"))
 
-
-```
-
-The sale of NOAH properties and ensuing new ownership often leads to rent increases and/or rehabilitation. In some cases, this may take NOAH properties out of market affordability. Over the last five years, NOAH properties have made up nearly half of all multifamily sales (49 percent).
-
-```{r noah-sales-cnt}
-mf_sales_summary <- mf_sales |> 
-  group_by(category) |> 
-  summarise(sales = sum(sales))
-
-mf_sales_bar <- ggplot(mf_sales,
-                        aes(x = period,
-                            y = sales,
-                            fill = category)) +
-  geom_col(position = "identity") +
-  theme(axis.title = element_blank()) +
-  labs(title = "NOAH versus all multifamily sales", color = "Type")
-
-ggplotly(mf_sales_bar) |> 
-  plotly_camera()
+write_rds(mf_sales, "data/pha_mf_sales.rds")
 
 ```
 
-During this timeframe, NOAH properties had an average price per unit below that of all multifamily sales, but from Q4 2020 to Q1 2021. At the end of 2020, the average price per unit of a NOAH property hit a high of \$221,534 --- over \$44,000 more when compared to all multifamily sales. Although both types of sales took a dip following the end of 2020, the higher NOAH price remained until Q2 2021, when NOAH average price per unit once again went below all sales.
+The sale of NOAH properties and ensuing new ownership often leads to rent increases and/or rehabilitation. In some cases, this may take NOAH properties out of market affordability. Over the last five years, NOAH properties have made up well over half of all multifamily property transactions in the region.
 
-```{r noah-sales-comp}
+```{r}
+#| label: fig-noah-sales
+#| fig.cap: "Number of multifamily properties sold"
 
-mf_sales_line <- ggplot(mf_sales,
-                        aes(x = period,
-                            y = average_price_per_unit,
-                            color = category)) +
+mf_sales <- read_rds("data/pha_mf_sales.rds")
+
+ggplot(mf_sales,
+       aes(x = period,
+           y = sales,
+           fill = category)) +
+  geom_col(position = "dodge") +
+  scale_x_yearqtr(format = "%Y Q%q",
+                  breaks = seq(from = min(mf_sales$period), to = max(mf_sales$period), by = 0.25)) +
+  labs(title = "Number of multifamily properties sold",
+       subtitle = "2017 Q3 to 2022 Q3 (to-date)",
+       caption = "Source: CoStar Group, Inc.") +
+  theme(panel.background = element_blank(),
+        axis.title = element_blank(),
+        axis.ticks.y = element_blank(),
+        legend.title = element_blank(),
+        legend.position = "top",
+        axis.text.x = element_text(angle = 90, vjust = 0.5),
+        panel.grid.major.y = element_line(color = "grey95",
+                                  size = 0.05))
+
+```
+
+However, NOAH transactions represent a smaller share of total units sold---about one-third since 2017 Q3.
+
+```{r}
+#| label: fig-noah-sales-units
+#| fig.cap: "Number of multifamily units sold"
+
+ggplot(mf_sales,
+       aes(x = period,
+           y = sold_units,
+           fill = category)) +
+  geom_col(position = "dodge") +
+  scale_x_yearqtr(format = "%Y Q%q",
+                  breaks = seq(from = min(mf_sales$period), to = max(mf_sales$period), by = 0.25)) +
+  scale_y_continuous(labels = label_comma()) +
+  labs(title = "Number of multifamily units sold",
+       subtitle = "2017 Q3 to 2022 Q3 (to-date)",
+       caption = "Source: CoStar Group, Inc.") +
+  theme(panel.background = element_blank(),
+        axis.title = element_blank(),
+        axis.ticks.y = element_blank(),
+        legend.title = element_blank(),
+        legend.position = "top",
+        axis.text.x = element_text(angle = 90, vjust = 0.5),
+        panel.grid.major.y = element_line(color = "grey95",
+                                  size = 0.05))
+
+```
+
+Sales volume for NOAH properties has, on average, been a small fraction of total volume in the region. However, beginning in 2021 Q4, NOAH sales volume rose above \$100 million for the first time since 2018 Q3, which itself was an an outlier. NOAH sales volume hit a new record in 2022 Q1 (over \$178 million), stayed at that level the next quarter, and continues to be well above average to-date in 2022 Q3.
+
+```{r}
+#| label: fig-noah-sales-vol
+#| fig.cap: "Volume of multifamily sales"
+
+ggplot(mf_sales,
+       aes(x = period,
+           y = volume,
+           color = category)) +
   geom_line(size = 1) +
-  scale_y_continuous(labels = dollar_format()) +
-  theme(axis.title = element_blank()) +
-  labs(title = "Average price per unit: NOAH versus all multifamily sales", color = "Type")
-
-ggplotly(mf_sales_line) |> 
-  plotly_camera()
-
-```
-
-## Manufactured Home Communities
-
-Manufactured home communities (MHCs) are also a valuable source of NOAH across the region. In 2016, the Manufactured Home Community Coalition of Virginia (MHCCV) conducted an assessment of all manufactured home communities across Central Virginia. Their report identified 54 different MHCs, wherein there were at least 2,742 individual manufactured homes. 
-
-This represents both manufactured homes that may be rented, as well as owned, but regardless residents in manufactured home units rent the lot in which their home resides. This leaves many manufactured home community residents who own their homes in a precarious position should a community owner decide to sell or redevelop the property. Manufactured homes are not easily moved once installed, leaving many families forced to abandon their homes and seek new and more expensive housing elsewhere.
-
-```{r mhc-map}
-
-# mhc <- st_read("https://services1.arcgis.com/Hp6G80Pky0om7QvQ/arcgis/rest/services/Mobile_Home_Parks/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
-
-# pha_mhc <- mhc |>  
-#   subset(COUNTYFIPS %in% pha)
-# 
-# write_rds(pha_mhc, "data/pha_mhc.rds")
-
-# pha_mhc <- read_rds("data/pha_mhc.rds") |> 
-#   filter(STATUS != "CLOSED")
-# 
-# mhc_map <- leaflet(pha_mhc) |> 
-#   addTiles() |> 
-#   addCircleMarkers(
-#     radius = 3
-#   )
-# 
-# saveWidget(mhc_map, "maps/mhc_map.html")
-
-knitr::include_url("map/mhc_map.html")
+  scale_x_yearqtr(format = "%Y Q%q",
+                  breaks = seq(from = min(mf_sales$period), to = max(mf_sales$period), by = 0.25)) +
+  scale_y_continuous(labels = label_dollar(scale = 0.000001, suffix = "M")) +
+  labs(title = "Volume of multifamily sales",
+       subtitle = "2017 Q3 to 2022 Q3 (to-date)",
+       caption = "Source: CoStar Group, Inc.") +
+  theme(panel.background = element_blank(),
+        axis.title = element_blank(),
+        axis.ticks.y = element_blank(),
+        legend.title = element_blank(),
+        legend.position = "top",
+        legend.key = element_blank(),
+        axis.text.x = element_text(angle = 90, vjust = 0.5),
+        panel.grid.major.y = element_line(color = "grey95",
+                                  size = 0.05))
 
 ```
 
-```{r mhc-cnt}
+During this timeframe, NOAH properties had an average price per unit below that of all multifamily sales until 2020 Q4. At the end of 2020, the average price per unit of a NOAH property hit a high of \$221,534 --- over \$44,000 more when compared to all multifamily sales. Although both types of sales took a dip following the end of 2020, the higher NOAH price remained until 2021 Q2, when NOAH average price per unit once again went below all sales.
+
+```{r}
+#| label: fig-noah-price-unit
+#| fig.cap: "Average price per unit"
+
+ggplot(mf_sales,
+       aes(x = period,
+           y = avg_price_unit,
+           color = category)) +
+  geom_line(size = 1) +
+  scale_x_yearqtr(format = "%Y Q%q",
+                  breaks = seq(from = min(mf_sales$period), to = max(mf_sales$period), by = 0.25)) +
+  scale_y_continuous(labels = label_dollar(scale = 0.001, suffix = "K")) +
+  labs(title = "Average price per unit",
+       subtitle = "2017 Q3 to 2022 Q3 (to-date)",
+       caption = "Source: CoStar Group, Inc.") +
+  theme(panel.background = element_blank(),
+        axis.title = element_blank(),
+        axis.ticks.y = element_blank(),
+        legend.title = element_blank(),
+        legend.position = "top",
+        legend.key = element_blank(),
+        axis.text.x = element_text(angle = 90, vjust = 0.5),
+        panel.grid.major.y = element_line(color = "grey95",
+                                  size = 0.05))
+
+```
+
+## Manufactured home communities
+
+Manufactured home communities (MHCs) are also a valuable source of NOAH across the region, but are not reliably monitors as traditional multifamily rental housing. As a result, accurate data on supply and rents are more difficult to obtain.
+
+### Supply
+
+In 2016, the Manufactured Home Community Coalition of Virginia (MHCCV) conducted an assessment of all manufactured home communities across the Richmond, Virginia Metropolitan Statistical Area (MSA). That report found 4,735 homes across 54 MHCs in the greater region. Within the primary PHA area[^Chesterfield, Hanover, Henrico, and Richmond.] there are 24 different MHCs, which in all contained at least 2,742 individual manufactured homes. 
+
+::: callout-note
+
+This data includes homes that may be rented, as well as owned. Regardless, residents in MHCs rent the lot on which their home resides. This leaves many manufactured home community residents who own their homes in a precarious position should a community owner decide to sell or redevelop the property. Manufactured homes are not easily moved once installed, leaving many families forced to abandon their homes and seek new and more expensive housing elsewhere.
+
+:::
+
+```{r}
+#| label: fig-mhc-supply
+#| fig.cap: "Units in manufactured home communities by locality"
 
 mhccv <- read_csv("data/mhccv_data.csv") |> 
   clean_names()
@@ -259,24 +486,67 @@ mhccv <- read_csv("data/mhccv_data.csv") |>
 names <- c("Chesterfield", "Hanover", "Henrico", "Richmond")
 
 mhc_cnt <- mhccv |> 
+  filter(county %in% names) |> 
   group_by(county) |> 
-  summarise(units = sum(units)) |> 
-  subset(county %in% names)
+  summarise(units = sum(units),
+            mhcs = n())
 
-mhc_bar <- ggplot(mhc_cnt,
-                  aes(x = reorder(county, units),
-                      y = units, 
-                      fill = county)) +
-  geom_bar(stat = "identity") +
-  coord_flip() +
-  labs(title = "Manufactured home community units by locality", fill = "Locality") +
-  theme(axis.title = element_blank())
+ggplot(mhc_cnt,
+       aes(y = reorder(county, units),
+           x = units, 
+           fill = county)) +
+  geom_col() +
+  scale_x_continuous(labels = label_comma()) +
+  labs(title = "Units in manufactured home communities by locality",
+       caption = "Source: Manufactured Home Community Coalition of Virginia.") +
+  theme(panel.background = element_blank(),
+        legend.position = "none",
+        axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid.major.x = element_line(color = "grey95",
+                                  size = 0.05))
 
-ggplotly(mhc_bar) |> 
-  plotly_camera()
+
+```
+Chesterfield County has the largest supply of homes in MHCs (1,543), which is about half the total number of subsidized rentals also in the county. Hanover and Richmond both have near 500 units in MHCs, while Henrico only has one MHC with 230 units.
+
+### Locations
+
+
+```{r}
+#| label: mhc-map
+#| eval: false
+
+mhc <- st_read("https://services1.arcgis.com/Hp6G80Pky0om7QvQ/arcgis/rest/services/Mobile_Home_Parks/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson")
+
+pha_mhc <- mhc |>
+  subset(COUNTYFIPS %in% pha)
+
+write_rds(pha_mhc, "data/pha_mhc.rds")
 
 ```
 
-The majority of manufactured home community units are located in Chesterfield County --- largely along the Route 1 corridor. But since the Framework was released several large MHCs in Chesterfield County were purchased by real estate investors --- leading to major concerns about increasing rents and redevelopment. Suburban Village, the county's third largest MHC at 226 units, was purchased by a Maryland-based company in August 2021 for \$22.5 million, while Shady Hill Mobile Home Park (an at least 110 unit community) received an offer of \$7.6 million in Spring 2022.
+```{r}
+#| label: fig-mhc-map
+#| fig.cap: "Units in manufactured home communities by locality"
 
-Manufactured homes --- often located along major corridors --- are well-positioned for redevelopment due to their location and proximity, but they offer many residents in need of housing an option. As these communities continue to be at risk, this puts whole communities in danger of displacement. To head off such negative impacts, affordable housing nonprofit, project:HOMES, acquired a 52 unit manufactured home community called Bermuda Estates in Chesterfield County. Since acquiring the community, project:HOMES has made significant infrastructure improvements, replaced some units in disrepair, and constructed a community center.
+pha_mhc <- read_rds("data/pha_mhc.rds") |>
+  filter(STATUS != "CLOSED") |> 
+  mutate(SIZE = str_to_sentence(SIZE))
+
+mapview(
+  pha_mhc,
+  zcol = "SIZE",
+  legend = T,
+  popup = F,
+  burst = F,
+  layer.name = "Units in park"
+)
+
+```
+
+The majority of manufactured home community units are located along the Route 1 corridor. 
+
+But since the Framework was released several large MHCs in Chesterfield County were purchased by real estate investors --- leading to major concerns about increasing rents and redevelopment. Suburban Village, the county's third largest MHC at 226 units, was purchased by a Maryland-based company in August 2021 for \$22.5 million, while Shady Hill Mobile Home Park (an at least 110 unit community) received an offer of \$7.6 million in Spring 2022.
+
+Manufactured homes --- often located along major corridors --- 

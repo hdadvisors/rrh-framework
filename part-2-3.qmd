@@ -262,7 +262,7 @@ multiple |>
   kable(align = "lrr",
         col.names = c("Detailed subsidy type", "Units with subsidy", "Percent of total")) |> 
   kableExtra::kable_styling(bootstrap_options = c("condensed")) |> 
-  kableExtra::footnote(general = "Note: Totals do not add to 100% because units are percent of all 8,061 units with multiple subsidies.\nSources: National Housing Preservation Database and Virginia Housing.",
+  kableExtra::footnote(general = "Note: Totals do not add to 100% because units are percent of all 8,061 units with multiple subsidies. \n Sources: National Housing Preservation Database and Virginia Housing.",
                        general_title = "")
 
 ```
@@ -613,7 +613,8 @@ HCV utilization across the region is concentrated in the East End and Southside 
 
 pha <- c("041", "760", "085", "087")
 
-hcv <- st_read("data/va_hcv_tract.geojson") |> 
+hcv <- st_read("data/va_hcv_tract.geojson",
+               quiet = TRUE) |> 
   clean_names() |> 
   subset(county %in% pha) |> 
   filter(!is.na(hcv_public_pct))
