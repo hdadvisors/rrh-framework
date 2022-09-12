@@ -2,7 +2,8 @@
 
 This chapter is a summary of the major changes to the Hanover County's population and housing market in the past five years.
 
-```{r setup}
+```{r}
+#| label: setup
 
 library(tidyverse)
 library(sf)
@@ -45,7 +46,7 @@ Between 2011 and 2012, Hanover County passed the 100,000 mark and has continued 
 
 ```{r}
 #| label: fig-pop
-#| fig-cap: !expr "paste0(name, ": Total Population")"
+#| fig-cap: !expr "paste0(name, /": Total Population/")"
 
 # Add choice of population stat (net change, components, etc)
 
@@ -85,7 +86,7 @@ The overwhelming reason for population increases in the last several years has b
 
 ```{r}
 #| label: fig-comp
-#| fig-cap: !expr "paste0(name,": Components of population change")"
+#| fig-cap: !expr "paste0(name, /": Components of population change/")"
 
 change <- read_rds("data/rr_comp_change.rds") |> 
   filter(year %in% as.character(years) | year == "2021") |> 
@@ -117,7 +118,7 @@ Households with children, both homeowners and renters, have been on the decline 
 
 ```{r}
 #| label: fig-children
-#| fig-cap: paste0(name, ": Change in households with children by tenure")
+#| fig-cap: !expr "paste0(name, /": Change in households with children by tenure/")"
 
 # Add choice of household stat (HHs with children, HHs with seniors, subfamilies, etc)
 
@@ -146,7 +147,7 @@ As with most of the region, the senior population in Hanover County has seen maj
 
 ```{r}
 #| label: fig-seniors
-#| fig-cap: !expr "paste0(name, ": Change in senior population by living arrangement")"
+#| fig-cap: !expr "paste0(name, /": Change in senior population by living arrangement/")"
 
 b09020 <- read_rds("data/b09020_data.rds") |> 
   filter(NAME == name) |> 
@@ -187,7 +188,7 @@ In Hanover County, there was a \$45,460 difference between median homeowner hous
 
 ```{r}
 #| label: fig-income
-#| fig-cap: !expr "paste0(name, ": Median houshold income by tenure")"
+#| fig-cap: !expr "paste0(name, /": Median houshold income by tenure/")"
 
 # Add choice of income stat (probably median household income of some kind)
 
@@ -220,7 +221,7 @@ The growth in median renter household income in the county can be shown to be du
 
 ```{r}
 #| label: fig-income-change
-#| fig-cap: !expr "paste0(name, ": Change households by tenure and income level")"
+#| fig-cap: !expr "paste0(name, /": Change households by tenure and income level/")"
 
 b25118_data <-read_rds("data/b25118_data.rds") |> 
   filter(NAME %in% "Hanover County") |>
@@ -262,7 +263,7 @@ While other localities have seen significant increases in adults below 65 years 
 
 ```{r}
 #| label: fig-ind-living
-#| fig-cap: !expr "paste0(name, ": Net change in individuals with independent living difficulties by age")"
+#| fig-cap: !expr "paste0(name, /": Net change in individuals with independent living difficulties by age/")"
 
 # Add disability stat (probably independent living difficulty)
 
@@ -298,7 +299,7 @@ During the early part of 2022, median home price in Hanover County passed into t
 
 ```{r}
 #| label: fig-sales
-#| fig-cap: !expr "paste0(name, ": Median home sales price")"
+#| fig-cap: !expr "paste0(name, /": Median home sales price/")"
 
 # Median sales price over time
 
@@ -346,7 +347,7 @@ Rental properties across Hanover County are largely located in the Town of Ashla
 
 ```{r}
 #| label: fig-rent-submarket
-#| fig-cap: !expr "paste0(name, ": Average asking rent by submarket")"
+#| fig-cap: !expr "paste0(name, /": Average asking rent by submarket/")"
 
 # Average asking rent over time (by submarket if applicable, maybe by bedroom if no submarkets)
 
@@ -391,7 +392,7 @@ ggplot(sub_rent,
 
 ```{r}
 #| label: fig-vacancy
-#| fig-cap: !expr "paste0(name, ": Rental vacancy rate")"
+#| fig-cap: !expr "paste0(name, /": Rental vacancy rate/")"
 
 
 vacancy <- sub_rent  |> 
@@ -422,8 +423,37 @@ ggplot(vacancy,
 
 ### Housing assistance
 
-```
-Change in number of assisted units (NHPD)
+```{r}
+#| label: tbl-nhpd
+#| tbl-cap: !expr "paste0(name, \": Added and removed affordable rental contracts since 2020\")"
+
+nhpd_coded_rr <- read_rds("data/nhpd_coded_rr.rds") |> 
+  filter(locality == "Hanover County")
+
+change <- nhpd_coded_rr |>
+  mutate(change_type = case_when(
+    start_date > '2019-12-31' ~ "Added",
+    end_date < '2022-09-01' & end_date > '2019-12-31' ~ "Removed",
+    TRUE ~ "No change"))
+
+change_table <- change |>
+  group_by(change_type) |>
+  summarise(subsidies = n(),
+            properties = n_distinct(nhpd_property_id),
+            units = sum(assisted_units)) |>
+  filter(change_type != "No change") |>
+  mutate(across(where(is.numeric), ~ ifelse(change_type == "Removed", (.x * -1), .x))) |>
+  adorn_totals(name = "Net change")
+
+change_table |>
+  mutate(across(where(is.numeric), ~ comma(.x, digits = 0))) |>
+  kable(align = "lrrr",
+        col.names = c("", "Subsidies", "Properties affected", "Units included")) |>
+  kableExtra::kable_styling(bootstrap_options = c("condensed", "striped")) |>
+  kableExtra::row_spec(3, bold = TRUE) |>
+  kableExtra::footnote(general = "Sources: National Housing Preservation Database and Virginia Housing.",
+                       general_title = "")
+
 ```
 
 ### Naturally-occurring affordable housing
@@ -432,7 +462,7 @@ As defined by this report, there are only five NOAH multifamily properties locat
 
 ```{r}
 #| label: fig-noah
-#| fig-cap: !expr "paste0(name, ": Distribution of average asking rents in NOAH properties by year built")"
+#| fig-cap: !expr "paste0(name, /": Distribution of average asking rents in NOAH properties by year built/")"
 
 # Add choice of NOAH stat (total number, change in rent, etc) 
 
@@ -484,7 +514,7 @@ mhc |>
   kableExtra::kable_styling(
     bootstrap_options = c("condensed", "striped", "hover"))
 
-sum(mhc$Units)
+# sum(mhc$Units)
 
 
 ```
@@ -496,7 +526,7 @@ In 2020, median renter household income was \$53,832. A household at this income
 
 ```{r}
 #| label: fig-income-rent-gap
-#| fig-cap: !expr "paste0(name, ": Average asking rent versus rent affordable to median renter income")"
+#| fig-cap: !expr "paste0(name, /": Average asking rent versus rent affordable to median renter income/")"
 
 # Compare local median renter income to average asking rent
 
@@ -546,7 +576,7 @@ Although median renter income has increased, the gap between income needed to af
 
 ```{r}
 #| label: fig-income-own-gap
-#| fig-cap: !expr "paste0(name, ": Income needed to afford median home price versus median renter income")"
+#| fig-cap: !expr "paste0(name, /": Income needed to afford median home price versus median renter income/")"
 
 # Compare local renter income versus local home prices
 
@@ -607,7 +637,7 @@ The deficit has decreased across all income levels below 80 percent AMI, but the
 
 ```{r}
 #| label: fig-gap
-#| fig-cap: !expr "paste0(name, ": Rental housing gap by AMI")"
+#| fig-cap: !expr "paste0(name, /": Rental housing gap by AMI/")"
 
 # Add choice of affordability stat (surplus/deficit, income vs prices, etc)
 
@@ -651,7 +681,7 @@ In spite of the continuous increase in housing costs in Hanover County, there ha
 
 ```{r}
 #| label: fig-cb
-#| fig-cap: paste0(name, ": Cumulative change in cost-burdened households by tenure")
+#| fig-cap: paste0(name, /": Cumulative change in cost-burdened households by tenure/")"
 
 cb <- read_rds("data/cb_7.rds") |> 
   filter(county == name,
@@ -685,7 +715,7 @@ During eviction protections of the pandemic, filings dropped below 20 a month, w
 
 ```{r}
 #| label: fig-evictions
-#| fig-cap: !expr "paste0(name, ": Evictions filings and judgements")"
+#| fig-cap: !expr "paste0(name, /": Evictions filings and judgements/")"
 
 evictions <- read_csv("data/evictions_17_22.csv") |> 
   pivot_longer(3:128,
