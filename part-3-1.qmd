@@ -29,12 +29,6 @@ rr_df <- data.frame(GEOID = rr, NAME = rr_names)
 
 ## Rental housing gap
 
-Comprehensive Housing Affordability Strategy (CHAS) data provided by the Department of Housing and Urban Development (HUD) allows us to understand the cost of housing in relation to household incomes. For renters making less than 80% AMI across the region, there has been little change in the gap in affordable rental housing. In 2015, there was an overall gap of nearly 40,000 (39,506) rental homes affordable to households making 80% AMI or less. By 2018, that gap had increased by 354 homes to reach a total gap of 39,860.
-
-Increases in the gap occurred mainly among housing between 31 and 80% AMI, but it is important to note that a gap in housing across all income levels impacts households of any income. Households don't just seek housing that directly matches their income. Often times households desire housing that costs less so that they can spend money on other necessities like transportation, healthcare, and food. But when overall supply is low, this means that households with lower incomes have to compete with those higher income households in the open market --- leaving them having to choose more expensive and lower quality housing.
-
-This accentuates the need for new affordable housing at all income levels --- but especially for 30% AMI or below households, where in 2018, there was a shortage of over 22,000 rental homes.
-
 ```{r}
 #| label: gap-data
 #| eval: false
@@ -109,91 +103,59 @@ write_rds(gap, "data/gap.rds")
 
 ```
 
+Comprehensive Housing Affordability Strategy (CHAS) data provided by the Department of Housing and Urban Development (HUD) allows us to understand the cost of housing in relation to household incomes. For renters making less than 80% AMI across the region, there has been little change in the gap in affordable rental housing.
 
-```{r gap-jtk, eval=FALSE}
+```{r}
+#| label: fig-gap-plot
+#| fig.cap: "Rental housing gap by AMI"
 
-library(ggsankey)
-library(ggalluvial)
-
-gap_jtk <- tb_18_match |>
-  ungroup() |> 
-  filter(year == 2018) |> 
-  mutate(across(.fns = ~str_replace_all(.x, " percent", "%"))) |> 
-  group_by(cost, household_income) |> 
-  summarise(estimate = sum(estimate))
-
-ggplot(gap_jtk,
-       aes(y = estimate,
-           axis2 = cost,
-           axis1 = household_income)) +
-  geom_alluvium(aes(fill = household_income)) +
-  geom_stratum() +
-  geom_text(stat = "stratum",
-            aes(label = after_stat(stratum))) +
-  scale_x_discrete(limits = c("Income", "Cost")) +
-  theme_void()
-
-```
-
-
-```{r gap-plot, fig.cap=""}
-
-gap <- read_rds("data/gap.rds")
+gap <- read_rds("data/gap.rds") |>
+  mutate(gapcode = case_when(
+    gapcode == "Gap" ~ "Unaffordable",
+    TRUE ~ "Affordable"
+  ))
 
 ggplot(gap,
        aes(x = year, 
            y = estimate,
            fill = gapcode)) +
-  geom_bar(stat = "identity") +
+  geom_col() +
   facet_grid(~household_income) +
-  theme(axis.title = element_blank()) +
-  labs(title = "Rental housing gap by AMI: 2015 to 2018", fill = "Gap/Affordability")
+  scale_y_continuous(labels = label_comma()) +
+  labs(title = "Rental housing gap by AMI",
+       subtitle = "2015 to 2018",
+       fill = "Affordability of current home") +
+  theme(
+    legend.position = "bottom",
+    axis.title = element_blank(),
+    panel.background = element_blank(),
+    panel.grid.major.y = element_line(color = "grey95",
+                                      size = 0.05),
+    axis.ticks = element_blank()
+  )
 
 ```
 
-## Income versus affordability
+In 2015, there was an overall gap of nearly 40,000 rental homes affordable to households making 80% AMI or less. By 2018, that gap had increased by 354 homes to reach a total gap of 39,860.
 
-Market asking rents across the region have been on the incline between 2016 and 2020. But median renter household income for the region is still not enough to afford asking rents in each locality. That gap is most prominent in the Chesterfield County, where the typical renter can only afford a rent of \$1,098, but the local market asking rent is \$1,265 --- a \$167 gap. The gap is less severe in Hanover County and the City of Richmond where the gap is only about \$30. 
+Increases in the gap occurred mainly among housing between 31 and 80% AMI, but it is important to note that a gap in housing across all income levels impacts households of any income. This accentuates the need for new affordable housing at all income levels --- but especially for 30% AMI or below households. As of 2018, these extremely low-income renters face a shortage of over 22,000 rental homes.
 
-```{r renter-rent}
+## Incomes versus housing costs
 
-# Compare regional renter income versus local rental prices
+```{r}
+#| label: income-costs-data
+#| eval: false
 
-years <- 2016:2020
+# Load income data
 
-b25119_vars <- load_variables(2020, "acs5") |> 
-  filter(str_sub(name, end = 6) %in% "B25119")
+b25119_cpi <- read_rds("data/b25119_cpi.rds")
 
-b25119_raw <- map_dfr(years, function(yr){
-  b25119_pull <- get_acs(
-    geography = "county",
-    state = "VA",
-    table = "B25119",
-    year = yr,
-    survey = "acs5",
-    cache_table = TRUE
-  ) %>%
-    mutate(year = yr)
-  })
+renter_income <- b25119_cpi |> 
+  filter(tenure == "Renter",
+         NAME %in% pha_names) |> 
+  select(NAME, year, estimate = cdollars, dollars20)
 
-b25119_raw <- b25119_raw |> 
-  mutate(NAME = str_remove_all(NAME, ", Virginia")) |> 
-  filter(NAME %in% pha_names)
-
-b25119_vars_cleaned <- b25119_vars |> 
-  separate(label, into = c("est", "income", "total", "tenure"), sep = "!!") |>  
-  select(variable = name, tenure) |> 
-  mutate(tenure = case_when(
-    tenure == "Owner occupied (dollars)" ~ "Homeowner",
-    tenure == "Renter occupied (dollars)" ~ "Renter"
-  ))
-
-b25119_vars_cleaned$tenure <- b25119_vars_cleaned$tenure |>  replace_na('All households')
-
-renter_income <- b25119_raw |> 
-  right_join(b25119_vars_cleaned, by = "variable") |> 
-  filter(tenure == "Renter") |> 
-  select(NAME, GEOID, year, estimate)
+# Load rent data
 
 rr_rent_annual <- read_csv("data/rr_annual_rent.csv") |> 
     pivot_longer(cols = 2:8,
@@ -202,9 +164,7 @@ rr_rent_annual <- read_csv("data/rr_annual_rent.csv") |>
   clean_names() |> 
   mutate(NAME = str_replace(locality, "City", "city"))
 
-```
-
-```{r}
+# Load sales data
 
 rr_sales_annual <- read_csv("data/rr_annual_sales.csv") |> 
   pivot_longer(cols = 2:9,
@@ -214,10 +174,7 @@ rr_sales_annual <- read_csv("data/rr_annual_sales.csv") |>
   mutate(locality = str_replace(locality, "City", "city")) |> 
   filter(locality %in% pha_names) 
 
-```
-
-
-```{r}
+# Join rents and sales to incomes
 
 costs_income <- rr_rent_annual |> 
   left_join(renter_income, by = c("NAME", "year")) |> 
@@ -228,10 +185,40 @@ costs_income <- rr_rent_annual |>
   select(locality=1,2,income=3,4) |> 
   left_join(rr_sales_annual, by = c("locality", "year"))
 
+# Add affordable rents and sales prices
+
+int_rates <- read_csv("data/fredmac_int_annual.csv")
+
+downpayment <- 0.05 # 5% downpayment
+closingcosts <- 0.015 # 1.5% closing costs
+taxes <- 250 # Assume $250/month for taxes
+ins_fees <- 150 # Assume $150/month for insurance and fees
+
+price_calc <-  function(x, y) {
+  
+  monthly_cost <- x / 12 * 0.28
+  monthly_pmt <- monthly_cost - (taxes + ins_fees)
+  principal <- monthly_pmt * (((1-1/(1+y)^360))/(y/12))
+  loan_amt <- principal/(1-closingcosts)
+  price <- (loan_amt * -1) / ((downpayment) - 1)
+
+  price
+  
+}
+
+costs_income_afford <- costs_income |> 
+  left_join(int_rates, by = "year") |> 
+  mutate(rent_afford = income / 12 * 0.3) |> 
+  mutate(price_afford = price_calc(income, annual_int))
+
+write_rds(costs_income_afford, "data/costs_income_afford.rds")
+
+
 ```
 
-
 ```{r}
+#| label: income-costs-change
+#| eval: false
 
 costs_income_change <- costs_income |> 
   group_by(locality) |> 
@@ -261,75 +248,98 @@ write_rds(costs_income_change, "data/costs_income_change.rds")
 
 ```
 
-
-
-
-
 ```{r}
+#| label: income-costs-load
+
+costs_income_afford <- read_rds("data/costs_income_afford.rds")
 
 costs_income_change <- read_rds("data/costs_income_change.rds")
-  
+
+```
+
+### Overview
+
+Housing costs---both for-sale prices and rents---have steadily accelerated in the region since 2016. Every locality say home prices rise more than 50 percent, with average rents not far behind. Average renter incomes also increased from 2016 to 2020, although those gains were not as steady across all localities.
+
+```{r}
+#| label: fig-costs-inc-change
+#| fig.cap: "Cumulative percent change in median renter income, home prices, and average rent"
+
 ggplot(costs_income_change,
        aes(x = year,
            y = pct_chg,
            color = type)) +
   geom_line(size = 1) +
-  facet_wrap(~locality) +
+  facet_wrap(~locality, nrow = 1) +
   scale_y_continuous(labels = label_percent()) +
-  labs(title = "Cumulative percent change in median renter income and average rent",
-       subtitle="2016 to 2022",
+  labs(title = "Cumulative percent change in median renter income,\nhome prices, and average rent",
+       subtitle ="2016 to 2022 (ACS income data through 2020)",
        color = "Percent change",
        caption = "Sources: U.S. Census Bureau, American Community Survey, Table B25119,\nCentral Virginia MLS, and CoStar Group, Inc.") +
   theme(axis.title = element_blank(),
         panel.background = element_blank(),
         panel.grid.major.x = element_blank(),
-        legend.position = "right",
-        axis.text.x = element_text(angle = 90),
+        legend.position = "bottom",
+        axis.text.x = element_text(angle = 90, vjust = 0.5),
         panel.grid.major.y = element_line(color = "grey95",
                                           size = 0.05),
         axis.ticks = element_blank())
 
 ```
 
+However, there are two other important takeaways:
+
+1. Average renter income data is currently only available through 2020, while the sharpest housing price increases occurred from then through 2022.
+2. Average renter incomes were already below the level necessary to afford the typical apartment or home for sale.
+
+### Rental affordability
+
+Market asking rents across the region have been on the incline between 2016. Still, the median incomes for renters in Chesterfield and Henrico---at least from 2016 to 2020---could afford average rents. That was not the case for Henrico and Richmond, where the monthly rental price affordability gaps were \$20 and \$218, respectively.
+
 ```{r}
+#| label: fig-rent-afford
+#| fig.cap: "Average rents versus affordable rents for median renter income"
 
-rent_income_gap <- rent_income |> 
-  mutate(affordable_rent = (estimate/12)*.30) |> 
-  mutate(difference = rent_current - affordable_rent) |> 
-  drop_na() |> 
-  select(year, locality, rent_current, affordable_rent, difference)
-
-rent_gap <- rent_income_gap |> 
-  pivot_longer(3:5,
-               names_to = "type",
-               values_to = "dollars") |> 
-  filter(type != "difference") |> 
-  subset(locality %in% pha_names) |> 
+rent_afford <- costs_income_afford |> 
+  select(1, 2, 4, 7) |> 
+  pivot_longer(cols = 3:4,
+               names_to = "type") |> 
   mutate(type = case_when(
-    type == "rent_current" ~ "Average market asking rent",
-    type == "affordable_rent" ~ "Rent affordable to typical renter"
+    type == "rent" ~ "Average rent",
+    TRUE ~ "Affordable rent"
   ))
-  
-ggplot(rent_gap,
-       aes(x = year,
-           y = dollars,
-           color = type
-        )) +
-  geom_line(stat = "identity", size = 1) +
-  facet_wrap(~locality) +
-  scale_y_continuous(labels = dollar_format()) +
-  theme(axis.title = element_blank(),
-        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 1)) +
-  labs(title = "Market asking rent versus rent affordable to typical renter in the region", color = "Nominal rent")
 
+ggplot(rent_afford,
+       aes(x = year,
+           y = value,
+           fill = type)) +
+  geom_col(position = "dodge") +
+  facet_wrap(~locality, nrow = 1) +
+  scale_x_continuous(n.breaks = 7) +
+  scale_y_continuous(labels = label_dollar()) +
+  labs(title = "Average rents versus affordable rents for median renter income",
+       subtitle ="2016 to 2022 (ACS income data through 2020)",
+       caption = "Sources: U.S. Census Bureau, American Community Survey,\nTable B25119 and CoStar Group, Inc.") +
+  theme(axis.title = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        legend.position = "bottom",
+        legend.title = element_blank(),
+        axis.text.x = element_text(angle = 90, vjust = 0.5),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.ticks = element_blank())
 
 ```
+
+
+
 
 For the typical renter household in the region wanting to enter homeownership, the income needed to afford local home prices remains wide. In every locality, the gap between income needed to afford the median home price and the regional renter income is over \$10,000. Renters are especially hard pressed to afford a home in Hanover County, where the gap is over \$25,000. 
 
 ```{r  renter-own}
 
-#Compare renter income versus home prices
+# Compare renter income versus home prices
 
 rr_sales_annual <- read_csv("data/rr_annual_sales.csv") |> 
   pivot_longer(cols = 2:9,
@@ -378,12 +388,12 @@ ggplot(sale_income_gap,
 
 ```{r occupations}
 
+# Income of five most common job sectors/occupations versus rental and home prices
 
 ```
 
 Ratio
 ```{r ratio}
 
-# Income of five most common job sectors/occupations versus rental and home prices
 
 ```
