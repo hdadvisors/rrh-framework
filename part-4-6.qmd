@@ -29,9 +29,12 @@ costar_name <- "Goochland County"
 
 ## Takeaways
 
-```
-Add short bullet points summarizing major changes
-```
+- After brief declined in the early 2010s, Goochland County's population has been growing steadily since 2012.
+- The majority of population change in the county has been due to domestic migration. Between 2020 and 2021, the county saw 738 new residents from other parts of the region, state, or nation.
+- Homeowners have seen increasing median incomes in the county, while renter median renter income gains disappeared by 2020. 
+- Despite the COVID-19 pandemic demand, median home price in Goochland County has remained relatively flat, but still among the highest in the region --- averaging in the \$500,00s.
+- New rental properties along the eastern border of the county have driven average asking rents well into the $2,000s.
+- Cost burden has been in decline for both homeowner and renter households, but nearly one in four renter households in the county remain cost-burdened as of 2018.
 
 ## Demographic and socioeconomic changes
 

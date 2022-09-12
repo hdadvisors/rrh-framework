@@ -29,17 +29,17 @@ costar_name <- "Powhatan County"
 
 ## Takeaways
 
-```
-Add short bullet points summarizing major changes
-```
+- 
 
 ## Demographic and socioeconomic changes
 
 ### Population changes
 
-.....
+Despite a dip in population from 2014 to 2015, Powhatan County has been on an upward trend for the most part. In 2020, the county reached a population of 30,333 --- an overall increase of 8 percent since 2010.
 
-```{r pop, fig.cap=paste0(name, ": Total Population")}
+```{r}
+#| label: fig-pop
+#| fig-cap: !expr "paste0(name, /": Total Population/")"
 
 # Add choice of population stat (net change, components, etc)
 
@@ -65,19 +65,15 @@ pop_bar <- ggplot(pop,
         panel.grid.major.y = element_line(color = "grey95",
                                           size = 0.05))
 
-# ggplotly(pop_bar) |> 
-#   plotly_camera()
-
-# 2010 to 2020 increase of 22,396 
-# 2019 TO 2020 decrease of 3,826
-
 pop_bar
 
 ```
 
-.....
+Like many other rural counties in the region, New Kent County's population growth in recent years has been due to domestic migration. Between 2020 and 2021, 
 
-```{r comp, fig.cap=paste0(name,": Components of population change"}
+```{r}
+#| label: fig-comp
+#| fig-cap: !expr "paste0(name, /": Components of population change/")"
 
 change <- read_rds("data/rr_comp_change.rds") |> 
   filter(year %in% as.character(years) | year == "2021") |> 
@@ -105,9 +101,11 @@ ggplot(change,
 
 ### Household characteristics
 
-.....
+The county has seen a decreasing number of renter households across the board. But homeowners continue to come to the county --- especially homeowner households with children. Between 2016 and 2020, there was an estimated 463 more homeowners with children. 
 
-```{r children, fig.cap=paste0(name, ": Change in households with children by tenure"}
+```{r}
+#| label: fig-children
+#| fig-cap: !expr "paste0(name, /": Change in households with children by tenure/")"
 
 # Add choice of household stat (HHs with children, HHs with seniors, subfamilies, etc)
 
@@ -132,10 +130,11 @@ ggplot(b25115,
         axis.ticks = element_blank())
 
 ```
+The greatest increases in the senior population in the county have been among seniors living with a spouse (+498). In contrast to other localities, New Kent County is not seeing a large increase in seniors living alone --- suggesting that senior families are choosing to stay or move to New Kent County.
 
-.....
-
-```{r seniors, fig.cap=paste0(name, ": Change in senior population by living arrangement"}
+```{r}
+#| label: fig-seniors
+#| fig-cap: !expr "paste0(name, /": Change in senior population by living arrangement/")"
 
 b09020 <- read_rds("data/b09020_data.rds") |> 
   filter(NAME == name) |> 
@@ -170,9 +169,11 @@ ggplot(b09020,
 
 ### Income and wages
 
-.....
+Homeowner median household income has been on the incline from 2016 to 2020 --- going from \$92,651 in 2016 to \$104,545 in 2020, a 14 percent increase. Although renter median household income was on its way up from 2016 to 2017, median renter household income has been on decline since a high of \$60,440 in 2017. 
 
-```{r income, fig.cap=paste0(name, ": Median houshold income by tenure")}
+```{r}
+#| label: fig-income
+#| fig-cap: !expr "paste0(name, /": Median houshold income by tenure/")"
 
 # Add choice of income stat (probably median household income of some kind)
 
@@ -206,7 +207,9 @@ ggplot(b25119_cpi,
 
 .....
 
-```{r ind-living, paste0(name, ": Net change in individuals with independent living difficulties by age"}
+```{r}
+#| label: fig-ind-living
+#| fig-cap: !expr "paste0(name, /": Net change in individuals with independent living difficulties by age/")"
 
 # Add disability stat (probably independent living difficulty)
 
@@ -234,17 +237,21 @@ ggplot(b18107,
 
 ```
 
+
+
 ## Housing supply and market changes
 
 ### Homeownership
 
-.....
+New Kent County median home price has been increasing in recent years. From a low of \$294,719 in September 2017 to a high of \$407,231 in May 2022, median home price in the county has increased nearly 40 percent. 
 
-```{r sales, fig.cap=paste0(name, ": Median home sales price")}
+```{r}
+#| label: fig-sales
+#| fig-cap: !expr "paste0(name, /": Median home sales price/")"
 
 # Median sales price over time
 
-price <- read_csv("data/powhatan_med_sales.csv") |> 
+price <- read_csv("data/newkent_med_sales.csv") |> 
   clean_names() |> 
   mutate(geography = name) |> 
   pivot_longer(cols = starts_with("sale"),
@@ -260,15 +267,27 @@ price <- price |>
   mutate(date = make_date(year, month)) |> 
   mutate(med_price = parse_number(med_price))
 
-ggplot(price,
+cpi <- read_csv("data/CPIAUCSL.csv") |> 
+  select(date = DATE, cpi = CPIAUCSL)
+
+price_adj <- price |> 
+  left_join(cpi, by = "date") |> 
+  mutate(dollars = ((295.271/cpi)*med_price)) |> 
+  select(date, med_price, dollars) |> 
+  pivot_longer(2:3,
+               names_to = "type",
+               values_to = "dollars") |> 
+  filter(type == "dollars")
+
+ggplot(price_adj,
        aes(x = date,
-           y = med_price,
-           color = med_price)) +
+           y = dollars,
+           color = dollars)) +
   geom_line(stat = "identity", size = 1) +
-  scale_y_continuous(labels = label_dollar(), limits = c(0, NA)) +
+  scale_y_continuous(labels = label_dollar()) +
   scale_x_date(date_labels = "%Y", date_breaks = "1 year") +
   labs(title = paste0(name, ": Median home sales price"),
-       subtitle = "January 2017 to June 2022",
+       subtitle = "January 2017 to July 2022",
        caption = "Source: Central Virginia Regional Multiple Listing Service.") +
   theme(axis.title = element_blank(),
         panel.background = element_blank(),
@@ -277,127 +296,98 @@ ggplot(price,
         panel.grid.major.x = element_blank(),
         panel.grid.major.y = element_line(color = "grey95",
                                           size = 0.05)) +
-  scale_color_continuous(type = "viridis", label = dollar_format())
+  scale_color_continuous(type = "viridis", label = dollar_format()) + 
+  geom_smooth(method = "lm")
 
 
 ```
 
 ### Rental
 
-.....
+CoStar does not list any multifamily properties in New Kent County. However in 2020, there was an estimated 815 renters in the county. This was a decrease from 2016 when there were 1,202 renters (16 percent of total households). Based on U.S. Census Bureau estimates the majority (89 percent) of those 815 renter households in the county live in single-family detached homes.
 
-```{r rent-submarket, fig.cap=paste0(name, ": Average asking rent by submarket"}
+```{r}
+#| label: fig-renters
+#| fig-cap: "Renter households in New Kent County"
 
-# Average asking rent over time (by submarket if applicable, maybe by bedroom if no submarkets)
+b25003_vars <- load_variables(2020, "acs5") |> 
+  filter(str_sub(name, end = 7) %in% "B25003_")
 
-# Disaggregate by Richmond CoStar Submarket
+b25003_raw <- map_dfr(years, function(yr){
+   b25003_pull <- get_acs(
+    geography = "county",
+    state = "VA",
+    table = "B25003",
+    year = yr,
+    survey = "acs5"
+  ) |> 
+    mutate(year = yr)
+})
 
-# CoStar Filters: Construction Status - Existing
+b25003_vars_cleaned <- b25003_vars |> 
+  separate(label, into = c("est", "total", "tenure"), sep = "!!") |> 
+  select(variable = name, tenure) |> 
+  mutate(tenure = case_when(
+    tenure == "Owner occupied" ~ "Homeowner",
+    tenure == "Renter occupied" ~ "Renter"
+  )) |> 
+  drop_na()
 
-# Added locality field manually
+b25003_raw <- b25003_raw |> 
+  filter(GEOID %in% fips)
 
-sub_rent <- read_csv("data/rr_submarket_data.csv") |> 
-  clean_names() |> 
-  separate(geography, into = c("region", "state", "submarket"), sep = " - ") |> 
-  select(period, locality, submarket, "rent" = market_asking_rent_unit, vacancy_rate) |> 
-  mutate(rent = parse_number(rent)) |> 
-  mutate(period = as.Date(as.yearqtr(period, format = "%Y Q%q"), frac = 1)) |> 
-  filter(locality == costar_name)
+b25003_data <- b25003_raw |> 
+  right_join(b25003_vars_cleaned, by = "variable") |> 
+  select(NAME, GEOID, year, tenure, estimate) |> 
+  mutate(NAME = str_remove_all(NAME, ", Virginia")) |>
+  group_by(NAME, year) |> 
+  mutate(pct = (estimate/sum(estimate))) |> 
+  filter(tenure == "Renter")
 
-# Issue with above is that rents are not inflation-adjusted. May need to revisit. I've requested from CoStar to allow for an inflation-adjusted average rent per unit pull, BUT who knows if they can add it. Might consider just having a table with most recent rents.
-
-ggplot(sub_rent,
-       aes(x = period,
-           y = rent, 
-           color = submarket)) +
-  geom_line(stat = "identity") + 
-  labs(title = paste0(name, ": Average asking rent by submarket"),
-       subtitle = "2000 Q1 to 2022 Q3 | Not adjusted for inflation",
-       color = "Submarket") +
-  scale_y_continuous(labels = label_dollar(), limits = c(0, NA), n.breaks = 7) +
-  scale_x_date(date_labels = "%Y", date_breaks = "2 years", limits = as.Date(c("2000-01-01", "2022-09-30"))) +
+ggplot(b25003_data,
+       aes(x = year,
+           y = pct,
+           fill = pct)) +
+  geom_col() +
   theme(axis.title = element_blank(),
-        panel.background = element_blank(),
-        axis.ticks = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+        legend.position = "none") +
+  scale_y_continuous(labels = percent_format()) +
+  labs(title = "Percent of renter households in Powhatan County", 
+       fill = "Percent of total households",
+       subtitle = "From 2016 to 2020",
+       caption = "Source: U.S Census Bureau. American Community Survey 2016-2020 5-Year Estimates. Table B25003.")  + 
+  geom_text(aes(label = percent(pct)),
+            color = "white",
+            vjust = 1)
 
-```
-
-```{r submarket-table, fig.cap="Change in average rents by Richmond submarket"}
-
-library(kableExtra)
-library(formattable)
-
-sub_rent_tbl <- read_csv("data/rr_submarket_data.csv") |> 
-  clean_names() |> 
-  separate(geography, into = c("region", "state", "submarket"), sep = " - ") |> 
-  select(period, locality, submarket, "rent" = market_asking_rent_unit) |> 
-  mutate(rent = parse_number(rent)) |> 
-  mutate(period = as.Date(as.yearqtr(period, format = "%Y Q%q"), frac = 1)) |> 
-  filter(locality == costar_name) |> 
-  filter(period == "2022-09-30" | period == "2016-03-31") |> 
-  pivot_wider(names_from = period,
-              values_from = rent)
-
-sub_tbl <- sub_rent_tbl |> 
-  select(2:4) |> 
-  mutate(pct_change = (`2022-09-30`-`2016-03-31`)/`2016-03-31`) |> 
-  mutate(across(c(2,3), ~currency(.x, digits = 0)),
-         pct_change = percent(pct_change, digits = 0)) |> 
-  arrange(desc(pct_change))
-
-sub_tbl |> 
-  kbl(col.names = c("Richmond submarket", "2016 Q1 Rent", "2022 Q3 Rent", "Percent change")) |> 
-  kable_material(c("striped", "hover")) |> 
-  footnote(general = "2016 Q1 Rent has not been adjusted for inflation")
 
 ```
 
 ### Housing assistance
 
-```
-Change in number of assisted units (NHPD)
-```
+The National Housing Preservation Database lists no federally-assisted housing properties in New Kent County. 
 
 ### Naturally-occurring affordable housing
 
-.....
+CoStar does not list any properties that can be defined as naturally-occurring affordable housing within New Kent County. However, there are at least three manufactured home communities located in the county. These communities represent a small but important source of affordability in the county.
 
-```{r noah, fig.cap=paste0(name, ": Distribution of average asking rents\nin NOAH properties by year built")}
+Putze's Mobile Home Park located in Quinton is an 11 unit community and Long Acres Mobile Home Park is a 24 unit community located in Providence Forge.
 
-# Add choice of NOAH stat (total number, change in rent, etc) 
+Rockahock Park is a combination manufactured home community and RV campground with an indeterminate amount of lots. 
 
-rva_noah <- read_csv("data/pha_noah_81722.csv") |> 
-  clean_names() |> 
-  st_as_sf(coords = c("longitude", "latitude"), crs=4326, remove=FALSE) |> 
-  filter(property_name != "Sedgefield" | property_name != "Holidy Mobile Home Park") |> 
-  filter(county_name == costar_name) |> 
-  mutate(period_built = case_when(
-    year_built < 1940 ~ "Before 1940",
-    year_built %in% 1940:1959 ~ "1940 to 1959",
-    year_built %in% 1960:1969 ~ "1960 to 1969",
-    year_built > 1969 ~ "1970 or after"
-  )) |> 
-  mutate(period_built = fct_relevel(period_built, "Before 1940"))
-  
+```{r}
+#| label: fig-mhc
+#| fig-cap: !expr "paste0(name, /": Manufactured home communities/")"
 
-ggplot(rva_noah,
-       aes(x = period_built,
-           y = avg_asking_unit,
-           fill = period_built)) +
-  geom_boxplot() +
-  scale_y_continuous(labels = label_dollar()) +
-  labs(title = paste0(name, ": Distribution of average asking rents\nin NOAH properties by year built"),
-       caption = "Source: CoStar Group, Inc.") +
-  theme(legend.position = "none",
-        panel.background = element_blank(),
-        axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
-  
+mhc <- st_read("https://services1.arcgis.com/Hp6G80Pky0om7QvQ/arcgis/rest/services/Mobile_Home_Parks/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson") |> 
+  filter(STATE == "VA",
+         COUNTY == "POWHATAN")
+
+library(leaflet)
+
+leaflet(mhc) |> 
+  addTiles() |> 
+  addCircleMarkers()
 
 ```
 
@@ -405,55 +395,11 @@ ggplot(rva_noah,
 
 ### Affordability of current housing stock
 
-```{r income-rent-gap, fig.cap=paste0(name, ": Average asking rent versus\nrent affordable to median renter income")}
+A lack of diverse rental options leave lower income households with few housing options in the county aside from renting a single-family home. To purchase a single-family home, the typical renter in the county would need to make at least \$17,000 more than they did in 2020. 
 
-# Compare local median renter income to average asking rent
-
-b25119_cpi_rent <- b25119_cpi |> 
-  filter(tenure == "Renter")
-
-rent <- read_csv("data/rr_annual_rent.csv") |> 
-    pivot_longer(cols = 2:8,
-               names_to = "locality",
-               values_to = "rent_current") |> 
-  clean_names() |> 
-  filter(locality == costar_name)
-
-rent_gap <- b25119_cpi_rent |> 
-  left_join(rent, by = "year") |> 
-  mutate(rent_current = parse_number(rent_current)) |> 
-  mutate(affordable_rent = (cdollars/12)*.30) |> 
-  mutate(difference = rent_current - affordable_rent) |> 
-  select(year, rent_current, affordable_rent) |> 
-  pivot_longer(2:3,
-               names_to = "type",
-               values_to = "dollars") |> 
-  mutate(type = case_when(
-    type == "affordable_rent" ~ "Affordable rent",
-    type == "rent_current" ~ "Current rent"
-  ))
-
-ggplot(rent_gap,
-       aes(x = year,
-           y = dollars,
-           fill = type)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  scale_y_continuous(labels = label_dollar()) +
-  labs(title = paste0(name, ": Average asking rent versus\nrent affordable to median renter income"),
-       subtitle = "2016 to 2020",
-       fill = "Nominal rent",
-       caption = "Sources: U.S. Census Bureau, American Community Survey, Table B25119\nand CoStar Group Inc.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
-
-
-```
-...
-
-```{r income-own-gap, fig.cap=title = paste0(name, ": Income needed to afford median home price\nversus median renter income")}
+```{r}
+#| label: fig-income-own-gap
+#| fig-cap: !expr "paste0(name, /": Income needed to afford median home price\nversus median renter income/")"
 
 # Compare local renter income versus local home prices
 
@@ -508,9 +454,12 @@ ggplot(slgap,
 
 
 ```
-...
 
-```{r gap, fig.cap=paste0(name, ": Rental housing gap by AMI")}
+In spite of a low number of rental housing options in the county, there was still a shortage of 255 rental housing units for households making 80 percent AMI or less in 2018. This shortage is an increase from 2015 when the shortage was 135. The increase in deficit was most significant for households making between 51 and 80 percent AMI --- an increase of 75 households from zero.
+
+```{r}
+#| label: fig-gap
+#| fig-cap: !expr "paste0(name, /": Rental housing gap by AMI/")"
 
 # Add choice of affordability stat (surplus/deficit, income vs prices, etc)
 
@@ -550,27 +499,26 @@ ggplot(gap,
 
 ### Impact of housing costs
 
-...
+Although the number of renter households in the county has been declining, the share of cost-burdened renters has only increased. In 2018, 34 percent of renter households were cost-burdened compared to about 26 percent in 2015. For homeowners, the number of cost-burdened households has remained largely unchanged (1352 in 2015 and 1322 in 2018). But as new homeowners come into the county, the share of cost-burdened homeowners has declined from 22 to 20 percent. 
 
-```{r cb, fig.cap=paste0(name, ": Cumulative change in cost-burdened households by tenure")}
+```{r}
+#| label: fig-cb
+#| fig-cap: !expr "paste0(name, /": Cost-burdened households by tenure/")"
 
 cb <- read_rds("data/cb_7.rds") |> 
-  filter(county == name,
-         cb_group == "Cost-burdened") |> 
-  group_by(year, county, tenure) |> 
+  filter(county == name) |> 
+  group_by(year, tenure, cb_group) |> 
   summarise(estimate = sum(estimate)) |> 
-  group_by(county, tenure) |> 
-  mutate(change = estimate - lag(estimate)) |> 
-  drop_na() |> 
-  mutate(run_diff = cumsum(change))
+  mutate(pct = estimate/sum(estimate))
 
 ggplot(cb,
-       aes(x = year, y = run_diff, fill = tenure)) +
-  geom_col(position = "dodge") +
-  scale_y_continuous(labels = label_comma()) +
+       aes(x = year, y = pct, fill = cb_group)) +
+  facet_wrap(~tenure) +
+  geom_col(position = position_fill(reverse = TRUE)) +
+  scale_y_continuous(labels = percent_format()) +
   labs(title = paste0(name, ": Cumulative change in cost-burdened households by tenure"),
        subtitle = "2015 to 2018",
-       fill = "Tenure",
+       fill = "Cost burden",
        caption = "Source: U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
   theme(axis.title = element_blank(),
         axis.ticks = element_blank(),
@@ -579,9 +527,11 @@ ggplot(cb,
                                           size = 0.05))
 
 ```
-...
 
-```{r mkv, fig.cap="Enrolled students experiencing homelessness by school year"}
+Available data from William and Mary's Project HOPE shows that the number of enrolled students experiencing homelessness in the county has declined in recent years. The county's McKinney-Vento Act data showed that there were 37 students experiencing homeless in the 2017-2017 school year. By the 2019-2020, that number had declined to 26. 
+```{r}
+#| label: fig-mkv
+#| fig-cap: !expr "paste0(name, /"Enrolled students experiencing homelessness by school year/")"
 
 div <- 72
 

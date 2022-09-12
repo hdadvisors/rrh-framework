@@ -30,9 +30,12 @@ costar_name <- "New Kent County"
 
 ## Takeaways
 
-```
-Add short bullet points summarizing major changes
-```
+- The county has grown by 24 percent since 2010 --- reaching a population of 22,945 as of 2020.
+- Much of the population growth in recent years has been a result of domestic migration.
+- Renters are exiting the county, while more and more new homeowners are setting up permanent residence in the county --- especially homeowners with children (+463 households between 2016 and 2020).
+- If home sales trends continue, median home price in the county is well on its way to $400,000.
+- Few rental options in the county leave lower income households having to rent single-family detached homes or simply leave the county.
+- Those renters that remain in the county are seeing increasing cost burden.
 
 ## Demographic and socioeconomic changes
 
@@ -240,6 +243,8 @@ ggplot(b18107,
 
 ```
 
+
+
 ## Housing supply and market changes
 
 ### Homeownership
@@ -366,61 +371,41 @@ ggplot(b25003_data,
 
 ### Housing assistance
 
+The National Housing Preservation Database lists no federally-assisted housing properties in New Kent County. 
 
+### Naturally-occurring affordable housing
+
+CoStar does not list any properties that can be defined as naturally-occurring affordable housing within New Kent County. However, there are at least three manufactured home communities located in the county. These communities represent a small but important source of affordability in the county.
+
+Putze's Mobile Home Park located in Quinton is an 11 unit community and Long Acres Mobile Home Park is a 24 unit community located in Providence Forge.
+
+Rockahock Park is a combination manufactured home community and RV campground with an indeterminate amount of lots. 
+
+```{r}
+#| label: fig-mhc
+#| fig-cap: !expr "paste0(name, /": Manufactured home communities/")"
+
+mhc <- st_read("https://services1.arcgis.com/Hp6G80Pky0om7QvQ/arcgis/rest/services/Mobile_Home_Parks/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson") |> 
+  filter(STATE == "VA",
+         COUNTY == "NEW KENT")
+
+library(leaflet)
+
+leaflet(mhc) |> 
+  addTiles() |> 
+  addCircleMarkers()
+
+```
 
 ## Gap analysis
 
 ### Affordability of current housing stock
 
-```{r income-rent-gap, fig.cap=paste0(name, ": Average asking rent versus\nrent affordable to median renter income")}
+A lack of diverse rental options leave lower income households with few housing options in the county aside from renting a single-family home. To purchase a single-family home, the typical renter in the county would need to make at least \$17,000 more than they did in 2020. 
 
-# Compare local median renter income to average asking rent
-
-b25119_cpi_rent <- b25119_cpi |> 
-  filter(tenure == "Renter")
-
-rent <- read_csv("data/rr_annual_rent.csv") |> 
-    pivot_longer(cols = 2:8,
-               names_to = "locality",
-               values_to = "rent_current") |> 
-  clean_names() |> 
-  filter(locality == costar_name)
-
-rent_gap <- b25119_cpi_rent |> 
-  left_join(rent, by = "year") |> 
-  mutate(rent_current = parse_number(rent_current)) |> 
-  mutate(affordable_rent = (cdollars/12)*.30) |> 
-  mutate(difference = rent_current - affordable_rent) |> 
-  select(year, rent_current, affordable_rent) |> 
-  pivot_longer(2:3,
-               names_to = "type",
-               values_to = "dollars") |> 
-  mutate(type = case_when(
-    type == "affordable_rent" ~ "Affordable rent",
-    type == "rent_current" ~ "Current rent"
-  ))
-
-ggplot(rent_gap,
-       aes(x = year,
-           y = dollars,
-           fill = type)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  scale_y_continuous(labels = label_dollar()) +
-  labs(title = paste0(name, ": Average asking rent versus\nrent affordable to median renter income"),
-       subtitle = "2016 to 2020",
-       fill = "Nominal rent",
-       caption = "Sources: U.S. Census Bureau, American Community Survey, Table B25119\nand CoStar Group Inc.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
-
-
-```
-...
-
-```{r income-own-gap, fig.cap=title = paste0(name, ": Income needed to afford median home price\nversus median renter income")}
+```{r}
+#| label: fig-income-own-gap
+#| fig-cap: !expr "paste0(name, /": Income needed to afford median home price\nversus median renter income/")"
 
 # Compare local renter income versus local home prices
 
@@ -475,9 +460,12 @@ ggplot(slgap,
 
 
 ```
-...
 
-```{r gap, fig.cap=paste0(name, ": Rental housing gap by AMI")}
+In spite of a low number of rental housing options in the county, there was still a shortage of 255 rental housing units for households making 80 percent AMI or less in 2018. This shortage is an increase from 2015 when the shortage was 135. The increase in deficit was most significant for households making between 51 and 80 percent AMI --- an increase of 75 households from zero.
+
+```{r}
+#| label: fig-gap
+#| fig-cap: !expr "paste0(name, /": Rental housing gap by AMI/")"
 
 # Add choice of affordability stat (surplus/deficit, income vs prices, etc)
 
@@ -517,27 +505,26 @@ ggplot(gap,
 
 ### Impact of housing costs
 
-...
+Although the number of renter households in the county has been declining, the share of cost-burdened renters has only increased. In 2018, 34 percent of renter households were cost-burdened compared to about 26 percent in 2015. For homeowners, the number of cost-burdened households has remained largely unchanged (1352 in 2015 and 1322 in 2018). But as new homeowners come into the county, the share of cost-burdened homeowners has declined from 22 to 20 percent. 
 
-```{r cb, fig.cap=paste0(name, ": Cumulative change in cost-burdened households by tenure")}
+```{r}
+#| label: fig-cb
+#| fig-cap: !expr "paste0(name, /": Cost-burdened households by tenure/")"
 
 cb <- read_rds("data/cb_7.rds") |> 
-  filter(county == name,
-         cb_group == "Cost-burdened") |> 
-  group_by(year, county, tenure) |> 
+  filter(county == name) |> 
+  group_by(year, tenure, cb_group) |> 
   summarise(estimate = sum(estimate)) |> 
-  group_by(county, tenure) |> 
-  mutate(change = estimate - lag(estimate)) |> 
-  drop_na() |> 
-  mutate(run_diff = cumsum(change))
+  mutate(pct = estimate/sum(estimate))
 
 ggplot(cb,
-       aes(x = year, y = run_diff, fill = tenure)) +
-  geom_col(position = "dodge") +
-  scale_y_continuous(labels = label_comma()) +
+       aes(x = year, y = pct, fill = cb_group)) +
+  facet_wrap(~tenure) +
+  geom_col(position = position_fill(reverse = TRUE)) +
+  scale_y_continuous(labels = percent_format()) +
   labs(title = paste0(name, ": Cumulative change in cost-burdened households by tenure"),
        subtitle = "2015 to 2018",
-       fill = "Tenure",
+       fill = "Cost burden",
        caption = "Source: U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
   theme(axis.title = element_blank(),
         axis.ticks = element_blank(),
@@ -546,8 +533,11 @@ ggplot(cb,
                                           size = 0.05))
 
 ```
-...
-```{r mkv, fig.cap="Enrolled students experiencing homelessness by school year"}
+
+Available data from William and Mary's Project HOPE shows that the number of enrolled students experiencing homelessness in the county has declined in recent years. The county's McKinney-Vento Act data showed that there were 37 students experiencing homeless in the 2017-2017 school year. By the 2019-2020, that number had declined to 26. 
+```{r}
+#| label: fig-mkv
+#| fig-cap: !expr "paste0(name, /"Enrolled students experiencing homelessness by school year/")"
 
 div <- 63
 
