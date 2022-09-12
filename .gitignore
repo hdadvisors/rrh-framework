@@ -5,5 +5,5 @@
 .Renviron
 
 /.quarto/
-/.part-*/
+/part-*/
 /_freeze/

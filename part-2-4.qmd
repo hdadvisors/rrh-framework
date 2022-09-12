@@ -468,7 +468,7 @@ Manufactured home communities (MHCs) are also a valuable source of NOAH across t
 
 ### Supply
 
-In 2016, the Manufactured Home Community Coalition of Virginia (MHCCV) conducted an assessment of all manufactured home communities across the Richmond, Virginia Metropolitan Statistical Area (MSA). That report found 4,735 homes across 54 MHCs in the greater region. Within the primary PHA area[^Chesterfield, Hanover, Henrico, and Richmond.] there are 24 different MHCs, which in all contained at least 2,742 individual manufactured homes. 
+In 2016, the Manufactured Home Community Coalition of Virginia (MHCCV) conducted an assessment of all manufactured home communities across the Richmond, Virginia Metropolitan Statistical Area (MSA). That report found 4,735 homes across 54 MHCs in the greater region. Within the primary PHA area^[Chesterfield, Hanover, Henrico, and Richmond.] there are 24 different MHCs, which in all contained at least 2,742 individual manufactured homes. 
 
 ::: callout-note
 

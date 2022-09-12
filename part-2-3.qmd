@@ -18,6 +18,9 @@ library(knitr)
 library(kableExtra)
 library(formattable)
 library(readxl)
+library(tigris)
+library(ggspatial)
+library(mapboxapi)
 
 ```
 
@@ -41,8 +44,8 @@ nhpd_clean <- nhpd |>
 localities <- c("CHARLES CITY", "CHESTER", "CHESTERFIELD", "GLEN ALLEN", "HENRICO", "HIGHLAND SPRINGS", "MIDLOTHIAN", "NORTH CHESTERFIELD", "Richmond", "RICHMOND", "RICHMOND CITY", "SANDSTON", "ASHLAND", "MECHANICSVILLE")
 
 nhpd_clean_rr <- nhpd_clean |>
-  subset(city %in% localities) |> 
-  mutate(across(c(6,7), ~ as.Date(.x, "%m/%d/%Y"))) |> 
+  subset(city %in% localities) |>
+  mutate(across(c(6,7), ~ as.Date(.x, "%m/%d/%Y"))) |>
   mutate(property_name = case_when(
     str_detect(fulladdress, "^5409 HULL") ~ "STUDIOS AT SOUTH RICHMOND",
     fulladdress == "707 N HARRISON ST, RICHMOND, VA, 23220" ~ "THE NEW CLAY HOUSE",
@@ -63,25 +66,25 @@ rr_names <- c("Richmond City", "Hanover County", "Henrico County", "Chesterfield
 
 vh_lihtc_recent <- read_xlsx("data/vh-lihtc-2022-01.xlsx",
                       range = "A2:L1384",
-                      trim_ws = TRUE) |> 
-  clean_names() |> 
-  filter(jurisdiction %in% rr_names) |> 
-  separate(cycle_name, into = c("cycle_year", "cycle_type"), sep = "\\s", extra = "merge") |> 
+                      trim_ws = TRUE) |>
+  clean_names() |>
+  filter(jurisdiction %in% rr_names) |>
+  separate(cycle_name, into = c("cycle_year", "cycle_type"), sep = "\\s", extra = "merge") |>
   mutate(subsidy_name = "LIHTC",
          subsidy_status = "Active",
-         start_date = lubridate::ymd(cycle_year, truncated = 2L)) |> 
-  filter(start_date > '2010-01-01') |> 
+         start_date = lubridate::ymd(cycle_year, truncated = 2L)) |>
+  filter(start_date > '2010-01-01') |>
   mutate(cycle_type = str_squish(cycle_type),
-         cycle_type = str_replace(cycle_type, "Hsg", "Housing")) |> 
-  mutate(fulladdress = str_to_upper(paste0(street_address, ", ", city, ", VA", " ", zip))) |> 
+         cycle_type = str_replace(cycle_type, "Hsg", "Housing")) |>
+  mutate(fulladdress = str_to_upper(paste0(street_address, ", ", city, ", VA", " ", zip))) |>
   mutate(subsidy_subname = case_when(
     str_detect(cycle_type, "9%") &  duplicated(vhda_number) ~ "9% Tax Credit and maybe 4%",
     str_detect(cycle_type, "4%") ~ "4% Tax Credit",
-    TRUE ~ "TCEP")) |> 
+    TRUE ~ "TCEP")) |>
   select(nhpd_property_id = vhda_number, subsidy_name, subsidy_status,
          subsidy_subname, start_date, assisted_units = tax_credit_units,
          known_total_units = total_units, property_name, fulladdress,
-         address_components.county = jurisdiction) |> 
+         address_components.county = jurisdiction) |>
   filter(!property_name %in% c("Ashland Woods", "Audubon Village II", "Bellevue",
                                "Belle Summit", "Brook Creek Crossings",
                                "Cary West", "Eggleston Plaza", "Goodwyn at Union Hill",
@@ -91,7 +94,7 @@ vh_lihtc_recent <- read_xlsx("data/vh-lihtc-2022-01.xlsx",
                                "New Clay House II", "North Oak", "Oakmeade",
                                "Somanath Seniors at Beckstoffers",
                                "Studios at South Richmond", "Townhomes at Warwick Place",
-                               "Tuscany Townhomes")) |> 
+                               "Tuscany Townhomes")) |>
   mutate(nhpd_property_id = case_when(
     str_detect(property_name, "Armstrong Renaissance") ~ 1155578,
     property_name == "Audubon Village I" ~ 1095212,
@@ -114,15 +117,15 @@ vh_lihtc_recent <- read_xlsx("data/vh-lihtc-2022-01.xlsx",
     TRUE ~ nhpd_property_id
   ))
 
-nhpd_clean_rr <- nhpd_clean_rr |> 
-  bind_rows(vh_lihtc_recent) |> 
-  group_by(nhpd_property_id, subsidy_status) |> 
-  add_count(nhpd_property_id, name = "subsidies") |> 
+nhpd_clean_rr <- nhpd_clean_rr |>
+  bind_rows(vh_lihtc_recent) |>
+  group_by(nhpd_property_id, subsidy_status) |>
+  add_count(nhpd_property_id, name = "subsidies") |>
   mutate(subsidy_type = case_when(
       subsidies > 1 ~ "Multiple",
       TRUE ~ subsidy_name
-  )) |> 
-  ungroup() |> 
+  )) |>
+  ungroup() |>
   mutate(known_total_units = case_when(
     nhpd_property_id == 1155578 ~ 186,
     TRUE ~ known_total_units
@@ -145,7 +148,7 @@ nhpd_coded <- nhpd_clean_rr |>
           long = Longitude)
 
 nhpd_coded_rr <- nhpd_coded |>
-  rename(locality = address_components.county...30) |> 
+  rename(locality = address_components.county...30) |>
   mutate(Latitude = case_when(
     property_name == "NEW MANCHESTER FLATS IX" ~ 37.517602,
     property_name == "KINGSRIDGE I" ~ 37.551666,
@@ -191,14 +194,14 @@ nhpd_clean_rr <- read_rds("data/nhpd_clean_rr.rds")
 
 nhpd_coded_rr <- read_rds("data/nhpd_coded_rr.rds")
 
-subsidy <- nhpd_clean_rr |> 
-  filter(subsidy_status != "Inactive") |> 
-  group_by(subsidy_type, nhpd_property_id) |> 
-  summarise(units = max(known_total_units)) |> 
-  group_by(subsidy_type) |> 
-  summarise(units = sum(units)) |> 
+subsidy <- nhpd_clean_rr |>
+  filter(subsidy_status != "Inactive") |>
+  group_by(subsidy_type, nhpd_property_id) |>
+  summarise(units = max(known_total_units)) |>
+  group_by(subsidy_type) |>
+  summarise(units = sum(units)) |>
   mutate(percent = units/sum(units))
-  
+
 ggplot(subsidy,
        aes(y = reorder(subsidy_type, units),
            x = percent,
@@ -231,20 +234,20 @@ In an effort to maximize assistance, rental subsidy programs are often layered t
 #| label: tbl-multiple
 #| tbl-cap: "Active subsidies in units with mutiple subsidies"
 
-multiple <- nhpd_clean_rr |> 
+multiple <- nhpd_clean_rr |>
   filter(subsidy_status != "Inactive",
-         subsidy_type == "Multiple") |> 
-  group_by(subsidy_name, subsidy_subname) |> 
-  summarise(units = sum(assisted_units)) |> 
-  ungroup() |> 
+         subsidy_type == "Multiple") |>
+  group_by(subsidy_name, subsidy_subname) |>
+  summarise(units = sum(assisted_units)) |>
+  ungroup() |>
   mutate(detail = case_when(
     subsidy_name == "LIHTC" ~ subsidy_subname,
     subsidy_name %in% c("HOME", "RHS 515", "Project Based Vouchers", "Section 202") ~ subsidy_name,
     units < 400 ~ " ",
-    TRUE ~ subsidy_subname)) |> 
+    TRUE ~ subsidy_subname)) |>
   mutate(subsidy_name = case_when(
     subsidy_name %in% c("HOME", "RHS 515", "Project Based Vouchers", "Section 202") ~ "Other",
-    TRUE ~ subsidy_name)) |> 
+    TRUE ~ subsidy_name)) |>
   mutate(detail = case_when(
     subsidy_subname == "4% and 9% Tax Credit" ~ subsidy_subname,
     subsidy_name == "Section 8" & units < 400 ~ "Other",
@@ -252,24 +255,30 @@ multiple <- nhpd_clean_rr |>
     subsidy_subname == "221(D)(4) MKT RATE MOD INC/ DISP FAMS" ~ "221(D)(4)",
     subsidy_name == "HUD Insured" & units < 600 ~ "Other",
     TRUE ~ detail
-  )) |> 
+  )) |>
   mutate(subsidy_name_ext = paste(subsidy_name, detail),
          subsidy_name_ext = fct_lump_n(subsidy_name_ext, n = 4, w = units),
          detail = str_wrap(detail, width = 10))
 
-multiple |> 
-  group_by(subsidy_name_ext) |> 
-  summarise(units = sum(units)) |> 
+multiple |>
+  group_by(subsidy_name_ext) |>
+  summarise(units = sum(units)) |>
   mutate(pct = units / 8061,
          pct = percent(pct, digits = 1),
-         units = comma(units, digits = 0)) |> 
+         units = comma(units, digits = 0)) |>
   kable(align = "lrr",
-        col.names = c("Detailed subsidy type", "Units with subsidy", "Percent of total")) |> 
-  kableExtra::kable_styling(bootstrap_options = c("condensed", "striped")) |> 
-  kableExtra::footnote(general = "Note: Totals do not add to 100% because units are percent of all 8,061 units with multiple subsidies. \n Sources: National Housing Preservation Database and Virginia Housing.",
+        col.names = c("Detailed subsidy type", "Units with subsidy", "Percent of total")) |>
+  kableExtra::kable_styling(bootstrap_options = c("condensed", "striped")) |>
+  kableExtra::footnote(general = "Sources: National Housing Preservation Database and Virginia Housing.",
                        general_title = "")
 
 ```
+
+::: callout-note
+
+Table totals do not add to 100 percent because units are percent of all 8,061 *units* with multiple subsidies, not the total of all subsidies.
+
+:::
 
 ```{r}
 #| label: fig-multiple-detail
@@ -304,8 +313,8 @@ The map below shows the locations of affordable rental properties in the Richmon
 #| label: nhpd-map
 #| eval: false
 
-nhpd_mapped_rr <- read_rds("data/nhpd_coded_rr.rds") |> 
-  st_as_sf(coords = c("Longitude", "Latitude"), crs=4326, remove = FALSE) |> 
+nhpd_mapped_rr <- read_rds("data/nhpd_coded_rr.rds") |>
+  st_as_sf(coords = c("Longitude", "Latitude"), crs=4326, remove = FALSE) |>
   filter(fulladdress != "PO BOX 8585, RICHMOND, VA, 23226")
 
 write_rds(nhpd_mapped_rr, "data/nhpd_mapped_rr.rds")
@@ -316,9 +325,9 @@ write_rds(nhpd_mapped_rr, "data/nhpd_mapped_rr.rds")
 #| label: fig-nhpd-map
 #| fig.cap: "Federally-assisted rental housing properties"
 
-nhpd_map <- read_rds("data/nhpd_mapped_rr.rds") |> 
-  filter(subsidy_status != "Inactive") |> 
-  group_by(subsidy_type, nhpd_property_id) |> 
+nhpd_map <- read_rds("data/nhpd_mapped_rr.rds") |>
+  filter(subsidy_status != "Inactive") |>
+  group_by(subsidy_type, nhpd_property_id) |>
   summarise(units = max(known_total_units))
 
 subsidyPal <- colorFactor(viridis(8), nhpd_map$subsidy_name)
@@ -340,15 +349,15 @@ Richmond continues to support the majority of affordable rentals in the region (
 #| label: fig-subsidy-location
 #| fig-cap: "Federally assisted units by subsidy and locality"
 
-subsidy_local <- nhpd_coded_rr |> 
+subsidy_local <- nhpd_coded_rr |>
   select(nhpd_property_id, subsidy_type, known_total_units,
-         subsidy_status, locality) |> 
+         subsidy_status, locality) |>
   filter(subsidy_status != "Inactive",
-         locality != "Charles City County") |> 
-  group_by(locality, subsidy_type, nhpd_property_id) |> 
-  summarise(units = max(known_total_units)) |> 
-  group_by(locality, subsidy_type) |> 
-  summarise(units = sum(units)) |> 
+         locality != "Charles City County") |>
+  group_by(locality, subsidy_type, nhpd_property_id) |>
+  summarise(units = max(known_total_units)) |>
+  group_by(locality, subsidy_type) |>
+  summarise(units = sum(units)) |>
   filter(units > 1)
 
 ggplot(subsidy_local,
@@ -393,30 +402,30 @@ ggplot(subsidy_local,
 Since January 2020, the region has seen 57 new rental subsidies added, which increased the number of active affordability contracts on units by 4,393. Over that same period, 17 subsidies ended, affecting 1,633 units. Some properties had multiple subsidies either added or expired. In all, there was a net addition of 2,760 rental affordability contracts.
 
 ```{r}
-#| label: tbl-change
+#| label: tbl-change-table
 #| tbl-cap: "Added and removed affordable rental contracts since 2020"
 
-change <- nhpd_coded_rr |> 
+change <- nhpd_coded_rr |>
   mutate(change_type = case_when(
     start_date > '2019-12-31' ~ "Added",
     end_date < '2022-09-01' & end_date > '2019-12-31' ~ "Removed",
     TRUE ~ "No change"))
 
-change_table <- change |> 
-  group_by(change_type) |> 
+change_table <- change |>
+  group_by(change_type) |>
   summarise(subsidies = n(),
             properties = n_distinct(nhpd_property_id),
-            units = sum(assisted_units)) |> 
-  filter(change_type != "No change") |> 
-  mutate(across(where(is.numeric), ~ ifelse(change_type == "Removed", (.x * -1), .x))) |> 
+            units = sum(assisted_units)) |>
+  filter(change_type != "No change") |>
+  mutate(across(where(is.numeric), ~ ifelse(change_type == "Removed", (.x * -1), .x))) |>
   adorn_totals(name = "Net change")
 
-change_table |> 
-  mutate(across(where(is.numeric), ~ comma(.x, digits = 0))) |> 
+change_table |>
+  mutate(across(where(is.numeric), ~ comma(.x, digits = 0))) |>
   kable(align = "lrrr",
-        col.names = c("", "Subsidies", "Properties affected", "Units included")) |> 
-  kableExtra::kable_styling(bootstrap_options = c("condensed", "striped")) |> 
-  kableExtra::row_spec(3, bold = TRUE) |> 
+        col.names = c("", "Subsidies", "Properties affected", "Units included")) |>
+  kableExtra::kable_styling(bootstrap_options = c("condensed", "striped")) |>
+  kableExtra::row_spec(3, bold = TRUE) |>
   kableExtra::footnote(general = "Sources: National Housing Preservation Database and Virginia Housing.",
                        general_title = "")
 
@@ -425,30 +434,30 @@ change_table |>
 New LIHTC units (net 2,129) comprised the majority of added affordable rentals, followed by Section 8 contracts (net 1,132). Net losses of affordable rental contracts occurred in projects supported by HOME funding and HUD insurance.
 
 ```{r}
-#| label: fig-change
+#| label: fig-change-fig
 #| fig.cap: "Additions and removals of subsidized rental units"
 
-change_subsidy <- change |> 
-  group_by(locality, subsidy_name, change_type) |> 
-  summarise(units = sum(assisted_units)) |> 
-  filter(change_type != "No change") |> 
-  mutate(units = if_else(change_type == "Removed", units*-1, units)) |> 
+change_subsidy <- change |>
+  group_by(locality, subsidy_name, change_type) |>
+  summarise(units = sum(assisted_units)) |>
+  filter(change_type != "No change") |>
+  mutate(units = if_else(change_type == "Removed", units*-1, units)) |>
   pivot_wider(
     names_from = change_type,
-    values_from = units) |> 
+    values_from = units) |>
   mutate(across(where(is.numeric), ~ replace_na(.x, 0)),
-         `Net change` = Removed + Added) |> 
+         `Net change` = Removed + Added) |>
   pivot_longer(
     cols = 3:5,
     names_to = "change_type",
-    values_to = "units") |> 
+    values_to = "units") |>
   mutate(subsidy_name = fct_reorder(subsidy_name, units, .desc = TRUE),
          change_type = fct_relevel(change_type, "Added", "Removed", "Net change"),
          subsidy_name = str_wrap(subsidy_name, width = 10))
 
-change_region <- change_subsidy |> 
-  filter(change_type == "Net change") |> 
-  group_by(subsidy_name) |> 
+change_region <- change_subsidy |>
+  filter(change_type == "Net change") |>
+  group_by(subsidy_name) |>
   summarise(units = sum(units))
 
 ggplot(change_region,
@@ -474,31 +483,31 @@ ggplot(change_region,
 
 ```
 
-While LIHTC additions drove new affordable supply in Richmond and Chesterfield, new (or renewed) Section 8 contracts covered more than 400 units in Henrico. Over 500 units in Richmond and Henrico saw HUD insurance contracts expire; however, many of these are in projects with another form of rental assistance that has not expired. 
+While LIHTC additions drove new affordable supply in Richmond and Chesterfield, new (or renewed) Section 8 contracts covered more than 400 units in Henrico. Over 500 units in Richmond and Henrico saw HUD insurance contracts expire; however, many of these are in projects with another form of rental assistance that has not expired.
 
 ```{r}
 #| label: fig-change-locality
 #| fig.cap: "Net change in subsidized rental unit contracts by locality"
 
-change_subsidy <- change |> 
-  group_by(locality, subsidy_name, change_type) |> 
-  summarise(units = sum(assisted_units)) |> 
-  filter(change_type != "No change") |> 
-  mutate(units = if_else(change_type == "Removed", units*-1, units)) |> 
+change_subsidy <- change |>
+  group_by(locality, subsidy_name, change_type) |>
+  summarise(units = sum(assisted_units)) |>
+  filter(change_type != "No change") |>
+  mutate(units = if_else(change_type == "Removed", units*-1, units)) |>
   pivot_wider(
     names_from = change_type,
-    values_from = units) |> 
+    values_from = units) |>
   mutate(across(where(is.numeric), ~ replace_na(.x, 0)),
-         `Net change` = Removed + Added) |> 
+         `Net change` = Removed + Added) |>
   pivot_longer(
     cols = 3:5,
     names_to = "change_type",
-    values_to = "units") |> 
+    values_to = "units") |>
   mutate(subsidy_name = fct_reorder(subsidy_name, units, .desc = TRUE),
          change_type = fct_relevel(change_type, "Added", "Removed", "Net change"),
          subsidy_name = str_wrap(subsidy_name, width = 10))
 
-change_locality <- change_subsidy |> 
+change_locality <- change_subsidy |>
   filter(change_type == "Net change",
          locality != "Charles City County")
 
@@ -532,20 +541,20 @@ By 2040, a large portion of active LIHTC units will be outside the 30 year commi
 #| label: fig-lihtc
 #| fig-cap: "Percent of active LIHTC units by end of commitment period"
 
-lihtc <- nhpd_coded_rr |> 
-  filter(subsidy_name == "LIHTC") |> 
-  select(nhpd_property_id, property_name, subsidy_name, subsidy_type, subsidy_status, owner_type, start_date, end_date, known_total_units, assisted_units, locality) |> 
+lihtc <- nhpd_coded_rr |>
+  filter(subsidy_name == "LIHTC") |>
+  select(nhpd_property_id, property_name, subsidy_name, subsidy_type, subsidy_status, owner_type, start_date, end_date, known_total_units, assisted_units, locality) |>
   mutate(end_date = case_when(
     is.na(end_date) ~ as.Date(start_date %m+% years(30)),
-    TRUE ~ end_date)) |> 
-  filter(subsidy_status == "Active") |> 
-  group_by(nhpd_property_id) |> 
+    TRUE ~ end_date)) |>
+  filter(subsidy_status == "Active") |>
+  group_by(nhpd_property_id) |>
   summarise(start_date = min(start_date),
             end_date = max(end_date),
-            units = max(known_total_units)) |> 
-  ungroup() |> 
-  group_by(end_year = ceiling_date(end_date, "5 years")) |> 
-  summarise(units = sum(units)) |> 
+            units = max(known_total_units)) |>
+  ungroup() |>
+  group_by(end_year = ceiling_date(end_date, "5 years")) |>
+  summarise(units = sum(units)) |>
   mutate(pct = units/sum(units),
          sum = cumsum(units),
          pct_cum = sum/sum(units),
@@ -568,7 +577,7 @@ ggplot(lihtc,
                                   size = 0.05)
   )
 
-  
+
 
 
 
@@ -595,7 +604,7 @@ This planning grant is being utilized to facilitate the community planning proce
 
 #### Funding for Public Housing redevelopment
 
-Federal housing policy has guided public housing authorities to use newer funding streams to redevelop older public housing communities. For these efforts, RRHA and its partners will use LIHTC, Tenant Protection Vouchers, Project-Based Vouchers, and other federal, state, and local sources. 
+Federal housing policy has guided public housing authorities to use newer funding streams to redevelop older public housing communities. For these efforts, RRHA and its partners will use LIHTC, Tenant Protection Vouchers, Project-Based Vouchers, and other federal, state, and local sources.
 
 :::
 
@@ -611,142 +620,195 @@ This changed significantly in early 2020, when the Virginia General Assembly pas
 
 HCV utilization across the region is concentrated in the East End and Southside of Richmond, but can also be found throughout the counties, as well as the Town of Ashland. Higher HCV utilization (above 20 percent) is seen in areas near Fulton Hill, Oakwood, Manchester, and Bellwood in Chesterfield County.
 
+
 ```{r}
-#| label: fig-hcv
-#| fig.cap: "Percent of renters with Housing Choice Vouchers by tract"
+#| label: hcv-setup
+#| eval: false
 
 # Download HCV geojson from HUD - 7.28.22
 
 # HCV as a Percent of Renter Occupied Housing Units
 
+sf_use_s2(TRUE)
+
+options(tigris_use_cache = TRUE)
+
 pha <- c("041", "760", "085", "087")
 
+pha_boundary <- counties("VA") |> 
+  filter(COUNTYFP %in% pha)
+
+pha_basemap <- layer_static_mapbox(
+  location = hcv,
+  style_id = "light-v10",
+  username = "mapbox"
+)
+
+write_rds(pha_basemap, "data/pha_basemap.rds")
+
+write_rds(pha_boundary, "data/pha_boundary.rds")
+
 hcv <- st_read("data/va_hcv_tract.geojson",
-               quiet = TRUE) |> 
-  clean_names() |> 
-  subset(county %in% pha) |> 
+               quiet = TRUE) |>
+  clean_names() |>
+  subset(county %in% pha) |>
   filter(!is.na(hcv_public_pct))
 
-mapview(hcv, 
-        zcol= "hcv_public_pct",
-        legend = T,
-        layer.name = "Percent renters with HCVs")
+write_rds(hcv, "data/hcv_tracts.rds")
 
 ```
 
-### Rent relief and mortgage relief
-
-In response to the COVID-19 pandemic's impact on renters across the nation, Congress created a \$25 billion Emergency Rental Assistance (ERA) program that was funded through the CARES Act in 2021. The program was implemented through the U.S. Treasury Department and resulted in a total of $1 billion being allocated to the Commonwealth of Virginia and eligible local governments. 
-
-With this funding, the Virginia Department of Housing and Community Development (DHCD) established the Virginia Rent Relief Program (RRP), while Chesterfield County elected to administer their own rental assistance program through local nonprofit, Area Congregations Together in Service (ACTS). 
-
-Through DHCD, a total of 32,029 payments were made to households across Richmond, Henrico, and Hanover. Both Richmond and Henrico saw increasing households receiving rental assistance with slight dips during the early part of 2022. Few households in Hanover County sought rental relief from DHCD.
-
-::: callout-warning
-
-#### All data not available
-
-Chesterfield County rent relief data has not been received yet.
-
-:::
-
 ```{r}
-#| label: fig-rrp
-#| fig.cap: "Rent relief payments by locality"
+#| label: fig-hcv
+#| fig.cap: "Percent of renters with Housing Choice Vouchers by tract"
 
-# Email gabriella.vazquez@dhcd.virginia.gov for data on RRP - breakdown of households helped in Hanover, Henrico, and Richmond --- consider including other localities
+pha_basemap <- read_rds("data/pha_basemap.rds")
 
-# Email Jessica about Chesterfield rent relief program.
+hcv <- read_rds("data/hcv_tracts.rds")
 
-rrp <- read_csv("data/rrp_data.csv")|> 
-  mutate(avgpayment = spent/payments) |> 
-  filter(locality == "Hanover County" | locality == "Henrico County" | locality == "Richmond") |> 
-  mutate(date = mdy(date))
-
-ggplot(rrp,
-       aes(x = date,
-           y = payments,
-           fill = locality)) +
-  geom_bar(stat = "identity") + 
-  facet_wrap(~locality) +
-  theme(axis.title = element_blank(),
-        axis.text.x = element_text(angle = 90, vjust = 1, hjust = 1)) +
-  labs(title = "Rent relief payments by locality") +
-  scale_y_continuous(labels = number_format(big.mark = ",")) +
-  theme(legend.position = "none")
-
-# https://crsreports.congress.gov/product/pdf/R/R46688
-
-
-```
-Average payments per household across the three localities was well into the above \$4,000 for most of the program's duration, with the highest payments being made in Hanover County.
-
-```{r}
-#| label: fig-rrp-payment
-#| fig.cap: "Average assistance by month and locality"
-
-ggplot(rrp,
-       aes(x = date,
-           y = avgpayment,
-           fill = locality)) +
-  geom_bar(stat = "identity") + 
-  facet_wrap(~locality) +
-  theme(axis.title = element_blank(),
-        axis.text.x = element_text(angle = 90, vjust = 1, hjust = 1)) +
-  labs(title = "Average assistance by month and locality") +
-  scale_y_continuous(labels = dollar_format()) +
-  theme(legend.position = "none")
-
-```
-## Affordable homeownership
-
-Since 2010, nonprofit developers in the region have averaged about 50 affordable homes sold to low-income buyers. Most of this production in attributable to Southside Community Development, project:HOMES, and the Maggie Walker Community Land Trust.
-
-::: callout-warning
-
-#### All data not available
-
-Production numbers for Habitat for Humanity not yet received.
-
-:::
-
-```{r}
-#| label: fig-pha-homeownership
-#| fig-cap: "Richmond region nonprofit homeownership production"
-
-pha_ho <- read_csv("data/pha_homeownership.csv") |> 
-  clean_names() |>  
-  select(1:7)
-
-ho_production <- pha_ho |> 
-  filter(data_type == "Number of homes completed and sold in calendar year") |> 
-  pivot_longer(3:7,
-               names_to = "year",
-               values_to = "homes") |> 
-  mutate(year = parse_number(year))
-
-# MWCLT, BHC, project:HOMES, Southside, Habitat - WAITING ON DATA
-
-# Ask for number of units produced each year from 2019 to now
-
-# Average home price each year?
-
-ggplot(ho_production,
-       aes(x = year,
-           y = homes,
-           fill = reorder(organization, homes))) +
-  geom_col() +
-  labs(title = "Richmond region nonprofit homeownership production",
-       subtitle = "Numbers for 2022 are current through August",
-       caption = "Source: Survey of nonprofit organizations.") +
-  theme(legend.title = element_blank(),
-        legend.position = "bottom",
-        axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                  size = 0.05)) +
-  guides(fill = guide_legend(nrow = 2))
+if (knitr::is_html_output()) {
   
+  mapview(hcv,
+          zcol= "hcv_public_pct",
+          legend = T,
+          layer.name = "Percent renters with HCVs")
+  
+  } else {
+    
+  ggplot() +
+    pha_basemap +
+    layer_spatial(hcv, aes(fill = hcv_public_pct)) +
+    scale_fill_gradient2(low = "#edf8b1", high = "#253494", mid = "#41b6c4",
+                         midpoint = 18,
+                         labels = label_percent(scale = 1)) +
+    labs(title = "Percent of renters\nwith Housing Choice Vouchers by tract",
+         fill = "Percent",
+         caption = "Source: U.S. Department of Housing and Urban Development.") +
+    #fixed_plot_aspect(ratio = 0.8) +
+    theme(panel.background = element_blank(),
+          axis.title = element_blank(),
+          axis.ticks = element_blank(),
+          axis.text = element_blank(),
+          legend.key.height = unit(0.1, "npc"),
+          plot.caption = element_text(hjust = 0))
+    
+  }
 
 ```
+
+<!-- ### Rent relief and mortgage relief -->
+
+<!-- In response to the COVID-19 pandemic's impact on renters across the nation, Congress created a \$25 billion Emergency Rental Assistance (ERA) program that was funded through the CARES Act in 2021. The program was implemented through the U.S. Treasury Department and resulted in a total of $1 billion being allocated to the Commonwealth of Virginia and eligible local governments.  -->
+
+<!-- With this funding, the Virginia Department of Housing and Community Development (DHCD) established the Virginia Rent Relief Program (RRP), while Chesterfield County elected to administer their own rental assistance program through local nonprofit, Area Congregations Together in Service (ACTS).  -->
+
+<!-- Through DHCD, a total of 32,029 payments were made to households across Richmond, Henrico, and Hanover. Both Richmond and Henrico saw increasing households receiving rental assistance with slight dips during the early part of 2022. Few households in Hanover County sought rental relief from DHCD. -->
+
+<!-- ::: callout-warning -->
+
+<!-- #### All data not available -->
+
+<!-- Chesterfield County rent relief data has not been received yet. -->
+
+<!-- ::: -->
+
+<!-- ```{r} -->
+<!-- #| label: fig-rrp -->
+<!-- #| fig.cap: "Rent relief payments by locality" -->
+
+<!-- # Email gabriella.vazquez@dhcd.virginia.gov for data on RRP - breakdown of households helped in Hanover, Henrico, and Richmond --- consider including other localities -->
+
+<!-- # Email Jessica about Chesterfield rent relief program. -->
+
+<!-- rrp <- read_csv("data/rrp_data.csv")|>  -->
+<!--   mutate(avgpayment = spent/payments) |>  -->
+<!--   filter(locality == "Hanover County" | locality == "Henrico County" | locality == "Richmond") |>  -->
+<!--   mutate(date = mdy(date)) -->
+
+<!-- ggplot(rrp, -->
+<!--        aes(x = date, -->
+<!--            y = payments, -->
+<!--            fill = locality)) + -->
+<!--   geom_bar(stat = "identity") +  -->
+<!--   facet_wrap(~locality) + -->
+<!--   theme(axis.title = element_blank(), -->
+<!--         axis.text.x = element_text(angle = 90, vjust = 1, hjust = 1)) + -->
+<!--   labs(title = "Rent relief payments by locality") + -->
+<!--   scale_y_continuous(labels = number_format(big.mark = ",")) + -->
+<!--   theme(legend.position = "none") -->
+
+<!-- # https://crsreports.congress.gov/product/pdf/R/R46688 -->
+
+
+<!-- ``` -->
+<!-- Average payments per household across the three localities was well into the above \$4,000 for most of the program's duration, with the highest payments being made in Hanover County. -->
+
+<!-- ```{r} -->
+<!-- #| label: fig-rrp-payment -->
+<!-- #| fig.cap: "Average assistance by month and locality" -->
+
+<!-- ggplot(rrp, -->
+<!--        aes(x = date, -->
+<!--            y = avgpayment, -->
+<!--            fill = locality)) + -->
+<!--   geom_bar(stat = "identity") +  -->
+<!--   facet_wrap(~locality) + -->
+<!--   theme(axis.title = element_blank(), -->
+<!--         axis.text.x = element_text(angle = 90, vjust = 1, hjust = 1)) + -->
+<!--   labs(title = "Average assistance by month and locality") + -->
+<!--   scale_y_continuous(labels = dollar_format()) + -->
+<!--   theme(legend.position = "none") -->
+
+<!-- ``` -->
+<!-- ## Affordable homeownership -->
+
+<!-- Since 2010, nonprofit developers in the region have averaged about 50 affordable homes sold to low-income buyers. Most of this production in attributable to Southside Community Development, project:HOMES, and the Maggie Walker Community Land Trust. -->
+
+<!-- ::: callout-warning -->
+
+<!-- #### All data not available -->
+
+<!-- Production numbers for Habitat for Humanity not yet received. -->
+
+<!-- ::: -->
+
+<!-- ```{r} -->
+<!-- #| label: fig-pha-homeownership -->
+<!-- #| fig-cap: "Richmond region nonprofit homeownership production" -->
+
+<!-- pha_ho <- read_csv("data/pha_homeownership.csv") |>  -->
+<!--   clean_names() |>   -->
+<!--   select(1:7) -->
+
+<!-- ho_production <- pha_ho |>  -->
+<!--   filter(data_type == "Number of homes completed and sold in calendar year") |>  -->
+<!--   pivot_longer(3:7, -->
+<!--                names_to = "year", -->
+<!--                values_to = "homes") |>  -->
+<!--   mutate(year = parse_number(year)) -->
+
+<!-- # MWCLT, BHC, project:HOMES, Southside, Habitat - WAITING ON DATA -->
+
+<!-- # Ask for number of units produced each year from 2019 to now -->
+
+<!-- # Average home price each year? -->
+
+<!-- ggplot(ho_production, -->
+<!--        aes(x = year, -->
+<!--            y = homes, -->
+<!--            fill = reorder(organization, homes))) + -->
+<!--   geom_col() + -->
+<!--   labs(title = "Richmond region nonprofit homeownership production", -->
+<!--        subtitle = "Numbers for 2022 are current through August", -->
+<!--        caption = "Source: Survey of nonprofit organizations.") + -->
+<!--   theme(legend.title = element_blank(), -->
+<!--         legend.position = "bottom", -->
+<!--         axis.title = element_blank(), -->
+<!--         axis.ticks = element_blank(), -->
+<!--         panel.background = element_blank(), -->
+<!--         panel.grid.major.y = element_line(color = "grey95", -->
+<!--                                   size = 0.05)) + -->
+<!--   guides(fill = guide_legend(nrow = 2)) -->
+
+
+<!-- ``` -->

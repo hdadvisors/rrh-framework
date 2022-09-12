@@ -1,6 +1,7 @@
-# Affordability of current housing stock {#part-3-1}
+# Affordability of current housing supply {#part-3-1}
 
-```{r setup}
+```{r}
+#| label: setup
 
 library(tidyverse)
 library(tidycensus)
@@ -34,7 +35,9 @@ Increases in the gap occurred mainly among housing between 31 and 80% AMI, but i
 
 This accentuates the need for new affordable housing at all income levels --- but especially for 30% AMI or below households, where in 2018, there was a shortage of over 22,000 rental homes.
 
-```{r gap-data, eval=FALSE}
+```{r}
+#| label: gap-data
+#| eval: false
 
 tb_18c <- read_csv("data/Table18C_2015to2018.csv")
 
@@ -321,6 +324,7 @@ ggplot(rent_gap,
 
 
 ```
+
 For the typical renter household in the region wanting to enter homeownership, the income needed to afford local home prices remains wide. In every locality, the gap between income needed to afford the median home price and the regional renter income is over \$10,000. Renters are especially hard pressed to afford a home in Hanover County, where the gap is over \$25,000. 
 
 ```{r  renter-own}
