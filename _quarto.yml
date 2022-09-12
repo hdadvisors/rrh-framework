@@ -32,9 +32,9 @@ book:
       chapters:
         #- part-3-1.qmd
         - part-3-2.qmd
-    # - part: "PART 4: Local summaries"
-    #   chapters:
-    #     - part-4-1.qmd
+    - part: "PART 4: Local summaries"
+      chapters:
+        - part-4-1.qmd
     #     - part-4-2.qmd
     #     - part-4-3.qmd
     #     - part-4-4.qmd
@@ -52,5 +52,5 @@ knitr:
 format:
   html:
     theme: lumen
-  pdf:
-    documentclass: scrreprt
+  # pdf:
+  #   documentclass: scrreprt

@@ -37,11 +37,11 @@ When applicable, please reference:
 
 ## Changelog {.unnumbered}
 
-### Release 1.0 {.unnumbered}
+### Release 0.3 {.unnumbered}
 
-*2022-09-12*
+*2022-09-11*
 
-tbd
+Third partial draft. Completed PART 2 chapters. Add dynamic figure and table captions to local summary.
 
 ### Release 0.2 {.unnumbered}
 

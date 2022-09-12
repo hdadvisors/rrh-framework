@@ -84,7 +84,7 @@ Census estimates from 2016 show Richmond gaining more than 2,000 net persons tha
 
 ```{r}
 #| label: fig-comp
-#| fig-cap: !expr "paste0(name, \": Components of population change\")
+#| fig-cap: !expr "paste0(name, \": Components of population change\")"
 
 change <- read_rds("data/rr_comp_change.rds") |> 
   filter(year %in% as.character(years) | year == "2021") |> 
@@ -120,7 +120,8 @@ Nonfamily households have seen an increase for both homeowners and renters, but 
 
 ```{r}
 #| label: fig-children
-#| fig-cap: paste0(name, ": Change in households with children by tenure")
+#| fig-cap: !expr "paste0(name, \": Change in households with children by tenure\")"
+
 
 # Add choice of household stat (HHs with children, HHs with seniors, subfamilies, etc)
 
@@ -151,7 +152,7 @@ Since 2016, the number of seniors (65 years and over) has been on the rise in th
 
 ```{r}
 #| label: fig-seniors
-#| fig-cap: paste0(name, ": Change in senior population by living arrangement")
+#| fig-cap: !expr "paste0(name, \": Change in senior population by living arrangement\")"
 
 b09020 <- read_rds("data/b09020_data.rds") |> 
   filter(NAME == name) |> 
@@ -190,7 +191,7 @@ There are wide disparities between homeowner and renter incomes in the City of R
 
 ```{r}
 #| label: fig-income
-#| fig-cap: paste0(name, ": Median houshold income by tenure")
+#| fig-cap: !expr "paste0(name, \": Median houshold income by tenure\")"
 
 # Add choice of income stat (probably median household income of some kind)
 
@@ -229,7 +230,8 @@ Since 2016, there are now over 500 more persons in the city with independent liv
 
 ```{r}
 #| label: fig-ind-living
-#| fig-cap: paste0(name, ": Net change in individuals with independent living difficulties by age")
+#| fig-cap: !expr "paste0(name, \": Net change in individuals with independent living difficulties by age\")"
+
 
 # Add disability stat (probably independent living difficulty)
 
@@ -265,7 +267,8 @@ From the start of 2017 to June 2022, the median home price in the city has incre
 
 ```{r}
 #| label: fig-sales
-#| fig-cap: paste0(name, ": Median home sales price")
+#| fig-cap: !expr "paste0(name, \": Median home sales price\")"
+
 
 # Median sales price over time
 
@@ -304,7 +307,6 @@ ggplot(price,
                                           size = 0.05)) +
   scale_color_continuous(type = "viridis", label = dollar_format())
 
-
 ```
 
 ### Rental
@@ -313,7 +315,8 @@ Rents across the city have steadily risen over the last ten years, accelerating 
 
 ```{r}
 #| label: fig-rent-submarket
-#| fig-cap: paste0(name, ": Average asking rent by submarket")
+#| fig-cap: !expr "paste0(name, \": Average asking rent by submarke\")"
+
 
 # Average asking rent over time (by submarket if applicable, maybe by bedroom if no submarkets)
 
@@ -354,7 +357,7 @@ ggplot(sub_rent,
 
 ```{r}
 #| label: tbl-submarket-table
-#| tbl-cap: paste0(name, ": Submarket rents")
+#| tbl-cap: !expr "paste0(name, \": Submarket rents\")"
 
 library(kableExtra)
 library(formattable)
@@ -386,21 +389,42 @@ sub_tbl |>
 
 ```
 
-
-
 ### Housing assistance
+
+Since January 2020, Richmond has seen 23 new rental subsidies added, which increased the number of active affordability contracts on units by 1,869. Over that same period, 10 subsidies ended, affecting 435 units. Some properties had multiple subsidies either added or expired. In all, there was a net addition of 1,434 rental affordability contracts.
 
 ```{r}
 #| label: tbl-nhpd
-#| eval: false
+#| tbl-cap: !expr "paste0(name, \": Added and removed affordable rental contracts since 2020\")"
 
+nhpd_coded_rr <- read_rds("data/nhpd_coded_rr.rds") |> 
+  filter(locality == "Richmond City")
 
+change <- nhpd_coded_rr |>
+  mutate(change_type = case_when(
+    start_date > '2019-12-31' ~ "Added",
+    end_date < '2022-09-01' & end_date > '2019-12-31' ~ "Removed",
+    TRUE ~ "No change"))
 
+change_table <- change |>
+  group_by(change_type) |>
+  summarise(subsidies = n(),
+            properties = n_distinct(nhpd_property_id),
+            units = sum(assisted_units)) |>
+  filter(change_type != "No change") |>
+  mutate(across(where(is.numeric), ~ ifelse(change_type == "Removed", (.x * -1), .x))) |>
+  adorn_totals(name = "Net change")
+
+change_table |>
+  mutate(across(where(is.numeric), ~ comma(.x, digits = 0))) |>
+  kable(align = "lrrr",
+        col.names = c("", "Subsidies", "Properties affected", "Units included")) |>
+  kableExtra::kable_styling(bootstrap_options = c("condensed", "striped")) |>
+  kableExtra::row_spec(3, bold = TRUE) |>
+  kableExtra::footnote(general = "Sources: National Housing Preservation Database and Virginia Housing.",
+                       general_title = "")
 
 ```
-
-
-*Change in number of assisted units (NHPD)*
 
 
 ### Naturally-occurring affordable housing
@@ -411,7 +435,7 @@ Older NOAH properties command slightly higher rents than those built in 1960 and
 
 ```{r}
 #| label: fig-noah
-#| fig-cap: paste0(name, ": Distribution of average asking rents in NOAH properties by year built")
+#| fig-cap: !expr "paste0(name, \": Distribution of average asking rents in NOAH properties by year built\")"
 
 # Add choice of NOAH stat (total number, change in rent, etc) 
 
@@ -455,7 +479,7 @@ Based on the 2020 median renter income estimate, the affordable rent for an aver
 
 ```{r}
 #| label: fig-income-rent-gap
-#| fig-cap: paste0(name, ": Average asking rent versus rent affordable to median renter income")
+#| fig-cap: !expr "paste0(name, \": Average asking rent versus rent affordable to median renter income\")"
 
 # Compare local median renter income to average asking rent
 
@@ -507,7 +531,7 @@ The average renter in the city would also be very challenged to find an affordab
 
 ```{r}
 #| label: fig-income-own-gap
-#| fig-cap: paste0(name, ": Income needed to afford median home price versus median renter income")
+#| fig-cap: !expr "paste0(name, \": Income needed to afford median home price versus median renter income\")"
 
 # Compare local renter income versus local home prices
 
@@ -569,7 +593,7 @@ But there has been a growing shortage among higher income households between 31 
 
 ```{r}
 #| label: fig-gap
-#| fig-cap: paste0(name, ": Rental housing gap by AMI")
+#| fig-cap: !expr "paste0(name, \": Rental housing gap by AMI\")"
 
 # Add choice of affordability stat (surplus/deficit, income vs prices, etc)
 
@@ -613,7 +637,7 @@ Rising rents have continued to increase the number of renters with cost burden i
 
 ```{r}
 #| label: fig-cb
-#| fig-cap: paste0(name, ": Cumulative change in cost-burdened households by tenure")
+#| fig-cap: !expr "paste0(name, \": Cumulative change in cost-burdened households by tenure\")"
 
 cb <- read_rds("data/cb_7.rds") |> 
   filter(county == name,
@@ -646,7 +670,7 @@ Federal and state eviction protections during the pandemic significantly reduced
 
 ```{r}
 #| label: fig-evictions
-#| fig-cap: paste0(name, ": Evictions filings and judgements")
+#| fig-cap: !expr "paste0(name, \": Evictions filings and judgements\")"
 
 evictions <- read_csv("data/evictions_17_22.csv") |> 
   pivot_longer(3:128,
