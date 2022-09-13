@@ -69,7 +69,7 @@ pop_bar
 
 ```
 
-Like many other rural counties in the region, New Kent County's population growth in recent years has been due to domestic migration. Between 2020 and 2021, 
+Like many other rural counties in the region, Powhatan County's population growth in recent years has been due to domestic migration. Between 2020 and 2021, 772 new residents came to the county from somewhere else within the country. 
 
 ```{r}
 #| label: fig-comp
@@ -101,7 +101,7 @@ ggplot(change,
 
 ### Household characteristics
 
-The county has seen a decreasing number of renter households across the board. But homeowners continue to come to the county --- especially homeowner households with children. Between 2016 and 2020, there was an estimated 463 more homeowners with children. 
+The county has seen a decreasing number of renter households across the board. But homeowners continue to come to the county --- especially homeowner households with no children. By 2020, there was an estimated 590 more homeowners with no children than in 2016.
 
 ```{r}
 #| label: fig-children
@@ -130,7 +130,8 @@ ggplot(b25115,
         axis.ticks = element_blank())
 
 ```
-The greatest increases in the senior population in the county have been among seniors living with a spouse (+498). In contrast to other localities, New Kent County is not seeing a large increase in seniors living alone --- suggesting that senior families are choosing to stay or move to New Kent County.
+The greatest increases in the senior population in the county have been among seniors in family households (either living with a spouse or are the head of household). In contrast to other localities, Powhatan County is seeing a decline in seniors in nonfamily households.
+
 
 ```{r}
 #| label: fig-seniors
@@ -169,7 +170,7 @@ ggplot(b09020,
 
 ### Income and wages
 
-Homeowner median household income has been on the incline from 2016 to 2020 --- going from \$92,651 in 2016 to \$104,545 in 2020, a 14 percent increase. Although renter median household income was on its way up from 2016 to 2017, median renter household income has been on decline since a high of \$60,440 in 2017. 
+Both homeowner and renter median household income has been on the incline from 2016 to 2020 in the county. For homeowners, there has been an increase of 8 percent, while renters experienced a 20 percent increase.
 
 ```{r}
 #| label: fig-income
@@ -205,7 +206,7 @@ ggplot(b25119_cpi,
 
 ### Persons with disabilities
 
-.....
+In the county, there has been an increase in individuals with independent living difficulties that are 65 years old and older (+204) between 2016 and 2020. For individuals younger than 65, there has been a decline in individuals with independent living difficulties.
 
 ```{r}
 #| label: fig-ind-living
@@ -243,7 +244,7 @@ ggplot(b18107,
 
 ### Homeownership
 
-New Kent County median home price has been increasing in recent years. From a low of \$294,719 in September 2017 to a high of \$407,231 in May 2022, median home price in the county has increased nearly 40 percent. 
+Powhatan County median home price has been on the rise. From a low of \$282,084 in March 2017 to a high of \$519,559 in May 2022, median home price in the county has increased nearly 84 percent. Although the over \$500,000 median home price may represent a seasonal spike, median home price has generally been trending upward and likely to stay above \$500,000 in the coming years.
 
 ```{r}
 #| label: fig-sales
@@ -251,7 +252,7 @@ New Kent County median home price has been increasing in recent years. From a lo
 
 # Median sales price over time
 
-price <- read_csv("data/newkent_med_sales.csv") |> 
+price <- read_csv("data/powhatan_med_sales.csv") |> 
   clean_names() |> 
   mutate(geography = name) |> 
   pivot_longer(cols = starts_with("sale"),
@@ -304,7 +305,7 @@ ggplot(price_adj,
 
 ### Rental
 
-CoStar does not list any multifamily properties in New Kent County. However in 2020, there was an estimated 815 renters in the county. This was a decrease from 2016 when there were 1,202 renters (16 percent of total households). Based on U.S. Census Bureau estimates the majority (89 percent) of those 815 renter households in the county live in single-family detached homes.
+CoStar lists three multifamily properties in the county; two are located along Old Buckingham Road near the county seat, while the third is located at the eastern edge of the county near Midlothian. 
 
 ```{r}
 #| label: fig-renters

@@ -107,7 +107,7 @@ ggplot(change,
 
 ### Household characteristics
 
-The county has seen a decreasing number of renter households across the board. But homeowners continue to come to the county --- especially homeowner households with children. Between 2016 and 2020, there was an estimated 463 more homeowners with children. 
+The county has seen a decreasing number of renter households across the board. But homeowners continue to come to the county --- especially homeowner households with children. Between 2016 and 2020, there was an increase of 463 homeowners with children.
 
 ```{r}
 #| label: fig-children
