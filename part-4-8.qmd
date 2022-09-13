@@ -18,6 +18,7 @@ library(lubridate)
 library(janitor)
 library(tigris)
 library(optiRum)
+library(kableExtra)
 
 years <- 2016:2020
 fips <- 51145
@@ -305,7 +306,29 @@ ggplot(price_adj,
 
 ### Rental
 
-CoStar lists three multifamily properties in the county; two are located along Old Buckingham Road near the county seat, while the third is located at the eastern edge of the county near Midlothian. 
+CoStar lists three multifamily properties in the county; two are located along Old Buckingham Road near the county seat, while the third is located at the eastern edge of the county near Midlothian. There was a 39 year period between the construction of both Powhatan Apartment buildings and the Artistry. 
+
+The development of the Artistry at Winterfield represents growing housing demand from the western edge of Chesterfield County's Midlothian community. This luxury multifamily property also includes 
+
+
+```{r}
+#| label: tbl-mf-list
+#| tbl-cap: "Powhatan County: Multifamily properties"
+
+names <- c("Artistry at Winterfield", "Powhatan Apartments", "Powhatan Apartments")
+units <- c(200, 11, 11)
+rating <- c(4, 2, 3)
+year <- c(2021, 1982, 1982)
+
+mf_tbl <- data.frame(names, year, rating, units)
+
+mf_tbl |> kable(caption = "Multifamily properties in Powhatan County",
+        col.names = c("Property name", "Year built", "CoStar rating", "Units")) |> 
+  kableExtra::kable_styling(
+    bootstrap_options = c("condensed", "striped", "hover"))
+
+
+```
 
 ```{r}
 #| label: fig-renters
