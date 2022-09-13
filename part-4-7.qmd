@@ -534,7 +534,7 @@ ggplot(cb,
 
 ```
 
-Available data from William and Mary's Project HOPE shows that the number of enrolled students experiencing homelessness in the county has declined in recent years. The county's McKinney-Vento Act data showed that there were 37 students experiencing homeless in the 2017-2017 school year. By the 2019-2020, that number had declined to 26. 
+Available data from William and Mary's Project HOPE shows that the number of enrolled students experiencing homelessness in the county has declined in recent years. The county's McKinney-Vento Act data showed that there were 37 students experiencing homeless in the 2016-2017 school year. By the 2019-2020, that number had declined to 26. 
 ```{r}
 #| label: fig-mkv
 #| fig-cap: !expr "paste0(name, /"Enrolled students experiencing homelessness by school year/")"

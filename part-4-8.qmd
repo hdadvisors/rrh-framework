@@ -30,7 +30,11 @@ costar_name <- "Powhatan County"
 
 ## Takeaways
 
-- 
+- Powhatan County is growing like many other parts of the region --- passing the 30,000 mark in 2020.
+- More and more homeowners without children have been moving into the county --- nearly 600 households between 2016 and 2020.
+- Unlike other localities, the county saw a decrease of nearly 100 seniors living alone between 2016 and 2020.
+- Median renter household income in the county saw a 20 percent increase in recent years, while fewer and fewer renters in the county.
+- Although only 29 enrolled students experienced homelessness during the 2019-2020 school year, this was a doubling from 2016-2017 when the count was at 15.
 
 ## Demographic and socioeconomic changes
 
@@ -306,29 +310,7 @@ ggplot(price_adj,
 
 ### Rental
 
-CoStar lists three multifamily properties in the county; two are located along Old Buckingham Road near the county seat, while the third is located at the eastern edge of the county near Midlothian. There was a 39 year period between the construction of both Powhatan Apartment buildings and the Artistry. 
-
-The development of the Artistry at Winterfield represents growing housing demand from the western edge of Chesterfield County's Midlothian community. This luxury multifamily property also includes 
-
-
-```{r}
-#| label: tbl-mf-list
-#| tbl-cap: "Powhatan County: Multifamily properties"
-
-names <- c("Artistry at Winterfield", "Powhatan Apartments", "Powhatan Apartments")
-units <- c(200, 11, 11)
-rating <- c(4, 2, 3)
-year <- c(2021, 1982, 1982)
-
-mf_tbl <- data.frame(names, year, rating, units)
-
-mf_tbl |> kable(caption = "Multifamily properties in Powhatan County",
-        col.names = c("Property name", "Year built", "CoStar rating", "Units")) |> 
-  kableExtra::kable_styling(
-    bootstrap_options = c("condensed", "striped", "hover"))
-
-
-```
+Renter households have been in decline since 2016 when roughly one in ten households in the county were renters. This share has dropped by four percentage points down to 7 percent renter household in 2020. Despite the declining number of renter households in the county, 2021 saw the completion of 200 new rental units at the eastern edge of the county.
 
 ```{r}
 #| label: fig-renters
@@ -386,6 +368,29 @@ ggplot(b25003_data,
 
 
 ```
+CoStar lists three multifamily properties in the county; two are located along Old Buckingham Road near the county seat, while the third is located at the eastern edge of the county near Midlothian. There was a 39 year period between the construction of both Powhatan Apartment buildings and the Artistry. 
+
+The development of the Artistry at Winterfield potentially represents growing housing demand from the western edge of Chesterfield County's Midlothian community. This luxury multifamily property has an average asking rent of \$1,888. 
+
+```{r}
+#| label: tbl-mf-list
+#| tbl-cap: "Powhatan County: Multifamily properties"
+
+names <- c("Artistry at Winterfield", "Powhatan Apartments", "Powhatan Apartments")
+units <- c(200, 11, 11)
+rating <- c(4, 2, 3)
+year <- c(2021, 1982, 1982)
+vacancy <- c("7.8%", "4.6%", "4.6%")
+
+mf_tbl <- data.frame(names, year, rating, units)
+
+mf_tbl |> kable(caption = "Multifamily properties in Powhatan County",
+        col.names = c("Property name", "Year built", "CoStar rating", "Vacancy rate", "Units")) |> 
+  kableExtra::kable_styling(
+    bootstrap_options = c("condensed", "striped", "hover"))
+
+
+```
 
 ### Housing assistance
 
@@ -393,11 +398,9 @@ The National Housing Preservation Database lists no federally-assisted housing p
 
 ### Naturally-occurring affordable housing
 
-CoStar does not list any properties that can be defined as naturally-occurring affordable housing within New Kent County. However, there are at least three manufactured home communities located in the county. These communities represent a small but important source of affordability in the county.
+Powhatan Apartments (both locations) represent the county's naturally-occurring affordable housing based on the definition of NOAH outlined in this report. Rent data is unavailable for Powhatan Apartments via CoStar.
 
-Putze's Mobile Home Park located in Quinton is an 11 unit community and Long Acres Mobile Home Park is a 24 unit community located in Providence Forge.
-
-Rockahock Park is a combination manufactured home community and RV campground with an indeterminate amount of lots. 
+In addition to Powhatan Apartments, there is a small manufactured home community located near the cross roads of Maidens Road (US-522) and Huguenot Trail that consists of at least six homes.
 
 ```{r}
 #| label: fig-mhc
@@ -419,7 +422,7 @@ leaflet(mhc) |>
 
 ### Affordability of current housing stock
 
-A lack of diverse rental options leave lower income households with few housing options in the county aside from renting a single-family home. To purchase a single-family home, the typical renter in the county would need to make at least \$17,000 more than they did in 2020. 
+With increasing renter household incomes in the county, the gap between income needed to afford the typical home price and typical renter income has been narrowing. In 2016, the gap stood at nearly \$12,000, but by 2020 the gap had decreased to just below \$7,000. 
 
 ```{r}
 #| label: fig-income-own-gap
@@ -440,8 +443,11 @@ downpayment <- 0.05 # 5% downpayment
 closingcosts <- 0.015 # 1.5% closing costs
 utilities <- 250 # Assume $250/month for utilities
 
+b25119_cpi <- b25119_cpi |> 
+  filter(tenure == "Renter")
+
 sale <- rr_sales_annual |> 
-  left_join(b25119_cpi_rent, by = "year") |> 
+  left_join(b25119_cpi, by = "year") |> 
   left_join(int_annual, by = "year") |> 
   drop_na() |> 
   mutate(principal = price - (price*downpayment)) |> 
@@ -479,7 +485,7 @@ ggplot(slgap,
 
 ```
 
-In spite of a low number of rental housing options in the county, there was still a shortage of 255 rental housing units for households making 80 percent AMI or less in 2018. This shortage is an increase from 2015 when the shortage was 135. The increase in deficit was most significant for households making between 51 and 80 percent AMI --- an increase of 75 households from zero.
+As of 2018, there was a 70 unit rental home shortage for households making less than 80 percent AMI. This was a major decline from 2015 when the shortage was 215 --- mainly for 30 percent AMI or less households. The deficit has decreased significantly among extremely and very low-income households, but has increased for higher income households.
 
 ```{r}
 #| label: fig-gap
@@ -523,11 +529,11 @@ ggplot(gap,
 
 ### Impact of housing costs
 
-Although the number of renter households in the county has been declining, the share of cost-burdened renters has only increased. In 2018, 34 percent of renter households were cost-burdened compared to about 26 percent in 2015. For homeowners, the number of cost-burdened households has remained largely unchanged (1352 in 2015 and 1322 in 2018). But as new homeowners come into the county, the share of cost-burdened homeowners has declined from 22 to 20 percent. 
+The share of cost-burdened renters has decreased from nearly 38 percent of renter households to 23 percent in a short period. For homeowners, the share of cost-burdened households has decreased only slightly --- going from 24 percent to 21 percent over three years.
 
 ```{r}
 #| label: fig-cb
-#| fig-cap: !expr "paste0(name, /": Cost-burdened households by tenure/")"
+#| fig-cap: !expr "paste0(name, /": Share of cost-burdened households by tenure/")"
 
 cb <- read_rds("data/cb_7.rds") |> 
   filter(county == name) |> 
@@ -540,7 +546,7 @@ ggplot(cb,
   facet_wrap(~tenure) +
   geom_col(position = position_fill(reverse = TRUE)) +
   scale_y_continuous(labels = percent_format()) +
-  labs(title = paste0(name, ": Cumulative change in cost-burdened households by tenure"),
+  labs(title = paste0(name, ": Share of cost-burdened households by tenure"),
        subtitle = "2015 to 2018",
        fill = "Cost burden",
        caption = "Source: U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
@@ -552,7 +558,8 @@ ggplot(cb,
 
 ```
 
-Available data from William and Mary's Project HOPE shows that the number of enrolled students experiencing homelessness in the county has declined in recent years. The county's McKinney-Vento Act data showed that there were 37 students experiencing homeless in the 2017-2017 school year. By the 2019-2020, that number had declined to 26. 
+Available data from William and Mary's Project HOPE shows that the number of enrolled students experiencing homelessness in the county has increased in recent years. The county's McKinney-Vento Act data showed that the number of students experiencing homeless has doubled from the 2016-2017 school year when the number was 15. By the 2019-2020, that number was 29.
+
 ```{r}
 #| label: fig-mkv
 #| fig-cap: !expr "paste0(name, /"Enrolled students experiencing homelessness by school year/")"
