@@ -362,6 +362,8 @@ ggplot(sub_rent,
 
 ### Housing assistance
 
+Over the last two and a half years, more than 1,202 new affordable rental unit subsidies were added in the county. However, another 918 contracts expired (across four properties), leading to a net gain of just 284 dedicated affordable rental units.
+
 ```{r}
 #| label: tbl-nhpd
 #| tbl-cap: !expr "paste0(name, \": Added and removed affordable rental contracts since 2020\")"
@@ -394,9 +396,6 @@ change_table |>
                        general_title = "")
 
 ```
-
-
-*Change in number of assisted units (NHPD)*
 
 
 ### Naturally-occurring affordable housing
@@ -670,5 +669,5 @@ evictions <- evictions |>
   filter(year >= 2020, 
          type == "Filings")
 
-mean(evictions$value)
+#mean(evictions$value)
 ```

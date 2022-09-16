@@ -424,6 +424,8 @@ ggplot(vacancy,
 
 ### Housing assistance
 
+Over the last two and a half years, almost 500 new affordable rental unit subsidies were added in the county. Another 100 contracts expired (across just one property), leading to a net gain of 389 dedicated affordable rental units---more than Henrico County over that same period.
+
 ```{r}
 #| label: tbl-nhpd
 #| tbl-cap: !expr "paste0(name, \": Added and removed affordable rental contracts since 2020\")"
@@ -462,8 +464,8 @@ change_table |>
 As defined by this report, there are only five NOAH multifamily properties located in Hanover County. Across these five properties there is a total of 492 rental units. NOAH properties in Hanover County were built between 1966 and 1987.
 
 ```{r}
-#| label: fig-noah
-#| fig-cap: !expr "paste0(name, \": Distribution of average asking rents in NOAH properties by year built\")"
+#| label: tbl-noah
+#| tbl-cap: !expr "paste0(name, \": NOAH properties\")"
 
 # Add choice of NOAH stat (total number, change in rent, etc) 
 
@@ -483,9 +485,9 @@ noah <- read_csv("data/pha_noah_81722.csv") |>
 
 noah_tbl <- noah |> 
   select(property_name, year_built, number_of_units) |> 
+  arrange(desc(number_of_units)) |> 
   st_drop_geometry() |> 
-  kable(caption = "NOAH properties in Hanover County",
-        col.names = c("Property name", "Year built", "Estimated units")) |> 
+  kable(col.names = c("Property name", "Year built", "Estimated units")) |> 
   kableExtra::kable_styling(
     bootstrap_options = c("condensed", "striped", "hover"))
 
