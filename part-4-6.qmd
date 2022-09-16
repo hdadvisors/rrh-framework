@@ -44,7 +44,7 @@ Despite an initial decline in the early 2010s, Goochland County's population has
 
 ```{r}
 #| label: fig-pop
-#| fig-cap: !expr "paste0(name, /": Total Population/")"
+#| fig-cap: !expr "paste0(name, \": Total Population\")"
 
 # Add choice of population stat (net change, components, etc)
 
@@ -83,7 +83,7 @@ The growth in population is due in large part to domestic migration. Between 202
 
 ```{r}
 #| label: fig-comp
-#| fig-cap: !expr "paste0(name, /": Components of population change/")"
+#| fig-cap: !expr "paste0(name, \": Components of population change\")"
 
 change <- read_rds("data/rr_comp_change.rds") |> 
   filter(year %in% as.character(years) | year == "2021") |> 
@@ -116,7 +116,7 @@ All types of households are seeing an increase in the county --- especially home
 
 ```{r}
 #| label: fig-children
-#| fig-cap: !expr "paste0(name, /": Change in households with children by tenure/")"
+#| fig-cap: !expr "paste0(name, \": Change in households with children by tenure\")"
 
 # Add choice of household stat (HHs with children, HHs with seniors, subfamilies, etc)
 
@@ -146,7 +146,7 @@ The senior population has been growing in the county (+996). Although much of th
 
 ```{r}
 #| label: fig-seniors
-#| fig-cap: !expr "paste0(name, /": Change in senior population by living arrangement/")"
+#| fig-cap: !expr "paste0(name, \": Change in senior population by living arrangement\")"
 
 b09020 <- read_rds("data/b09020_data.rds") |> 
   filter(NAME == name) |> 
@@ -185,7 +185,7 @@ Median homeowner household income has been growing in Goochland County. From 201
 
 ```{r}
 #| label: fig-income
-#| fig-cap: !expr "paste0(name, /": Median houshold income by tenure/")"
+#| fig-cap: !expr "paste0(name, \": Median houshold income by tenure\")"
 
 # Add choice of income stat (probably median household income of some kind)
 
@@ -218,7 +218,7 @@ Individuals with independent living difficulties have generally been decreasing 
 
 ```{r}
 #| label: fig-ind-living
-#| fig-cap: !expr "paste0(name, /": Net change in individuals with independent living difficulties by age/")"
+#| fig-cap: !expr "paste0(name, \": Net change in individuals with independent living difficulties by age\")"
 
 # Add disability stat (probably independent living difficulty)
 
@@ -254,7 +254,7 @@ As with all other localities in the region, home prices in the county have follo
 
 ```{r}
 #| label: fig-sales
-#| fig-cap: !expr "paste0(name, /": Median home sales price/")"
+#| fig-cap: !expr "paste0(name, \": Median home sales price\")"
 
 # Median sales price over time
 
@@ -316,7 +316,7 @@ The increasing rental demand has been apparent in high average asking rent in Go
 
 ```{r}
 #| label: fig-rent
-#| fig-cap: !expr "paste0(name, /": Average asking rent/")"
+#| fig-cap: !expr "paste0(name, \": Average asking rent\")"
 
 # Pull in Goochland Rent manually
 
@@ -368,7 +368,7 @@ As of 2020, the majority of renters reside in single-family homes (71 percent). 
 
 ```{r}
 #| label: fig-ro-structure-percent
-#| fig.cap: !expr "paste0(name, /": Change in share of renter-occupied housing units by structure type/")"
+#| fig.cap: !expr "paste0(name, \": Change in share of renter-occupied housing units by structure type\")"
 
 
 b25127_data <- read_rds("data/b25127_data.rds") |> 
@@ -418,7 +418,7 @@ When comparing renter income to the average asking rent in a year, Goochland Cou
 
 ```{r}
 #| label: fig-income-rent-gap
-#| fig-cap: !expr "paste0(name, /": Average asking rent versus\nrent affordable to median renter income/")"
+#| fig-cap: !expr "paste0(name, \": Average asking rent versus\nrent affordable to median renter income\")"
 
 # Compare local median renter income to average asking rent
 
@@ -469,7 +469,7 @@ For renters to afford homeownership, the income needed to afford the the median 
 
 ```{r}
 #| label: fig-income-own-gap
-#| fig-cap: !expr "paste0(name, /": Income needed to afford median home price\nversus median renter income/")"
+#| fig-cap: !expr "paste0(name, \": Income needed to afford median home price\nversus median renter income\")"
 
 # Compare local renter income versus local home prices
 
@@ -528,7 +528,7 @@ The latest data from HUD shows that there was a shortage of 160 rental homes aff
 
 ```{r}
 #| label: fig-gap
-#| fig-cap: !expr "paste0(name, /": Rental housing gap by AMI/")"
+#| fig-cap: !expr "paste0(name, \": Rental housing gap by AMI\")"
 
 # Add choice of affordability stat (surplus/deficit, income vs prices, etc)
 
@@ -572,7 +572,7 @@ Cost burden in the county has declined in the county for both homeowners and ren
 
 ```{r}
 #| label: fig-cb
-#| fig-cap: !expr "paste0(name, /": Cost-burdened households by tenure/")"
+#| fig-cap: !expr "paste0(name, \": Cost-burdened households by tenure\")"
 
 cb <- read_rds("data/cb_7.rds") |> 
   filter(county == name) |> 
@@ -600,7 +600,7 @@ McKinney-Vento Act data shows small changes in the number of enrolled students e
 
 ```{r}
 #| label: fig-mkv
-#| fig-cap: !expr "paste0(name, /"Enrolled students experiencing homelessness by school year/")"
+#| fig-cap: !expr "paste0(name, \"Enrolled students experiencing homelessness by school year\")"
 
 div <- 37
 

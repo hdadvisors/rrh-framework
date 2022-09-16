@@ -44,7 +44,7 @@ Despite a dip in population from 2014 to 2015, Powhatan County has been on an up
 
 ```{r}
 #| label: fig-pop
-#| fig-cap: !expr "paste0(name, /": Total Population/")"
+#| fig-cap: !expr "paste0(name, \": Total Population\")"
 
 # Add choice of population stat (net change, components, etc)
 
@@ -78,7 +78,7 @@ Like many other rural counties in the region, Powhatan County's population growt
 
 ```{r}
 #| label: fig-comp
-#| fig-cap: !expr "paste0(name, /": Components of population change/")"
+#| fig-cap: !expr "paste0(name, \": Components of population change\")"
 
 change <- read_rds("data/rr_comp_change.rds") |> 
   filter(year %in% as.character(years) | year == "2021") |> 
@@ -110,7 +110,7 @@ The county has seen a decreasing number of renter households across the board. B
 
 ```{r}
 #| label: fig-children
-#| fig-cap: !expr "paste0(name, /": Change in households with children by tenure/")"
+#| fig-cap: !expr "paste0(name, \": Change in households with children by tenure\")"
 
 # Add choice of household stat (HHs with children, HHs with seniors, subfamilies, etc)
 
@@ -140,7 +140,7 @@ The greatest increases in the senior population in the county have been among se
 
 ```{r}
 #| label: fig-seniors
-#| fig-cap: !expr "paste0(name, /": Change in senior population by living arrangement/")"
+#| fig-cap: !expr "paste0(name, \": Change in senior population by living arrangement\")"
 
 b09020 <- read_rds("data/b09020_data.rds") |> 
   filter(NAME == name) |> 
@@ -179,7 +179,7 @@ Both homeowner and renter median household income has been on the incline from 2
 
 ```{r}
 #| label: fig-income
-#| fig-cap: !expr "paste0(name, /": Median houshold income by tenure/")"
+#| fig-cap: !expr "paste0(name, \": Median houshold income by tenure\")"
 
 # Add choice of income stat (probably median household income of some kind)
 
@@ -215,7 +215,7 @@ In the county, there has been an increase in individuals with independent living
 
 ```{r}
 #| label: fig-ind-living
-#| fig-cap: !expr "paste0(name, /": Net change in individuals with independent living difficulties by age/")"
+#| fig-cap: !expr "paste0(name, \": Net change in individuals with independent living difficulties by age\")"
 
 # Add disability stat (probably independent living difficulty)
 
@@ -253,7 +253,7 @@ Powhatan County median home price has been on the rise. From a low of \$282,084 
 
 ```{r}
 #| label: fig-sales
-#| fig-cap: !expr "paste0(name, /": Median home sales price/")"
+#| fig-cap: !expr "paste0(name, \": Median home sales price\")"
 
 # Median sales price over time
 
@@ -314,7 +314,7 @@ Renter households have been in decline since 2016 when roughly one in ten househ
 
 ```{r}
 #| label: fig-renters
-#| fig-cap: "Renter households in New Kent County"
+#| fig-cap: "Renter households in Powhatan County"
 
 b25003_vars <- load_variables(2020, "acs5") |> 
   filter(str_sub(name, end = 7) %in% "B25003_")
@@ -404,7 +404,7 @@ In addition to Powhatan Apartments, there is a small manufactured home community
 
 ```{r}
 #| label: fig-mhc
-#| fig-cap: !expr "paste0(name, /": Manufactured home communities/")"
+#| fig-cap: !expr "paste0(name, \": Manufactured home communities\")"
 
 mhc <- st_read("https://services1.arcgis.com/Hp6G80Pky0om7QvQ/arcgis/rest/services/Mobile_Home_Parks/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson") |> 
   filter(STATE == "VA",
@@ -426,7 +426,7 @@ With increasing renter household incomes in the county, the gap between income n
 
 ```{r}
 #| label: fig-income-own-gap
-#| fig-cap: !expr "paste0(name, /": Income needed to afford median home price\nversus median renter income/")"
+#| fig-cap: !expr "paste0(name, \": Income needed to afford median home price\nversus median renter income\")"
 
 # Compare local renter income versus local home prices
 
@@ -489,7 +489,7 @@ As of 2018, there was a 70 unit rental home shortage for households making less 
 
 ```{r}
 #| label: fig-gap
-#| fig-cap: !expr "paste0(name, /": Rental housing gap by AMI/")"
+#| fig-cap: !expr "paste0(name, \": Rental housing gap by AMI\")"
 
 # Add choice of affordability stat (surplus/deficit, income vs prices, etc)
 
@@ -533,7 +533,7 @@ The share of cost-burdened renters has decreased from nearly 38 percent of rente
 
 ```{r}
 #| label: fig-cb
-#| fig-cap: !expr "paste0(name, /": Share of cost-burdened households by tenure/")"
+#| fig-cap: !expr "paste0(name, \": Share of cost-burdened households by tenure\")"
 
 cb <- read_rds("data/cb_7.rds") |> 
   filter(county == name) |> 
@@ -562,7 +562,7 @@ Available data from William and Mary's Project HOPE shows that the number of enr
 
 ```{r}
 #| label: fig-mkv
-#| fig-cap: !expr "paste0(name, /"Enrolled students experiencing homelessness by school year/")"
+#| fig-cap: !expr "paste0(name, \"Enrolled students experiencing homelessness by school year\")"
 
 div <- 72
 
