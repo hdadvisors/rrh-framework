@@ -8,6 +8,8 @@ library(tidycensus)
 library(janitor)
 library(optiRum)
 library(scales)
+library(kableExtra)
+library(readxl)
 
 # rr includes Charles City, Goochland, New Kent, and Powhatan.
 
@@ -296,6 +298,14 @@ However, there are two other important takeaways:
 
 Market asking rents across the region have been on the incline between 2016. Still, the median incomes for renters in Chesterfield and Henrico---at least from 2016 to 2020---could afford average rents. That was not the case for Henrico and Richmond, where the monthly rental price affordability gaps were \$20 and \$218, respectively.
 
+::: callout-tip
+
+#### Calculating rental affordability
+
+In this chapter, an "affordable rent" is no more than 30 percent of a household's gross monthly income. Any rent amount higher than this level would make the renter cost-burdened.
+
+:::
+
 ```{r}
 #| label: fig-rent-afford
 #| fig.cap: "Average rents versus affordable rents for median renter income"
@@ -332,68 +342,272 @@ ggplot(rent_afford,
 
 ```
 
+### Homeownership affordability
 
+To determine how affordable homeownership is at the median renter income, we can calculate the maximum home sales price affordable to a buyer with that income. To make these estimates, we make the following simplified assumptions:
 
+  -   5 percent down payment
+  -   1.5 percent in closing costs
+  -   \$250 per month for property taxes
+  -   \$150 per month for insurance and other costs
 
-For the typical renter household in the region wanting to enter homeownership, the income needed to afford local home prices remains wide. In every locality, the gap between income needed to afford the median home price and the regional renter income is over \$10,000. Renters are especially hard pressed to afford a home in Hanover County, where the gap is over \$25,000. 
+For underwriting purposes, we assume that the monthly mortgage payment plus these costs can not exceed 28 percent of the buyer's gross income. For example, a renter earning \$50,000 can afford a monthly housing cost no more than \$1,166.67.
 
-```{r  renter-own}
+To determine the maximum principal amount, and the subsequent sales price, we assume a standard 30-year fixed-rate mortgage using the average annual interest rates published by Freddie Mac^[Freddie Mac, [30-Year Fixed-Rate Mortgages Since 1971](https://www.freddiemac.com/pmms/pmms30).]. The 2022 value is the average through August. The figure below shows these interest rates used for the homeowner affordability analysis.
 
-# Compare renter income versus home prices
+```{r}
+#| label: fig-int-rates
+#| fig-cap: "Average annual rates for 30-year fixed-rate mortgages"
 
-rr_sales_annual <- read_csv("data/rr_annual_sales.csv") |> 
-  pivot_longer(cols = 2:9,
-               names_to = "locality",
-               values_to = "price") |> 
-  clean_names()
+ggplot(costs_income_afford,
+       aes(x = year,
+           y = annual_int)) +
+  geom_line(size = 1,
+            color = "#619cff") +
+  geom_text(aes(label = label_percent()(annual_int)),
+            nudge_y = 0.004,
+            color = "#619cff",
+            size = 3) +
+  scale_y_continuous(labels = label_percent(accuracy = 0.01),
+                     limits = c(0,0.055),
+                     n.breaks = 6) +
+  scale_x_continuous(n.breaks = 7) +
+  labs(title = "Average annual rates for 30-year fixed-rate mortgages",
+       subtitle ="2022 rate current through August",
+       caption = "Source: Freddie Mac, Primary Mortgage Market Survey.") +
+  theme(axis.title = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        legend.title = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.ticks = element_blank())
 
-int_annual <- read_csv("data/fredmac_int_annual.csv")
+```
 
-downpayment <- 0.05 # 5% downpayment
-closingcosts <- 0.015 # 1.5% closing costs
-utilities <- 250 # Assume $250/month for utilities
+The figure below shows these maximum affordable home sales prices versus actual median sales prices for each locality from 2016 through 2020. Only median sales prices are shown for 2021 and 2022 year-to-date, since renter income estimates from ACS are only available through 2020.
 
-sale_income <- rr_sales_annual |> 
-  left_join(renter_income, by = "year") |> 
-  left_join(int_annual, by = "year") |> 
-  drop_na() |> 
-  mutate(principal = price - (price*downpayment)) |> 
-  mutate(loanamt = principal/(1-closingcosts)) |> 
-  mutate(mortgage = abs(PMT((annual_int/12), 360, loanamt)) + 250) |> 
-  mutate(inc_needed = ((mortgage*10)/2.8)*12) |> 
-  select(year, locality, inc_needed, income = estimate)
+```{r}
+#| label: fig-price-afford
+#| fig.cap: "Median sales price versus maximum home price affordable to median renter income"
 
-sale_income_gap <- sale_income |> 
-  pivot_longer(3:4,
-               names_to = "data",
-               values_to = "value") |> 
-  mutate(data = case_when(
-    data == "income" ~ "Renter median household income",
-    data == "inc_needed" ~ "Income needed to afford median home price"
-  )) |> 
-  subset(locality %in% pha_names)
+price_afford <- costs_income_afford |> 
+  select(1, 2, 5, 8) |> 
+  pivot_longer(cols = 3:4,
+               names_to = "type") |> 
+  mutate(type = case_when(
+    type == "price" ~ "Median sales price",
+    TRUE ~ "Maximum affordable home price"
+  ))
 
-ggplot(sale_income_gap,
-       aes(x = year, 
+ggplot(price_afford,
+       aes(x = year,
            y = value,
-           color = data)) +
-  geom_line(stat = "identity", size = 1) +
-  facet_wrap(~locality) +
-  labs(title = "Income needed to afford median home price versus median renter income", color = "Nominal dollars") +
-  theme(axis.title = element_blank()) +
-  scale_y_continuous(labels = dollar_format())
-
+           fill = type)) +
+  geom_col(position = "dodge") +
+  facet_wrap(~locality, nrow = 1) +
+  scale_x_continuous(n.breaks = 7) +
+  scale_y_continuous(labels = label_dollar()) +
+  labs(title = "Median sales price versus\nmaximum home price affordable to median renter income",
+       subtitle ="2016 to 2022 (ACS income data through 2020)",
+       caption = "Sources: U.S. Census Bureau, American Community Survey,\nTable B25119 and CVR MLS.") +
+  theme(axis.title = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        legend.position = "bottom",
+        legend.title = element_blank(),
+        axis.text.x = element_text(angle = 90, vjust = 0.5),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.ticks = element_blank())
 
 ```
 
-```{r occupations}
+In the three counties, median sales prices were generally just out of reach for the average renter's income from 2016 through 2019. Then, historically low interest rates in 2020 increased buyers' purchasing power to put the median-priced home within reach.
 
-# Income of five most common job sectors/occupations versus rental and home prices
+The purchase price gap in Richmond, however, has continued---even with lower rates, the average renter could not afford to buy a home more than \$200,000 in 2020. By 2021, the median-priced home in the city topped \$300,000 for the first time.
+
+## Wage-based affordability
+
+In a [previous chapter](part-1-3.qmd#wages), the five most common occupation categories in the Richmond MSA were determined from the latest (May 2021) BLS Occupational Employment and Wage Statistics (OEWS) data. These wages are an opportunity to assess the ability of many of the region's workers to afford rent or purchase a home. Annual salary amounts range from \$75,800 for workers in Business and Financial Operations, to \$23,650 for those in Food Preparation and Serving Related positions.
+
+```{r}
+#| label: oews-data
+#| eval: false
+
+oews_occ <- read_rds("data/oews_occ.rds")
+
+occ_afford <- oews_occ |> 
+  filter(!is.na(occ_code)) |> 
+  select(group = 2, income = 4) |> 
+  mutate(type = "Occupation", .before = 1) |> 
+  mutate(group = str_remove_all(group, " Occupations"))
+
+locality_costs <- costs_income_afford |> 
+  filter(year == 2022) |> 
+  select(group = 1, annual_int, income, rent, price) |> 
+  mutate(type = "Locality", .before = 1)
+
+occ_locality_afford <- locality_costs |> 
+  bind_rows(occ_afford) |> 
+  mutate(annual_int = replace_na(annual_int, first(annual_int))) |> 
+  mutate(rent = case_when(
+    is.na(rent) ~ income / 12*.3,
+    TRUE ~ rent)) |> 
+  mutate(price = case_when(
+    is.na(price) ~ price_calc(income, annual_int),
+    TRUE ~ price))
+
+write_rds(occ_locality_afford, "data/occ_locality_afford.rds")
 
 ```
 
-Ratio
-```{r ratio}
+```{r}
+#| label: fig-occ-salary
+#| fig.cap: "Median annual salaries for the five most common occupation categories"
 
+occ_locality_afford <- read_rds("data/occ_locality_afford.rds")
+
+occ_locality_afford |> 
+  filter(type == "Occupation") |>
+  mutate(group = str_wrap(group, width = 16)) |> 
+
+ggplot(aes(x = reorder(group, income, decreasing = T),
+           y = income,
+           fill = group)) +
+  geom_col() +
+  scale_y_continuous(labels = label_dollar()) +
+  labs(title = "Median annual salaries for the five most common occupation categories",
+       subtitle = "Richmond, VA MSA | May 2021",
+       caption = "Source: U.S. Bureau of Labor Statistics, Occupational Employment and Wage Statistics.") +
+  theme(panel.background = element_blank(),
+        legend.position = "none",
+        axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
+```
+
+### Rental affordability
+
+Every occupation except for Business and Financial Operations supports an affordable rent less than \$1,000. Apartments in the region for less than this are hard to come by, and average rents across localities are now hundreds of dollars more. 
+
+```{r}
+#| label: fig-occ-rent
+#| fig.cap: "Affordable rent by median occupation wage versus average rents"
+
+occ_locality_afford |> 
+  filter(type == "Occupation") |>
+  mutate(group = str_wrap(group, width = 16)) |> 
+
+ggplot(aes(x = reorder(group, rent, decreasing = T),
+           y = rent,
+           fill = group)) +
+  geom_col() +
+  geom_hline(yintercept = with(occ_locality_afford, rent[match("Chesterfield County", group)])) +
+  annotate(geom = "text",
+           label = "Chesterfield",
+           x = 5,
+           y = with(occ_locality_afford, rent[match("Chesterfield County", group)]),
+           vjust = -.5,
+           hjust = -.85) +
+  geom_hline(yintercept = with(occ_locality_afford, rent[match("Hanover County", group)])) +
+  annotate(geom = "text",
+           label = "Hanover",
+           x = 5,
+           y = with(occ_locality_afford, rent[match("Hanover County", group)]),
+           vjust = 1,
+           hjust = -1.25) +
+  geom_hline(yintercept = with(occ_locality_afford, rent[match("Henrico County", group)])) +
+  annotate(geom = "text",
+           label = "Henrico",
+           x = 5,
+           y = with(occ_locality_afford, rent[match("Henrico County", group)]),
+           vjust = 0.15,
+           hjust = -1.33) +
+  geom_hline(yintercept = with(occ_locality_afford, rent[match("Richmond city", group)])) +
+  annotate(geom = "text",
+           label = "Richmond",
+           x = 5,
+           y = with(occ_locality_afford, rent[match("Richmond city", group)]),
+           vjust = 1,
+           hjust = -1) +
+  coord_cartesian(clip = "off") +
+  #scale_x_discrete(expand = expand_scale(add = c(0.5,2))) +
+  scale_y_continuous(labels = label_dollar()) +
+  labs(title = "Affordable rent by median occupation wage versus average rents",
+       subtitle = "Lines show current average rents by locality as of August 2022",
+       caption = "Sources: U.S. Bureau of Labor Statistics, Occupational Employment and\nWage Statistics; CoStar Group, Inc.") +
+  theme(panel.background = element_blank(),
+        legend.position = "none",
+        axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        plot.margin = margin(10,80,10,10, unit = "pt"))
+
+```
+
+However, these average rents *can* be relatively attainable if households have two earners with annual salaries each above \$30,000. Still, even dual-income households where both workers are in retail and/or restaurant jobs would currently struggle to find an affordable apartment anywhere in the region.
+
+### Homeownership affordability
+
+Similarly, all occupation categories other than Business and Financial Operations command wages that make homeownership a challenging goal, especially for single-earner households. Most of these common jobs, on their own, would support only home purchases prices below \$140,000. This does not even consider related financial barriers often faced by lower-income workers, such as savings for down payments and acceptable credit scores. 
+
+```{r}
+#| label: fig-occ-price
+#| fig.cap: "Maximum home price by median occupation wage versus median sales prices"
+
+occ_locality_afford |> 
+  filter(type == "Occupation") |>
+  mutate(group = str_wrap(group, width = 16)) |> 
+
+ggplot(aes(x = reorder(group, price, decreasing = T),
+           y = price,
+           fill = group)) +
+  geom_col() +
+  geom_hline(yintercept = with(occ_locality_afford, price[match("Chesterfield County", group)])) +
+  annotate(geom = "text",
+           label = "Chesterfield",
+           x = 5,
+           y = with(occ_locality_afford, price[match("Chesterfield County", group)]),
+           vjust = -0.3,
+           hjust = -.85) +
+  geom_hline(yintercept = with(occ_locality_afford, price[match("Hanover County", group)])) +
+  annotate(geom = "text",
+           label = "Hanover",
+           x = 5,
+           y = with(occ_locality_afford, price[match("Hanover County", group)]),
+           vjust = 0,
+           hjust = -1.24) +
+  geom_hline(yintercept = with(occ_locality_afford, price[match("Henrico County", group)])) +
+  annotate(geom = "text",
+           label = "Henrico",
+           x = 5,
+           y = with(occ_locality_afford, price[match("Henrico County", group)]),
+           vjust = -.25,
+           hjust = -1.33) +
+  geom_hline(yintercept = with(occ_locality_afford, price[match("Richmond city", group)])) +
+  annotate(geom = "text",
+           label = "Richmond",
+           x = 5,
+           y = with(occ_locality_afford, price[match("Richmond city", group)]),
+           vjust = 1.25,
+           hjust = -1) +
+  coord_cartesian(clip = "off") +
+  #scale_x_discrete(expand = expand_scale(add = c(0.5,2))) +
+  scale_y_continuous(labels = label_dollar(),
+                     limits = c(0, 500000)) +
+  labs(title = "Maximum home price by median occupation wage versus median sales prices",
+       subtitle = "Lines show median sales prices by locality as of August 2022",
+       caption = "Sources: U.S. Bureau of Labor Statistics, Occupational Employment and\nWage Statistics; CVR MLS.") +
+  theme(panel.background = element_blank(),
+        legend.position = "none",
+        axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        plot.margin = margin(10,80,10,10, unit = "pt"))
 
 ```

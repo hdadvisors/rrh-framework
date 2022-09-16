@@ -30,18 +30,18 @@ book:
         - part-2-4.qmd
     - part: "PART 3: Gap analysis"
       chapters:
-        #- part-3-1.qmd
+        - part-3-1.qmd
         - part-3-2.qmd
     - part: "PART 4: Local summaries"
       chapters:
         - part-4-1.qmd
-    #     - part-4-2.qmd
-    #     - part-4-3.qmd
-    #     - part-4-4.qmd
-    #     - part-4-5.qmd
-    #     - part-4-6.qmd
-    #     - part-4-7.qmd
-    #     - part-4-8.qmd
+        - part-4-2.qmd
+        - part-4-3.qmd
+        - part-4-4.qmd
+        - part-4-5.qmd
+        - part-4-6.qmd
+        - part-4-7.qmd
+        - part-4-8.qmd
 
 knitr:
   opts_chunk: 
