@@ -19,7 +19,7 @@ This report is an interactive website with three main columns for navigation:
 
 1.  **Table of contents** (*left*): Search bar and links to all chapters in the report.
 2.  **Current chapter** (*center*): Main chapter content.
-3.  **On this page** (*right*): Links to subsections within the currently-viewed chapter.
+3.  **Chapter navigation** (*right*): Quick links to subsections within the currently-viewed chapter.
 
 Links to both the previous and next chapter are included at the bottom of each chapter page.
 
@@ -37,11 +37,25 @@ When applicable, please reference:
 
 ## Changelog {.unnumbered}
 
+### Release 1.0 {.unnumbered}
+
+*2022-09-15*
+
+First complete draft. Completed PART 3 chapters and local summaries for main four localities.
+
+Still to come:
+
+-   Local summaries for Charles City County, Goochland County, New Kent County, Powhatan County, and additional details for the Town of Ashland
+-   Standardize colors across visualizations to match PHA brand palette
+-   Make selection of plots interactive
+-   Add in dynamic links for all footnotes and citations
+-   PDF version of full report and locality summaries
+
 ### Release 0.3 {.unnumbered}
 
 *2022-09-11*
 
-Third partial draft. Completed PART 2 chapters. Add dynamic figure and table captions to local summary.
+Third partial draft. Completed PART 2 chapters. Add dynamic figure and table captions to local summary template.
 
 ### Release 0.2 {.unnumbered}
 
@@ -53,23 +67,4 @@ Second partial draft. Migrate from Bookdown project to Quarto project.
 
 *2022-08-30*
 
-First partial draft. Test site rendering and hosting. PART 1 chapters fully drafted. Remaining chapters in final production.
-
-Next release will include:
-
--   PART 2 chapters:
-    -   Rental
-    -   Housing Assistance
-    -   Naturally-occurring affordable housing
--   PART 3 chapters:
-    -   Affordability of current housing stock
--   PART 4 chapters:
-    -   Remaining local summaries
-
-Still to come:
-
--   Standardize colors across visualizations to match PHA brand palette
--   Make selection of plots interactive
--   Add in dynamic links for all footnotes and citations
--   Improve formatting for call-out boxes
--   PDF version of full report and locality summaries
+First partial draft. Test site rendering and hosting. PART 1 chapters fully drafted. Remaining chapters in production.

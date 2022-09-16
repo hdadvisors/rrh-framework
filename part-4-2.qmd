@@ -18,6 +18,7 @@ library(lubridate)
 library(janitor)
 library(optiRum)
 library(viridis)
+library(kableExtra)
 
 years <- 2016:2020
 fips <- 51041
@@ -70,9 +71,6 @@ pop_bar <- ggplot(pop,
         axis.ticks = element_blank(),
         panel.grid.major.y = element_line(color = "grey95",
                                           size = 0.05))
-
-ggplotly(pop_bar) |>
-  plotly_camera()
 
 # 2010 to 2020 increase of 48,312 --- 15 percent increase
 # 2019 TO 2020 increase of 11,746 --- 3 percent increase
@@ -392,6 +390,8 @@ ggplot(sub_rent,
 
 ### Housing assistance
 
+Over the last two and a half years, more than 800 new affordable rental unit subsidies were added in the county. Another 144 contracts expired (across just one property), leading to a net gain of 689 dedicated affordable rental units.
+
 ```{r}
 #| label: tbl-nhpd
 #| tbl-cap: !expr "paste0(name, \": Added and removed affordable rental contracts since 2020\")"
@@ -425,8 +425,6 @@ change_table |>
 
 ```
 
-*Change in number of assisted units (NHPD)*
-
 ### Naturally-occurring affordable housing
 
 As defined in this report, there are 19 rental properties in the Chesterfield County that qualify as naturally-occurring affordable housing. There are about 3,712 apartments across these properties, which make up approximately 23 percent of all multifamily (two or more units) rental housing in the county.
@@ -452,7 +450,7 @@ noah <- read_csv("data/pha_noah_81722.csv") |>
   )) |> 
   mutate(period_built = fct_relevel(period_built, "Before 1940"))
 
-sum(noah$number_of_units)
+# sum(noah$number_of_units)
 
 ggplot(noah,
        aes(x = period_built,
@@ -505,7 +503,7 @@ mhc |>
 
 ### Affordability of current housing stock
 
-In Chesterfield County, the median renter household income is just enough to afford the average market asking rent. In 2020, the rent affordable based on the median renter household income was \$1,328, while the average asking rent was \$\$1,265 --- meaning that the typical renter could afford \$63 more than the average asking rent.
+In Chesterfield County, the median renter household income is just enough to afford the average market asking rent. In 2020, the rent affordable based on the median renter household income was \$1,328, while the average asking rent was \$1,265 --- meaning that the typical renter could afford \$63 more than the average asking rent.
 
 This difference between affordable rent and asking rent has been shrinking in recent years. From a difference of \$89 in 2016 to \$63 in 2020.
 
@@ -622,7 +620,11 @@ ggplot(slgap,
 
 ```
 
-Across renter households with incomes below 80 percent AMI, the gap in affordable housing has increased by 204 units from 2015 to 2018 --- for a total shortage of 7,569 rental units affordable to households making 80 percent AMI or less. This estimated gap is based on matching renter income to rental housing affordable to that income and should be considered with some caution. Household incomes matching housing costs does not necessarily reflect that a household is able to afford housing costs given the numerous other financial responsibilities held by individuals and families. Nonetheless, the estimated gap provides our closest assessment of a gap in housing at specific income-levels. For Chesterfield County, the gap has increased most significantly for households between 51 and 80 percent AMI --- suggesting a growing need for affordable housing for higher income households.
+Across renter households with incomes below 80 percent AMI, the gap in affordable housing has increased by 204 units from 2015 to 2018 --- for a total shortage of 7,569 rental units affordable to households making 80 percent AMI or less. This estimated gap is based on matching renter income to rental housing affordable to that income and should be considered with some caution.
+
+Household incomes matching housing costs does not necessarily reflect that a household is able to afford housing costs given the numerous other financial responsibilities held by individuals and families. Nonetheless, the estimated gap provides our closest assessment of a gap in housing at specific income-levels. 
+
+For Chesterfield County, the gap has increased most significantly for households between 51 and 80 percent AMI --- suggesting a growing need for affordable housing for higher income households.
 
 ```{r}
 #| label: fig-gap
