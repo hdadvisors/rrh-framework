@@ -38,10 +38,10 @@ book:
         - part-4-2.qmd
         - part-4-3.qmd
         - part-4-4.qmd
-        - part-4-5.qmd
-        - part-4-6.qmd
-        - part-4-7.qmd
-        - part-4-8.qmd
+        # - part-4-5.qmd
+        # - part-4-6.qmd
+        # - part-4-7.qmd
+        # - part-4-8.qmd
 
 knitr:
   opts_chunk: 
