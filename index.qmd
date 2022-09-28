@@ -13,6 +13,8 @@ There are four parts in this report:
 3.  Gap analysis
 4.  Local summaries
 
+::: {.content-visible when-format="html"}
+
 ## How to read this report {.unnumbered}
 
 This report is an interactive website with three main columns for navigation:
@@ -68,3 +70,5 @@ Second partial draft. Migrate from Bookdown project to Quarto project.
 *2022-08-30*
 
 First partial draft. Test site rendering and hosting. PART 1 chapters fully drafted. Remaining chapters in production.
+
+:::

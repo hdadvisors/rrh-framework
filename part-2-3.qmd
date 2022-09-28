@@ -1,6 +1,7 @@
 # Housing assistance {#part-2-3}
 
-```{r setup}
+```{r}
+#| label: setup
 
 library(tidyverse)
 library(tidygeocoder)
@@ -21,6 +22,31 @@ library(readxl)
 library(tigris)
 library(ggspatial)
 library(mapboxapi)
+
+```
+
+```{r}
+#| label: geo-setup
+#| eval: false
+
+sf_use_s2(TRUE)
+
+options(tigris_use_cache = TRUE)
+
+rr <- c("51085", "51760", "51075", "51145", "51087", "51127", "51036", "51041")
+
+rr_boundary <- counties("VA") |> 
+  filter(GEOID %in% rr)
+
+rr_basemap <- layer_static_mapbox(
+  location = rr_boundary,
+  style_id = "light-v10",
+  username = "mapbox"
+  )
+
+write_rds(rr_basemap, "data/rr_basemap.rds")
+
+write_rds(rr_boundary, "data/rr_boundary.rds")
 
 ```
 
@@ -325,6 +351,8 @@ write_rds(nhpd_mapped_rr, "data/nhpd_mapped_rr.rds")
 #| label: fig-nhpd-map
 #| fig.cap: "Federally-assisted rental housing properties"
 
+rr_basemap <- read_rds("data/rr_basemap.rds")
+
 nhpd_map <- read_rds("data/nhpd_mapped_rr.rds") |>
   filter(subsidy_status != "Inactive") |>
   group_by(subsidy_type, nhpd_property_id) |>
@@ -332,14 +360,32 @@ nhpd_map <- read_rds("data/nhpd_mapped_rr.rds") |>
 
 subsidyPal <- colorFactor(viridis(8), nhpd_map$subsidy_name)
 
-mapview(
-  nhpd_map,
-  zcol = "subsidy_type",
-  legend = T,
-  popup = F,
-  burst = F,
-  layer.name = "Subsidy type"
-)
+if (knitr::is_html_output()) {
+  
+  mapview(nhpd_map,
+          zcol= "subsidy_type",
+          legend = T,
+          popup = F,
+          burst = F,
+          layer.name = "Subsidy type")
+  
+  } else {
+    
+  ggplot() +
+    rr_basemap +
+    geom_sf(nhpd_map, mapping = aes(color = subsidy_type), show.legend = "point") +
+    labs(title = "Federally-assisted rental housing properties",
+         color = "Subsidy type",
+         caption = "Sources: National Housing Preservation Database and Virginia Housing.") +
+    #fixed_plot_aspect(ratio = 0.8) +
+    theme(panel.background = element_blank(),
+          axis.title = element_blank(),
+          axis.ticks = element_blank(),
+          axis.text = element_blank(),
+          legend.key = element_blank(),
+          plot.caption = element_text(hjust = 0))
+    
+  }
 
 ```
 
@@ -629,25 +675,6 @@ HCV utilization across the region is concentrated in the East End and Southside 
 
 # HCV as a Percent of Renter Occupied Housing Units
 
-sf_use_s2(TRUE)
-
-options(tigris_use_cache = TRUE)
-
-pha <- c("041", "760", "085", "087")
-
-pha_boundary <- counties("VA") |> 
-  filter(COUNTYFP %in% pha)
-
-pha_basemap <- layer_static_mapbox(
-  location = hcv,
-  style_id = "light-v10",
-  username = "mapbox"
-)
-
-write_rds(pha_basemap, "data/pha_basemap.rds")
-
-write_rds(pha_boundary, "data/pha_boundary.rds")
-
 hcv <- st_read("data/va_hcv_tract.geojson",
                quiet = TRUE) |>
   clean_names() |>
@@ -662,8 +689,6 @@ write_rds(hcv, "data/hcv_tracts.rds")
 #| label: fig-hcv
 #| fig.cap: "Percent of renters with Housing Choice Vouchers by tract"
 
-pha_basemap <- read_rds("data/pha_basemap.rds")
-
 hcv <- read_rds("data/hcv_tracts.rds")
 
 if (knitr::is_html_output()) {
@@ -676,7 +701,7 @@ if (knitr::is_html_output()) {
   } else {
     
   ggplot() +
-    pha_basemap +
+    rr_basemap +
     layer_spatial(hcv, aes(fill = hcv_public_pct)) +
     scale_fill_gradient2(low = "#edf8b1", high = "#253494", mid = "#41b6c4",
                          midpoint = 18,
@@ -696,119 +721,136 @@ if (knitr::is_html_output()) {
 
 ```
 
-<!-- ### Rent relief and mortgage relief -->
+### Rent relief and mortgage relief
 
-<!-- In response to the COVID-19 pandemic's impact on renters across the nation, Congress created a \$25 billion Emergency Rental Assistance (ERA) program that was funded through the CARES Act in 2021. The program was implemented through the U.S. Treasury Department and resulted in a total of $1 billion being allocated to the Commonwealth of Virginia and eligible local governments.  -->
+In response to the COVID-19 pandemic's impact on renters across the nation, Congress created a \$25 billion Emergency Rental Assistance (ERA) program that was funded through the CARES Act in 2021. The program was implemented through the U.S. Treasury Department and resulted in a total of $1 billion being allocated to the Commonwealth of Virginia and eligible local governments.
 
-<!-- With this funding, the Virginia Department of Housing and Community Development (DHCD) established the Virginia Rent Relief Program (RRP), while Chesterfield County elected to administer their own rental assistance program through local nonprofit, Area Congregations Together in Service (ACTS).  -->
+With this funding, the Virginia Department of Housing and Community Development (DHCD) established the Virginia Rent Relief Program (RRP), while Chesterfield County elected to administer their own rental assistance program through local nonprofit, Area Congregations Together in Service (ACTS).
 
-<!-- Through DHCD, a total of 32,029 payments were made to households across Richmond, Henrico, and Hanover. Both Richmond and Henrico saw increasing households receiving rental assistance with slight dips during the early part of 2022. Few households in Hanover County sought rental relief from DHCD. -->
+Through DHCD, a total of 32,029 payments were made to households across Richmond, Henrico, and Hanover. Both Richmond and Henrico saw increasing households receiving rental assistance with slight dips during the early part of 2022. Few households in Hanover County sought rental relief from DHCD.
 
-<!-- ::: callout-warning -->
+::: callout-warning
 
-<!-- #### All data not available -->
+#### All data not available
 
-<!-- Chesterfield County rent relief data has not been received yet. -->
+Chesterfield County rent relief data has not been received yet.
 
-<!-- ::: -->
+:::
 
-<!-- ```{r} -->
-<!-- #| label: fig-rrp -->
-<!-- #| fig.cap: "Rent relief payments by locality" -->
+```{r}
+#| label: fig-rrp
+#| fig.cap: "Rent relief payments by locality"
 
-<!-- # Email gabriella.vazquez@dhcd.virginia.gov for data on RRP - breakdown of households helped in Hanover, Henrico, and Richmond --- consider including other localities -->
+# Email gabriella.vazquez@dhcd.virginia.gov for data on RRP - breakdown of households helped in Hanover, Henrico, and Richmond --- consider including other localities
 
-<!-- # Email Jessica about Chesterfield rent relief program. -->
+# Email Jessica about Chesterfield rent relief program.
 
-<!-- rrp <- read_csv("data/rrp_data.csv")|>  -->
-<!--   mutate(avgpayment = spent/payments) |>  -->
-<!--   filter(locality == "Hanover County" | locality == "Henrico County" | locality == "Richmond") |>  -->
-<!--   mutate(date = mdy(date)) -->
+rrp <- read_csv("data/rrp_data.csv")|>
+  mutate(avgpayment = spent/payments) |>
+  filter(locality == "Hanover County" | locality == "Henrico County" | locality == "Richmond") |>
+  mutate(date = mdy(date))
 
-<!-- ggplot(rrp, -->
-<!--        aes(x = date, -->
-<!--            y = payments, -->
-<!--            fill = locality)) + -->
-<!--   geom_bar(stat = "identity") +  -->
-<!--   facet_wrap(~locality) + -->
-<!--   theme(axis.title = element_blank(), -->
-<!--         axis.text.x = element_text(angle = 90, vjust = 1, hjust = 1)) + -->
-<!--   labs(title = "Rent relief payments by locality") + -->
-<!--   scale_y_continuous(labels = number_format(big.mark = ",")) + -->
-<!--   theme(legend.position = "none") -->
+ggplot(rrp,
+       aes(x = date,
+           y = payments,
+           fill = locality)) +
+  geom_col() +
+  facet_wrap(~locality) +
+  labs(title = "Rent relief payments by locality",
+       caption = "Source: Virginia Department of Housing and Community Development") +
+  scale_x_date(date_labels = "%b %y",
+               expand = c(0,0)) +
+  scale_y_continuous(labels = label_comma()) +
+  theme(
+    axis.ticks = element_blank(),
+    axis.title = element_blank(),
+    axis.text.x = element_text(angle = 90, vjust = 1, hjust = 1),
+    panel.background = element_blank(),
+    panel.grid.major.y = element_line(color = "grey95",
+                                  size = 0.05),
+    legend.position = "none")
 
-<!-- # https://crsreports.congress.gov/product/pdf/R/R46688 -->
-
-
-<!-- ``` -->
-<!-- Average payments per household across the three localities was well into the above \$4,000 for most of the program's duration, with the highest payments being made in Hanover County. -->
-
-<!-- ```{r} -->
-<!-- #| label: fig-rrp-payment -->
-<!-- #| fig.cap: "Average assistance by month and locality" -->
-
-<!-- ggplot(rrp, -->
-<!--        aes(x = date, -->
-<!--            y = avgpayment, -->
-<!--            fill = locality)) + -->
-<!--   geom_bar(stat = "identity") +  -->
-<!--   facet_wrap(~locality) + -->
-<!--   theme(axis.title = element_blank(), -->
-<!--         axis.text.x = element_text(angle = 90, vjust = 1, hjust = 1)) + -->
-<!--   labs(title = "Average assistance by month and locality") + -->
-<!--   scale_y_continuous(labels = dollar_format()) + -->
-<!--   theme(legend.position = "none") -->
-
-<!-- ``` -->
-<!-- ## Affordable homeownership -->
-
-<!-- Since 2010, nonprofit developers in the region have averaged about 50 affordable homes sold to low-income buyers. Most of this production in attributable to Southside Community Development, project:HOMES, and the Maggie Walker Community Land Trust. -->
-
-<!-- ::: callout-warning -->
-
-<!-- #### All data not available -->
-
-<!-- Production numbers for Habitat for Humanity not yet received. -->
-
-<!-- ::: -->
-
-<!-- ```{r} -->
-<!-- #| label: fig-pha-homeownership -->
-<!-- #| fig-cap: "Richmond region nonprofit homeownership production" -->
-
-<!-- pha_ho <- read_csv("data/pha_homeownership.csv") |>  -->
-<!--   clean_names() |>   -->
-<!--   select(1:7) -->
-
-<!-- ho_production <- pha_ho |>  -->
-<!--   filter(data_type == "Number of homes completed and sold in calendar year") |>  -->
-<!--   pivot_longer(3:7, -->
-<!--                names_to = "year", -->
-<!--                values_to = "homes") |>  -->
-<!--   mutate(year = parse_number(year)) -->
-
-<!-- # MWCLT, BHC, project:HOMES, Southside, Habitat - WAITING ON DATA -->
-
-<!-- # Ask for number of units produced each year from 2019 to now -->
-
-<!-- # Average home price each year? -->
-
-<!-- ggplot(ho_production, -->
-<!--        aes(x = year, -->
-<!--            y = homes, -->
-<!--            fill = reorder(organization, homes))) + -->
-<!--   geom_col() + -->
-<!--   labs(title = "Richmond region nonprofit homeownership production", -->
-<!--        subtitle = "Numbers for 2022 are current through August", -->
-<!--        caption = "Source: Survey of nonprofit organizations.") + -->
-<!--   theme(legend.title = element_blank(), -->
-<!--         legend.position = "bottom", -->
-<!--         axis.title = element_blank(), -->
-<!--         axis.ticks = element_blank(), -->
-<!--         panel.background = element_blank(), -->
-<!--         panel.grid.major.y = element_line(color = "grey95", -->
-<!--                                   size = 0.05)) + -->
-<!--   guides(fill = guide_legend(nrow = 2)) -->
+# https://crsreports.congress.gov/product/pdf/R/R46688
 
 
-<!-- ``` -->
+```
+
+Average payments per household across the three localities was well into the above \$4,000 for most of the program's duration, with the highest payments being made in Hanover County.
+
+```{r}
+#| label: fig-rrp-payment
+#| fig.cap: "Average assistance by month and locality"
+
+ggplot(rrp,
+       aes(x = date,
+           y = avgpayment,
+           fill = locality)) +
+  geom_col() +
+  facet_wrap(~locality) +
+  labs(title = "Average assistance by month and locality",
+       caption = "Source: Virginia Department of Housing and Community Development") +
+  scale_x_date(date_labels = "%b %y",
+               expand = c(0,0)) +
+  scale_y_continuous(labels = label_dollar()) +
+  theme(
+    axis.ticks = element_blank(),
+    axis.title = element_blank(),
+    axis.text.x = element_text(angle = 90, vjust = 1, hjust = 1),
+    panel.background = element_blank(),
+    panel.grid.major.y = element_line(color = "grey95",
+                                  size = 0.05),
+    legend.position = "none")
+
+```
+
+## Affordable homeownership
+
+Since 2010, nonprofit developers in the region have averaged about 50 affordable homes sold to low-income buyers. Most of this production in attributable to Southside Community Development, project:HOMES, and the Maggie Walker Community Land Trust.
+
+::: callout-warning
+
+#### All data not available
+
+Production numbers for Habitat for Humanity not yet received.
+
+:::
+
+```{r}
+#| label: fig-pha-homeownership
+#| fig-cap: "Richmond region nonprofit homeownership production"
+
+pha_ho <- read_csv("data/pha_homeownership.csv") |>
+  clean_names() |>
+  select(1:7)
+
+ho_production <- pha_ho |>
+  filter(data_type == "Number of homes completed and sold in calendar year") |>
+  pivot_longer(3:7,
+               names_to = "year",
+               values_to = "homes") |>
+  mutate(year = parse_number(year))
+
+# MWCLT, BHC, project:HOMES, Southside, Habitat - WAITING ON DATA
+
+# Ask for number of units produced each year from 2019 to now
+
+# Average home price each year?
+
+ggplot(ho_production,
+       aes(x = year,
+           y = homes,
+           fill = reorder(organization, homes))) +
+  geom_col() +
+  labs(title = "Richmond region nonprofit homeownership production",
+       subtitle = "Numbers for 2022 are current through August",
+       caption = "Source: Survey of nonprofit organizations.") +
+  theme(legend.title = element_blank(),
+        legend.position = "bottom",
+        axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                  size = 0.05)) +
+  guides(fill = guide_legend(nrow = 2))
+
+```

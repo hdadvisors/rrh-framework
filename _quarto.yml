@@ -52,5 +52,5 @@ knitr:
 format:
   html:
     theme: lumen
-  # pdf:
-  #   documentclass: scrreprt
+  pdf:
+    documentclass: scrreprt

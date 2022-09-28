@@ -64,7 +64,9 @@ Based on this criteria, NOAH properties are located all across the region, espec
 
 ```{r}
 #| label: fig-noah-map
-#| fig.cap: "Map of NOAH properties in region."
+#| fig.cap: "Map of NOAH properties in region"
+
+rr_basemap <- read_rds("data/rr_basemap.rds")
 
 noah <- read_csv("data/pha_noah_81722.csv") |> 
   clean_names() |> 
@@ -72,14 +74,35 @@ noah <- read_csv("data/pha_noah_81722.csv") |>
   filter(!property_name %in% c("Sedgefield", "Holiday Mobile Home Park")) |> 
   mutate(property_name = fct_reorder(property_name, avg_asking_unit, .desc = TRUE))
 
-mapview(
-  noah,
-  zcol = "avg_asking_unit",
-  legend = T,
-  popup = F,
-  burst = F,
-  layer.name = "Average asking rent ($)"
-)
+if (knitr::is_html_output()) {
+  
+  mapview(noah,
+    zcol = "avg_asking_unit",
+    legend = T,
+    popup = F,
+    burst = F,
+    layer.name = "Average asking rent ($)")
+  
+  } else {
+  
+  noah_dropna_rent <- noah |> 
+    filter(!is.na(avg_asking_unit))
+  
+  ggplot() +
+    rr_basemap +
+    geom_sf(noah_dropna_rent, mapping = aes(color = avg_asking_unit)) +
+    scale_color_continuous(type = "viridis", labels = label_dollar()) +
+    labs(title = "Map of NOAH properties in region",
+         color = "Average asking rent",
+         caption = "Source: CoStar Group, Inc.") +
+    theme(panel.background = element_blank(),
+          axis.title = element_blank(),
+          axis.ticks = element_blank(),
+          axis.text = element_blank(),
+          legend.key = element_blank(),
+          plot.caption = element_text(hjust = 0))
+    
+  }
 
 ```
 
@@ -199,14 +222,37 @@ Garden style properties, on the other hand, are more commonly found in the count
 #| label: fig-noah-style-map
 #| fig.cap: "Map of NOAH properties by building style"
 
-mapview(
-  noah,
-  zcol = "style",
-  legend = T,
-  popup = F,
-  burst = F,
-  layer.name = "Building style"
-)
+if (knitr::is_html_output()) {
+  
+  mapview(
+    noah,
+    zcol = "style",
+    legend = T,
+    popup = F,
+    burst = F,
+    layer.name = "Building style"
+  )
+  
+  } else {
+  
+  noah_dropna_style <- noah |> 
+  filter(!is.na(style))  
+
+  ggplot() +
+    rr_basemap +
+    geom_sf(noah_dropna_style, mapping = aes(color = style), show.legend = "point") +
+    labs(title = "Map of NOAH properties by building style",
+         color = "Building style",
+         caption = "Source: CoStar Group, Inc.") +
+    #fixed_plot_aspect(ratio = 0.8) +
+    theme(panel.background = element_blank(),
+          axis.title = element_blank(),
+          axis.ticks = element_blank(),
+          axis.text = element_blank(),
+          legend.key = element_blank(),
+          plot.caption = element_text(hjust = 0))
+    
+  }
 
 ```
 
@@ -529,20 +575,41 @@ write_rds(pha_mhc, "data/pha_mhc.rds")
 
 ```{r}
 #| label: fig-mhc-map
-#| fig.cap: "Units in manufactured home communities by locality"
+#| fig.cap: "Map of manufactured housing communities"
 
 pha_mhc <- read_rds("data/pha_mhc.rds") |>
   filter(STATUS != "CLOSED") |> 
   mutate(SIZE = str_to_sentence(SIZE))
 
-mapview(
-  pha_mhc,
-  zcol = "SIZE",
-  legend = T,
-  popup = F,
-  burst = F,
-  layer.name = "Units in park"
-)
+if (knitr::is_html_output()) {
+  
+  mapview(
+    pha_mhc,
+    zcol = "SIZE",
+    legend = T,
+    popup = F,
+    burst = F,
+    layer.name = "Units in park"
+  )
+  
+  } else {
+
+
+  ggplot() +
+    rr_basemap +
+    geom_sf(pha_mhc, mapping = aes(color = SIZE), show.legend = "point") +
+    labs(title = "Map of manufactured housing communities",
+         color = "Units in park",
+         caption = "Source: Manufactured Home Community Coalition of Virginia.") +
+    #fixed_plot_aspect(ratio = 0.8) +
+    theme(panel.background = element_blank(),
+          axis.title = element_blank(),
+          axis.ticks = element_blank(),
+          axis.text = element_blank(),
+          legend.key = element_blank(),
+          plot.caption = element_text(hjust = 0))
+    
+  }
 
 ```
 

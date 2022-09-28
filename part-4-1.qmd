@@ -269,7 +269,6 @@ From the start of 2017 to June 2022, the median home price in the city has incre
 #| label: fig-sales
 #| fig-cap: !expr "paste0(name, \": Median home sales price\")"
 
-
 # Median sales price over time
 
 price <- read_csv("data/richmond_med_sales.csv") |> 
@@ -315,8 +314,7 @@ Rents across the city have steadily risen over the last ten years, accelerating 
 
 ```{r}
 #| label: fig-rent-submarket
-#| fig-cap: !expr "paste0(name, \": Average asking rent by submarke\")"
-
+#| fig-cap: !expr "paste0(name, \": Average asking rent by submarket\")"
 
 # Average asking rent over time (by submarket if applicable, maybe by bedroom if no submarkets)
 
@@ -354,7 +352,6 @@ ggplot(sub_rent,
                                           size = 0.05))
 
 ```
-
 ```{r}
 #| label: tbl-submarket-table
 #| tbl-cap: !expr "paste0(name, \": Submarket rents\")"
@@ -381,7 +378,8 @@ sub_tbl <- sub_rent_tbl |>
   arrange(desc(pct_change))
 
 sub_tbl |> 
-  kable(caption = "Change in average rents by Richmond submarket",
+  kable(
+        # caption = "Change in average rents by Richmond submarket",
         col.names = c("Richmond submarket", "2016 Q1 Rent", "2022 Q3 Rent", "Percent change")) |> 
   kableExtra::kable_styling(
     bootstrap_options = c("condensed", "striped", "hover")) |> 

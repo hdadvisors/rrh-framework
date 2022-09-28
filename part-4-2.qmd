@@ -489,15 +489,16 @@ mhc <- read_csv("data/mhccv_data.csv") |>
   arrange(desc(Units))
 
 mhc |> 
-  kable(caption = "Manufactured Home Communities in Chesterfield County",
+  kable(
+        # caption = "Manufactured Home Communities in Chesterfield County",
         col.names = c("Community name", "Estimated units")) |> 
   kableExtra::kable_styling(
     bootstrap_options = c("condensed", "striped", "hover"))
 
 # sum(mhc$Units)
 
-
 ```
+
 
 ## Gap analysis
 
