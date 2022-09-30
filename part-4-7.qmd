@@ -204,8 +204,6 @@ ggplot(b25119_cpi,
                                           size = 0.05),
         legend.position = "none")
 
-# 16 percent increase for renters
-# 10 percent increase for homeowners
 
 ```
 
@@ -242,8 +240,6 @@ ggplot(b18107,
                                           size = 0.05))
 
 ```
-
-
 
 ## Housing supply and market changes
 

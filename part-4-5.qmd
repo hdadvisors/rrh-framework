@@ -382,7 +382,7 @@ For the few hundred renters in the county, reaching homeownership has becoming m
 
 ```{r}
 #| label: fig-income-own-gap
-#| fig-cap: !expr "paste0(name, \": Income needed to afford median home price\nversus median renter income\")"
+#| fig-cap: !expr "paste0(name, \": Income needed to afford median home price versus median renter income\")"
 
 # Compare local renter income versus local home prices
 

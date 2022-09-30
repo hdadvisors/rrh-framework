@@ -73,9 +73,6 @@ pop_bar <- ggplot(pop,
 # ggplotly(pop_bar) |> 
 #   plotly_camera()
 
-# 2010 to 2020 increase of 22,396 
-# 2019 TO 2020 decrease of 3,826
-
 pop_bar
 
 ```
@@ -356,9 +353,7 @@ ggplot(rent,
 
 ### Housing assistance
 
-```
-Change in number of assisted units (NHPD)
-```
+As of early 2022, there were no federally-assisted rental housing properties located in Goochland County.
 
 ### Naturally-occurring affordable housing
 

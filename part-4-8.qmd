@@ -384,7 +384,7 @@ vacancy <- c("7.8%", "4.6%", "4.6%")
 
 mf_tbl <- data.frame(names, year, rating, units)
 
-mf_tbl |> kable(caption = "Multifamily properties in Powhatan County",
+mf_tbl |> kable(
         col.names = c("Property name", "Year built", "CoStar rating", "Vacancy rate", "Units")) |> 
   kableExtra::kable_styling(
     bootstrap_options = c("condensed", "striped", "hover"))
