@@ -382,9 +382,9 @@ rating <- c(4, 2, 3)
 year <- c(2021, 1982, 1982)
 vacancy <- c("7.8%", "4.6%", "4.6%")
 
-mf_tbl <- data.frame(names, year, rating, units)
+mf_tbl <- data.frame(names, year, rating, vacancy, units)
 
-mf_tbl |> kable(
+mf_tbl |> kable(align = "lcccr",
         col.names = c("Property name", "Year built", "CoStar rating", "Vacancy rate", "Units")) |> 
   kableExtra::kable_styling(
     bootstrap_options = c("condensed", "striped", "hover"))
@@ -406,7 +406,7 @@ In addition to Powhatan Apartments, there is a small manufactured home community
 #| label: fig-mhc
 #| fig-cap: !expr "paste0(name, \": Manufactured home communities\")"
 
-mhc <- st_read("https://services1.arcgis.com/Hp6G80Pky0om7QvQ/arcgis/rest/services/Mobile_Home_Parks/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson") |> 
+mhc <- st_read("https://services1.arcgis.com/Hp6G80Pky0om7QvQ/arcgis/rest/services/Mobile_Home_Parks/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson", quiet = TRUE) |> 
   filter(STATE == "VA",
          COUNTY == "POWHATAN")
 

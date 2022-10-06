@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.1.189">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Richmond Regional Housing Framework Data Update - 18&nbsp; Powhatan County</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./part-4-7.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+<script src="site_libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
+<script src="site_libs/jquery-1.12.4/jquery.min.js"></script>
+<link href="site_libs/leaflet-1.3.1/leaflet.css" rel="stylesheet">
+<script src="site_libs/leaflet-1.3.1/leaflet.js"></script>
+<link href="site_libs/leafletfix-1.0.0/leafletfix.css" rel="stylesheet">
+<script src="site_libs/proj4-2.6.2/proj4.min.js"></script>
+<script src="site_libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
+<link href="site_libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet">
+<script src="site_libs/leaflet-binding-2.1.1/leaflet.js"></script>
+
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Powhatan County</span></h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Richmond Regional Housing Framework Data Update</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/hdadvisors/rrh-framework" title="Source Code" class="sidebar-tool px-1"><i class="bi bi-github"></i></a>
+</div>
+    </div>
+      </div>
+      <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">About</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">PART 1: Demographic and socioeconomic changes</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./part-1-1.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Population changes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./part-1-2.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Household characteristics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./part-1-3.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Incomes and wages</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./part-1-4.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Special populations</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">PART 2: Housing supply and market changes</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./part-2-1.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Homeownership</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./part-2-2.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Rental homes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./part-2-3.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Housing assistance</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./part-2-4.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Assessment of naturally-occurring affordable housing</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">PART 3: Gap analysis</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./part-3-1.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Affordability of current housing supply</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./part-3-2.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Impact of housing costs on household budgets</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">PART 4: Local summaries</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./part-4-1.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Richmond City</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./part-4-2.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Chesterfield County</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./part-4-3.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Henrico County</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./part-4-4.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Hanover County</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./part-4-5.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Charles City County</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./part-4-6.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Goochland County</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./part-4-7.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">New Kent County</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./part-4-8.html" class="sidebar-item-text sidebar-link active"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Powhatan County</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#takeaways" id="toc-takeaways" class="nav-link active" data-scroll-target="#takeaways"><span class="toc-section-number">18.1</span>  Takeaways</a></li>
+  <li><a href="#demographic-and-socioeconomic-changes" id="toc-demographic-and-socioeconomic-changes" class="nav-link" data-scroll-target="#demographic-and-socioeconomic-changes"><span class="toc-section-number">18.2</span>  Demographic and socioeconomic changes</a>
+  <ul class="collapse">
+  <li><a href="#population-changes" id="toc-population-changes" class="nav-link" data-scroll-target="#population-changes"><span class="toc-section-number">18.2.1</span>  Population changes</a></li>
+  <li><a href="#household-characteristics" id="toc-household-characteristics" class="nav-link" data-scroll-target="#household-characteristics"><span class="toc-section-number">18.2.2</span>  Household characteristics</a></li>
+  <li><a href="#income-and-wages" id="toc-income-and-wages" class="nav-link" data-scroll-target="#income-and-wages"><span class="toc-section-number">18.2.3</span>  Income and wages</a></li>
+  <li><a href="#persons-with-disabilities" id="toc-persons-with-disabilities" class="nav-link" data-scroll-target="#persons-with-disabilities"><span class="toc-section-number">18.2.4</span>  Persons with disabilities</a></li>
+  </ul></li>
+  <li><a href="#housing-supply-and-market-changes" id="toc-housing-supply-and-market-changes" class="nav-link" data-scroll-target="#housing-supply-and-market-changes"><span class="toc-section-number">18.3</span>  Housing supply and market changes</a>
+  <ul class="collapse">
+  <li><a href="#homeownership" id="toc-homeownership" class="nav-link" data-scroll-target="#homeownership"><span class="toc-section-number">18.3.1</span>  Homeownership</a></li>
+  <li><a href="#rental" id="toc-rental" class="nav-link" data-scroll-target="#rental"><span class="toc-section-number">18.3.2</span>  Rental</a></li>
+  <li><a href="#housing-assistance" id="toc-housing-assistance" class="nav-link" data-scroll-target="#housing-assistance"><span class="toc-section-number">18.3.3</span>  Housing assistance</a></li>
+  <li><a href="#naturally-occurring-affordable-housing" id="toc-naturally-occurring-affordable-housing" class="nav-link" data-scroll-target="#naturally-occurring-affordable-housing"><span class="toc-section-number">18.3.4</span>  Naturally-occurring affordable housing</a></li>
+  </ul></li>
+  <li><a href="#gap-analysis" id="toc-gap-analysis" class="nav-link" data-scroll-target="#gap-analysis"><span class="toc-section-number">18.4</span>  Gap analysis</a>
+  <ul class="collapse">
+  <li><a href="#affordability-of-current-housing-stock" id="toc-affordability-of-current-housing-stock" class="nav-link" data-scroll-target="#affordability-of-current-housing-stock"><span class="toc-section-number">18.4.1</span>  Affordability of current housing stock</a></li>
+  <li><a href="#impact-of-housing-costs" id="toc-impact-of-housing-costs" class="nav-link" data-scroll-target="#impact-of-housing-costs"><span class="toc-section-number">18.4.2</span>  Impact of housing costs</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span id="part-4-8" class="quarto-section-identifier d-none d-lg-block"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Powhatan County</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    
+  </div>
+  
+
+</header>
+
+<p>This chapter is a summary of the major changes to the Powhatan County’s population and housing market in the past five years.</p>
+<div class="cell">
+
+</div>
+<section id="takeaways" class="level2" data-number="18.1">
+<h2 data-number="18.1" class="anchored" data-anchor-id="takeaways"><span class="header-section-number">18.1</span> Takeaways</h2>
+<ul>
+<li>Powhatan County is growing like many other parts of the region — passing the 30,000 mark in 2020.</li>
+<li>More and more homeowners without children have been moving into the county — nearly 600 households between 2016 and 2020.</li>
+<li>Unlike other localities, the county saw a decrease of nearly 100 seniors living alone between 2016 and 2020.</li>
+<li>Median renter household income in the county saw a 20 percent increase in recent years, while fewer and fewer renters in the county.</li>
+<li>Although only 29 enrolled students experienced homelessness during the 2019-2020 school year, this was a doubling from 2016-2017 when the count was at 15.</li>
+</ul>
+</section>
+<section id="demographic-and-socioeconomic-changes" class="level2" data-number="18.2">
+<h2 data-number="18.2" class="anchored" data-anchor-id="demographic-and-socioeconomic-changes"><span class="header-section-number">18.2</span> Demographic and socioeconomic changes</h2>
+<section id="population-changes" class="level3" data-number="18.2.1">
+<h3 data-number="18.2.1" class="anchored" data-anchor-id="population-changes"><span class="header-section-number">18.2.1</span> Population changes</h3>
+<p>Despite a dip in population from 2014 to 2015, Powhatan County has been on an upward trend for the most part. In 2020, the county reached a population of 30,333 — an overall increase of 8 percent since 2010.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-pop" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="part-4-8_files/figure-html/fig-pop-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;18.1: Powhatan County: Total Population</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Like many other rural counties in the region, Powhatan County’s population growth in recent years has been due to domestic migration. Between 2020 and 2021, 772 new residents came to the county from somewhere else within the country.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-comp" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="part-4-8_files/figure-html/fig-comp-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;18.2: Powhatan County: Components of population change</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="household-characteristics" class="level3" data-number="18.2.2">
+<h3 data-number="18.2.2" class="anchored" data-anchor-id="household-characteristics"><span class="header-section-number">18.2.2</span> Household characteristics</h3>
+<p>The county has seen a decreasing number of renter households across the board. But homeowners continue to come to the county — especially homeowner households with no children. By 2020, there was an estimated 590 more homeowners with no children than in 2016.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-children" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="part-4-8_files/figure-html/fig-children-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;18.3: Powhatan County: Change in households with children by tenure</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The greatest increases in the senior population in the county have been among seniors in family households (either living with a spouse or are the head of household). In contrast to other localities, Powhatan County is seeing a decline in seniors in nonfamily households.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-seniors" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="part-4-8_files/figure-html/fig-seniors-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;18.4: Powhatan County: Change in senior population by living arrangement</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="income-and-wages" class="level3" data-number="18.2.3">
+<h3 data-number="18.2.3" class="anchored" data-anchor-id="income-and-wages"><span class="header-section-number">18.2.3</span> Income and wages</h3>
+<p>Both homeowner and renter median household income has been on the incline from 2016 to 2020 in the county. For homeowners, there has been an increase of 8 percent, while renters experienced a 20 percent increase.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-income" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="part-4-8_files/figure-html/fig-income-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;18.5: Powhatan County: Median houshold income by tenure</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="persons-with-disabilities" class="level3" data-number="18.2.4">
+<h3 data-number="18.2.4" class="anchored" data-anchor-id="persons-with-disabilities"><span class="header-section-number">18.2.4</span> Persons with disabilities</h3>
+<p>In the county, there has been an increase in individuals with independent living difficulties that are 65 years old and older (+204) between 2016 and 2020. For individuals younger than 65, there has been a decline in individuals with independent living difficulties.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-ind-living" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="part-4-8_files/figure-html/fig-ind-living-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;18.6: Powhatan County: Net change in individuals with independent living difficulties by age</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="housing-supply-and-market-changes" class="level2" data-number="18.3">
+<h2 data-number="18.3" class="anchored" data-anchor-id="housing-supply-and-market-changes"><span class="header-section-number">18.3</span> Housing supply and market changes</h2>
+<section id="homeownership" class="level3" data-number="18.3.1">
+<h3 data-number="18.3.1" class="anchored" data-anchor-id="homeownership"><span class="header-section-number">18.3.1</span> Homeownership</h3>
+<p>Powhatan County median home price has been on the rise. From a low of $282,084 in March 2017 to a high of $519,559 in May 2022, median home price in the county has increased nearly 84 percent. Although the over $500,000 median home price may represent a seasonal spike, median home price has generally been trending upward and likely to stay above $500,000 in the coming years.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-sales" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="part-4-8_files/figure-html/fig-sales-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;18.7: Powhatan County: Median home sales price</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="rental" class="level3" data-number="18.3.2">
+<h3 data-number="18.3.2" class="anchored" data-anchor-id="rental"><span class="header-section-number">18.3.2</span> Rental</h3>
+<p>Renter households have been in decline since 2016 when roughly one in ten households in the county were renters. This share has dropped by four percentage points down to 7 percent renter household in 2020. Despite the declining number of renter households in the county, 2021 saw the completion of 200 new rental units at the eastern edge of the county.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-renters" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="part-4-8_files/figure-html/fig-renters-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;18.8: Renter households in Powhatan County</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>CoStar lists three multifamily properties in the county; two are located along Old Buckingham Road near the county seat, while the third is located at the eastern edge of the county near Midlothian. There was a 39 year period between the construction of both Powhatan Apartment buildings and the Artistry.</p>
+<p>The development of the Artistry at Winterfield potentially represents growing housing demand from the western edge of Chesterfield County’s Midlothian community. This luxury multifamily property has an average asking rent of $1,888.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="tbl-mf-list" class="anchored">
+
+<table class="table table-condensed table-striped table-hover" style="margin-left: auto; margin-right: auto;"><caption>Table&nbsp;18.1:  Powhatan County: Multifamily properties </caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Property name </th>
+   <th style="text-align:center;"> Year built </th>
+   <th style="text-align:center;"> CoStar rating </th>
+   <th style="text-align:center;"> Vacancy rate </th>
+   <th style="text-align:right;"> Units </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Artistry at Winterfield </td>
+   <td style="text-align:center;"> 2021 </td>
+   <td style="text-align:center;"> 4 </td>
+   <td style="text-align:center;"> 7.8% </td>
+   <td style="text-align:right;"> 200 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Powhatan Apartments </td>
+   <td style="text-align:center;"> 1982 </td>
+   <td style="text-align:center;"> 2 </td>
+   <td style="text-align:center;"> 4.6% </td>
+   <td style="text-align:right;"> 11 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Powhatan Apartments </td>
+   <td style="text-align:center;"> 1982 </td>
+   <td style="text-align:center;"> 3 </td>
+   <td style="text-align:center;"> 4.6% </td>
+   <td style="text-align:right;"> 11 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="housing-assistance" class="level3" data-number="18.3.3">
+<h3 data-number="18.3.3" class="anchored" data-anchor-id="housing-assistance"><span class="header-section-number">18.3.3</span> Housing assistance</h3>
+<p>The National Housing Preservation Database lists no federally-assisted housing properties in New Kent County.</p>
+</section>
+<section id="naturally-occurring-affordable-housing" class="level3" data-number="18.3.4">
+<h3 data-number="18.3.4" class="anchored" data-anchor-id="naturally-occurring-affordable-housing"><span class="header-section-number">18.3.4</span> Naturally-occurring affordable housing</h3>
+<p>Powhatan Apartments (both locations) represent the county’s naturally-occurring affordable housing based on the definition of NOAH outlined in this report. Rent data is unavailable for Powhatan Apartments via CoStar.</p>
+<p>In addition to Powhatan Apartments, there is a small manufactured home community located near the cross roads of Maidens Road (US-522) and Huguenot Trail that consists of at least six homes.</p>
+<div class="cell">
+<div id="fig-mhc" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<div id="htmlwidget-47013a92f18c747b0830" style="width:100%;height:464px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-47013a92f18c747b0830">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"https://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addCircleMarkers","args":[37.619223311,-77.90356144,10,null,null,{"interactive":true,"className":"","stroke":true,"color":"#03F","weight":5,"opacity":0.5,"fill":true,"fillColor":"#03F","fillOpacity":0.2},null,null,null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[37.619223311,37.619223311],"lng":[-77.90356144,-77.90356144]}},"evals":[],"jsHooks":[]}</script>
+<p></p><figcaption class="figure-caption">Figure&nbsp;18.9: Powhatan County: Manufactured home communities</figcaption><p></p>
+</figure>
+</div>
+</div>
+</section>
+</section>
+<section id="gap-analysis" class="level2" data-number="18.4">
+<h2 data-number="18.4" class="anchored" data-anchor-id="gap-analysis"><span class="header-section-number">18.4</span> Gap analysis</h2>
+<section id="affordability-of-current-housing-stock" class="level3" data-number="18.4.1">
+<h3 data-number="18.4.1" class="anchored" data-anchor-id="affordability-of-current-housing-stock"><span class="header-section-number">18.4.1</span> Affordability of current housing stock</h3>
+<p>With increasing renter household incomes in the county, the gap between income needed to afford the typical home price and typical renter income has been narrowing. In 2016, the gap stood at nearly $12,000, but by 2020 the gap had decreased to just below $7,000.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-income-own-gap" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="part-4-8_files/figure-html/fig-income-own-gap-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;18.10: Powhatan County: Income needed to afford median home price versus median renter income</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>As of 2018, there was a 70 unit rental home shortage for households making less than 80 percent AMI. This was a major decline from 2015 when the shortage was 215 — mainly for 30 percent AMI or less households. The deficit has decreased significantly among extremely and very low-income households, but has increased for higher income households.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-gap" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="part-4-8_files/figure-html/fig-gap-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;18.11: Powhatan County: Rental housing gap by AMI</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="impact-of-housing-costs" class="level3" data-number="18.4.2">
+<h3 data-number="18.4.2" class="anchored" data-anchor-id="impact-of-housing-costs"><span class="header-section-number">18.4.2</span> Impact of housing costs</h3>
+<p>The share of cost-burdened renters has decreased from nearly 38 percent of renter households to 23 percent in a short period. For homeowners, the share of cost-burdened households has decreased only slightly — going from 24 percent to 21 percent over three years.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-cb" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="part-4-8_files/figure-html/fig-cb-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;18.12: Powhatan County: Share of cost-burdened households by tenure</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Available data from William and Mary’s Project HOPE shows that the number of enrolled students experiencing homelessness in the county has increased in recent years. The county’s McKinney-Vento Act data showed that the number of students experiencing homeless has doubled from the 2016-2017 school year when the number was 15. By the 2019-2020, that number was 29.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-mkv" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="part-4-8_files/figure-html/fig-mkv-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;18.13: Powhatan CountyEnrolled students experiencing homelessness by school year</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./part-4-7.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">New Kent County</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>

@@ -39,6 +39,20 @@ When applicable, please reference:
 
 ## Changelog {.unnumbered}
 
+### Release 1.1 {.unnumbered}
+
+*2022-10-06*
+
+Completed local summaries for Charles City County, Goochland County, New Kent County, and Powhatan County.
+
+Still to come:
+
+-   Additional details for the Town of Ashland
+-   Standardize colors across visualizations to match PHA brand palette
+-   Make selection of plots interactive
+-   Add in dynamic links for all footnotes and citations
+-   PDF version of full report and locality summaries
+
 ### Release 1.0 {.unnumbered}
 
 *2022-09-15*
