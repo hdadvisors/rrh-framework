@@ -1,0 +1,12 @@
+﻿Property Address,County Name,State,Zip,Property Name,Building Status,Number Of Units,Style,Star Rating,Market Name,Year Built,Year Renovated,Building Park,Total Buildings,Zoning,Number Of Stories,$Price/Unit,Vacancy %,Avg Unit SF,Avg Asking/Unit,Avg Effective/Unit,Rent Type,Affordable Type,Market Segment,Latitude,Longitude,Building Class
+305 Arlington St,Hanover,VA,23005,Misty Pines Townhomes,Existing,83,Garden,3,Richmond,1978,,,4,R5,2,,2.4,902.00,"1,425","1,425",Market,,All,37.7544274,-77.477858,C
+304 Center St,Hanover,VA,23005,,Existing,7,,1,Richmond,1850,,,,R5,2,,1.9,,,,,,,37.7621589,-77.4808128,F
+205 N Cottage Green Dr,Hanover,VA,23005,Hanover Apartments,Existing,40,Garden,3,Richmond,1998,,,5,B2,2,,0.2,617.00,502,501,Affordable,Rent Restricted,All,37.762167,-77.4679465,B
+211-223 N Cottage Green Dr,Hanover,VA,23005,Laurel Woods,Existing,40,Garden,2,Richmond,,,,7,R5,2,,,679.00,739,739,Affordable,Rent Restricted,All,37.762522,-77.467812,C
+204 Kings Arms St,Hanover,VA,23005,Ashland Towne Square Apartments,Existing,218,Garden,3,Richmond,1973,,,30,R-5 MULTIP,2,,0.3,891.00,"1,501","1,497",Market,,All,37.764972,-77.469254,C
+101 Omni Rd,Hanover,VA,23005-2481,Omni Park Place Senior Apartments,Existing,61,Low-Rise,3,Richmond,,,,1,R5,2,,0.0,,,,Affordable,Rent Restricted,Senior,37.7619198,-77.4691417,C
+1100 W Omni Ter,Hanover,VA,23005-2478,Ashland Woods Apartments,Existing,150,Garden,4,Richmond,2000,,,18,R5,2,,3.6,938.00,"1,124","1,118",Affordable,Rent Restricted,All,37.762722,-77.471115,A
+304 S Railroad Ave,Hanover,VA,23005,,Existing,22,Low-Rise,3,Richmond,1994,,,1,R-5,2,,1.9,,,,Market,,All,37.7578126,-77.4821053,B
+102 Water Oak Ln,Hanover,VA,23005,Sedgefield,Existing,262,,2,Richmond,1984,,,,PMH,1,,1.9,,,,Market,,,37.7531162,-77.4690325,C
+205-209 Duncan St,Hanover,VA,23005-1941,Ashland Manor Apartments,Existing,,,3,Richmond,,,,,R5,,,,,,,,,,37.75743,-77.48339,B
+214 Randolph St,Hanover,VA,23005-2168,Henry Clay Apartments,Existing,27,Low-Rise,3,Richmond,1968,,,1,R5,2,,1.9,,,,Market,,All,37.7551484,-77.474762,B

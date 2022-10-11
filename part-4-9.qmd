@@ -602,3 +602,93 @@ ashland_sales <- read_csv("data/ashland_mls_5yrsales.csv")
 
 
 ```
+
+### Rental
+
+```{r}
+
+rent <- read_csv("data/ashland_rent.csv") %>%  
+  pivot_longer(2:3,
+               names_to = "rent",
+               values_to = "value") %>%  
+  mutate(period = as.Date(as.yearqtr(period, format = "%Y Q%q"), frac = 1)) %>%  
+  mutate(year = year(period)) %>%  
+  filter(year >= 2016) %>%  
+  mutate(rent = case_when(
+    rent == "rent" ~ "Nominal rent",
+    rent == "rent_adj" ~ "Inflation-adjusted rent"
+  ))
+
+ggplot(rent,
+       aes(x = period,
+           y = value, 
+           color = rent)) +
+  geom_line(stat = "identity", size = 1) + 
+  labs(title = "Town of Ashland: Average asking rent by submarket",
+       subtitle = "2016 Q1 to 2022 Q3",
+       color = "Dollar value") +
+  scale_y_continuous(labels = label_dollar()) +
+  scale_x_date(date_labels = "%Y", date_breaks = "2 years", limits = as.Date(c("2016-01-01", "2022-09-30"))) +
+  theme(axis.title = element_blank(),
+        panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
+```
+
+
+```{r}
+
+nhpd_coded_rr <- read_rds("data/nhpd_coded_rr.rds") |> 
+  filter(locality == "Hanover County") %>% 
+  filter(city == "ASHLAND")
+
+```
+
+
+```{r}
+mhc <- st_read("https://services1.arcgis.com/Hp6G80Pky0om7QvQ/arcgis/rest/services/Mobile_Home_Parks/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson", quiet = TRUE) |> 
+  filter(STATE == "VA",
+         CITY == "ASHLAND")
+
+library(leaflet)
+
+leaflet(mhc) |> 
+  addTiles() |> 
+  addCircleMarkers()
+```
+```{r}
+
+mhc_list <- read_csv("data/mhccv_data.csv") %>% 
+  filter(`Park Name` == "Palm Leaf Mobile Home Park" | `Park Name` == "Sedgefield Manufactured Home")
+
+
+```
+```{r}
+
+years <- 2016:2020
+
+b25119_vars <- load_variables(2020, "acs5") %>% 
+ filter(str_sub(name, end = 6) %in% "B25119")
+
+b25119_raw <- map_dfr(years, function(yr){
+  b25119_pull <- get_acs(
+    geography = "place",
+    state = "VA",
+    table = "B25119",
+    year = yr,
+    survey = "acs5",
+    cache_table = TRUE
+  ) |> 
+    mutate(year = yr)
+  })
+
+
+    
+    
+  )
+})
+
+```
