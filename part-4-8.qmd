@@ -529,7 +529,7 @@ ggplot(gap,
 
 ### Impact of housing costs
 
-The share of cost-burdened renters has decreased from nearly 38 percent of renter households to 23 percent in a short period. For homeowners, the share of cost-burdened households has decreased only slightly --- going from 24 percent to 21 percent over three years.
+The share of cost-burdened renters has decreased from nearly 38 percent of renter households to 26 percent in a short period. For homeowners, the share of cost-burdened households has decreased by 8 percentage points --- going from 24 percent to 16 percent over four years.
 
 ```{r}
 #| label: fig-cb

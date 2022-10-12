@@ -588,7 +588,7 @@ ggplot(gap,
 
 ### Impact of housing costs
 
-From 2015 to 2018, the number of cost burdened homeowners has been on a steady decline --- an overall decrease of 1,706 cost burdened homeowners. For renters, there has been an overall increase in cost-burdened renters; a net increase of 163 cost-burdened renters since 2015, but from year-to-year there have been fewer and fewer cost-burdened renters in the county.
+From 2015 to 2019, the number of cost burdened homeowners has been on a steady decline --- an overall decrease of 2,442 cost burdened homeowners. For renters, there has been an overall increase in cost-burdened renters; a net increase of 700 cost-burdened renters since 2015, a significant gain from when the runing difference was only 163 in 2018.
 
 ```{r}
 #| label: fig-cb
@@ -609,7 +609,7 @@ ggplot(cb,
   geom_col(position = "dodge") +
   scale_y_continuous(labels = label_comma()) +
   labs(title = paste0(name, ": Cumulative change in cost-burdened households by tenure"),
-       subtitle = "2015 to 2018",
+       subtitle = "2015 to 2019",
        fill = "Tenure",
        caption = "Source: U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
   theme(axis.title = element_blank(),

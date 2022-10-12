@@ -563,7 +563,7 @@ ggplot(gap,
 
 ### Impact of housing costs
 
-Cost burden in the county has declined in the county for both homeowners and renters. In 2015, 22 percent of homeowners were cost-burdened, but by 2018 that estimate had declined to 18 percent. Renters also saw declines --- from roughly 32 percent to 25 percent during this same time period. 
+Cost burden in the county has declined in the county for both homeowners and renters. In 2015, 22 percent of homeowners were cost-burdened, but by 2019 that estimate had declined to 17 percent. Renters also saw declines --- from roughly 32 percent to 27 percent during this same time period. 
 
 ```{r}
 #| label: fig-cb

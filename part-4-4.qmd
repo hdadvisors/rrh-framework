@@ -662,7 +662,7 @@ ggplot(gap,
 
 ### Impact of housing costs
 
-In spite of the continuous increase in housing costs in Hanover County, there has been an overall decreaes in the number of cost-burdened households from 2015 to 2018. As of 2018, there were 1,061 fewer cost-burdened homeowners and 325 fewer cost-burdened renters.
+In spite of the continuous increase in housing costs in Hanover County, there has been an overall decrease in the number of cost-burdened households from 2015 to 2019. As of 2019, there were 1,004 fewer cost-burdened homeowners and 393 fewer cost-burdened renters.
 
 ```{r}
 #| label: fig-cb

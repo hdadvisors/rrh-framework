@@ -652,7 +652,7 @@ ggplot(cb,
   geom_col(position = "dodge") +
   scale_y_continuous(labels = label_comma()) +
   labs(title = paste0(name, ": Cumulative change in cost-burdened households by tenure"),
-       subtitle = "2015 to 2018",
+       subtitle = "2015 to 2019",
        fill = "Tenure",
        caption = "Source: U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
   theme(axis.title = element_blank(),

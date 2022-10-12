@@ -501,7 +501,7 @@ ggplot(gap,
 
 ### Impact of housing costs
 
-Although the number of renter households in the county has been declining, the share of cost-burdened renters has only increased. In 2018, 34 percent of renter households were cost-burdened compared to about 26 percent in 2015. For homeowners, the number of cost-burdened households has remained largely unchanged (1352 in 2015 and 1322 in 2018). But as new homeowners come into the county, the share of cost-burdened homeowners has declined from 22 to 20 percent. 
+Although the number of renter households in the county has been declining, the share of cost-burdened renters has only increased. In 2019, 41 percent of renter households were cost-burdened compared to about 26 percent in 2015. For homeowners, the number of cost-burdened households has remained largely unchanged (1,352 in 2015 and 1,354 in 2019). But as new homeowners come into the county, the share of cost-burdened homeowners has declined from 22 to 20 percent. 
 
 ```{r}
 #| label: fig-cb

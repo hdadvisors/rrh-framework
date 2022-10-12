@@ -669,7 +669,7 @@ ggplot(gap,
 
 ### Impact of housing costs
 
-From 2015 to 2018, the number of cost burden homeowners has been in decline. By 2018, there was a total decline of 2,661 cost-burdened homeowners from 2015 estimates. But during this same timeframe, the number of cost-burdened renters has increased by 696. The disparate changes in cost burden in Chesterfield County speak to growing affordability issues for renters and greater stability for existing homeowners.
+From 2015 to 2019, the number of cost burden homeowners has been in decline. By 2019, there was a total decline of 2,660 cost-burdened homeowners from 2015 estimates. But during this same timeframe, the number of cost-burdened renters has increased by 1,161. The disparate changes in cost burden in Chesterfield County speak to growing affordability issues for renters and greater stability for existing homeowners.
 
 ```{r}
 #| label: fig-cb
@@ -690,7 +690,7 @@ ggplot(cb,
   geom_col(position = "dodge") +
   scale_y_continuous(labels = label_comma()) +
   labs(title = paste0(name, ": Cumulative change in cost-burdened households by tenure"),
-       subtitle = "2015 to 2018",
+       subtitle = "2015 to 2019",
        fill = "Tenure",
        caption = "Source: U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
   theme(axis.title = element_blank(),
