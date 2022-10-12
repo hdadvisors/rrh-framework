@@ -666,6 +666,8 @@ mhc_list <- read_csv("data/mhccv_data.csv") %>%
 
 
 ```
+
+
 ```{r}
 
 years <- 2016:2020
@@ -685,10 +687,18 @@ b25119_raw <- map_dfr(years, function(yr){
     mutate(year = yr)
   })
 
+b25119_vars_cleaned <- b25119_vars %>% 
+  separate(label, into = c("est", "lab", "total", "tenure"), sep = "!!") %>% 
+  select(variable = name, tenure) %>% 
+  drop_na() %>% 
+  mutate(tenure = case_when(
+    tenure == "Owner occupied (dollars)" ~ "Homeowner",
+    tenure == "Renter occupied (dollars)" ~ "Renter"
+  ))
 
+b25119_data <- b25119_raw %>% 
+  right_join(b25119_vars_cleaned, by = "variable")
     
     
-  )
-})
 
 ```

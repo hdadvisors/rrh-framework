@@ -35,7 +35,7 @@ rr_df <- data.frame(GEOID = rr, NAME = rr_names)
 #| label: gap-data
 #| eval: false
 
-tb_18c <- read_csv("data/Table18C_2015to2018.csv")
+tb_18c <- read_csv("data/Table18C_2015to2019.csv")
 
 colnames(tb_18c)[16] <- "Cost"
 
@@ -125,7 +125,7 @@ ggplot(gap,
   facet_grid(~household_income) +
   scale_y_continuous(labels = label_comma()) +
   labs(title = "Rental housing gap by AMI",
-       subtitle = "2015 to 2018",
+       subtitle = "2015 to 2019",
        fill = "Affordability of current home") +
   theme(
     legend.position = "bottom",
@@ -138,9 +138,9 @@ ggplot(gap,
 
 ```
 
-In 2015, there was an overall gap of nearly 40,000 rental homes affordable to households making 80% AMI or less. By 2018, that gap had increased by 354 homes to reach a total gap of 39,860.
+In 2015, there was an overall gap of 38,778 rental homes affordable to households making 80% AMI or less. By 2019, that gap had increased by 1,220 homes to reach a total gap of 38,778.
 
-Increases in the gap occurred mainly among housing between 31 and 80% AMI, but it is important to note that a gap in housing across all income levels impacts households of any income. This accentuates the need for new affordable housing at all income levels --- but especially for 30% AMI or below households. As of 2018, these extremely low-income renters face a shortage of over 22,000 rental homes.
+Increases in the gap occurred mainly among housing at 30 percent AMI and below, but it is important to note that a gap in housing across all income levels impacts households of any income. This accentuates the need for new affordable housing at all income levels --- but especially for 30% AMI or below households. As of 2018, these extremely low-income renters face a shortage of over 24,000 rental homes.
 
 ## Incomes versus housing costs
 

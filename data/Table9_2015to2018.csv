@@ -2335,3 +2335,587 @@ T9_est70,2018,755,206,2014thru2018,050,05000US51760,Richmond city, Virginia,51,7
 T9_est71,2018,425,178,2014thru2018,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",greater than 30% but less than or equal to 50%
 T9_est72,2018,505,159,2014thru2018,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",greater than 50%
 T9_est73,2018,80,56,2014thru2018,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",not computed (no/negative income)
+T9_est1,2019,2895,94,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Total,Total: Occupied housing units,All,All
+T9_est2,2019,2430,101,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Subtotal,Owner occupied,All,All
+T9_est3,2019,1080,61,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Subtotal,Owner occupied,"White alone, non-Hispanic",All
+T9_est4,2019,785,57,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Owner occupied,"White alone, non-Hispanic",less than or equal to 30%
+T9_est5,2019,130,36,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Owner occupied,"White alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est6,2019,130,44,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Owner occupied,"White alone, non-Hispanic",greater than 50%
+T9_est7,2019,30,24,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Owner occupied,"White alone, non-Hispanic",not computed (no/negative income)
+T9_est8,2019,1065,72,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Subtotal,Owner occupied,"Black or African-American alone, non-Hispanic",All
+T9_est9,2019,790,93,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",less than or equal to 30%
+T9_est10,2019,200,55,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est11,2019,65,27,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",greater than 50%
+T9_est12,2019,10,13,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",not computed (no/negative income)
+T9_est13,2019,10,11,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Subtotal,Owner occupied,"Asian alone, non-Hispanic",All
+T9_est14,2019,4,6,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Owner occupied,"Asian alone, non-Hispanic",less than or equal to 30%
+T9_est15,2019,4,1,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Owner occupied,"Asian alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est16,2019,4,2,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Owner occupied,"Asian alone, non-Hispanic",greater than 50%
+T9_est17,2019,0,17,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Owner occupied,"Asian alone, non-Hispanic",not computed (no/negative income)
+T9_est18,2019,185,18,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Subtotal,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",All
+T9_est19,2019,145,17,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",less than or equal to 30%
+T9_est20,2019,15,10,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est21,2019,20,12,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 50%
+T9_est22,2019,4,9,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",not computed (no/negative income)
+T9_est23,2019,0,17,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Subtotal,Owner occupied,"Pacific Islander alone, non-Hispanic",All
+T9_est24,2019,0,17,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",less than or equal to 30%
+T9_est25,2019,0,17,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est26,2019,0,17,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",greater than 50%
+T9_est27,2019,0,17,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",not computed (no/negative income)
+T9_est28,2019,50,20,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Subtotal,Owner occupied,"Hispanic, any race",All
+T9_est29,2019,50,20,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Owner occupied,"Hispanic, any race",less than or equal to 30%
+T9_est30,2019,0,17,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Owner occupied,"Hispanic, any race",greater than 30% but less than or equal to 50%
+T9_est31,2019,0,17,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Owner occupied,"Hispanic, any race",greater than 50%
+T9_est32,2019,0,17,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Owner occupied,"Hispanic, any race",not computed (no/negative income)
+T9_est33,2019,40,17,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Subtotal,Owner occupied,"other (including multiple races, non-Hispanic)",All
+T9_est34,2019,35,19,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",less than or equal to 30%
+T9_est35,2019,4,17,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",greater than 30% but less than or equal to 50%
+T9_est36,2019,4,4,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",greater than 50%
+T9_est37,2019,0,17,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",not computed (no/negative income)
+T9_est38,2019,465,85,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Subtotal,Renter occupied,All,All
+T9_est39,2019,225,56,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Subtotal,Renter occupied,"White alone, non-Hispanic",All
+T9_est40,2019,125,38,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Renter occupied,"White alone, non-Hispanic",less than or equal to 30%
+T9_est41,2019,40,25,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Renter occupied,"White alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est42,2019,50,30,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Renter occupied,"White alone, non-Hispanic",greater than 50%
+T9_est43,2019,10,14,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Renter occupied,"White alone, non-Hispanic",not computed (no/negative income)
+T9_est44,2019,200,61,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Subtotal,Renter occupied,"Black or African-American alone, non-Hispanic",All
+T9_est45,2019,95,30,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",less than or equal to 30%
+T9_est46,2019,10,12,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est47,2019,90,47,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",greater than 50%
+T9_est48,2019,4,8,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",not computed (no/negative income)
+T9_est49,2019,10,15,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Subtotal,Renter occupied,"Asian alone, non-Hispanic",All
+T9_est50,2019,0,17,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Renter occupied,"Asian alone, non-Hispanic",less than or equal to 30%
+T9_est51,2019,0,17,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Renter occupied,"Asian alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est52,2019,10,15,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Renter occupied,"Asian alone, non-Hispanic",greater than 50%
+T9_est53,2019,0,17,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Renter occupied,"Asian alone, non-Hispanic",not computed (no/negative income)
+T9_est54,2019,15,11,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Subtotal,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",All
+T9_est55,2019,10,10,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",less than or equal to 30%
+T9_est56,2019,0,17,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est57,2019,4,2,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 50%
+T9_est58,2019,0,17,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",not computed (no/negative income)
+T9_est59,2019,0,17,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Subtotal,Renter occupied,"Pacific Islander alone, non-Hispanic",All
+T9_est60,2019,0,17,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",less than or equal to 30%
+T9_est61,2019,0,17,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est62,2019,0,17,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",greater than 50%
+T9_est63,2019,0,17,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",not computed (no/negative income)
+T9_est64,2019,10,13,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Subtotal,Renter occupied,"Hispanic, any race",All
+T9_est65,2019,10,13,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Renter occupied,"Hispanic, any race",less than or equal to 30%
+T9_est66,2019,0,17,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Renter occupied,"Hispanic, any race",greater than 30% but less than or equal to 50%
+T9_est67,2019,0,17,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Renter occupied,"Hispanic, any race",greater than 50%
+T9_est68,2019,0,17,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Renter occupied,"Hispanic, any race",not computed (no/negative income)
+T9_est69,2019,15,15,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Subtotal,Renter occupied,"other (including multiple races, non-Hispanic)",All
+T9_est70,2019,15,15,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",less than or equal to 30%
+T9_est71,2019,0,17,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",greater than 30% but less than or equal to 50%
+T9_est72,2019,0,17,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",greater than 50%
+T9_est73,2019,0,17,2015thru2019,050,05000US51036,Charles City County, Virginia,51,036,51036,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",not computed (no/negative income)
+T9_est1,2019,124970,691,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Total,Total: Occupied housing units,All,All
+T9_est2,2019,94700,967,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Subtotal,Owner occupied,All,All
+T9_est3,2019,69080,683,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Subtotal,Owner occupied,"White alone, non-Hispanic",All
+T9_est4,2019,57300,851,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Owner occupied,"White alone, non-Hispanic",less than or equal to 30%
+T9_est5,2019,7525,558,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Owner occupied,"White alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est6,2019,3965,390,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Owner occupied,"White alone, non-Hispanic",greater than 50%
+T9_est7,2019,290,129,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Owner occupied,"White alone, non-Hispanic",not computed (no/negative income)
+T9_est8,2019,16385,598,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Subtotal,Owner occupied,"Black or African-American alone, non-Hispanic",All
+T9_est9,2019,12835,558,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",less than or equal to 30%
+T9_est10,2019,2165,306,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est11,2019,1375,286,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",greater than 50%
+T9_est12,2019,10,16,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",not computed (no/negative income)
+T9_est13,2019,3200,258,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Subtotal,Owner occupied,"Asian alone, non-Hispanic",All
+T9_est14,2019,2485,258,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Owner occupied,"Asian alone, non-Hispanic",less than or equal to 30%
+T9_est15,2019,580,163,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Owner occupied,"Asian alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est16,2019,130,90,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Owner occupied,"Asian alone, non-Hispanic",greater than 50%
+T9_est17,2019,10,15,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Owner occupied,"Asian alone, non-Hispanic",not computed (no/negative income)
+T9_est18,2019,195,80,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Subtotal,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",All
+T9_est19,2019,175,82,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",less than or equal to 30%
+T9_est20,2019,4,10,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est21,2019,15,26,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 50%
+T9_est22,2019,0,29,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",not computed (no/negative income)
+T9_est23,2019,70,55,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Subtotal,Owner occupied,"Pacific Islander alone, non-Hispanic",All
+T9_est24,2019,70,55,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",less than or equal to 30%
+T9_est25,2019,0,29,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est26,2019,0,29,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",greater than 50%
+T9_est27,2019,0,29,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",not computed (no/negative income)
+T9_est28,2019,4285,358,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Subtotal,Owner occupied,"Hispanic, any race",All
+T9_est29,2019,3285,323,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Owner occupied,"Hispanic, any race",less than or equal to 30%
+T9_est30,2019,690,221,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Owner occupied,"Hispanic, any race",greater than 30% but less than or equal to 50%
+T9_est31,2019,275,102,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Owner occupied,"Hispanic, any race",greater than 50%
+T9_est32,2019,35,42,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Owner occupied,"Hispanic, any race",not computed (no/negative income)
+T9_est33,2019,1485,276,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Subtotal,Owner occupied,"other (including multiple races, non-Hispanic)",All
+T9_est34,2019,1210,275,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",less than or equal to 30%
+T9_est35,2019,85,52,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",greater than 30% but less than or equal to 50%
+T9_est36,2019,155,89,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",greater than 50%
+T9_est37,2019,35,34,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",not computed (no/negative income)
+T9_est38,2019,30275,998,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Subtotal,Renter occupied,All,All
+T9_est39,2019,14705,707,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Subtotal,Renter occupied,"White alone, non-Hispanic",All
+T9_est40,2019,8695,590,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Renter occupied,"White alone, non-Hispanic",less than or equal to 30%
+T9_est41,2019,3310,352,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Renter occupied,"White alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est42,2019,2610,301,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Renter occupied,"White alone, non-Hispanic",greater than 50%
+T9_est43,2019,100,77,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Renter occupied,"White alone, non-Hispanic",not computed (no/negative income)
+T9_est44,2019,10540,567,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Subtotal,Renter occupied,"Black or African-American alone, non-Hispanic",All
+T9_est45,2019,5385,573,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",less than or equal to 30%
+T9_est46,2019,2955,442,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est47,2019,2100,390,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",greater than 50%
+T9_est48,2019,95,64,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",not computed (no/negative income)
+T9_est49,2019,955,201,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Subtotal,Renter occupied,"Asian alone, non-Hispanic",All
+T9_est50,2019,600,146,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Renter occupied,"Asian alone, non-Hispanic",less than or equal to 30%
+T9_est51,2019,145,86,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Renter occupied,"Asian alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est52,2019,145,90,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Renter occupied,"Asian alone, non-Hispanic",greater than 50%
+T9_est53,2019,65,57,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Renter occupied,"Asian alone, non-Hispanic",not computed (no/negative income)
+T9_est54,2019,115,63,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Subtotal,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",All
+T9_est55,2019,35,40,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",less than or equal to 30%
+T9_est56,2019,80,56,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est57,2019,0,29,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 50%
+T9_est58,2019,0,29,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",not computed (no/negative income)
+T9_est59,2019,20,33,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Subtotal,Renter occupied,"Pacific Islander alone, non-Hispanic",All
+T9_est60,2019,20,33,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",less than or equal to 30%
+T9_est61,2019,0,29,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est62,2019,0,29,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",greater than 50%
+T9_est63,2019,0,29,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",not computed (no/negative income)
+T9_est64,2019,3335,349,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Subtotal,Renter occupied,"Hispanic, any race",All
+T9_est65,2019,1610,244,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Renter occupied,"Hispanic, any race",less than or equal to 30%
+T9_est66,2019,875,208,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Renter occupied,"Hispanic, any race",greater than 30% but less than or equal to 50%
+T9_est67,2019,795,193,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Renter occupied,"Hispanic, any race",greater than 50%
+T9_est68,2019,55,82,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Renter occupied,"Hispanic, any race",not computed (no/negative income)
+T9_est69,2019,600,173,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Subtotal,Renter occupied,"other (including multiple races, non-Hispanic)",All
+T9_est70,2019,335,127,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",less than or equal to 30%
+T9_est71,2019,125,74,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",greater than 30% but less than or equal to 50%
+T9_est72,2019,130,69,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",greater than 50%
+T9_est73,2019,10,23,2015thru2019,050,05000US51041,Chesterfield County, Virginia,51,041,51041,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",not computed (no/negative income)
+T9_est1,2019,8505,277,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Total,Total: Occupied housing units,All,All
+T9_est2,2019,7220,255,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Subtotal,Owner occupied,All,All
+T9_est3,2019,6050,237,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Subtotal,Owner occupied,"White alone, non-Hispanic",All
+T9_est4,2019,5095,265,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Owner occupied,"White alone, non-Hispanic",less than or equal to 30%
+T9_est5,2019,520,164,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Owner occupied,"White alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est6,2019,420,167,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Owner occupied,"White alone, non-Hispanic",greater than 50%
+T9_est7,2019,20,24,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Owner occupied,"White alone, non-Hispanic",not computed (no/negative income)
+T9_est8,2019,895,117,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Subtotal,Owner occupied,"Black or African-American alone, non-Hispanic",All
+T9_est9,2019,595,110,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",less than or equal to 30%
+T9_est10,2019,135,71,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est11,2019,145,69,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",greater than 50%
+T9_est12,2019,20,30,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",not computed (no/negative income)
+T9_est13,2019,70,35,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Subtotal,Owner occupied,"Asian alone, non-Hispanic",All
+T9_est14,2019,60,36,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Owner occupied,"Asian alone, non-Hispanic",less than or equal to 30%
+T9_est15,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Owner occupied,"Asian alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est16,2019,10,22,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Owner occupied,"Asian alone, non-Hispanic",greater than 50%
+T9_est17,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Owner occupied,"Asian alone, non-Hispanic",not computed (no/negative income)
+T9_est18,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Subtotal,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",All
+T9_est19,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",less than or equal to 30%
+T9_est20,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est21,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 50%
+T9_est22,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",not computed (no/negative income)
+T9_est23,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Subtotal,Owner occupied,"Pacific Islander alone, non-Hispanic",All
+T9_est24,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",less than or equal to 30%
+T9_est25,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est26,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",greater than 50%
+T9_est27,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",not computed (no/negative income)
+T9_est28,2019,115,83,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Subtotal,Owner occupied,"Hispanic, any race",All
+T9_est29,2019,115,83,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Owner occupied,"Hispanic, any race",less than or equal to 30%
+T9_est30,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Owner occupied,"Hispanic, any race",greater than 30% but less than or equal to 50%
+T9_est31,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Owner occupied,"Hispanic, any race",greater than 50%
+T9_est32,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Owner occupied,"Hispanic, any race",not computed (no/negative income)
+T9_est33,2019,85,72,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Subtotal,Owner occupied,"other (including multiple races, non-Hispanic)",All
+T9_est34,2019,60,58,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",less than or equal to 30%
+T9_est35,2019,20,34,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",greater than 30% but less than or equal to 50%
+T9_est36,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",greater than 50%
+T9_est37,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",not computed (no/negative income)
+T9_est38,2019,1285,238,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Subtotal,Renter occupied,All,All
+T9_est39,2019,885,207,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Subtotal,Renter occupied,"White alone, non-Hispanic",All
+T9_est40,2019,665,160,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Renter occupied,"White alone, non-Hispanic",less than or equal to 30%
+T9_est41,2019,145,106,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Renter occupied,"White alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est42,2019,80,52,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Renter occupied,"White alone, non-Hispanic",greater than 50%
+T9_est43,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Renter occupied,"White alone, non-Hispanic",not computed (no/negative income)
+T9_est44,2019,245,104,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Subtotal,Renter occupied,"Black or African-American alone, non-Hispanic",All
+T9_est45,2019,145,62,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",less than or equal to 30%
+T9_est46,2019,30,45,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est47,2019,55,69,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",greater than 50%
+T9_est48,2019,10,19,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",not computed (no/negative income)
+T9_est49,2019,20,37,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Subtotal,Renter occupied,"Asian alone, non-Hispanic",All
+T9_est50,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Renter occupied,"Asian alone, non-Hispanic",less than or equal to 30%
+T9_est51,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Renter occupied,"Asian alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est52,2019,20,37,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Renter occupied,"Asian alone, non-Hispanic",greater than 50%
+T9_est53,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Renter occupied,"Asian alone, non-Hispanic",not computed (no/negative income)
+T9_est54,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Subtotal,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",All
+T9_est55,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",less than or equal to 30%
+T9_est56,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est57,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 50%
+T9_est58,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",not computed (no/negative income)
+T9_est59,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Subtotal,Renter occupied,"Pacific Islander alone, non-Hispanic",All
+T9_est60,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",less than or equal to 30%
+T9_est61,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est62,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",greater than 50%
+T9_est63,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",not computed (no/negative income)
+T9_est64,2019,105,54,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Subtotal,Renter occupied,"Hispanic, any race",All
+T9_est65,2019,90,48,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Renter occupied,"Hispanic, any race",less than or equal to 30%
+T9_est66,2019,15,25,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Renter occupied,"Hispanic, any race",greater than 30% but less than or equal to 50%
+T9_est67,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Renter occupied,"Hispanic, any race",greater than 50%
+T9_est68,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Renter occupied,"Hispanic, any race",not computed (no/negative income)
+T9_est69,2019,30,38,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Subtotal,Renter occupied,"other (including multiple races, non-Hispanic)",All
+T9_est70,2019,30,38,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",less than or equal to 30%
+T9_est71,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",greater than 30% but less than or equal to 50%
+T9_est72,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",greater than 50%
+T9_est73,2019,0,23,2015thru2019,050,05000US51075,Goochland County, Virginia,51,075,51075,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",not computed (no/negative income)
+T9_est1,2019,38985,377,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Total,Total: Occupied housing units,All,All
+T9_est2,2019,32175,485,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Subtotal,Owner occupied,All,All
+T9_est3,2019,28385,484,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Subtotal,Owner occupied,"White alone, non-Hispanic",All
+T9_est4,2019,24210,513,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Owner occupied,"White alone, non-Hispanic",less than or equal to 30%
+T9_est5,2019,2595,270,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Owner occupied,"White alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est6,2019,1505,221,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Owner occupied,"White alone, non-Hispanic",greater than 50%
+T9_est7,2019,75,42,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Owner occupied,"White alone, non-Hispanic",not computed (no/negative income)
+T9_est8,2019,2385,176,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Subtotal,Owner occupied,"Black or African-American alone, non-Hispanic",All
+T9_est9,2019,1765,194,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",less than or equal to 30%
+T9_est10,2019,365,116,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est11,2019,240,116,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",greater than 50%
+T9_est12,2019,15,21,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",not computed (no/negative income)
+T9_est13,2019,405,78,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Subtotal,Owner occupied,"Asian alone, non-Hispanic",All
+T9_est14,2019,330,79,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Owner occupied,"Asian alone, non-Hispanic",less than or equal to 30%
+T9_est15,2019,10,15,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Owner occupied,"Asian alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est16,2019,60,42,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Owner occupied,"Asian alone, non-Hispanic",greater than 50%
+T9_est17,2019,0,29,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Owner occupied,"Asian alone, non-Hispanic",not computed (no/negative income)
+T9_est18,2019,35,28,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Subtotal,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",All
+T9_est19,2019,25,25,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",less than or equal to 30%
+T9_est20,2019,0,29,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est21,2019,10,14,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 50%
+T9_est22,2019,0,29,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",not computed (no/negative income)
+T9_est23,2019,0,29,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Subtotal,Owner occupied,"Pacific Islander alone, non-Hispanic",All
+T9_est24,2019,0,29,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",less than or equal to 30%
+T9_est25,2019,0,29,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est26,2019,0,29,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",greater than 50%
+T9_est27,2019,0,29,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",not computed (no/negative income)
+T9_est28,2019,550,152,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Subtotal,Owner occupied,"Hispanic, any race",All
+T9_est29,2019,450,143,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Owner occupied,"Hispanic, any race",less than or equal to 30%
+T9_est30,2019,85,70,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Owner occupied,"Hispanic, any race",greater than 30% but less than or equal to 50%
+T9_est31,2019,0,29,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Owner occupied,"Hispanic, any race",greater than 50%
+T9_est32,2019,10,21,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Owner occupied,"Hispanic, any race",not computed (no/negative income)
+T9_est33,2019,415,122,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Subtotal,Owner occupied,"other (including multiple races, non-Hispanic)",All
+T9_est34,2019,260,93,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",less than or equal to 30%
+T9_est35,2019,95,80,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",greater than 30% but less than or equal to 50%
+T9_est36,2019,55,41,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",greater than 50%
+T9_est37,2019,0,29,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",not computed (no/negative income)
+T9_est38,2019,6815,506,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Subtotal,Renter occupied,All,All
+T9_est39,2019,5215,501,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Subtotal,Renter occupied,"White alone, non-Hispanic",All
+T9_est40,2019,3290,364,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Renter occupied,"White alone, non-Hispanic",less than or equal to 30%
+T9_est41,2019,840,190,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Renter occupied,"White alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est42,2019,970,222,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Renter occupied,"White alone, non-Hispanic",greater than 50%
+T9_est43,2019,120,75,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Renter occupied,"White alone, non-Hispanic",not computed (no/negative income)
+T9_est44,2019,985,200,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Subtotal,Renter occupied,"Black or African-American alone, non-Hispanic",All
+T9_est45,2019,650,167,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",less than or equal to 30%
+T9_est46,2019,165,90,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est47,2019,165,84,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",greater than 50%
+T9_est48,2019,0,29,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",not computed (no/negative income)
+T9_est49,2019,60,52,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Subtotal,Renter occupied,"Asian alone, non-Hispanic",All
+T9_est50,2019,30,43,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Renter occupied,"Asian alone, non-Hispanic",less than or equal to 30%
+T9_est51,2019,20,35,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Renter occupied,"Asian alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est52,2019,10,16,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Renter occupied,"Asian alone, non-Hispanic",greater than 50%
+T9_est53,2019,0,29,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Renter occupied,"Asian alone, non-Hispanic",not computed (no/negative income)
+T9_est54,2019,55,61,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Subtotal,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",All
+T9_est55,2019,20,34,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",less than or equal to 30%
+T9_est56,2019,0,29,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est57,2019,35,50,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 50%
+T9_est58,2019,0,29,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",not computed (no/negative income)
+T9_est59,2019,0,29,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Subtotal,Renter occupied,"Pacific Islander alone, non-Hispanic",All
+T9_est60,2019,0,29,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",less than or equal to 30%
+T9_est61,2019,0,29,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est62,2019,0,29,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",greater than 50%
+T9_est63,2019,0,29,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",not computed (no/negative income)
+T9_est64,2019,405,151,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Subtotal,Renter occupied,"Hispanic, any race",All
+T9_est65,2019,240,114,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Renter occupied,"Hispanic, any race",less than or equal to 30%
+T9_est66,2019,125,111,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Renter occupied,"Hispanic, any race",greater than 30% but less than or equal to 50%
+T9_est67,2019,40,56,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Renter occupied,"Hispanic, any race",greater than 50%
+T9_est68,2019,0,29,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Renter occupied,"Hispanic, any race",not computed (no/negative income)
+T9_est69,2019,100,67,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Subtotal,Renter occupied,"other (including multiple races, non-Hispanic)",All
+T9_est70,2019,70,63,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",less than or equal to 30%
+T9_est71,2019,25,26,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",greater than 30% but less than or equal to 50%
+T9_est72,2019,0,29,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",greater than 50%
+T9_est73,2019,0,29,2015thru2019,050,05000US51085,Hanover County, Virginia,51,085,51085,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",not computed (no/negative income)
+T9_est1,2019,128465,906,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Total,Total: Occupied housing units,All,All
+T9_est2,2019,80490,1179,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Subtotal,Owner occupied,All,All
+T9_est3,2019,53480,922,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Subtotal,Owner occupied,"White alone, non-Hispanic",All
+T9_est4,2019,44415,869,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Owner occupied,"White alone, non-Hispanic",less than or equal to 30%
+T9_est5,2019,5310,444,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Owner occupied,"White alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est6,2019,3400,387,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Owner occupied,"White alone, non-Hispanic",greater than 50%
+T9_est7,2019,355,140,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Owner occupied,"White alone, non-Hispanic",not computed (no/negative income)
+T9_est8,2019,18630,675,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Subtotal,Owner occupied,"Black or African-American alone, non-Hispanic",All
+T9_est9,2019,13270,781,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",less than or equal to 30%
+T9_est10,2019,3355,387,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est11,2019,1930,391,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",greater than 50%
+T9_est12,2019,75,63,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",not computed (no/negative income)
+T9_est13,2019,5240,313,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Subtotal,Owner occupied,"Asian alone, non-Hispanic",All
+T9_est14,2019,4060,318,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Owner occupied,"Asian alone, non-Hispanic",less than or equal to 30%
+T9_est15,2019,630,184,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Owner occupied,"Asian alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est16,2019,525,178,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Owner occupied,"Asian alone, non-Hispanic",greater than 50%
+T9_est17,2019,30,37,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Owner occupied,"Asian alone, non-Hispanic",not computed (no/negative income)
+T9_est18,2019,170,85,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Subtotal,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",All
+T9_est19,2019,155,83,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",less than or equal to 30%
+T9_est20,2019,0,29,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est21,2019,15,25,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 50%
+T9_est22,2019,0,29,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",not computed (no/negative income)
+T9_est23,2019,25,22,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Subtotal,Owner occupied,"Pacific Islander alone, non-Hispanic",All
+T9_est24,2019,20,17,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",less than or equal to 30%
+T9_est25,2019,0,29,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est26,2019,10,13,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",greater than 50%
+T9_est27,2019,0,29,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",not computed (no/negative income)
+T9_est28,2019,1975,292,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Subtotal,Owner occupied,"Hispanic, any race",All
+T9_est29,2019,1465,238,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Owner occupied,"Hispanic, any race",less than or equal to 30%
+T9_est30,2019,355,136,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Owner occupied,"Hispanic, any race",greater than 30% but less than or equal to 50%
+T9_est31,2019,155,103,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Owner occupied,"Hispanic, any race",greater than 50%
+T9_est32,2019,4,12,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Owner occupied,"Hispanic, any race",not computed (no/negative income)
+T9_est33,2019,965,232,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Subtotal,Owner occupied,"other (including multiple races, non-Hispanic)",All
+T9_est34,2019,735,198,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",less than or equal to 30%
+T9_est35,2019,170,105,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",greater than 30% but less than or equal to 50%
+T9_est36,2019,60,47,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",greater than 50%
+T9_est37,2019,0,29,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",not computed (no/negative income)
+T9_est38,2019,47975,1278,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Subtotal,Renter occupied,All,All
+T9_est39,2019,21065,861,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Subtotal,Renter occupied,"White alone, non-Hispanic",All
+T9_est40,2019,11760,680,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Renter occupied,"White alone, non-Hispanic",less than or equal to 30%
+T9_est41,2019,4480,448,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Renter occupied,"White alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est42,2019,4565,578,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Renter occupied,"White alone, non-Hispanic",greater than 50%
+T9_est43,2019,265,150,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Renter occupied,"White alone, non-Hispanic",not computed (no/negative income)
+T9_est44,2019,18285,920,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Subtotal,Renter occupied,"Black or African-American alone, non-Hispanic",All
+T9_est45,2019,9615,670,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",less than or equal to 30%
+T9_est46,2019,4565,597,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est47,2019,3940,451,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",greater than 50%
+T9_est48,2019,160,117,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",not computed (no/negative income)
+T9_est49,2019,3780,408,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Subtotal,Renter occupied,"Asian alone, non-Hispanic",All
+T9_est50,2019,2935,362,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Renter occupied,"Asian alone, non-Hispanic",less than or equal to 30%
+T9_est51,2019,560,201,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Renter occupied,"Asian alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est52,2019,265,104,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Renter occupied,"Asian alone, non-Hispanic",greater than 50%
+T9_est53,2019,25,29,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Renter occupied,"Asian alone, non-Hispanic",not computed (no/negative income)
+T9_est54,2019,65,52,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Subtotal,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",All
+T9_est55,2019,65,52,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",less than or equal to 30%
+T9_est56,2019,0,29,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est57,2019,0,29,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 50%
+T9_est58,2019,0,29,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",not computed (no/negative income)
+T9_est59,2019,4,5,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Subtotal,Renter occupied,"Pacific Islander alone, non-Hispanic",All
+T9_est60,2019,4,5,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",less than or equal to 30%
+T9_est61,2019,0,29,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est62,2019,0,29,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",greater than 50%
+T9_est63,2019,0,29,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",not computed (no/negative income)
+T9_est64,2019,3300,289,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Subtotal,Renter occupied,"Hispanic, any race",All
+T9_est65,2019,1495,258,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Renter occupied,"Hispanic, any race",less than or equal to 30%
+T9_est66,2019,850,245,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Renter occupied,"Hispanic, any race",greater than 30% but less than or equal to 50%
+T9_est67,2019,870,212,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Renter occupied,"Hispanic, any race",greater than 50%
+T9_est68,2019,85,63,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Renter occupied,"Hispanic, any race",not computed (no/negative income)
+T9_est69,2019,1475,305,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Subtotal,Renter occupied,"other (including multiple races, non-Hispanic)",All
+T9_est70,2019,580,167,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",less than or equal to 30%
+T9_est71,2019,500,169,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",greater than 30% but less than or equal to 50%
+T9_est72,2019,340,184,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",greater than 50%
+T9_est73,2019,50,73,2015thru2019,050,05000US51087,Henrico County, Virginia,51,087,51087,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",not computed (no/negative income)
+T9_est1,2019,7960,227,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Total,Total: Occupied housing units,All,All
+T9_est2,2019,6885,325,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Subtotal,Owner occupied,All,All
+T9_est3,2019,5680,308,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Subtotal,Owner occupied,"White alone, non-Hispanic",All
+T9_est4,2019,4585,343,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Owner occupied,"White alone, non-Hispanic",less than or equal to 30%
+T9_est5,2019,545,179,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Owner occupied,"White alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est6,2019,515,201,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Owner occupied,"White alone, non-Hispanic",greater than 50%
+T9_est7,2019,35,54,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Owner occupied,"White alone, non-Hispanic",not computed (no/negative income)
+T9_est8,2019,710,144,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Subtotal,Owner occupied,"Black or African-American alone, non-Hispanic",All
+T9_est9,2019,550,157,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",less than or equal to 30%
+T9_est10,2019,80,60,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est11,2019,80,55,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",greater than 50%
+T9_est12,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",not computed (no/negative income)
+T9_est13,2019,135,54,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Subtotal,Owner occupied,"Asian alone, non-Hispanic",All
+T9_est14,2019,120,51,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Owner occupied,"Asian alone, non-Hispanic",less than or equal to 30%
+T9_est15,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Owner occupied,"Asian alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est16,2019,20,31,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Owner occupied,"Asian alone, non-Hispanic",greater than 50%
+T9_est17,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Owner occupied,"Asian alone, non-Hispanic",not computed (no/negative income)
+T9_est18,2019,95,76,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Subtotal,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",All
+T9_est19,2019,90,77,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",less than or equal to 30%
+T9_est20,2019,4,5,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est21,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 50%
+T9_est22,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",not computed (no/negative income)
+T9_est23,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Subtotal,Owner occupied,"Pacific Islander alone, non-Hispanic",All
+T9_est24,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",less than or equal to 30%
+T9_est25,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est26,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",greater than 50%
+T9_est27,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",not computed (no/negative income)
+T9_est28,2019,160,79,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Subtotal,Owner occupied,"Hispanic, any race",All
+T9_est29,2019,50,56,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Owner occupied,"Hispanic, any race",less than or equal to 30%
+T9_est30,2019,80,83,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Owner occupied,"Hispanic, any race",greater than 30% but less than or equal to 50%
+T9_est31,2019,25,43,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Owner occupied,"Hispanic, any race",greater than 50%
+T9_est32,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Owner occupied,"Hispanic, any race",not computed (no/negative income)
+T9_est33,2019,105,71,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Subtotal,Owner occupied,"other (including multiple races, non-Hispanic)",All
+T9_est34,2019,105,71,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",less than or equal to 30%
+T9_est35,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",greater than 30% but less than or equal to 50%
+T9_est36,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",greater than 50%
+T9_est37,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",not computed (no/negative income)
+T9_est38,2019,1075,235,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Subtotal,Renter occupied,All,All
+T9_est39,2019,835,228,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Subtotal,Renter occupied,"White alone, non-Hispanic",All
+T9_est40,2019,520,178,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Renter occupied,"White alone, non-Hispanic",less than or equal to 30%
+T9_est41,2019,155,100,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Renter occupied,"White alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est42,2019,160,118,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Renter occupied,"White alone, non-Hispanic",greater than 50%
+T9_est43,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Renter occupied,"White alone, non-Hispanic",not computed (no/negative income)
+T9_est44,2019,170,77,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Subtotal,Renter occupied,"Black or African-American alone, non-Hispanic",All
+T9_est45,2019,115,42,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",less than or equal to 30%
+T9_est46,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est47,2019,55,65,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",greater than 50%
+T9_est48,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",not computed (no/negative income)
+T9_est49,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Subtotal,Renter occupied,"Asian alone, non-Hispanic",All
+T9_est50,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Renter occupied,"Asian alone, non-Hispanic",less than or equal to 30%
+T9_est51,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Renter occupied,"Asian alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est52,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Renter occupied,"Asian alone, non-Hispanic",greater than 50%
+T9_est53,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Renter occupied,"Asian alone, non-Hispanic",not computed (no/negative income)
+T9_est54,2019,4,5,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Subtotal,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",All
+T9_est55,2019,4,4,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",less than or equal to 30%
+T9_est56,2019,4,6,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est57,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 50%
+T9_est58,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",not computed (no/negative income)
+T9_est59,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Subtotal,Renter occupied,"Pacific Islander alone, non-Hispanic",All
+T9_est60,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",less than or equal to 30%
+T9_est61,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est62,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",greater than 50%
+T9_est63,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",not computed (no/negative income)
+T9_est64,2019,70,61,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Subtotal,Renter occupied,"Hispanic, any race",All
+T9_est65,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Renter occupied,"Hispanic, any race",less than or equal to 30%
+T9_est66,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Renter occupied,"Hispanic, any race",greater than 30% but less than or equal to 50%
+T9_est67,2019,70,61,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Renter occupied,"Hispanic, any race",greater than 50%
+T9_est68,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Renter occupied,"Hispanic, any race",not computed (no/negative income)
+T9_est69,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Subtotal,Renter occupied,"other (including multiple races, non-Hispanic)",All
+T9_est70,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",less than or equal to 30%
+T9_est71,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",greater than 30% but less than or equal to 50%
+T9_est72,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",greater than 50%
+T9_est73,2019,0,23,2015thru2019,050,05000US51127,New Kent County, Virginia,51,127,51127,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",not computed (no/negative income)
+T9_est1,2019,10265,261,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Total,Total: Occupied housing units,All,All
+T9_est2,2019,9255,332,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Subtotal,Owner occupied,All,All
+T9_est3,2019,8550,323,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Subtotal,Owner occupied,"White alone, non-Hispanic",All
+T9_est4,2019,7255,355,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Owner occupied,"White alone, non-Hispanic",less than or equal to 30%
+T9_est5,2019,730,177,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Owner occupied,"White alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est6,2019,505,155,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Owner occupied,"White alone, non-Hispanic",greater than 50%
+T9_est7,2019,60,92,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Owner occupied,"White alone, non-Hispanic",not computed (no/negative income)
+T9_est8,2019,450,127,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Subtotal,Owner occupied,"Black or African-American alone, non-Hispanic",All
+T9_est9,2019,305,119,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",less than or equal to 30%
+T9_est10,2019,60,64,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est11,2019,75,53,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",greater than 50%
+T9_est12,2019,10,21,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",not computed (no/negative income)
+T9_est13,2019,35,28,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Subtotal,Owner occupied,"Asian alone, non-Hispanic",All
+T9_est14,2019,35,28,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Owner occupied,"Asian alone, non-Hispanic",less than or equal to 30%
+T9_est15,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Owner occupied,"Asian alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est16,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Owner occupied,"Asian alone, non-Hispanic",greater than 50%
+T9_est17,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Owner occupied,"Asian alone, non-Hispanic",not computed (no/negative income)
+T9_est18,2019,15,29,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Subtotal,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",All
+T9_est19,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",less than or equal to 30%
+T9_est20,2019,15,29,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est21,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 50%
+T9_est22,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",not computed (no/negative income)
+T9_est23,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Subtotal,Owner occupied,"Pacific Islander alone, non-Hispanic",All
+T9_est24,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",less than or equal to 30%
+T9_est25,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est26,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",greater than 50%
+T9_est27,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",not computed (no/negative income)
+T9_est28,2019,115,77,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Subtotal,Owner occupied,"Hispanic, any race",All
+T9_est29,2019,60,51,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Owner occupied,"Hispanic, any race",less than or equal to 30%
+T9_est30,2019,55,68,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Owner occupied,"Hispanic, any race",greater than 30% but less than or equal to 50%
+T9_est31,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Owner occupied,"Hispanic, any race",greater than 50%
+T9_est32,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Owner occupied,"Hispanic, any race",not computed (no/negative income)
+T9_est33,2019,90,54,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Subtotal,Owner occupied,"other (including multiple races, non-Hispanic)",All
+T9_est34,2019,50,45,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",less than or equal to 30%
+T9_est35,2019,35,34,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",greater than 30% but less than or equal to 50%
+T9_est36,2019,4,13,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",greater than 50%
+T9_est37,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",not computed (no/negative income)
+T9_est38,2019,1010,246,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Subtotal,Renter occupied,All,All
+T9_est39,2019,800,230,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Subtotal,Renter occupied,"White alone, non-Hispanic",All
+T9_est40,2019,640,209,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Renter occupied,"White alone, non-Hispanic",less than or equal to 30%
+T9_est41,2019,130,106,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Renter occupied,"White alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est42,2019,30,31,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Renter occupied,"White alone, non-Hispanic",greater than 50%
+T9_est43,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Renter occupied,"White alone, non-Hispanic",not computed (no/negative income)
+T9_est44,2019,145,85,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Subtotal,Renter occupied,"Black or African-American alone, non-Hispanic",All
+T9_est45,2019,45,45,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",less than or equal to 30%
+T9_est46,2019,100,82,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est47,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",greater than 50%
+T9_est48,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",not computed (no/negative income)
+T9_est49,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Subtotal,Renter occupied,"Asian alone, non-Hispanic",All
+T9_est50,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Renter occupied,"Asian alone, non-Hispanic",less than or equal to 30%
+T9_est51,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Renter occupied,"Asian alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est52,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Renter occupied,"Asian alone, non-Hispanic",greater than 50%
+T9_est53,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Renter occupied,"Asian alone, non-Hispanic",not computed (no/negative income)
+T9_est54,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Subtotal,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",All
+T9_est55,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",less than or equal to 30%
+T9_est56,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est57,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 50%
+T9_est58,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",not computed (no/negative income)
+T9_est59,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Subtotal,Renter occupied,"Pacific Islander alone, non-Hispanic",All
+T9_est60,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",less than or equal to 30%
+T9_est61,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est62,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",greater than 50%
+T9_est63,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",not computed (no/negative income)
+T9_est64,2019,65,54,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Subtotal,Renter occupied,"Hispanic, any race",All
+T9_est65,2019,65,54,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Renter occupied,"Hispanic, any race",less than or equal to 30%
+T9_est66,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Renter occupied,"Hispanic, any race",greater than 30% but less than or equal to 50%
+T9_est67,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Renter occupied,"Hispanic, any race",greater than 50%
+T9_est68,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Renter occupied,"Hispanic, any race",not computed (no/negative income)
+T9_est69,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Subtotal,Renter occupied,"other (including multiple races, non-Hispanic)",All
+T9_est70,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",less than or equal to 30%
+T9_est71,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",greater than 30% but less than or equal to 50%
+T9_est72,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",greater than 50%
+T9_est73,2019,0,23,2015thru2019,050,05000US51145,Powhatan County, Virginia,51,145,51145,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",not computed (no/negative income)
+T9_est1,2019,90300,864,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Total,Total: Occupied housing units,All,All
+T9_est2,2019,38495,858,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Subtotal,Owner occupied,All,All
+T9_est3,2019,23105,569,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Subtotal,Owner occupied,"White alone, non-Hispanic",All
+T9_est4,2019,18605,495,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Owner occupied,"White alone, non-Hispanic",less than or equal to 30%
+T9_est5,2019,2545,284,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Owner occupied,"White alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est6,2019,1800,254,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Owner occupied,"White alone, non-Hispanic",greater than 50%
+T9_est7,2019,155,93,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Owner occupied,"White alone, non-Hispanic",not computed (no/negative income)
+T9_est8,2019,13295,591,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Subtotal,Owner occupied,"Black or African-American alone, non-Hispanic",All
+T9_est9,2019,8355,501,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",less than or equal to 30%
+T9_est10,2019,2450,335,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est11,2019,2320,279,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",greater than 50%
+T9_est12,2019,175,83,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Owner occupied,"Black or African-American alone, non-Hispanic",not computed (no/negative income)
+T9_est13,2019,640,132,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Subtotal,Owner occupied,"Asian alone, non-Hispanic",All
+T9_est14,2019,435,119,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Owner occupied,"Asian alone, non-Hispanic",less than or equal to 30%
+T9_est15,2019,85,52,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Owner occupied,"Asian alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est16,2019,125,53,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Owner occupied,"Asian alone, non-Hispanic",greater than 50%
+T9_est17,2019,0,29,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Owner occupied,"Asian alone, non-Hispanic",not computed (no/negative income)
+T9_est18,2019,40,33,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Subtotal,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",All
+T9_est19,2019,15,27,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",less than or equal to 30%
+T9_est20,2019,15,20,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est21,2019,4,11,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 50%
+T9_est22,2019,0,29,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Owner occupied,"American Indian or Alaska Native alone, non-Hispanic",not computed (no/negative income)
+T9_est23,2019,0,29,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Subtotal,Owner occupied,"Pacific Islander alone, non-Hispanic",All
+T9_est24,2019,0,29,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",less than or equal to 30%
+T9_est25,2019,0,29,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est26,2019,0,29,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",greater than 50%
+T9_est27,2019,0,29,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Owner occupied,"Pacific Islander alone, non-Hispanic",not computed (no/negative income)
+T9_est28,2019,655,152,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Subtotal,Owner occupied,"Hispanic, any race",All
+T9_est29,2019,365,111,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Owner occupied,"Hispanic, any race",less than or equal to 30%
+T9_est30,2019,135,59,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Owner occupied,"Hispanic, any race",greater than 30% but less than or equal to 50%
+T9_est31,2019,110,68,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Owner occupied,"Hispanic, any race",greater than 50%
+T9_est32,2019,45,58,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Owner occupied,"Hispanic, any race",not computed (no/negative income)
+T9_est33,2019,760,158,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Subtotal,Owner occupied,"other (including multiple races, non-Hispanic)",All
+T9_est34,2019,465,142,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",less than or equal to 30%
+T9_est35,2019,200,103,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",greater than 30% but less than or equal to 50%
+T9_est36,2019,85,52,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",greater than 50%
+T9_est37,2019,10,14,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Owner occupied,"other (including multiple races, non-Hispanic)",not computed (no/negative income)
+T9_est38,2019,51805,1056,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Subtotal,Renter occupied,All,All
+T9_est39,2019,20065,812,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Subtotal,Renter occupied,"White alone, non-Hispanic",All
+T9_est40,2019,10950,521,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"White alone, non-Hispanic",less than or equal to 30%
+T9_est41,2019,4335,434,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"White alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est42,2019,4420,449,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"White alone, non-Hispanic",greater than 50%
+T9_est43,2019,360,122,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"White alone, non-Hispanic",not computed (no/negative income)
+T9_est44,2019,25970,907,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Subtotal,Renter occupied,"Black or African-American alone, non-Hispanic",All
+T9_est45,2019,10550,752,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",less than or equal to 30%
+T9_est46,2019,6320,573,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est47,2019,8305,643,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",greater than 50%
+T9_est48,2019,800,215,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"Black or African-American alone, non-Hispanic",not computed (no/negative income)
+T9_est49,2019,950,204,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Subtotal,Renter occupied,"Asian alone, non-Hispanic",All
+T9_est50,2019,345,117,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"Asian alone, non-Hispanic",less than or equal to 30%
+T9_est51,2019,165,93,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"Asian alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est52,2019,270,119,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"Asian alone, non-Hispanic",greater than 50%
+T9_est53,2019,170,86,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"Asian alone, non-Hispanic",not computed (no/negative income)
+T9_est54,2019,170,118,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Subtotal,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",All
+T9_est55,2019,80,88,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",less than or equal to 30%
+T9_est56,2019,30,48,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est57,2019,55,58,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",greater than 50%
+T9_est58,2019,4,11,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"American Indian or Alaska Native alone, non-Hispanic",not computed (no/negative income)
+T9_est59,2019,4,10,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Subtotal,Renter occupied,"Pacific Islander alone, non-Hispanic",All
+T9_est60,2019,4,10,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",less than or equal to 30%
+T9_est61,2019,0,29,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",greater than 30% but less than or equal to 50%
+T9_est62,2019,0,29,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",greater than 50%
+T9_est63,2019,0,29,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"Pacific Islander alone, non-Hispanic",not computed (no/negative income)
+T9_est64,2019,2740,271,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Subtotal,Renter occupied,"Hispanic, any race",All
+T9_est65,2019,1445,210,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"Hispanic, any race",less than or equal to 30%
+T9_est66,2019,660,155,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"Hispanic, any race",greater than 30% but less than or equal to 50%
+T9_est67,2019,560,146,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"Hispanic, any race",greater than 50%
+T9_est68,2019,70,58,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"Hispanic, any race",not computed (no/negative income)
+T9_est69,2019,1905,364,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Subtotal,Renter occupied,"other (including multiple races, non-Hispanic)",All
+T9_est70,2019,945,269,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",less than or equal to 30%
+T9_est71,2019,365,175,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",greater than 30% but less than or equal to 50%
+T9_est72,2019,540,153,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",greater than 50%
+T9_est73,2019,55,47,2015thru2019,050,05000US51760,Richmond city, Virginia,51,760,51760,Detail,Renter occupied,"other (including multiple races, non-Hispanic)",not computed (no/negative income)
