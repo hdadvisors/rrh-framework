@@ -19,6 +19,7 @@ library(lubridate)
 library(janitor)
 library(viridis)
 library(kableExtra)
+library(optiRum)
 
 tenure <- c("Homeowner", "Renter")
 tenure_colors <-setNames(viridis(2), nm = tenure)
@@ -32,9 +33,11 @@ tenure_colors <-setNames(viridis(2), nm = tenure)
 
 ### Population changes
 
+The gradual population growth that Ashland was seeing throughout the last decade took a change in course between 2019 and 2020. Between these years, it was estimated that Ashland's population declined by 310 individuals. This was a greater decrease than the town's last recorded population decrease between 2010 and 2011, when the town population declined by 38. The small population of Ashland may warrant some caution in describing trends between American Community Survey estimates and decennial census counts.
 
 ```{r}
 #| label: pop-data
+#| echo: false
 
 
 ashland_pop <- get_estimates(
@@ -120,6 +123,8 @@ population_data <- ashpop_clean |>
 
 
 ```
+Population projections produced by the University of Virginia's Weldon Cooper Center show that the town will continue to grow over the coming decades. By 2050, the Weldon Cooper Center expects Ashland to approach nearly 10,000 residents --- a 27 percent increase over 30 years.
+
 ```{r}
 #| label: pop-forecasts
 
@@ -161,7 +166,7 @@ ggplot(forecast,
 
 ### Household characteristics
 
-
+From 2016 to 2020, Ashland has seen most of its household growth among homeowners between the ages of 25 and 44 years old (+342). Declines have mainly been among homeowner householders older than 45 years old (-249), while there has been an increase of renter households among this same age group.
 
 ```{r}
 #| label: hh-age-data
@@ -246,7 +251,7 @@ ggplot(b25007_data,
   scale_fill_manual(values = tenure_colors)
 
 ```
-
+Households with children have only increased among renters in Hanover (+83) from 2016 to 2020. But the greatest household type to see growth in the town has been among nonfamily homeowner households (i.e. individuals living alone or with )
 ```{r}
 #| label: hh-child-data
 #| eval: FALSE
@@ -667,7 +672,6 @@ mhc_list <- read_csv("data/mhccv_data.csv") %>%
 
 ```
 
-
 ```{r}
 
 years <- 2016:2020
@@ -685,7 +689,8 @@ b25119_raw <- map_dfr(years, function(yr){
     cache_table = TRUE
   ) |> 
     mutate(year = yr)
-  })
+  }) %>% 
+  filter(NAME == "Ashland town, Virginia")
 
 b25119_vars_cleaned <- b25119_vars %>% 
   separate(label, into = c("est", "lab", "total", "tenure"), sep = "!!") %>% 
@@ -697,8 +702,95 @@ b25119_vars_cleaned <- b25119_vars %>%
   ))
 
 b25119_data <- b25119_raw %>% 
-  right_join(b25119_vars_cleaned, by = "variable")
-    
+  right_join(b25119_vars_cleaned, by = "variable") %>% 
+  select(year, tenure, estimate)
+
+ashland_rent <- read_csv("data/ashland_annual_rent.csv")
+
+rentgap <- b25119_data %>% 
+  filter(tenure == "Renter") %>% 
+  left_join(ashland_rent, by = "year") %>% 
+  mutate(affordable_rent = (estimate/12)*.30) %>% 
+  select(year, rent, affordable_rent) %>% 
+  pivot_longer(2:3, 
+               names_to = "label",
+               values_to = "rent") %>% 
+  mutate(label = case_when(
+    label == "rent" ~ "Current rent",
+    label == "affordable_rent" ~ "Affordable rent"
+  ))
+
+ggplot(rentgap,
+       aes(x = year,
+           y = rent,
+           fill = label)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_y_continuous(labels = label_dollar()) +
+  labs(title = "Town of Ashland: Average asking rent versus\nrent affordable to median renter income",
+       subtitle = "2016 to 2020",
+       fill = "Nominal rent",
+       caption = "Sources: U.S. Census Bureau, American Community Survey, Table B25119\nand CoStar Group Inc.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
+
+
+
+```
+
+```{r}
+
+
+ashland_medsales <- read_csv("data/ashland_mls_medsales.csv")
+
+int_annual <- read_csv("data/fredmac_int_annual.csv")
+
+downpayment <- 0.05 # 5% downpayment
+closingcosts <- 0.015 # 1.5% closing costs
+utilities <- 250 # Assume $250/month for utilities
+
+slgap <- b25119_data %>% 
+  filter(tenure == "Renter") %>% 
+  left_join(ashland_medsales, by = "year") %>% 
+  left_join(int_annual, by = "year") |> 
+  drop_na() |> 
+  mutate(principal = price - (price*downpayment)) |> 
+  mutate(loanamt = principal/(1-closingcosts)) |> 
+  mutate(mortgage = abs(PMT((annual_int/12), 360, loanamt)) + 250) |> 
+  mutate(inc_needed = ((mortgage*10)/2.8)*12) |> 
+  select(year, inc_needed, estimate) %>% 
+  pivot_longer(2:3,
+               names_to = "label",
+               values_to = "dollars") |> 
+  mutate(label = case_when(
+    label == "estimate" ~ "Renter median household income",
+    label == "inc_needed" ~ "Income needed to afford median home price"
+  ))
+  
+ggplot(slgap,
+       aes(x = year,
+           y = dollars,
+           fill = str_wrap(label, 25))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_y_continuous(labels = label_dollar()) +
+  labs(title = "Town of Ashland: Income needed to afford median home price\nversus median renter income",
+       subtitle = "2016 to 2020",
+       fill = "Nominal income",
+       caption = "Sources: U.S. Census Bureau, American Community Survey, Table B25119\nand Central Virginia Regional Multiple Listing Service.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        legend.key.height=unit(1, "cm"))
     
 
 ```
+
+```{r}
+
+ashland_cb <- read_csv("data/ashland_cb.csv")
+
