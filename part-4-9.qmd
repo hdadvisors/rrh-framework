@@ -610,6 +610,8 @@ ashland_sales <- read_csv("data/ashland_mls_5yrsales.csv")
 
 ### Rental
 
+From 2016 Q1 to 2021 Q1, average market asking rent in Ashland has been on a gradual increase --- just a 7 percent increase during this timeframe. But in 2021 onward, the Ashland rental market has seen a dramatic shift upward. From 2021 Q1 to 2022 Q3, rent growth has doubled to 15 percent in a shorter period of time. 
+
 ```{r}
 
 rent <- read_csv("data/ashland_rent.csv") %>%  
@@ -643,6 +645,7 @@ ggplot(rent,
 
 ```
 
+### Housing assistance
 
 ```{r}
 
@@ -672,6 +675,13 @@ mhc_list <- read_csv("data/mhccv_data.csv") %>%
 
 ```
 
+## Gap analysis
+
+### Affordability of current housing stock
+
+In the Town of Ashland, renter median household incomes have been growing --- allowing for the average renter to afford higher rents. In 2020, the typical Ashland renter household could afford a rent of \$1,234 without being cost-burdened. This rent is \$275 more than what the average asking rent in 2020 was. 
+
+Although this suggests that c
 ```{r}
 
 years <- 2016:2020

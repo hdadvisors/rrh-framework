@@ -42,6 +42,7 @@ book:
         - part-4-6.qmd
         - part-4-7.qmd
         - part-4-8.qmd
+        # - part-4-9.qmd
 
 knitr:
   opts_chunk: 
