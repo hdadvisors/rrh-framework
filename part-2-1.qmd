@@ -722,7 +722,7 @@ ggplot(avg_sales,
 
 Median home prices have continued to climb in the Richmond Region---reaching over \$300,000 in all four major localities. The greatest price increases have occurred in the City of Richmond during 2022, where the median home price went from \$303,941 in February to \$389,950 in June, a 28 percent increase. Home prices are continuing to trend upward in spite of rising mortgage interest rates. 
 
-Hanover County remains the most expensive locality in the region with a median home price of \$464,000 in July 2022, followed by the Chesterfield County (\$378,671), Henrico County (\$370,000), and the City of Richmond (\$352,500).
+Hanover County remains the most expensive locality in the region with a median home price of \$423,250 as of September 2022, followed by the Chesterfield County (\$371,273), Henrico County (\$349,950), and the City of Richmond (\$325,500).
 
 ```{r sales-price-data, eval=FALSE}
 
@@ -771,11 +771,12 @@ pha_price <- pha_price |>
   mutate(med_price = parse_number(med_price))
 
 cpi <- read_csv("data/CPIAUCSL.csv") |> 
-  select(date = DATE, cpi = CPIAUCSL)
+  select(date = DATE, cpi = CPIAUCSL) 
+  
 
 pha_price_adj <- pha_price |> 
   left_join(cpi, by = "date") |> 
-  mutate(dollars = ((295.271/cpi)*med_price)) |> 
+  mutate(dollars = ((296.761/cpi)*med_price)) |> 
   select(geography, date, med_price, dollars, cpi)
 
 write_rds(pha_price_adj, "data/pha_price.rds")
