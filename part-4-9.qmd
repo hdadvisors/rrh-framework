@@ -1,6 +1,6 @@
 # Town of Ashland {#part-4-9}
 
-This chapter is a summary of the major changes to the Town of Ashland's population and housing market in the past five years.
+This chapter is a summary of the major changes to the Town of Ashland's population and housing market in the past five years. Although Ashland resides in Hanover County, the town sees some differences in population and housing trends from the rest of the county. 
 
 ```{r}
 #| label: setup
@@ -27,7 +27,21 @@ tenure_colors <-setNames(viridis(2), nm = tenure)
 
 ```
 
+```{r}
+ashland <- st_read('https://services2.arcgis.com/sKZWgJlU6SekCzQV/arcgis/rest/services/Ashland_Boundary/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson', quiet = TRUE)
+
+leaflet(ashland) %>% 
+  addTiles() %>% 
+  addPolygons()
+
+```
+
 ## Takeaways
+
+- The Town of Ashland saw recent declines in population, but is still expected to grow --- reaching nearly 10,000 residents by 2050.
+- More and more younger adults are coming to the town; mainly renter households with children and homeowners living alone.
+- Home prices and rent continue to rise with the influx of higher earning households --- especially higher income renters.
+- In contrast to other localities, homeowners are increasingly see cost burden compared to renters who are seeing less.
 
 
 ## Demographic and socioeconomic changes
@@ -252,7 +266,7 @@ ggplot(b25007_data,
   scale_fill_manual(values = tenure_colors)
 
 ```
-Households with children have only increased among renters in Hanover (+83) from 2016 to 2020. But the greatest household type to see growth in the town has been among nonfamily homeowner households (i.e. individuals living alone or with )
+Households with children have only increased among renters in Hanover (+83) from 2016 to 2020 --- this is contrast to Hanover County as a whole, which is seeing an overall decrease in households with children. But the greatest household type to see growth in the town has been among nonfamily homeowner households (i.e. individuals living alone or with roommates) --- similarly to the county.
 ```{r}
 #| label: hh-child-data
 #| eval: FALSE
@@ -396,7 +410,7 @@ b09020_data <- b09020_raw |>
          family = fct_relevel(family, "Family", "Nonfamily", " "))
 
 ```
-While the senior population has grown overall in Ashland (+107), that growth has been largely among seniors who live with other relatives (+225) or with a spouse (+52). Seniors who are head of households has declined in the town (-87), as well as the number of seniors living in group quarters (-69).
+While the senior population has grown overall in Ashland (+107), that growth has been largely among seniors who live with other relatives (+225) or with a spouse (+52). Seniors who are head of households has declined in the town (-87), as well as the number of seniors living in group quarters (-69). Unlike the rest of the county, Ashland is not seeing major increases in seniors living alone.
 
 ```{r}
 #| label: fig-hh-seniors-plot
@@ -429,7 +443,7 @@ ggplot(b09020_data,
 
 ### Income and wages
 
-Household incomes have also shifted in Ashland. There has been a larger increase among renter households making more than \$50,000 than homeowners in the same income group. The greatest increase among homeowners has occurred with homeowners making between \$15,000 and \$49,999. Households making under \$15,000 have decreased for both homeowners and renters. 
+Household incomes have also shifted in Ashland. Although there still remains an income gap between the average homeowner and renter households, the gap has been narrowing in recent years. In 2016, there was an over \$22,000 difference between homeowner and renter median household incomes. But by 2020, that difference had declined to only \$6,364, as homeowner incomes declined and renter incomes increased. 
 
 ```{r}
 #| label: med-inc
@@ -466,179 +480,45 @@ b25119_data <- b25119_raw %>%
   right_join(b25119_vars_cleaned, by = "variable") %>% 
   select(year, tenure, estimate)
 
-```
+cpi <- read_excel("data/CPI_U_RS.xlsx")
+cpi <- cpi |> 
+  rename(year = Year,
+         priceindex = Index) |> 
+  transform(year = as.numeric(year))
 
-```{r}
-#| label: hh-inc-data
-#| eval: FALSE
+b25119_cpi <- b25119_data |> 
+  left_join(cpi, by = 'year') |> 
+  transform(dollars20 = ((381.2/priceindex)*estimate)) |> 
+  select(year, tenure, dollars20, cdollars = estimate) |> 
+  select(year, tenure, dollars20, cdollars)
 
-
-years <- 2016:2020
-
-b25118_vars <- load_variables(2020, "acs5") |> 
-  filter(str_sub(name, end = 6) %in% "B25118")
-
-b25118_raw <- map_dfr(years, function(yr){
-  b25118_pull <- get_acs(
-    geography = "place",
-    state = "VA",
-    table = "B25118",
-    year = yr,
-    survey = "acs5",
-    cache_table = TRUE
-  ) |> 
-    mutate(year = yr)
-  }) %>% 
-  filter(NAME == "Ashland town, Virginia")
-
-b25118_vars_cleaned <- b25118_vars |> 
-  separate(label, into = c("est", "total", "tenure", "income"), sep = "!!") |>  
-  select(variable = name, tenure, income) |> 
-  mutate(tenure = case_when(
-    tenure == "Owner occupied:" ~ "Homeowner",
-    tenure == "Renter occupied:" ~ "Renter"
-  )) |> 
-  drop_na()
-
-b25118_data <- b25118_raw |> 
-  right_join(b25118_vars_cleaned, by = "variable") |> 
-  select(year, tenure, income, estimate) |> 
-  mutate(income = case_when(
-    income == "Less than $5,000" ~ "Less than $15,000",
-    income == "$5,000 to $9,999" ~ "Less than $15,000",
-    income == "$10,000 to $14,999" ~ "Less than $15,000",
-    income == "$15,000 to $19,999" ~ "$15,000 to $24,999",
-    income == "$$20,000 to $24,999" ~ "$15,000 to $24,999",
-    income == "$25,000 to $34,999" ~ "$25,000 to $49,999",
-    income == "$35,000 to $49,999" ~ "$25,000 to $49,999",
-    income == "$50,000 to $74,999" ~ "$50,000 to $74,999",
-    TRUE ~ income
-  )) |> 
-  group_by(year, tenure, income) |> 
-  summarise(estimate = sum(estimate)) |> 
-  filter(year %in% c(2016, 2020)) |> 
-  pivot_wider(names_from = year,
-              values_from = estimate) |>
-  mutate(change = `2020` - `2016`,
-         pct_change = change/`2016`)
-
-```
-
-```{r}
-#| label: fig-hh-inc-plot
-#| fig.cap: "Change in households by tenure and income level"
-
-ggplot(b25118_data, 
-       aes(y = income,
-           x = change,
+ggplot(b25119_cpi, 
+       aes(x = year,
+           y = dollars20,
            fill = tenure)) +
-  geom_col(position = "dodge") +
-  facet_grid(~tenure) +
-  scale_x_continuous(labels = label_comma()) +
-  scale_y_discrete(limits = c("Less than $15,000","$15,000 to $24,999",
-                              "$25,000 to $49,999", "$50,000 to $74,999",
-                              "$75,000 to $99,999", "$100,000 to $149,999",
-                              "$150,000 or more"),
-                   labels = function(x) str_wrap(x, width = 12)) +
-  labs(title = "Change in households by tenure and income level",
-       subtitle="2016 to 2020",
-       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25118.") +
-  theme(axis.title = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.y = element_blank(),
-        legend.position = "none",
-        panel.grid.major.x = element_line(color = "grey95",
-                                          size = 0.05),
-        axis.ticks = element_blank()) +
-  scale_fill_manual(values = tenure_colors)
-
-```
-
-### Persons with disabilities
-
-There has been a net increase of 32 individuals with independent living difficulties in Ashland. This increase has mostly been among individuals 18 to 34 years of age, while decreases were only experienced by individuals between 35 and 64 years old --- indicating a greater need for accessibility and assistance for young adults and seniors in the town.
-
-```{r}
-#| label: ind-liv-age-data
-#| eval: FALSE
-
-# Table B18107 Sex by age by independent living difficulty
-
-# "Because of a physical, mental, or emotional problem, having difficulty doing errands alone such as visiting a doctor’s office or shopping (DOUT)."
-
-years <- 2016:2020
-
-b18107_vars <- load_variables(2020, "acs5") |> 
-  filter(str_sub(name, end = 6) %in% "B18107")
-
-b18107_raw <- map_dfr(years, function(yr){
-  b10107_pull <- get_acs(
-    geography = "place",
-    state = "VA",
-    table = "B18107",
-    year = yr,
-    survey = "acs5",
-    cache_table = TRUE
-  ) |> 
-    mutate(year = yr)
-  }) %>% 
-  filter(NAME == "Ashland town, Virginia")
-
-b18107_vars_cleaned <- b18107_vars |> 
-  separate(label, into = c("est", "total", "sex", "age", "indliv"), sep = "!!") |> 
-  select(variable = name, sex , age, indliv) |> 
-  drop_na() |> 
-  mutate(across(.fns = ~str_remove_all(.x, ":")))
-
-b18107_data <- b18107_raw |> 
-  right_join(b18107_vars_cleaned, by = "variable") |> 
-  select(GEOID, year, sex, age, indliv, estimate) |> 
-  group_by(year, age, indliv) |> 
-  summarise(estimate = sum(estimate)) |> 
-  filter(indliv == "With an independent living difficulty") |> 
-  pivot_wider(names_from = year,
-              values_from =  estimate) |> 
-  transform(change = `2020` - `2016`) |> 
-  group_by(age) |> 
-  summarise(change = sum(change))
-
-```
-
-
-
-```{r}
-#| label: fig-ind-liv-age-plot
-#| fig.cap: "Net change in individuals with independent living difficulties by age"
-
-ggplot(b18107_data,
-       aes(x = age,
-           y = change,
-           fill = age)) +
   geom_col() +
-  labs(title="Net change in individuals with independent living difficulties by age",
-       subtitle="2016 to 2020",
-       caption="Source: U.S. Census Bureau, American Community Survey, Table B18107.") +
-  scale_y_continuous(labels = label_comma()) +
+  facet_wrap(~tenure) +
+  scale_y_continuous(labels = dollar_format(), limits = c(0, NA)) +
+  labs(title = "Town of Ashland: Median houshold income by tenure", 
+       color = "Tenure",
+       subtitle = "2016 to 2020 | Adjusted to 2020 dollars",
+       caption = "Source: U.S. Census Bureau, American Community Survey") +
   theme(axis.title = element_blank(),
         axis.ticks = element_blank(),
-        legend.position = "none",
         panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
         panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+                                          size = 0.05),
+        legend.position = "none")
 
 ```
+
 ## Housing supply and market changes
 
 ### Homeownership
 
+Median home prices in Ashland had crossed into the \$400,000 range well before the pandemic, but from 2021 onward, median home price has remained above \$400,000 for the majority of the time. Homeownership demand in the town continues to drive prices upwards and the trend is expected to continue.
+
 ```{r}
-
-ashland <- st_read('https://services2.arcgis.com/sKZWgJlU6SekCzQV/arcgis/rest/services/Ashland_Boundary/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson', quiet = TRUE)
-
-leaflet(ashland) %>% 
-  addTiles() %>% 
-  addPolygons()
 
 # Data pulled on 2022-10-13
 
@@ -679,7 +559,7 @@ ashland_priceadj <- ashland_medsales %>%
 ggplot(ashland_priceadj,
        aes(x = date, y = dollars, color = dollars)) +
   geom_line(size = 1) +
-  scale_y_continuous(labels = label_dollar()) +
+  scale_y_continuous(labels = label_dollar(), limits = c(0, NA)) +
   scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
   labs(title = "Monthly median sales price",
        subtitle = "January 2017 to July 2022",
@@ -698,7 +578,7 @@ ggplot(ashland_priceadj,
 
 ### Rental
 
-From 2016 Q1 to 2021 Q1, average market asking rent in Ashland has been on a gradual increase --- just a 7 percent increase during this timeframe. But in 2021 onward, the Ashland rental market has seen a dramatic shift upward. From 2021 Q1 to 2022 Q3, rent growth has doubled to 15 percent in a shorter period of time. 
+From 2016 Q1 to 2021 Q1, average market asking rent in Ashland has been on a gradual increase --- just a 7 percent increase during this timeframe. But in 2021 onward, the Ashland rental market has seen a dramatic shift upward. From 2021 Q1 to 2022 Q3, rent growth has doubled to 15 percent in a shorter period of time. The median renter household further points to an increasing number of higher income earners demanding rental options in the town.
 
 ```{r}
 
@@ -733,43 +613,14 @@ ggplot(rent,
 
 ```
 
-### Housing assistance
-
-```{r}
-
-nhpd_coded_rr <- read_rds("data/nhpd_coded_rr.rds") |> 
-  filter(locality == "Hanover County") %>% 
-  filter(city == "ASHLAND")
-
-```
-
-
-```{r}
-mhc <- st_read("https://services1.arcgis.com/Hp6G80Pky0om7QvQ/arcgis/rest/services/Mobile_Home_Parks/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson", quiet = TRUE) |> 
-  filter(STATE == "VA",
-         CITY == "ASHLAND")
-
-library(leaflet)
-
-leaflet(mhc) |> 
-  addTiles() |> 
-  addCircleMarkers()
-```
-```{r}
-
-mhc_list <- read_csv("data/mhccv_data.csv") %>% 
-  filter(`Park Name` == "Palm Leaf Mobile Home Park" | `Park Name` == "Sedgefield Manufactured Home")
-
-
-```
-
 ## Gap analysis
 
 ### Affordability of current housing stock
 
 In the Town of Ashland, renter median household incomes have been growing --- allowing for the average renter to afford higher rents. In 2020, the typical Ashland renter household could afford a rent of \$1,234 without being cost-burdened. This rent is \$275 more than what the average asking rent in 2020 was. 
 
-Although this suggests that c
+Although this suggests that renters in the town are more able to afford rental housing, it could also point to lower income renter households having to move elsewhere in order to afford housing.
+
 ```{r}
 
 years <- 2016:2020
@@ -839,6 +690,7 @@ ggplot(rentgap,
 
 ```
 
+In spite of increasing incomes among renters in the town, the high price of homeownership continues to keep renters from moving to more permanent tenureship. In 2016. the gap between income needed to afford the median home price and the typical renter income was just over \$17,000. By 2020, that gap had only decreased by about \$2,000 --- leaving the typical renter \$15,241 away from being able to afford the median home price in 2020 (\$305,000).
 ```{r}
 
 
@@ -887,8 +739,33 @@ ggplot(slgap,
     
 
 ```
-
+In contrast to other localities, homeowner cost burden has increased in Ashland. From 2015 to 2019, there has been an increase of 57 cost-burdened homeowner households --- a 19 percent increase. However, the number of cost-burdened renter households decreased from 690 to 580 --- a 16 percent decrease.
 ```{r}
 
 ashland_cb <- read_csv("data/ashland_cb.csv")
 
+ashland_cb_cln <- ashland_cb %>% 
+  group_by(year, grouping) %>% 
+  summarise(Homeowner = sum(Homeowner),
+            Renter = sum(Renter)) %>% 
+  pivot_longer(3:4,
+               names_to = "tenure",
+               values_to = "estimate") %>% 
+  mutate(year = as.character(year)) %>% 
+  filter(grouping == "Cost-burdened")
+
+ggplot(ashland_cb_cln,
+       aes(x = year,
+           y = estimate,
+           fill = factor(grouping, levels = c("Not computed", "Cost-burdened", "Not cost-burdened")))) +
+  geom_col(position = "stack") +
+  facet_wrap(~tenure) +
+  labs(title = "Town of Ashland: Cost burden by tenure",
+       subtitle = "In 2015 and 2019",
+       fill = "Cost burden") +
+  scale_y_continuous(labels = number_format(big.mark = ",")) +
+  theme(axis.title = element_blank(),
+        legend.position = "none")
+  
+
+```
