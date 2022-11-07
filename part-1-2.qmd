@@ -33,7 +33,6 @@ tenure <- c("Homeowner", "Renter")
 tenure_colors <-setNames(viridis(2), nm = tenure)
 
 ```
-
 ```{r}
 #| label: geography-setup
 #| eval: FALSE
@@ -50,6 +49,8 @@ pha_va <- va |>
 years <- 2016:2020
 
 ```
+
+This chapter covers the household trends that influence housing demand across the Partnership for Housing Affordability's coverage area, including, but not limited to householder age, household size, and multigenerational households.
 
 ## Household formation
 
@@ -861,7 +862,7 @@ ggplot(multigen_data,
 
 ## Adult children with parents
 
-Over the past decade, a common stereotype has been the adult millennial child continuing to live with their parents. While this trope is based in real economic challenges faced by young adults, such as increasing housing costs and student debt, its magnitude can often be overstated.
+Over the past decade, a common stereotype has been that of adult millennial child continuing to live with their parents. While this trope is based in real economic challenges faced by young adults, such as increasing housing costs and student debt, its magnitude can often be overstated.
 
 Today, more than 75,800 adults 18 to 34 years old in the region---about one-in-three---live with their parents. This is more than any other arrangement. However, since 2016, the fastest growing living arrangement for young adults has been with an unmarried partner, followed by other nonrelatives (roommates). In fact, the share of young adults now living with a married spouse increased slightly more than the share still living with parents.
 

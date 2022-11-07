@@ -1,5 +1,7 @@
 # Population changes {#part-1-1}
 
+This chapter covers population changes across the Partnership for Housing Affordability's main coverage area, including the City of Richmond and the counties of Chesterfield, Hanover, and Henrico.
+
 ```{r}
 #| label: setup
 

@@ -35,6 +35,7 @@ tenure_colors <-setNames(viridis(2), nm = tenure)
 years <- 2016:2020
 
 ```
+This chapter covers the changes in incomes and wages among households and occupations across the region. 
 
 ## Household incomes
 
@@ -140,7 +141,15 @@ ggplot(b25118_data,
 
 ```
 
-Average homeowner incomes continue to be well above average renter incomes across the region. When adjusted for inflation, incomes across tenures for each locality show very minor to modest growth. Incomes in the city---for both homeowners and renters---remain significantly below those in the surrounding counties. The average household income for homeowners in the counties is around three times that of renters in Richmond.
+:::{.callout-important}
+
+## Why use medians
+
+Using [medians](https://www.investopedia.com/terms/m/median.asp) instead of averages is a standard data analysis practice because it accounts for outliers. An average household income or home sales price would be influenced adversely by one or a few data points at the high end --- causing data skewing. 
+
+:::
+
+Typical homeowner incomes continue to be well above average renter incomes across the region. When adjusted for inflation, incomes across tenures for each locality show very minor to modest growth. Incomes in the city---for both homeowners and renters---remain significantly below those in the surrounding counties. The average household income for homeowners in the counties is around three times that of renters in Richmond.
 
 ```{r}
 #| label: med-income-data
