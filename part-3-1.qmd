@@ -28,6 +28,7 @@ pha_names <- c("Richmond city", "Hanover County", "Henrico County", "Chesterfiel
 rr_df <- data.frame(GEOID = rr, NAME = rr_names)
 
 ```
+This chapter is an analysis of existing housing costs versus the ability of households in the region to afford those housing costs.
 
 ## Rental housing gap
 
@@ -105,7 +106,7 @@ write_rds(gap, "data/gap.rds")
 
 ```
 
-Comprehensive Housing Affordability Strategy (CHAS) data provided by the Department of Housing and Urban Development (HUD) allows us to understand the cost of housing in relation to household incomes. For renters making less than 80% AMI across the region, there has been little change in the gap in affordable rental housing.
+[Comprehensive Housing Affordability Strategy (CHAS)](https://www.huduser.gov/portal/datasets/cp.html) data provided by the Department of Housing and Urban Development (HUD) allows us to understand the cost of housing in relation to household incomes. For renters making less than 80% AMI across the region, there has been little change in the gap in affordable rental housing.
 
 ```{r}
 #| label: fig-gap-plot
