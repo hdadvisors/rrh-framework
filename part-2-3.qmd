@@ -812,15 +812,8 @@ ggplot(rrp,
 
 ## Affordable homeownership
 
-Since 2010, nonprofit developers in the region have averaged about 50 affordable homes sold to low-income buyers. Most of this production in attributable to Southside Community Development, project:HOMES, and the Maggie Walker Community Land Trust.
+Since 2018, nonprofit developers in the region have averaged about 53 affordable homes sold to low-income buyers a year. Most of this production is attributable to Southside Community Development and project:HOMES.
 
-::: callout-warning
-
-#### All data not available
-
-Production numbers for Habitat for Humanity not yet received.
-
-:::
 
 ```{r}
 #| label: fig-pha-homeownership
@@ -836,6 +829,12 @@ ho_production <- pha_ho |>
                names_to = "year",
                values_to = "homes") |>
   mutate(year = parse_number(year))
+
+avg_ho <- ho_production %>% 
+  group_by(year) %>% 
+  summarise(total = sum(homes))
+
+mean(avg_ho$total)
 
 # MWCLT, BHC, project:HOMES, Southside, Habitat - WAITING ON DATA
 

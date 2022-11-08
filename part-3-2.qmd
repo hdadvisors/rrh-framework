@@ -565,7 +565,7 @@ Eviction filings should continue to be monitored over the coming months. The RVA
 
 ## Housing Resource Line
 
-On September 1, 2020, PHA launched the Housing Resource Line to help residents across Central Virginia in need of housing. As of July 2022, the hotline has fielded nearly 15,000 calls from people across the region---from rural Goochland County to the City of Richmond.
+On September 1, 2020, PHA launched the [Housing Resource Line](https://pharva.com/housing-hotline/) to help residents across Central Virginia in need of housing. As of November 2022, the hotline has fielded nearly 17,000 calls from people across the region---from rural Goochland County to the City of Richmond.
 
 Call volume has remained steady over since the line's launch. Call volume has not dropped below 500 calls per month since March 2021.
 
@@ -586,7 +586,7 @@ ggplot(call_vol,
   geom_col(aes(fill = "red")) +
   scale_x_date(labels = label_date_short(), breaks = breaks_width("2 months")) +
   labs(title = "Housing Resource Line monthly call volume",
-       subtitle = "September 2020 to July 2022",
+       subtitle = "September 2020 through October 2022",
        caption = "Source: Partnership for Housing Affordability.") +
   theme(legend.position = "none",
         axis.title = element_blank(),
@@ -598,7 +598,7 @@ ggplot(call_vol,
 
 ```
 
-The majority of calls (56 percent) were for rental options (36 percent) and financial assistance (20 percent). The two other largest share of calls were for an option not listed (17 percent) and homelessness (13 percent).
+The majority of calls (56 percent) were for rental options (36 percent) and financial assistance (21 percent). The two other largest share of calls were for an option not listed (17 percent) and homelessness (12 percent).
 
 ```{r}
 #| label: fig-call-topic
@@ -618,7 +618,7 @@ ggplot(call_top,
            fill = need)) +
   geom_col() +
   labs(title = "Housing Resource Line volume by call topic",
-       subtitle = "September 2020 to July 2022",
+       subtitle = "September 2020 through October 2022",
        caption = "Note: Does not include topics below 1 percent of call volume.\nSource: Partnership for Housing Affordability.") +
   theme(axis.title = element_blank(),
         legend.position = "none",
