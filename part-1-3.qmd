@@ -149,7 +149,7 @@ Using [medians](https://www.investopedia.com/terms/m/median.asp) instead of aver
 
 :::
 
-Typical homeowner incomes continue to be well above average renter incomes across the region. When adjusted for inflation, incomes across tenures for each locality show very minor to modest growth. Incomes in the city---for both homeowners and renters---remain significantly below those in the surrounding counties. The average household income for homeowners in the counties is around three times that of renters in Richmond.
+Typical homeowner incomes continue to be well above average renter incomes across the region. When adjusted for inflation, incomes across tenures for each locality show very minor to modest growth. Incomes in the city---for both homeowners and renters---remain significantly below those in the surrounding counties. The median household income for homeowners in the counties is around three times that of renters in Richmond.
 
 ```{r}
 #| label: med-income-data
@@ -234,9 +234,18 @@ ggplot(b25119_cpi,
 
 ```
 
+:::{.callout-important}
+
+## Adjusting for inflation
+
+When comparing dollar figures at different points in time, it is important to account for the effects of [inflation](https://www.investopedia.com/ask/answers/042415/what-impact-does-inflation-have-time-value-money.asp) on the dollar value. The value of a dollar in 2020 is not the same as in 2010 because inflation increases 
+
+To accurately compare data like median household incomes across time, we must convert all dollar values to the same timeframe. The [Consumer Price Index (CPI)](https://www.investopedia.com/terms/c/consumerpriceindex.asp) is used to adjust previous dollar figures to the most recent data point. 
+
+:::
 ### Incomes by race and ethnicity
 
-Average incomes in the region remain unequal by race and ethnicity. Households with the highest incomes include Asian and white, non-Hispanic residents in the counties---earning well above \$75,000. Black and Hispanic households consistently have the lowest average incomes, along with multiracial households in Henrico and Richmond.
+Typical incomes in the region remain unequal by race and ethnicity. Households with the highest incomes include Asian and white, non-Hispanic residents in the counties---earning well above \$75,000. Black and Hispanic households consistently have the lowest median incomes, along with multiracial households in Henrico and Richmond.
 
 ```{r}
 #| label: inc-race-data
@@ -346,7 +355,7 @@ ggplot(b19013_data,
 
 ### Incomes by family type
 
-Household incomes also vary by the presence of children or other related individuals. Throughout the region, non-family households (i.e., persons living alone or with unrelated persons) consistently have average incomes below \$50,000. In Henrico and Chesterfield counties, families living with and without children under 18 have very similar income levels. This trend is different in Hanover, where families with children have much higher incomes, as well as Richmond, where they have much lower incomes.
+Household incomes also vary by the presence of children or other related individuals. Throughout the region, non-family households (i.e., persons living alone or with unrelated persons) consistently have typical incomes below \$50,000. In Henrico and Chesterfield counties, families living with and without children under 18 have very similar income levels. This trend is different in Hanover, where families with children have much higher incomes, as well as Richmond, where they have much lower incomes.
 
 ```{r}
 #| label: inc-child-data

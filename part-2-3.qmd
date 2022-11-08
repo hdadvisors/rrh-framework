@@ -212,6 +212,13 @@ The other significant source of dedicated affordable housing continues to be mor
 Descriptions of each rental assistance program are available on the [NHPD website](https://preservationdatabase.org/documentation/program-descriptions/).
 :::
 
+:::{.callout-important}
+
+It is important to note that Section 8 described in this section is not the same as Section 8 Housing Choice Vouchers. Section 8 subsidies described in this section refer to HUD project-based rental assistance --- meaning that they are rental assistance that is tied to a specific development, whereas Section 8 Housing Choice Vouchers are tenant-based subsidies that a recipient can take wherever they can find housing.
+
+::::
+
+
 ```{r}
 #| label: fig-subsidy-overall
 #| fig-cap: "Share of federally assisted units by subsidy"
@@ -631,11 +638,11 @@ ggplot(lihtc,
 
 ### Public Housing
 
-The redevelopment of public housing in the City of Richmond has begun to take shape at the first of the "Big Six" public housing courts --- **Creighton Court**. This public housing property located in Richmond's far East End consisted of 504 public housing units.
+The redevelopment of public housing in the City of Richmond has begun to take shape at the first of the "Big Six" public housing courts --- [**Creighton Court**](https://www.rrha.com/redevelopment/creighton/). This public housing property located in Richmond's far East End consisted of 504 public housing units.
 
 As part of their first phase of redevelopment, RRHA has begun demolition of Creighton Court, with plans to develop roughly 700 units of mixed-income housing. Construction on Phase 1 is expected to begin in Winter 2022 with the entire redevelopment process expected to last ten years.
 
-RRHA's next focus area will be **Gilpin Court**, north of Jackson Ward, where about 780 public housing units reside. In November 2021, RRHA and the City of Richmond were awarded a Choice Neighborhoods Planning Grant by the U.S. Department of Housing and Urban Development for \$450,000.
+RRHA's next focus area will be [**Gilpin Court**](https://www.rrha.com/redevelopment/jackson-ward/), north of Jackson Ward, where about 780 public housing units reside. In November 2021, RRHA and the City of Richmond were awarded a Choice Neighborhoods Planning Grant by the U.S. Department of Housing and Urban Development for \$450,000.
 
 This planning grant is being utilized to facilitate the community planning process around not only Gilpin Court, but the Jackson Ward community --- including strategies to undo the negative impacts of interstate development on the historically Black communities of Jackson Ward and North Jackson Ward.
 
@@ -660,7 +667,7 @@ Federal housing policy has guided public housing authorities to use newer fundin
 
 Section 8 Housing Choice Vouchers (HCV) are tenant-based rental assistance that allows recipients to find housing on the open market. This provides household with greater choice in where they want to live, but historically many HCV recipients have faced discrimination from landlords unwilling to accept HCV.
 
-This changed significantly in early 2020, when the Virginia General Assembly passed new fair housing legislation that made it illegal to discriminate based on source of income --- defined as:
+This changed significantly in early 2020, when the Virginia General Assembly passed [new fair housing legislation](https://homeofva.org/get-help/fair-housing/source-of-funds/) that made it illegal to discriminate based on source of income --- defined as:
 
 > *"any source that lawfully provides funds to or on behalf of a renter or buyer of housing, including any assistance, benefit, or subsidy program, whether such program is administered by a governmental or nongovernmental entity."*
 
@@ -775,7 +782,7 @@ ggplot(rrp,
 
 ```
 
-Average payments per household across the three localities was well into the above \$4,000 for most of the program's duration, with the highest payments being made in Hanover County.
+Average payments per household across the three localities was well above \$4,000 for most of the program's duration, with the highest payments being made in Hanover County.
 
 ```{r}
 #| label: fig-rrp-payment

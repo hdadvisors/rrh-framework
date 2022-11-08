@@ -37,6 +37,7 @@ submarkets <- c("Midlothian" = "#2ca25f",
                 "Northside" = "#c7e9b4")
 
 ```
+This chapter covers trends in the rental housing market across the four main Partnership for Housing Affordability localities, including the City of Richmond and counties of Chesterfield, Hanover, and Henrico.
 
 ## Supply
 
@@ -128,6 +129,16 @@ ggplot(ro_structure,
 Since 2016, the region has seen major changes in the age of its rental stock as existing homes transition from being owned to leased out, or vice-versa. Of note, every locality except for Hanover saw significant increases in the number of renter-occupied homes built between 1980 and 1999.
 
 These homes---now over 20 years old---are likely becoming the target of investors purchasing from homeowners, making certain improvements, and renting them out. In Henrico County, this trend was even more prevalent among homes built between 1960 and 1979.
+
+:::{.callout-note}
+
+## Market Value Analysis (MVA)
+
+In 2021, Richmond Memorial Health Foundation (RMHF) and PlanRVA commissioned a second Market Value Analysis (MVA) of the Richmond region. The MVA is a "is a data-based, field-validated analysis and mapping of a community’s housing market." Richmond's MVA provides fine-grained data analysis of neighborhood changes and trends, including residential vacancy and investor sales.
+
+Learn more about the MVA [here](https://rmhfoundation.org/resource/richmond-memorial-health-foundation-co-sponsored-analysis-of-the-richmond-areas-housing-market-reveals-important-trends-for-residents-policymakers-and-investors/).
+
+:::
 
 Conversely, Chesterfield and Henrico each had over 1,000 homes built between 2000 and 2009 change from renter- to owner-occupied. The largest losses in rental stock, however, occurred in Richmond among homes built prior to 1980. Several factors could explain this decline:
 
@@ -242,7 +253,7 @@ ggplot(pha_cbps,
 
 ### Average market asking rent
 
-Rental demand reached a fever pitch amid the ongoing COVID-19 pandemic. With eviction moratoriums and a flow of rental assistance, low supply gave way to historic rent increases. The average market asking rent in the region reached a two-decade high of \$1,395 in the first quarter of 2022.
+Rental demand reached [a fever pitch amid the ongoing COVID-19 pandemic](https://richmond.com/news/local/rent-in-richmond-region-surged-during-the-pandemic-two-bedroom-apartments-average-1-340-a/article_751d018b-b5b4-5592-9582-9e825bda674b.html). With eviction moratoriums and a flow of rental assistance, low supply gave way to historic rent increases. The average market asking rent in the region reached a two-decade high of \$1,395 in the first quarter of 2022.
 
 ```{r}
 #| label: fig-avg-rent

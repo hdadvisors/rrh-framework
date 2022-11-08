@@ -37,6 +37,8 @@ years <- 2016:2020
 
 ```
 
+This chapter covers trends among populations that experience a disability that may impact their ability to access and maintain housing.
+
 ## Independent living difficulty
 
 In the American Community Survey (ACS), the Census Bureau collects a range of characteristics to capture the range of different disability types found in the population. One important disability type available in ACS data is *independent living difficulty*, which includes persons who:

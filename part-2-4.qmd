@@ -37,11 +37,19 @@ pal <-colorFactor(palette = c("#440154FF", "#31688EFF","#35B779FF", "#FDE725FF")
                   levels = c("Richmond City", "Hanover", "Henrico", "Chesterfield"))
 
 ```
+This chapter covers trends in naturally-occurring affordable housing (NOAH), or market affordable housing.
 
 ## Naturally-occurring affordable housing
 
-Not all affordable housing is supported by public subsidy. In fact, a large share of affordable housing is privately-owned and receives no government assistance. Widely referred to as naturally occurring affordable housing (NOAH), or market-affordable housing, these properties are a growing concern for communities facing housing affordability challenges.
+Not all affordable housing is supported by public subsidy. In fact, a large share of affordable housing is privately-owned and receives no government assistance. Widely referred to as [naturally occurring affordable housing (NOAH)](https://www.mckinsey.com/industries/public-and-social-sector/our-insights/preserving-the-largest-and-most-at-risk-supply-of-affordable-housing), or market-affordable housing, these properties are a growing concern for communities facing housing affordability challenges.
 
+:::{.callout-note}
+
+## Is it really "naturally-occurring"?
+
+Many experts consider NOAH to be a [misnomer](https://cityobservatory.org/the-myth-of-naturally-occurring-affordable-housing/) because there is nothing "natural" about the affordability of these properties. Some prefer ["market-rate affordable"](https://www.allianceforhousingsolutions.org/market-rate-affordable-housing). But regardless of the choice of term, this type of housing plays a pivotal, albeit precarious, role in providing localities with a significant amount of affordable housing without government resources.
+
+:::
 The preservation of NOAH properties has been a growing strategy to support affordable housing in communities as the ability to quickly develop new units has been stifled by labor shortages, rising land prices, and supply chain issues. NOAH is at great risk of being lost because it often requires greater investment to maintain and more likely to be redeveloped---in turn contributing to a loss of affordable housing units.
 
 ::: callout-note
