@@ -489,8 +489,8 @@ The eviction landscape changed dramatically during the COVID-19 pandemic when th
 #| label: fig-evictions
 #| fig.cap: "Evictions filings and judgements by locality"
 
-evictions <- read_csv("data/evictions_17_22.csv") |>
-  pivot_longer(3:128,
+evictions <- read_csv("data/evictions_17_22.csv") %>% 
+  pivot_longer(3:142,
                names_to = "data",
                values_to = "value") |>
   mutate(type = case_when(
@@ -513,7 +513,7 @@ ggplot(evictions,
     scale_x_date(labels = label_date_short(), breaks = breaks_width("6 months")) +
   scale_y_continuous(labels = label_comma()) +
   labs(title = "Evictions filings and judgements by locality",
-       subtitle = "January 2017 to March 2022",
+       subtitle = "January 2017 through October 2022",
        caption = "Source: RVA Eviction Lab") +
   scale_fill_manual(values = eviction_colors) +
   theme(legend.position = "bottom",
@@ -527,7 +527,7 @@ ggplot(evictions,
 
 ```
 
-These measures led to dramatic decreases in both the number of filings and eviction judgements across the region. However, the eviction moratorium's official end in Virginia on June 30, 2022, brings about concerns among advocates and service providers over a potential wave of evictions and homelessness in the coming months.
+These measures led to dramatic decreases in both the number of filings and eviction judgements across the region. However, the eviction moratorium's official end in Virginia on June 30, 2022, brings about concerns among advocates and service providers over a potential wave of evictions and homelessness in the coming months. The last quarter of 2022 has already seen major increases in evictions that are well on their way to exceeding pre-pandemic levels.
 
 ```{r}
 #| label: fig-evict-avg
@@ -561,7 +561,7 @@ ggplot(eviction_avg,
 
 ```
 
-Eviction filings should continue to be monitored over the coming months. The RVA Eviction Lab has been at the forefront of this data collection and analysis, and will continue to be a resource for the region in understanding the increasing risks for renters with renter protections and resources coming to an end.
+Eviction filings should continue to be monitored over the coming months. The [RVA Eviction Lab](https://rampages.us/rvaevictionlab/) has been at the forefront of this data collection and analysis, and will continue to be a resource for the region in understanding the increasing risks for renters with renter protections and resources coming to an end.
 
 ## Housing Resource Line
 
