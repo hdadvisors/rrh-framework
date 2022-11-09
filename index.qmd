@@ -1,9 +1,5 @@
 # About {.unnumbered}
 
-::: callout-note
-This report is currently in development. It was last updated on **`r Sys.Date()`**.
-:::
-
 This report is a data update for the Richmond Regional Housing Framework, which was [released](https://pharva.com/framework/about-the-framework/) by the Partnership for Housing Affordability (PHA) in January 2020. It will support PHA's ongoing efforts to educate both decision-makers and the public at large about the region's housing needs and opportunities. Data in the report will also help PHA continue to monitor, change, and implement the policy solutions outlined in the Framework.
 
 There are four parts in this report:
