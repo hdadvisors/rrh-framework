@@ -1,9 +1,8 @@
-# Town of Ashland {#part-4-9}
+# Powhatan County {#part-4-9}
 
-This chapter is a summary of the major changes to the Town of Ashland's population and housing market in the past five years. Although Ashland resides in Hanover County, the town sees some differences in population and housing trends from the rest of the county. 
+This chapter is a summary of the major changes to the Powhatan County's population and housing market in the past five years.
 
-```{r}
-#| label: setup
+```{r setup}
 
 library(tidyverse)
 library(tidycensus)
@@ -17,115 +16,50 @@ library(readxl)
 library(zoo)
 library(lubridate)
 library(janitor)
-library(viridis)
-library(kableExtra)
-library(leaflet)
+library(tigris)
 library(optiRum)
+library(kableExtra)
 
-tenure <- c("Homeowner", "Renter")
-tenure_colors <-setNames(viridis(2), nm = tenure)
+years <- 2016:2020
+fips <- 51145
+name <- "Powhatan County"
+costar_name <- "Powhatan County"
 
-```
-
-```{r}
-ashland <- st_read('https://services2.arcgis.com/sKZWgJlU6SekCzQV/arcgis/rest/services/Ashland_Boundary/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson', quiet = TRUE)
-
-leaflet(ashland) %>% 
-  addTiles() %>% 
-  addPolygons()
 
 ```
 
 ## Takeaways
 
-- The Town of Ashland saw recent declines in population, but is still expected to grow --- reaching nearly 10,000 residents by 2050.
-- More and more younger adults are coming to the town; mainly renter households with children and homeowners living alone.
-- Home prices and rent continue to rise with the influx of higher earning households --- especially higher income renters.
-- In contrast to other localities, homeowners are increasingly see cost burden compared to renters who are seeing less.
-
+- Powhatan County is growing like many other parts of the region --- passing the 30,000 mark in 2020.
+- More and more homeowners without children have been moving into the county --- nearly 600 households between 2016 and 2020.
+- Unlike other localities, the county saw a decrease of nearly 100 seniors living alone between 2016 and 2020.
+- Median renter household income in the county saw a 20 percent increase in recent years, while fewer and fewer renters in the county.
+- Although only 29 enrolled students experienced homelessness during the 2019-2020 school year, this was a doubling from 2016-2017 when the count was at 15.
 
 ## Demographic and socioeconomic changes
 
 ### Population changes
 
-The gradual population growth that Ashland was seeing throughout the last decade took a change in course between 2019 and 2020. Between these years, it was estimated that Ashland's population declined by 310 individuals. This was a greater decrease than the town's last recorded population decrease between 2010 and 2011, when the town population declined by 38. The small population of Ashland may warrant some caution in describing trends between American Community Survey estimates and decennial census counts.
+Despite a dip in population from 2014 to 2015, Powhatan County has been on an upward trend for the most part. In 2020, the county reached a population of 30,333 --- an overall increase of 8 percent since 2010.
 
 ```{r}
-#| label: pop-data
-#| echo: false
+#| label: fig-pop
+#| fig-cap: !expr "paste0(name, \": Total Population\")"
 
+# Add choice of population stat (net change, components, etc)
 
-ashland_pop <- get_estimates(
-  geography = "place",
-  state = "VA",
-  variables = "POP",
-  year = 2019,
-  time_series = TRUE
-) %>% 
-  filter(NAME == "Ashland town, Virginia")
+pop <- read_rds("data/rr_pop_data.rds") |> 
+  mutate(GEOID = parse_number(GEOID)) |> 
+  filter(counttype != "Forecast",
+         GEOID == fips)
 
-ashland_20 <- get_decennial(
-  geography = "place",
-  state = "VA",
-  year = 2020,
-  sumfile = "pl",
-  variables = "P1_001N"
-) %>% 
-  filter(NAME == "Ashland town, Virginia")
-
-ashpop_clean <- ashland_pop |>
-  filter(!DATE %in% c(2, 3)) |> # Remove non-decennial 2010 counts
-  mutate(year = # Translate date codes into years
-    case_when(
-      DATE == 1 ~ "2010",
-      DATE == 4 ~ "2011",
-      DATE == 5 ~ "2012",
-      DATE == 6 ~ "2013",
-      DATE == 7 ~ "2014",
-      DATE == 8 ~ "2015",
-      DATE == 9 ~ "2016",
-      DATE == 10 ~ "2017",
-      DATE == 11 ~ "2018",
-      DATE == 12 ~ "2019")) |> 
-  mutate(counttype = # Add descriptions to count types
-      case_when(
-        DATE == 1 ~ "Census population",
-        TRUE ~ "Population estimate")) |> 
-  select( # Simplify columns
-    GEOID,
-    year,
-    counttype,
-    value
-  )
-
-# Prep total population counts from 2020 Census summary file
-
-census_clean <- ashland_20 |> 
-  mutate(year = "2020", # Add year and count type columns
-         counttype = "Census population") |>
-  select( # Simplify columns
-    GEOID,
-    year,
-    counttype,
-    value
-  )
-
-population_data <- ashpop_clean |> 
-  bind_rows(census_clean)
-
-```
-
-```{r}
-#| label: fig-ash-pop
-#| fig-cap: "Town of Ashland: Total Population"
-
- ggplot(population_data,
-        aes(x = year,
-            y = value,
-            fill = value)) +
+pop_bar <- ggplot(pop,
+                      aes(x = year,
+                          y = value,
+                          fill = value)) +
   geom_col() +
   scale_fill_continuous(viridis_pal()) +
-  labs(title = "Town of Ashland: Total Population",
+  labs(title = paste0(name, ": Total Population"),
        subtitle = "2010 to 2020",
        caption = "Source: U.S. Census Bureau Decennial Census and American Community Survey.") +
   scale_y_continuous(labels = label_comma()) +
@@ -136,208 +70,59 @@ population_data <- ashpop_clean |>
         panel.grid.major.y = element_line(color = "grey95",
                                           size = 0.05))
 
+pop_bar
 
 ```
-Population projections produced by the University of Virginia's Weldon Cooper Center show that the town will continue to grow over the coming decades. By 2050, the Weldon Cooper Center expects Ashland to approach nearly 10,000 residents --- a 27 percent increase over 30 years.
+
+Like many other rural counties in the region, Powhatan County's population growth in recent years has been due to domestic migration. Between 2020 and 2021, 772 new residents came to the county from somewhere else within the country. 
 
 ```{r}
-#| label: pop-forecasts
+#| label: fig-comp
+#| fig-cap: !expr "paste0(name, \": Components of population change\")"
 
-years <- c(2020, 2030, 2040, 2050)
-estimate <- c(7565, 8142, 8824, 9638)
-type <- c("Census", "Forecast", "Forecast", "Forecast")
+change <- read_rds("data/rr_comp_change.rds") |> 
+  filter(year %in% as.character(years) | year == "2021") |> 
+  filter(NAMELSAD == name)
 
-forecast <- data.frame(year = years,
-                       estimate = estimate,
-                       type = type)
-
-
-ggplot(forecast,
+ggplot(change,
        aes(x = year,
-           y = estimate,
-           fill = type,
-           label = label_comma()(estimate))) +
+           y = value,
+           fill = component)) +
   geom_col() +
-  geom_text(vjust= 1.5,
-            color="white",
-            size = 3,
-            fontface="bold") +
-  scale_y_continuous(labels = label_comma()) +
+  facet_wrap(~component) +
+  labs(title = paste0(name,": Components of population change"), 
+       subtitle = "2016 through 2021",
+       fill = "Component of change",
+       caption = "Note: 2020 components of change data not available.\nSource: U.S. Census Bureau, Population Estimates Program.") +
   theme(axis.title = element_blank(),
+        legend.position = "none",
+        panel.background = element_blank(),
         axis.ticks = element_blank(),
         panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        panel.background = element_blank()) +
-  labs(title="Town of Ashland: Population projections",
-       subtitle="Town Population in 2020 and forecast to 2050",
-       fill="Estimate type",
-       caption="Source: University of Virginia Weldon Cooper Center for Public Service")
-
-
-  
+                                          size = 0.05)) +
+  scale_y_continuous(labels = label_number(big.mark = ",", style_positive = "plus", style_negative = "minus"))
 
 ```
-
 
 ### Household characteristics
 
-From 2016 to 2020, Ashland has seen most of its household growth among homeowners between the ages of 25 and 44 years old (+342). Declines have mainly been among homeowner householders older than 45 years old (-249), while there has been an increase of renter households among this same age group.
+The county has seen a decreasing number of renter households across the board. But homeowners continue to come to the county --- especially homeowner households with no children. By 2020, there was an estimated 590 more homeowners with no children than in 2016.
 
 ```{r}
-#| label: hh-age-data
-#| eval: FALSE
+#| label: fig-children
+#| fig-cap: !expr "paste0(name, \": Change in households with children by tenure\")"
 
-years <- 2016:2020
+# Add choice of household stat (HHs with children, HHs with seniors, subfamilies, etc)
 
-b25007_vars <- load_variables(2020, "acs5") |>
-  filter(str_sub(name, end = 6) %in% "B25007")
+b25115 <- read_rds("data/b25115_data.rds") |> 
+  filter(NAME == name)
 
-b25007_raw <- map_dfr(years, function(yr){
-  b25007_pull <- get_acs(
-    geography = "place",
-    state = "VA",
-    table = "B25007",
-    year = yr,
-    survey = "acs5",
-    cache_table = TRUE
-  ) |>
-    mutate(year = yr)
-}) %>% 
-  filter(NAME == "Ashland town, Virginia")
-
-
-b25007_vars_cleaned <- b25007_vars |>
-  separate(label, into = c("est", "total", "tenure", "age"), sep = "!!") |>
-  select(variable = name, tenure, age) |>
-  drop_na() |>
-  mutate(tenure = case_when(
-    tenure == "Owner occupied:" ~ "Homeowner",
-    tenure == "Renter occupied:" ~ "Renter"
-  ))
-
-b25007_data <- b25007_raw |>
-  right_join(b25007_vars_cleaned, by = "variable") |>
-  select(NAME, GEOID, year, tenure, age, estimate, moe) |>
-  mutate(NAME = str_remove_all(NAME, "town, Virginia")) |>
-  mutate(age = case_when(
-    age == "Householder 15 to 24 years" ~ "Under 25 years old",
-    age == "Householder 25 to 34 years" ~ "25 to 44 years old",
-    age == "Householder 35 to 44 years" ~ "25 to 44 years old",
-    age == "Householder 45 to 54 years" ~ "45 to 64 years old",
-    age == "Householder 55 to 59 years" ~ "45 to 64 years old",
-    age == "Householder 60 to 64 years" ~ "45 to 64 years old",
-    age == "Householder 65 to 74 years" ~ "65 years and over",
-    age == "Householder 75 to 84 years" ~ "65 years and over",
-    age == "Householder 85 years and over" ~ "65 years and over"
-  )) |>
-  group_by(year, tenure, age) |>
-  summarise(estimate = sum(estimate)) |>
-  pivot_wider(names_from = year,
-              values_from = estimate) |>
-  select(tenure, age, `2016`, `2020`) |>
-  transform(change = `2020` - `2016`) |>
-  group_by(tenure, age) |>
-  summarise(change = sum(change)) |>
-  mutate(age = fct_relevel(age, "Under 25 years old")) |> 
-  group_by(tenure, age) |> 
-  summarise(change = sum(change))
-```
-
-```{r}
-#| label: fig-hh-age-plot
-#| fig.cap: "Change in households by age and tenure"
-
-ggplot(b25007_data,
-       aes(y = change, x =tenure, fill = tenure)) +
-  geom_col(position = "dodge") +
-  facet_wrap(~age, nrow = 1) +
-  scale_y_continuous(labels = label_comma()) +
-  labs(title="Change in households by age and tenure",
-       subtitle="2016 to 2020",
-       fill="Tenure",
-       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25007.") +
-  theme(axis.title = element_blank(),
-        axis.text.x = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        axis.ticks = element_blank()) +
-  scale_fill_manual(values = tenure_colors)
-
-```
-Households with children have only increased among renters in Hanover (+83) from 2016 to 2020 --- this is contrast to Hanover County as a whole, which is seeing an overall decrease in households with children. But the greatest household type to see growth in the town has been among nonfamily homeowner households (i.e. individuals living alone or with roommates) --- similarly to the county.
-```{r}
-#| label: hh-child-data
-#| eval: FALSE
-#| 
-years <- 2016:2020
-
-b25115_vars <- load_variables(2020, "acs5") |>
-  filter(str_sub(name, end = 6) %in% "B25115")
-
-b25115_raw <- map_dfr(years, function(yr){
-  b25115_pull <- get_acs(
-    geography = "place",
-    state = "VA",
-    table = "B25115",
-    year = yr,
-    survey = "acs5"
-  ) |>
-    mutate(year = yr)
-}) %>% 
-  filter(NAME == "Ashland town, Virginia")
-
-
-b25115_vars_cleaned <- b25115_vars |>
-  separate(label, into = c("est", "total", "tenure", "family", "type", "rel", "children"), sep = "!!") |>
-  select(variable = name, tenure, family, type, rel, children) |>
-  mutate(tenure = case_when(
-    tenure == "Owner occupied:" ~ "Homeowner",
-    tenure == "Renter occupied:" ~ "Renter"
-  )) |>
-  mutate(family = case_when(
-    family == "Family households:" ~ "Family household",
-    family == "Nonfamily households" ~ "Nonfamily household"
-  )) |>
-  mutate(type = case_when(
-    type == "Married-couple family:" ~ "Married household",
-    rel == "Male householder, no spouse present:" ~ "Single male household",
-    rel == "Female householder, no spouse present:" ~ "Single female household",
-    family == "Nonfamily household" ~ "Nonfamily household"
-  )) |>
-  mutate(children = case_when(
-    rel == "With own children of the householder under 18 years" ~ "With children",
-    rel == "No own children of the householder under 18 years" ~ "No children",
-    children == "No own children of the householder under 18 years" ~ "No children",
-    children == "With own children of the householder under 18 years" ~ "With children",
-    family == "Nonfamily household" ~ "Nonfamily household"
-  )) |>
-  select(variable, tenure, family, type, children) |>
-  drop_na()
-
-b25115_data <- b25115_raw |>
-  right_join(b25115_vars_cleaned, by = "variable") |>
-  select(GEOID, year, tenure, type, children, estimate) |>
-  pivot_wider(names_from = year,
-              values_from = estimate) |>
-  transform(change = `2020` - `2016`) |>
-  select(tenure, type, children, change) |>
-  group_by(tenure, children) |>
-  summarise(change = sum(change)) 
-
-```
-
-```{r}
-#| label: fig-hh-child-plot
-#| fig.cap: "Change in households with children by tenure"
-
-ggplot(b25115_data,
+ggplot(b25115,
        aes(x = children, y = change, fill = tenure)) +
   geom_col(position = "dodge") + 
   facet_wrap(~children, nrow = 1, scales = "free_x") +
-  scale_y_continuous(labels = label_comma()) +
-  labs(title = "Change in households with children by tenure",
+  scale_y_continuous(labels = label_number(style_positive = "plus", big.mark = ",")) +
+  labs(title = paste0(name, ": Change in households with children by tenure"),
        subtitle = "2016 to 2020",
        fill = "Tenure",
        caption = "Source: U.S. Census Bureau, American Community Survey, Table B25115.") +
@@ -347,76 +132,22 @@ ggplot(b25115_data,
         panel.grid.major.x = element_blank(),
         panel.grid.major.y = element_line(color = "grey95",
                                           size = 0.05),
-        axis.ticks = element_blank()) +
-  scale_fill_manual(values = tenure_colors)
+        axis.ticks = element_blank())
 
 ```
+The greatest increases in the senior population in the county have been among seniors in family households (either living with a spouse or are the head of household). In contrast to other localities, Powhatan County is seeing a decline in seniors in nonfamily households.
+
 
 ```{r}
-#| label: hh-seniors-data
-#| eval: FALSE
+#| label: fig-seniors
+#| fig-cap: !expr "paste0(name, \": Change in senior population by living arrangement\")"
 
-years <- 2016:2020
-
-b09020_vars <- load_variables(2020, "acs5") |>
-  filter(str_sub(name, end = 6) %in% "B09020")
-
-b09020_raw <- map_dfr(years, function(yr){
-  b09020_pull <- get_acs(
-    geography = "place",
-    state = "VA",
-    table = "B09020",
-    year = yr,
-    survey = "acs5"
-  ) |>
-    mutate(year = yr)
-}) %>% 
-  filter(NAME == "Ashland town, Virginia")
-
-b09020_vars_cleaned <- b09020_vars |>
-  separate(label, into = c("est", "total", "hhgq", "family", "relationship", "sex", "alone"), sep = "!!") |>
-  select(variable = name, hhgq, family, relationship, alone) |>
-  filter(!variable %in% c("B09020_001", "B09020_002", "B09020_003", "B09020_005", "B09020_006",
-                          "B09020_012", "B09020_013", "B09020_014", "B09020_017")) |>
-  mutate(relationship = case_when(
-    relationship == "Spouse" ~ "With spouse",
-    relationship == "Nonrelatives" ~ "With nonrelatives",
-    relationship %in% c("Parent", "Parent-in-law", "Other relatives") ~ "With other relative(s)",
-    hhgq == "In group quarters" ~ "Group quarters",
-    !is.na(alone) ~ alone,
-    TRUE ~ relationship
-  )) |>
-  mutate(family = case_when(
-    family == "In family households:" ~ "Family",
-    family == "In nonfamily households:" ~ "Nonfamily",
-    hhgq == "In group quarters" ~ "Group quarters"
-  )) |>
-  mutate(across(.fns = ~str_remove_all(.x, ":"))) |>
-  select(1,3,4)
-
-b09020_data <- b09020_raw |>
-  right_join(b09020_vars_cleaned, by = "variable") |>
-  select(GEOID, year, family, relationship, estimate) |>
-  group_by(year, family, relationship) |> 
-  summarise(estimate = sum(estimate)) |> 
-  pivot_wider(names_from = year,
-              values_from = estimate) |>
-  transform(change = `2020` - `2016`) |>
-  select(family, relationship, change) |>
-  group_by(family, relationship) |> 
-  summarise(change = sum(change)) |> 
-  ungroup() |>
+b09020 <- read_rds("data/b09020_data.rds") |> 
+  filter(NAME == name) |> 
   mutate(family = str_replace(family, "Group quarters", " "),
          family = fct_relevel(family, "Family", "Nonfamily", " "))
 
-```
-While the senior population has grown overall in Ashland (+107), that growth has been largely among seniors who live with other relatives (+225) or with a spouse (+52). Seniors who are head of households has declined in the town (-87), as well as the number of seniors living in group quarters (-69). Unlike the rest of the county, Ashland is not seeing major increases in seniors living alone.
-
-```{r}
-#| label: fig-hh-seniors-plot
-#| fig.cap: "Change in senior population by living arrangement"
-
-ggplot(b09020_data,
+ggplot(b09020,
        aes(y = reorder_within(relationship, change, family),
            x = change,
            fill = relationship)) +
@@ -424,7 +155,8 @@ ggplot(b09020_data,
   scale_y_reordered() +
   scale_x_continuous(labels = label_comma()) +
   facet_grid(rows = vars(family), scales = "free_y", space = "free", switch = "y") +
-  labs(title="Change in senior population by living arrangement",
+  #scale_y_discrete(labels = function(x) str_wrap(x, width = 10)) +
+  labs(title = paste0(name, ": Change in senior population by living arrangement"),
        subtitle="2016 to 2020",
        fill="Tenure",
        caption = "Source: U.S. Census Bureau, American Community Survey, Table B09020.") +
@@ -443,54 +175,16 @@ ggplot(b09020_data,
 
 ### Income and wages
 
-Household incomes have also shifted in Ashland. Although there still remains an income gap between the average homeowner and renter households, the gap has been narrowing in recent years. In 2016, there was an over \$22,000 difference between homeowner and renter median household incomes. But by 2020, that difference had declined to only \$6,364, as homeowner incomes declined and renter incomes increased. 
+Both homeowner and renter median household income has been on the incline from 2016 to 2020 in the county. For homeowners, there has been an increase of 8 percent, while renters experienced a 20 percent increase.
 
 ```{r}
-#| label: med-inc
-#| eval: false
+#| label: fig-income
+#| fig-cap: !expr "paste0(name, \": Median houshold income by tenure\")"
 
-years <- 2016:2020
+# Add choice of income stat (probably median household income of some kind)
 
-b25119_vars <- load_variables(2020, "acs5") %>% 
- filter(str_sub(name, end = 6) %in% "B25119")
-
-b25119_raw <- map_dfr(years, function(yr){
-  b25119_pull <- get_acs(
-    geography = "place",
-    state = "VA",
-    table = "B25119",
-    year = yr,
-    survey = "acs5",
-    cache_table = TRUE
-  ) |> 
-    mutate(year = yr)
-  }) %>% 
-  filter(NAME == "Ashland town, Virginia")
-
-b25119_vars_cleaned <- b25119_vars %>% 
-  separate(label, into = c("est", "lab", "total", "tenure"), sep = "!!") %>% 
-  select(variable = name, tenure) %>% 
-  drop_na() %>% 
-  mutate(tenure = case_when(
-    tenure == "Owner occupied (dollars)" ~ "Homeowner",
-    tenure == "Renter occupied (dollars)" ~ "Renter"
-  ))
-
-b25119_data <- b25119_raw %>% 
-  right_join(b25119_vars_cleaned, by = "variable") %>% 
-  select(year, tenure, estimate)
-
-cpi <- read_excel("data/CPI_U_RS.xlsx")
-cpi <- cpi |> 
-  rename(year = Year,
-         priceindex = Index) |> 
-  transform(year = as.numeric(year))
-
-b25119_cpi <- b25119_data |> 
-  left_join(cpi, by = 'year') |> 
-  transform(dollars20 = ((381.2/priceindex)*estimate)) |> 
-  select(year, tenure, dollars20, cdollars = estimate) |> 
-  select(year, tenure, dollars20, cdollars)
+b25119_cpi <-read_rds("data/b25119_cpi.rds") |> 
+  filter(NAME == name)
 
 ggplot(b25119_cpi, 
        aes(x = year,
@@ -499,7 +193,7 @@ ggplot(b25119_cpi,
   geom_col() +
   facet_wrap(~tenure) +
   scale_y_continuous(labels = dollar_format(), limits = c(0, NA)) +
-  labs(title = "Town of Ashland: Median houshold income by tenure", 
+  labs(title = paste0(name, ": Median houshold income by tenure"), 
        color = "Tenure",
        subtitle = "2016 to 2020 | Adjusted to 2020 dollars",
        caption = "Source: U.S. Census Bureau, American Community Survey") +
@@ -510,106 +204,217 @@ ggplot(b25119_cpi,
                                           size = 0.05),
         legend.position = "none")
 
-```
-
-## Housing supply and market changes
-
-### Homeownership
-
-Median home prices in Ashland had crossed into the \$400,000 range well before the pandemic, but from 2021 onward, median home price has remained above \$400,000 for the majority of the time. Homeownership demand in the town continues to drive prices upwards and the trend is expected to continue.
-
-```{r}
-
-# Data pulled on 2022-10-13
-
-annual_cpi <- read_csv("data/CPIAUCSL_annual.csv") %>% 
-  mutate(year = year(DATE)) %>% 
-  select(year, cpi = CPIAUCSL)
-
-ashland_medsales <- read_csv("data/ashland_med_sales.csv") %>% 
-  clean_names() %>% 
-  pivot_longer(cols = starts_with("sale"),
-    names_to = "label",
-    values_to = "med_price",
-    values_drop_na = TRUE
-  ) |> 
-mutate(year = substr(label, 19,23)) %>% 
-  select(year, month, med_price)
-
-ashland_medsales$month <- match(ashland_medsales$month, month.abb)
-
-ashland_medsales <- ashland_medsales %>% 
-  mutate(date = make_date(year, month)) %>% 
-  mutate(med_price = parse_number(med_price))
-
-cpi <- read_csv("data/CPIAUCSL.csv") %>% 
-  select(date = DATE, cpi = CPIAUCSL)
-
-ashland_priceadj <- ashland_medsales %>% 
-  left_join(cpi, by = "date") %>% 
-  mutate(dollars = ((295.271/cpi)*med_price)) %>%  
-  mutate(year = year(date)) %>% 
-  select(date, year, med_price, dollars, cpi) %>% 
-  filter(year >= 2017)
+# 16 percent increase for renters
+# 10 percent increase for homeowners
 
 ```
 
-```{r}
+### Persons with disabilities
 
-ggplot(ashland_priceadj,
-       aes(x = date, y = dollars, color = dollars)) +
-  geom_line(size = 1) +
-  scale_y_continuous(labels = label_dollar(), limits = c(0, NA)) +
-  scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
-  labs(title = "Monthly median sales price",
-       subtitle = "January 2017 to July 2022",
-       caption = "Source: Central Virginia Regional Multiple Listing Service.") +
+In the county, there has been an increase in individuals with independent living difficulties that are 65 years old and older (+204) between 2016 and 2020. For individuals younger than 65, there has been a decline in individuals with independent living difficulties.
+
+```{r}
+#| label: fig-ind-living
+#| fig-cap: !expr "paste0(name, \": Net change in individuals with independent living difficulties by age\")"
+
+# Add disability stat (probably independent living difficulty)
+
+b18107 <- read_rds("data/b18107_data.rds") |> 
+  filter(NAME == name) |> 
+  group_by(age) |> 
+  summarise(change = sum(change))
+
+ggplot(b18107,
+       aes(x = age,
+           y = change,
+           fill = age)) +
+  geom_col() +
+  labs(title=paste0(name, ": Net change in individuals with\nindependent living difficulties by age"),
+       subtitle="2016 to 2020",
+       caption="Source: U.S. Census Bureau, American Community Survey, Table B18107.") +
+  scale_y_continuous(labels = label_comma()) +
   theme(axis.title = element_blank(),
         axis.ticks = element_blank(),
         legend.position = "none",
         panel.background = element_blank(),
         panel.grid.major.x = element_blank(),
         panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
+```
+
+
+
+## Housing supply and market changes
+
+### Homeownership
+
+Powhatan County median home price has been on the rise. From a low of \$282,084 in March 2017 to a high of \$519,559 in May 2022, median home price in the county has increased nearly 84 percent. Although the over \$500,000 median home price may represent a seasonal spike, median home price has generally been trending upward and likely to stay above \$500,000 in the coming years.
+
+```{r}
+#| label: fig-sales
+#| fig-cap: !expr "paste0(name, \": Median home sales price\")"
+
+# Median sales price over time
+
+price <- read_csv("data/powhatan_med_sales.csv") |> 
+  clean_names() |> 
+  mutate(geography = name) |> 
+  pivot_longer(cols = starts_with("sale"),
+    names_to = "label",
+    values_to = "med_price",
+    values_drop_na = TRUE) |> 
+  mutate(year = substr(label, 19,23)) |> 
+  select(geography, year, month, med_price)
+
+price$month <- match(price$month, month.abb)
+
+price <- price |> 
+  mutate(date = make_date(year, month)) |> 
+  mutate(med_price = parse_number(med_price))
+
+cpi <- read_csv("data/CPIAUCSL.csv") |> 
+  select(date = DATE, cpi = CPIAUCSL)
+
+price_adj <- price |> 
+  left_join(cpi, by = "date") |> 
+  mutate(dollars = ((295.271/cpi)*med_price)) |> 
+  select(date, med_price, dollars) |> 
+  pivot_longer(2:3,
+               names_to = "type",
+               values_to = "dollars") |> 
+  filter(type == "dollars")
+
+ggplot(price_adj,
+       aes(x = date,
+           y = dollars,
+           color = dollars)) +
+  geom_line(stat = "identity", size = 1) +
+  scale_y_continuous(labels = label_dollar()) +
+  scale_x_date(date_labels = "%Y", date_breaks = "1 year") +
+  labs(title = paste0(name, ": Median home sales price"),
+       subtitle = "January 2017 to July 2022",
+       caption = "Source: Central Virginia Regional Multiple Listing Service.") +
+  theme(axis.title = element_blank(),
+        panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        legend.title = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
                                           size = 0.05)) +
   scale_color_continuous(type = "viridis", label = dollar_format()) + 
   geom_smooth(method = "lm")
+
 
 ```
 
 ### Rental
 
-From 2016 Q1 to 2021 Q1, average market asking rent in Ashland has been on a gradual increase --- just a 7 percent increase during this timeframe. But in 2021 onward, the Ashland rental market has seen a dramatic shift upward. From 2021 Q1 to 2022 Q3, rent growth has doubled to 15 percent in a shorter period of time. The median renter household further points to an increasing number of higher income earners demanding rental options in the town.
+Renter households have been in decline since 2016 when roughly one in ten households in the county were renters. This share has dropped by four percentage points down to 7 percent renter household in 2020. Despite the declining number of renter households in the county, 2021 saw the completion of 200 new rental units at the eastern edge of the county.
 
 ```{r}
+#| label: fig-renters
+#| fig-cap: "Renter households in Powhatan County"
 
-rent <- read_csv("data/ashland_rent.csv") %>%  
-  pivot_longer(2:3,
-               names_to = "rent",
-               values_to = "value") %>%  
-  mutate(period = as.Date(as.yearqtr(period, format = "%Y Q%q"), frac = 1)) %>%  
-  mutate(year = year(period)) %>%  
-  filter(year >= 2016) %>%  
-  mutate(rent = case_when(
-    rent == "rent" ~ "Nominal rent",
-    rent == "rent_adj" ~ "Inflation-adjusted rent"
-  ))
+b25003_vars <- load_variables(2020, "acs5") |> 
+  filter(str_sub(name, end = 7) %in% "B25003_")
 
-ggplot(rent,
-       aes(x = period,
-           y = value, 
-           color = rent)) +
-  geom_line(stat = "identity", size = 1) + 
-  labs(title = "Town of Ashland: Average asking rent by submarket",
-       subtitle = "2016 Q1 to 2022 Q3",
-       color = "Dollar value") +
-  scale_y_continuous(labels = label_dollar()) +
-  scale_x_date(date_labels = "%Y", date_breaks = "2 years", limits = as.Date(c("2016-01-01", "2022-09-30"))) +
+b25003_raw <- map_dfr(years, function(yr){
+   b25003_pull <- get_acs(
+    geography = "county",
+    state = "VA",
+    table = "B25003",
+    year = yr,
+    survey = "acs5"
+  ) |> 
+    mutate(year = yr)
+})
+
+b25003_vars_cleaned <- b25003_vars |> 
+  separate(label, into = c("est", "total", "tenure"), sep = "!!") |> 
+  select(variable = name, tenure) |> 
+  mutate(tenure = case_when(
+    tenure == "Owner occupied" ~ "Homeowner",
+    tenure == "Renter occupied" ~ "Renter"
+  )) |> 
+  drop_na()
+
+b25003_raw <- b25003_raw |> 
+  filter(GEOID %in% fips)
+
+b25003_data <- b25003_raw |> 
+  right_join(b25003_vars_cleaned, by = "variable") |> 
+  select(NAME, GEOID, year, tenure, estimate) |> 
+  mutate(NAME = str_remove_all(NAME, ", Virginia")) |>
+  group_by(NAME, year) |> 
+  mutate(pct = (estimate/sum(estimate))) |> 
+  filter(tenure == "Renter")
+
+ggplot(b25003_data,
+       aes(x = year,
+           y = pct,
+           fill = pct)) +
+  geom_col() +
   theme(axis.title = element_blank(),
-        panel.background = element_blank(),
-        axis.ticks = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+        legend.position = "none") +
+  scale_y_continuous(labels = percent_format()) +
+  labs(title = "Percent of renter households in Powhatan County", 
+       fill = "Percent of total households",
+       subtitle = "From 2016 to 2020",
+       caption = "Source: U.S Census Bureau. American Community Survey 2016-2020 5-Year Estimates. Table B25003.")  + 
+  geom_text(aes(label = percent(pct)),
+            color = "white",
+            vjust = 1)
+
+
+```
+CoStar lists three multifamily properties in the county; two are located along Old Buckingham Road near the county seat, while the third is located at the eastern edge of the county near Midlothian. There was a 39 year period between the construction of both Powhatan Apartment buildings and the Artistry. 
+
+The development of the Artistry at Winterfield potentially represents growing housing demand from the western edge of Chesterfield County's Midlothian community. This luxury multifamily property has an average asking rent of \$1,888. 
+
+```{r}
+#| label: tbl-mf-list
+#| tbl-cap: "Powhatan County: Multifamily properties"
+
+names <- c("Artistry at Winterfield", "Powhatan Apartments", "Powhatan Apartments")
+units <- c(200, 11, 11)
+rating <- c(4, 2, 3)
+year <- c(2021, 1982, 1982)
+vacancy <- c("7.8%", "4.6%", "4.6%")
+
+mf_tbl <- data.frame(names, year, rating, vacancy, units)
+
+mf_tbl |> kable(align = "lcccr",
+        col.names = c("Property name", "Year built", "CoStar rating", "Vacancy rate", "Units")) |> 
+  kableExtra::kable_styling(
+    bootstrap_options = c("condensed", "striped", "hover"))
+
+
+```
+
+### Housing assistance
+
+The National Housing Preservation Database lists no federally-assisted housing properties in New Kent County. 
+
+### Naturally-occurring affordable housing
+
+Powhatan Apartments (both locations) represent the county's naturally-occurring affordable housing based on the definition of NOAH outlined in this report. Rent data is unavailable for Powhatan Apartments via CoStar.
+
+In addition to Powhatan Apartments, there is a small manufactured home community located near the cross roads of Maidens Road (US-522) and Huguenot Trail that consists of at least six homes.
+
+```{r}
+#| label: fig-mhc
+#| fig-cap: !expr "paste0(name, \": Manufactured home communities\")"
+
+mhc <- st_read("https://services1.arcgis.com/Hp6G80Pky0om7QvQ/arcgis/rest/services/Mobile_Home_Parks/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson", quiet = TRUE) |> 
+  filter(STATE == "VA",
+         COUNTY == "POWHATAN")
+
+library(leaflet)
+
+leaflet(mhc) |> 
+  addTiles() |> 
+  addCircleMarkers()
 
 ```
 
@@ -617,84 +422,20 @@ ggplot(rent,
 
 ### Affordability of current housing stock
 
-In the Town of Ashland, renter median household incomes have been growing --- allowing for the average renter to afford higher rents. In 2020, the typical Ashland renter household could afford a rent of \$1,234 without being cost-burdened. This rent is \$275 more than what the average asking rent in 2020 was. 
-
-Although this suggests that renters in the town are more able to afford rental housing, it could also point to lower income renter households having to move elsewhere in order to afford housing.
+With increasing renter household incomes in the county, the gap between income needed to afford the typical home price and typical renter income has been narrowing. In 2016, the gap stood at nearly \$12,000, but by 2020 the gap had decreased to just below \$7,000. 
 
 ```{r}
+#| label: fig-income-own-gap
+#| fig-cap: !expr "paste0(name, \": Income needed to afford median home price\nversus median renter income\")"
 
-years <- 2016:2020
+# Compare local renter income versus local home prices
 
-b25119_vars <- load_variables(2020, "acs5") %>% 
- filter(str_sub(name, end = 6) %in% "B25119")
-
-b25119_raw <- map_dfr(years, function(yr){
-  b25119_pull <- get_acs(
-    geography = "place",
-    state = "VA",
-    table = "B25119",
-    year = yr,
-    survey = "acs5",
-    cache_table = TRUE
-  ) |> 
-    mutate(year = yr)
-  }) %>% 
-  filter(NAME == "Ashland town, Virginia")
-
-b25119_vars_cleaned <- b25119_vars %>% 
-  separate(label, into = c("est", "lab", "total", "tenure"), sep = "!!") %>% 
-  select(variable = name, tenure) %>% 
-  drop_na() %>% 
-  mutate(tenure = case_when(
-    tenure == "Owner occupied (dollars)" ~ "Homeowner",
-    tenure == "Renter occupied (dollars)" ~ "Renter"
-  ))
-
-b25119_data <- b25119_raw %>% 
-  right_join(b25119_vars_cleaned, by = "variable") %>% 
-  select(year, tenure, estimate)
-
-ashland_rent <- read_csv("data/ashland_annual_rent.csv")
-
-rentgap <- b25119_data %>% 
-  filter(tenure == "Renter") %>% 
-  left_join(ashland_rent, by = "year") %>% 
-  mutate(affordable_rent = (estimate/12)*.30) %>% 
-  select(year, rent, affordable_rent) %>% 
-  pivot_longer(2:3, 
-               names_to = "label",
-               values_to = "rent") %>% 
-  mutate(label = case_when(
-    label == "rent" ~ "Current rent",
-    label == "affordable_rent" ~ "Affordable rent"
-  ))
-
-ggplot(rentgap,
-       aes(x = year,
-           y = rent,
-           fill = label)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  scale_y_continuous(labels = label_dollar()) +
-  labs(title = "Town of Ashland: Average asking rent versus\nrent affordable to median renter income",
-       subtitle = "2016 to 2020",
-       fill = "Nominal rent",
-       caption = "Sources: U.S. Census Bureau, American Community Survey, Table B25119\nand CoStar Group Inc.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
-
-
-
-
-```
-
-In spite of increasing incomes among renters in the town, the high price of homeownership continues to keep renters from moving to more permanent tenureship. In 2016. the gap between income needed to afford the median home price and the typical renter income was just over \$17,000. By 2020, that gap had only decreased by about \$2,000 --- leaving the typical renter \$15,241 away from being able to afford the median home price in 2020 (\$305,000).
-```{r}
-
-
-ashland_medsales <- read_csv("data/ashland_mls_medsales.csv")
+rr_sales_annual <- read_csv("data/rr_annual_sales.csv") |> 
+  pivot_longer(cols = 2:9,
+               names_to = "locality",
+               values_to = "price") |> 
+  clean_names() |> 
+  filter(locality == costar_name)
 
 int_annual <- read_csv("data/fredmac_int_annual.csv")
 
@@ -702,31 +443,35 @@ downpayment <- 0.05 # 5% downpayment
 closingcosts <- 0.015 # 1.5% closing costs
 utilities <- 250 # Assume $250/month for utilities
 
-slgap <- b25119_data %>% 
-  filter(tenure == "Renter") %>% 
-  left_join(ashland_medsales, by = "year") %>% 
+b25119_cpi <- b25119_cpi |> 
+  filter(tenure == "Renter")
+
+sale <- rr_sales_annual |> 
+  left_join(b25119_cpi, by = "year") |> 
   left_join(int_annual, by = "year") |> 
   drop_na() |> 
   mutate(principal = price - (price*downpayment)) |> 
   mutate(loanamt = principal/(1-closingcosts)) |> 
   mutate(mortgage = abs(PMT((annual_int/12), 360, loanamt)) + 250) |> 
   mutate(inc_needed = ((mortgage*10)/2.8)*12) |> 
-  select(year, inc_needed, estimate) %>% 
+  select(year, inc_needed, cdollars)
+
+slgap <- sale |> 
   pivot_longer(2:3,
-               names_to = "label",
-               values_to = "dollars") |> 
-  mutate(label = case_when(
-    label == "estimate" ~ "Renter median household income",
-    label == "inc_needed" ~ "Income needed to afford median home price"
+               names_to = "data",
+               values_to = "value") |> 
+  mutate(data = case_when(
+    data == "cdollars" ~ "Renter median household income",
+    data == "inc_needed" ~ "Income needed to afford median home price"
   ))
-  
+
 ggplot(slgap,
        aes(x = year,
-           y = dollars,
-           fill = str_wrap(label, 25))) +
+           y = value,
+           fill = str_wrap(data, 25))) +
   geom_bar(stat = "identity", position = "dodge") +
   scale_y_continuous(labels = label_dollar()) +
-  labs(title = "Town of Ashland: Income needed to afford median home price\nversus median renter income",
+  labs(title = paste0(name, ": Income needed to afford median home price\nversus median renter income"),
        subtitle = "2016 to 2020",
        fill = "Nominal income",
        caption = "Sources: U.S. Census Bureau, American Community Survey, Table B25119\nand Central Virginia Regional Multiple Listing Service.") +
@@ -736,36 +481,110 @@ ggplot(slgap,
         panel.grid.major.y = element_line(color = "grey95",
                                           size = 0.05),
         legend.key.height=unit(1, "cm"))
-    
+
 
 ```
-In contrast to other localities, homeowner cost burden has increased in Ashland. From 2015 to 2019, there has been an increase of 57 cost-burdened homeowner households --- a 19 percent increase. However, the number of cost-burdened renter households decreased from 690 to 580 --- a 16 percent decrease.
+
+As of 2018, there was a 70 unit rental home shortage for households making less than 80 percent AMI. This was a major decline from 2015 when the shortage was 215 --- mainly for 30 percent AMI or less households. The deficit has decreased significantly among extremely and very low-income households, but has increased for higher income households.
+
 ```{r}
+#| label: fig-gap
+#| fig-cap: !expr "paste0(name, \": Rental housing gap by AMI\")"
 
-ashland_cb <- read_csv("data/ashland_cb.csv")
+# Add choice of affordability stat (surplus/deficit, income vs prices, etc)
 
-ashland_cb_cln <- ashland_cb %>% 
-  group_by(year, grouping) %>% 
-  summarise(Homeowner = sum(Homeowner),
-            Renter = sum(Renter)) %>% 
-  pivot_longer(3:4,
-               names_to = "tenure",
-               values_to = "estimate") %>% 
-  mutate(year = as.character(year)) %>% 
-  filter(grouping == "Cost-burdened")
+gap <- read_rds("data/tb_18_match.rds") |> 
+  filter(county == name) |> 
+  group_by(year, household_income, gapcode) |>
+  summarise(estimate = sum(estimate)) |>
+  mutate(estimate = case_when(
+    gapcode == "Gap" ~ estimate * -1,
+    gapcode == "Matches or less than income" ~ estimate
+  )) |>
+  mutate(gapcode = case_when(
+    gapcode == "Gap" ~ "Shortage of units",
+    gapcode == "Matches or less than income" ~ "Households at or less than income"
+  )) |>
+  filter(household_income != "80 percent AMI or greater")
 
-ggplot(ashland_cb_cln,
-       aes(x = year,
+ggplot(gap,
+       aes(x = year, 
            y = estimate,
-           fill = factor(grouping, levels = c("Not computed", "Cost-burdened", "Not cost-burdened")))) +
-  geom_col(position = "stack") +
-  facet_wrap(~tenure) +
-  labs(title = "Town of Ashland: Cost burden by tenure",
-       subtitle = "In 2015 and 2019",
-       fill = "Cost burden") +
-  scale_y_continuous(labels = number_format(big.mark = ",")) +
+           fill = gapcode)) +
+  geom_bar(stat = "identity") +
+  facet_grid(~household_income) +
+  scale_y_continuous(labels = label_comma()) +
+  labs(title = paste0(name, ": Rental housing gap by AMI"),
+       subtitle = "2015 to 2018",
+       caption = "Source: U.S. Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
   theme(axis.title = element_blank(),
-        legend.position = "none")
-  
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        legend.position = "bottom",
+        legend.title = element_blank())
+
+```
+
+### Impact of housing costs
+
+The share of cost-burdened renters has decreased from nearly 38 percent of renter households to 26 percent in a short period. For homeowners, the share of cost-burdened households has decreased by 8 percentage points --- going from 24 percent to 16 percent over four years.
+
+```{r}
+#| label: fig-cb
+#| fig-cap: !expr "paste0(name, \": Share of cost-burdened households by tenure\")"
+
+cb <- read_rds("data/cb_7.rds") |> 
+  filter(county == name) |> 
+  group_by(year, tenure, cb_group) |> 
+  summarise(estimate = sum(estimate)) |> 
+  mutate(pct = estimate/sum(estimate))
+
+ggplot(cb,
+       aes(x = year, y = pct, fill = cb_group)) +
+  facet_wrap(~tenure) +
+  geom_col(position = position_fill(reverse = TRUE)) +
+  scale_y_continuous(labels = percent_format()) +
+  labs(title = paste0(name, ": Share of cost-burdened households by tenure"),
+       subtitle = "2015 to 2018",
+       fill = "Cost burden",
+       caption = "Source: U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05))
+
+```
+
+Available data from William and Mary's Project HOPE shows that the number of enrolled students experiencing homelessness in the county has increased in recent years. The county's McKinney-Vento Act data showed that the number of students experiencing homeless has doubled from the 2016-2017 school year when the number was 15. By the 2019-2020, that number was 29.
+
+```{r}
+#| label: fig-mkv
+#| fig-cap: !expr "paste0(name, \"Enrolled students experiencing homelessness by school year\")"
+
+div <- 72
+
+mkv <- read_csv("data/mkv.csv") |> 
+  subset(Division %in% div)
+
+ggplot(mkv,
+       aes(x = year,
+           y = students,
+           fill = Name)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~Name) +
+  labs(title = "Enrolled students experiencing homelessness by school year",
+       subtitle = "2016-2017 to 2019-2020",
+       caption = "William & Mary School of Education, Project HOME - Virginia.") +
+  theme(axis.title = element_blank(),
+        legend.position = "none",
+        panel.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "grey95",
+                                          size = 0.05),
+        axis.ticks = element_blank()) +
+  scale_y_continuous(labels = label_comma())
 
 ```

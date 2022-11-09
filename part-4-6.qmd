@@ -1,8 +1,9 @@
-# Goochland County {#part-4-6}
+# Charles City County {#part-4-6}
 
-This chapter is a summary of the major changes to the Goochland County's population and housing market in the past five years.
+This chapter is a summary of the major changes to the Charles City County's population and housing market in the past five years.
 
-```{r setup}
+```{r}
+# label: setup
 
 library(tidyverse)
 library(tidycensus)
@@ -20,27 +21,25 @@ library(tigris)
 library(optiRum)
 
 years <- 2016:2020
-fips <- 51075
-name <- "Goochland County"
-costar_name <- "Goochland County"
+fips <- 51036
+name <- "Charles City County"
+costar_name <- "Charles City County"
 
 
 ```
 
 ## Takeaways
 
-- After brief declined in the early 2010s, Goochland County's population has been growing steadily since 2012.
-- The majority of population change in the county has been due to domestic migration. Between 2020 and 2021, the county saw 738 new residents from other parts of the region, state, or nation.
-- Homeowners have seen increasing median incomes in the county, while renter median renter income gains disappeared by 2020. 
-- Despite the COVID-19 pandemic demand, median home price in Goochland County has remained relatively flat, but still among the highest in the region --- averaging in the \$500,00s.
-- New rental properties along the eastern border of the county have driven average asking rents well into the $2,000s.
-- Cost burden has been in decline for both homeowner and renter households, but nearly one in four renter households in the county remain cost-burdened as of 2018.
+- Population decline in the last decade in Charles City County has largely been the result of natural decreases.
+- Although there are fewer renters in the county than there were in 2016, affordability challenges remain.
+- Median renter income has decreased by 22 percent between 2016 and 2020, while the income needed to afford the median home price has only increased.
+- There is now a nearly $17,000 gap between the typical renter household income and the income needed to afford the typical home price.
 
 ## Demographic and socioeconomic changes
 
 ### Population changes
 
-Despite an initial decline in the early 2010s, Goochland County's population has been on a steady increase since 2012. From 2012 to 2020, the population has increased by 16 percent to reach 24,727 residents. Much of this growth can be tied to development in the eastern part of the county, where development activity Goochland-Henrico border has been increasing.
+In Charles City, population has been decreasing between 2010 and 2020 --- going from 7,256 to 6,773, a loss of 483 residents. These changes reflect a trend among many Virginia rural localities as job opportunities leave and fewer and fewer adults have children.
 
 ```{r}
 #| label: fig-pop
@@ -70,13 +69,11 @@ pop_bar <- ggplot(pop,
         panel.grid.major.y = element_line(color = "grey95",
                                           size = 0.05))
 
-# ggplotly(pop_bar) |> 
-#   plotly_camera()
-
 pop_bar
 
 ```
-The growth in population is due in large part to domestic migration. Between 2020 and 2021, 738 new residents arrived in the county from somewhere else in the region, state, or nation. 
+
+The components of population change for Charles City County showed that, in 2016 and 2017, people were moving to the county from other parts of the state or country. But natural decreases have consistently outpaced any and all growth within the county until 2021, when domestic migration joined natural decreases in contributing to the county's population loss.
 
 ```{r}
 #| label: fig-comp
@@ -108,8 +105,7 @@ ggplot(change,
 
 ### Household characteristics
 
-All types of households are seeing an increase in the county --- especially homeowner households. Renter households have also seen a net increase in the county between 2016 and 2020, but that growth has mainly been among nonfamily renter households (+119), which typically refers to households that live alone or with a roommate.
-
+The changes in household types in Charles City County have been only a fraction of the overall population. But from 2016 to 2020, there has been an overall decrease in households with children in the county --- both among homeowners and renters (-48). The only major increaes has been among nonfamily homeowner households (+146). This is most likely attributable to an increasing number of seniors living alone.
 
 ```{r}
 #| label: fig-children
@@ -139,7 +135,7 @@ ggplot(b25115,
 
 ```
 
-The senior population has been growing in the county (+996). Although much of that growth has occurred among seniors living with family, 27 percent of the increase was among seniors living alone.
+The senior population in the county increased by 251 between 2016 and 2020. Much of that growth occurred among seniors who were the head of their family household (+130), followed by seniors living alone (+49).
 
 ```{r}
 #| label: fig-seniors
@@ -178,7 +174,9 @@ ggplot(b09020,
 
 ### Income and wages
 
-Median homeowner household income has been growing in Goochland County. From 2016 to 2020, the typical homeowner household income increased by 14 percent. Renter households saw some initial increases in median household income from 2016 to 2019, but between 2019 and 2020, median renter household income actually decreased by 18 percent (-\$10,291). 
+For homeowners in the county, there has been very little change in median household income. When adjusted for inflation, homeowner median household income has only increased by 2 percent --- from \$65,077 in 2016 to \$66,719 in 2020.
+
+Renters in the county have seen a decrease in median household income by 22 percent --- falling nearly \$10,000 to \$33,661 in 2020.
 
 ```{r}
 #| label: fig-income
@@ -207,15 +205,19 @@ ggplot(b25119_cpi,
                                           size = 0.05),
         legend.position = "none")
 
+# 16 percent increase for renters
+# 10 percent increase for homeowners
+
 ```
 
 ### Persons with disabilities
 
-Individuals with independent living difficulties have generally been decreasing in the county --- particularly among individuals under 75 years old. But there has been a slight increase in individuals 75 years old and older with independent living difficulties. The net decrease in individuals with independent living difficulties could be a signal of limited accommodations and resources for adults in the county and subsequent departure of those individuals from the county.
+Individuals with independent living difficulties have increased largely among the 65 year and older age group. In total, there has been an increase of 67 individuals with independent living difficulties at this age between 2016 and 2020. Although this may seem like a small portion of the population, these individuals will increasingly require home aide assistance, accessibility modifcations, or an assisted living facility.
 
 ```{r}
 #| label: fig-ind-living
 #| fig-cap: !expr "paste0(name, \": Net change in individuals with independent living difficulties by age\")"
+
 
 # Add disability stat (probably independent living difficulty)
 
@@ -247,7 +249,7 @@ ggplot(b18107,
 
 ### Homeownership
 
-As with all other localities in the region, home prices in the county have followed seasonal trends. In January 2017, the median home price in the county was \$473,901 and by July 2022 reached \$534,441 --- a 13 percent increase. Goochland County saw some spikes in median home price during the pandemic, but clearly those spikes did not exceed previous trends in the county.
+From 2017 to June 2022, median home price in the county has been on a general increase. In January 2017 the median home price was \$142,000 and by July 2022 was \$200,000. Between this time, monthly median sales price have fluctuated seasonally. But home sales in the county have not typically numbered beyond ten closed sales during this time frame. In fact, it was only in August 2019 that Charles City County so a five year high of ten total sales. With low sales and lower median prices, the loss of population is generally reflected in the for-sale home market.
 
 ```{r}
 #| label: fig-sales
@@ -255,7 +257,7 @@ As with all other localities in the region, home prices in the county have follo
 
 # Median sales price over time
 
-price <- read_csv("data/goochland_med_sales.csv") |> 
+price <- read_csv("data/charlescity_med_sales.csv") |> 
   clean_names() |> 
   mutate(geography = name) |> 
   pivot_longer(cols = starts_with("sale"),
@@ -291,7 +293,7 @@ ggplot(price_adj,
   scale_y_continuous(labels = label_dollar(), limits = c(0, NA)) +
   scale_x_date(date_labels = "%Y", date_breaks = "1 year") +
   labs(title = paste0(name, ": Median home sales price (adjusted for inflation)"),
-       subtitle = "January 2017 to July 2022",
+       subtitle = "January 2017 to June 2022",
        caption = "Source: Central Virginia Regional Multiple Listing Service.") +
   theme(axis.title = element_blank(),
         panel.background = element_blank(),
@@ -302,171 +304,91 @@ ggplot(price_adj,
                                           size = 0.05)) + 
   scale_color_continuous(type = "viridis", label = dollar_format()) +
   geom_smooth(method=lm)
+  
+
 
 ```
 
 ### Rental
 
-The rental market in Goochland County has largely grown in the past five years. The development of West Creek Business Park and with it the headquarters for major employers such as CarMax and Capital One has led to increasing demand for housing at the eastern edge of the county. The market has responded with luxury multifamily developments such as The Retreat at West Creek and Tuckahoe Pines and there are at least 1,700 more units on the way.
-
-The increasing rental demand has been apparent in high average asking rent in Goochland County. As of 2022 Q3, average asking rent in the county was \$2,208. Adjusting for inflation shows despite what appears to be a 24 percent increase in rent from 2016 Q1 to 2022 Q3, the value of the dollar has changed in such a way that rent then and now has changed very little. Nonetheless, an average asking rent of \$2,208 remains a steep price for low- and even moderate-income households.
+Less than one in five households in the county are renters as of 2020 (15.6 percent). From 2016 to 2020, renter households have been declining in the county --- going from 504 in 2016 to 467 in 2020. With few multifamily properties in the county, there is no doubt a large number of renters who are renting single-family homes across the county.
 
 ```{r}
-#| label: fig-rent
-#| fig-cap: !expr "paste0(name, \": Average asking rent\")"
+#| label: fig-renters
+#| fig-cap: "Renter households in Charles City County"
 
-# Pull in Goochland Rent manually
+b25003_vars <- load_variables(2020, "acs5") |> 
+  filter(str_sub(name, end = 7) %in% "B25003_")
 
-rent <- read_csv("data/goochland_rent.csv") |> 
-  clean_names() |> 
-  pivot_longer(2:3,
-               names_to = "rent",
-               values_to = "value") |> 
-  mutate(value = parse_number(value)) |> 
-  mutate(period = as.Date(as.yearqtr(period, format = "%Y Q%q"), frac = 1)) |> 
-  mutate(year = year(period)) |> 
-  filter(year >= 2016) |> 
-  mutate(rent = case_when(
-    rent == "rent" ~ "Nominal rent",
-    rent == "rent_adj" ~ "Inflation-adjusted rent"
-  ))
+b25003_raw <- map_dfr(years, function(yr){
+   b25003_pull <- get_acs(
+    geography = "county",
+    state = "VA",
+    table = "B25003",
+    year = yr,
+    survey = "acs5"
+  ) |> 
+    mutate(year = yr)
+})
 
+b25003_vars_cleaned <- b25003_vars |> 
+  separate(label, into = c("est", "total", "tenure"), sep = "!!") |> 
+  select(variable = name, tenure) |> 
+  mutate(tenure = case_when(
+    tenure == "Owner occupied" ~ "Homeowner",
+    tenure == "Renter occupied" ~ "Renter"
+  )) |> 
+  drop_na()
 
-ggplot(rent,
-       aes(x = period,
-           y = value, 
-           color = rent)) +
-  geom_line(stat = "identity", size = 1) + 
-  labs(title = paste0(name, ": Average asking rent by submarket"),
-       subtitle = "2016 Q1 to 2022 Q3",
-       color = "Dollar value") +
-  scale_y_continuous(labels = label_dollar()) +
-  scale_x_date(date_labels = "%Y", date_breaks = "2 years", limits = as.Date(c("2016-01-01", "2022-09-30"))) +
-  theme(axis.title = element_blank(),
-        panel.background = element_blank(),
-        axis.ticks = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+b25003_raw <- b25003_raw |> 
+  filter(GEOID %in% fips)
 
-```
+b25003_data <- b25003_raw |> 
+  right_join(b25003_vars_cleaned, by = "variable") |> 
+  select(NAME, GEOID, year, tenure, estimate) |> 
+  mutate(NAME = str_remove_all(NAME, ", Virginia")) |>
+  group_by(NAME, year) |> 
+  mutate(pct = (estimate/sum(estimate))) |> 
+  filter(tenure == "Renter")
 
-### Housing assistance
-
-As of early 2022, there were no federally-assisted rental housing properties located in Goochland County.
-
-### Naturally-occurring affordable housing
-
-CoStar does not list any one- or two-star rental properties in Goochland County, therefore the number of NOAH properties in the county is largely unknown. However, the U.S. Census Bureau may provide clues as to where NOAH may be generally located in the county by determining what type of structures renters reside in.
-
-As of 2020, the majority of renters reside in single-family homes (71 percent). The share of renters residing single-family homes has decreased as the number of multifamily properties has increased, but there has also been a raw decrease in single-family renters (from 935 in 2016 to 838 in 2020). The large share of single-family rentals could potentially be a large source of NOAH in the county.
-
-```{r}
-#| label: fig-ro-structure-percent
-#| fig.cap: !expr "paste0(name, \": Change in share of renter-occupied housing units by structure type\")"
-
-
-b25127_data <- read_rds("data/b25127_data.rds") |> 
-  filter(GEOID %in% fips,
-         tenure == "Renter") |> 
-  ungroup()
-
-ro_structure_percent <- b25127_data |> 
-  filter(structure != "Other") |>
-  select(5, 6, 10) |> 
-  pivot_longer(
-    cols = 2:3,
-    names_to = "year",
-    values_to = "estimate") |> 
-  group_by(structure, year) |> 
-  summarise(estimate = sum(estimate)) |> 
-  group_by(year) |> 
-  mutate(pct = estimate/sum(estimate))
-
-ggplot(ro_structure_percent,
-       aes(x = structure,
+ggplot(b25003_data,
+       aes(x = year,
            y = pct,
-           fill = year,
-           label = label_percent(accuracy = 0.1)(pct))) +
-  geom_col(position = "dodge") +
-  geom_text(vjust = 1.5,
+           fill = pct)) +
+  geom_col() +
+  theme(axis.title = element_blank(),
+        legend.position = "none") +
+  scale_y_continuous(labels = percent_format()) +
+  labs(title = "Percent of renter households in Charles City County", 
+       fill = "Percent of total households",
+       subtitle = "From 2016 to 2020",
+       caption = "Source: U.S Census Bureau. American Community Survey 2016-2020 5-Year Estimates. Table B25003.") +
+  geom_text(aes(label = percent(pct, accuracy = .1)),
             color = "white",
-            position = position_dodge(width = 0.9)) +
-  labs(title = "Change in share of renter-occupied housing units by structure type",
-       subtitle = "2016 to 2020",
-      caption = "Source: U.S. Census Bureau, American Community Survey, Table B25127.") +
-  theme(panel.background = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        legend.title = element_blank()) +
-  scale_y_continuous(labels = label_percent())
+            vjust = 1) +
+  scale_fill_continuous(labels = percent_format())
+
 
 ```
+
+The rental market in Charles City County is small to non-existent. Apartments.com shows no available rental listings in the county, although CoStar lists at least one multifamily property in the county, Sign Post Estates. This 36 unit apartment complex was built in 1992 utilizing USDA Rural Rental Housing Loans and then utilized 9% Competitive Low-Income Housing Tax Credit program in 2004.
+
 
 ## Gap analysis
 
 ### Affordability of current housing stock
 
-When comparing renter income to the average asking rent in a year, Goochland County has seen a persistent gap between what is on the market and what is affordable to the typical renter. The gap between median renter household income and average asking rent in 2016 was \$752. By 2020, that gap had increased by \$10 --- continuing to leave the typical renter hundreds of dollars short of affording the typical rent.
+For the few hundred renters in the county, reaching homeownership has becoming more and more difficult in the county. In 2016, the income needed to afford the median home price was \$34,539, while the median renter household income was \$40,152. Since 2016, the ability of a renter to afford homeownership has quickly slipped away. By 2017, the median renter household was a few thousand dollars short of being able to afford homeownership. And by 2020, the gap between renter income and income needed had grown to nearly \$17,000.
 
 ```{r}
-#| label: fig-income-rent-gap
-#| fig-cap: !expr "paste0(name, \": Average asking rent versus\nrent affordable to median renter income\")"
+#| label: fig-income-own-gap
+#| fig-cap: !expr "paste0(name, \": Income needed to afford median home price versus median renter income\")"
 
-# Compare local median renter income to average asking rent
+# Compare local renter income versus local home prices
 
 b25119_cpi_rent <- b25119_cpi |> 
   filter(tenure == "Renter")
 
-rent <- read_csv("data/rr_annual_rent.csv") |> 
-    pivot_longer(cols = 2:8,
-               names_to = "locality",
-               values_to = "rent_current") |> 
-  clean_names() |> 
-  filter(locality == costar_name)
-
-rent_gap <- b25119_cpi_rent |> 
-  left_join(rent, by = "year") |> 
-  mutate(rent_current = parse_number(rent_current)) |> 
-  mutate(affordable_rent = (cdollars/12)*.30) |> 
-  mutate(difference = rent_current - affordable_rent) |> 
-  select(year, rent_current, affordable_rent) |> 
-  pivot_longer(2:3,
-               names_to = "type",
-               values_to = "dollars") |> 
-  mutate(type = case_when(
-    type == "affordable_rent" ~ "Affordable rent",
-    type == "rent_current" ~ "Current rent"
-  ))
-
-ggplot(rent_gap,
-       aes(x = year,
-           y = dollars,
-           fill = type)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  scale_y_continuous(labels = label_dollar()) +
-  labs(title = paste0(name, ": Average asking rent versus\nrent affordable to median renter income"),
-       subtitle = "2016 to 2020",
-       fill = "Nominal rent",
-       caption = "Sources: U.S. Census Bureau, American Community Survey, Table B25119\nand CoStar Group Inc.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
-
-
-```
-.
-For renters to afford homeownership, the income needed to afford the the median priced home is a steep economic climb. In 2016, a household needed to make roughly \$87,483 to afford the median sales price, but a renter's median household income was only \$40,915. By 2020, the gap had only narrowed slightly to \$39,448.
-
-```{r}
-#| label: fig-income-own-gap
-#| fig-cap: !expr "paste0(name, \": Income needed to afford median home price\nversus median renter income\")"
-
-# Compare local renter income versus local home prices
 
 rr_sales_annual <- read_csv("data/rr_annual_sales.csv") |> 
   pivot_longer(cols = 2:9,
@@ -519,7 +441,8 @@ ggplot(slgap,
 
 
 ```
-The latest data from HUD shows that there was a shortage of 160 rental homes affordable to households making less than 80 percent AMI in 2018. This was a deficit decrease from 2015 when the shortage was 274. For Goochland County, the shortage among renters below 30 percent AMI has been declining slightly. But the major shortage exists among renters between 31 and 50 percent AMI.
+
+In spite of the low number of renters in the county, there is still a shortage of affordable rentals for households making less than 80 percent AMI. That shortage has shrunk since 2015, from 104 rental units to 83 in 2018. With the county's declining population, a likely explanation is the departure of lower income renter households to other parts of the region.
 
 ```{r}
 #| label: fig-gap
@@ -563,7 +486,7 @@ ggplot(gap,
 
 ### Impact of housing costs
 
-Cost burden in the county has declined in the county for both homeowners and renters. In 2015, 22 percent of homeowners were cost-burdened, but by 2019 that estimate had declined to 17 percent. Renters also saw declines --- from roughly 32 percent to 27 percent during this same time period. 
+From 2015 to 2019, there has been little change in the percent of households experiencing cost burden. Although there has been a slight decline in the number of cost-burdened homeowners, the share of cost-burdened homeowners has remained largely unchanged (24 percent in 2019). For renters, the number of cost-burdened renters has increased to 44 percent.
 
 ```{r}
 #| label: fig-cb
@@ -581,7 +504,7 @@ ggplot(cb,
   geom_col(position = position_fill(reverse = TRUE)) +
   scale_y_continuous(labels = percent_format()) +
   labs(title = paste0(name, ": Cumulative change in cost-burdened households by tenure"),
-       subtitle = "2015 to 2018",
+       subtitle = "2015 to 2019",
        fill = "Cost burden",
        caption = "Source: U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
   theme(axis.title = element_blank(),
@@ -591,13 +514,13 @@ ggplot(cb,
                                           size = 0.05))
 
 ```
-McKinney-Vento Act data shows small changes in the number of enrolled students experiencing homelessness. Although there was a decline from the 2016-2017 school year, the number of students experiencing homelessness increased in the most recent year of 2019-2020. In rural communities like Goochland County, homelessness can often be invisible and difficult to assess. In some cases, substandard housing is a just as critical issue for those extremely low-income individuals and households.
+McKinney-Vento Act data provides an estimate of enrolled students who are experiencing homelessness. This data is contrast to HUD Point-in-Time (PIT) counts because it utilizes a [different definition of homelessness](https://nche.ed.gov/mckinney-vento-definition/). In Charles City County, the number of enrolled students has remained below 30 from the 2016-2017 to 2019-2020 school years. During the 2018-2019 school year, Charles City County had a lower count of 16, but experiences a slight increase to 22 in 2019-2020.
 
 ```{r}
 #| label: fig-mkv
 #| fig-cap: !expr "paste0(name, \"Enrolled students experiencing homelessness by school year\")"
 
-div <- 37
+div <- 19
 
 mkv <- read_csv("data/mkv.csv") |> 
   subset(Division %in% div)
