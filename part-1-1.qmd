@@ -12,26 +12,17 @@ library(tigris)
 library(sf)
 library(sp)
 library(scales)
-library(plotly)
-library(gridExtra)
-library(viridis)
-library(leaflet)
+library(ggiraph)
+library(hdatools)
 
 rr <- c("51085", "51760", "51075", "51145", "51087", "51127", "51036", "51041")
 
 pha <- c("51085", "51760", "51087", "51041")
 
-# Set palette colors; may need to find a palette that better complements the PHA branding.
-
 rr_names <- c("Richmond city", "Hanover County", "Henrico County", "Chesterfield County",
               "Powhatan County", "Goochland County", "New Kent County", "Charles City County")
 
 pha_names <- c("Richmond city", "Hanover County", "Henrico County", "Chesterfield County")
-
-geo_colors <- setNames(viridis(4), nm = pha_names)
-
-pal <-colorFactor(palette = c("#440154FF", "#31688EFF","#35B779FF", "#FDE725FF"),
-                  levels = c("Richmond City", "Hanover", "Henrico", "Chesterfield"))
 
 ```
 
@@ -141,27 +132,32 @@ pha_pop_compare <- pha_pop |>
   mutate(difference = `2020` - `2016`,
          perchange = (difference/`2016`))
 
-ggplot(pha_pop_compare,
-       aes(x= NAMELSAD,
-           y=perchange,
-           fill=NAMELSAD,
-           label= percent(perchange))) +
-  geom_bar(stat = "identity") +
-  geom_text(vjust= 1.5,
-            color="white",
-            size = 4,
-            fontface="bold") +
+total_pop_plot <- ggplot(pha_pop_compare,
+       aes(x = NAMELSAD,
+           y = perchange,
+           fill = NAMELSAD,
+           label = percent(perchange),
+           data_id = perchange,
+           tooltip = percent(perchange))) +
+  geom_col() +
+  geom_col_interactive(size = 2) +
   scale_y_continuous(labels = percent_format()) +
   labs(title="Percent change in population by locality",
        subtitle="2016 to 2020",
-       caption="Sources: U.S. Census Bureau, Population Estimates Program.") +
-  theme(axis.title = element_blank(),
-        panel.background = element_blank(),
-        axis.ticks = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        legend.position = "none") +
-  scale_fill_manual(values = geo_colors)
+       caption="**Source:** U.S. Census Bureau, Population Estimates Program.") +
+  scale_fill_pha() +
+  theme_pha() +
+  theme(legend.position = "none")
+
+if (knitr::is_html_output()) {
+  girafe(ggobj = total_pop_plot) 
+} else {
+  total_pop_plot +
+    geom_text(vjust= 1.5,
+              color="white",
+              size = 4,
+              fontface="bold")
+  }
   
 ```
 
@@ -267,8 +263,8 @@ ggplot(comp_chg_summary,
         axis.ticks = element_blank(),
         panel.grid.major.y = element_line(color = "grey95",
                                           size = 0.05)) +
-  scale_y_continuous(labels = percent_format()) +
-  scale_fill_manual(values = viridis(3))
+  scale_y_continuous(labels = percent_format())
+  #scale_fill_manual(values = viridis(3))
 
 ```
 
@@ -339,8 +335,8 @@ ggplot(forecasts_locality,
                                           size = 0.05)) +
   labs(title="Population projections by locality",
        subtitle="Local population in 2020 and forecast to 2050",
-       caption="Source: University of Virginia\nWeldon Cooper Center for Public Service") +
-  scale_fill_manual(values = geo_colors)
+       caption="Source: University of Virginia\nWeldon Cooper Center for Public Service")
+  #scale_fill_manual(values = geo_colors)
 
 # Chesterfield - 140,266 difference / 38 percent increase
 # Hanover - 30,134 difference / 27 percent increase

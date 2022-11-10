@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.269">
+<meta name="generator" content="quarto-1.0.36">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -11,15 +11,10 @@
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
-ul.task-list li input[type="checkbox"] {
-  width: 0.8em;
-  margin: 0 0.8em 0.2em -1.6em;
-  vertical-align: middle;
-}
 </style>
 
 
@@ -241,35 +236,35 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
+        <nav id="TOC" role="doc-toc">
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#supply" id="toc-supply" class="nav-link active" data-scroll-target="#supply"><span class="toc-section-number">5.1</span>  Supply</a>
+  <li><a href="#supply" id="toc-supply" class="nav-link active" data-scroll-target="#supply"> <span class="header-section-number">5.1</span> Supply</a>
   <ul class="collapse">
-  <li><a href="#change-in-stock" id="toc-change-in-stock" class="nav-link" data-scroll-target="#change-in-stock"><span class="toc-section-number">5.1.1</span>  Change in stock</a></li>
-  <li><a href="#age-of-stock" id="toc-age-of-stock" class="nav-link" data-scroll-target="#age-of-stock"><span class="toc-section-number">5.1.2</span>  Age of stock</a></li>
-  <li><a href="#bedrooms" id="toc-bedrooms" class="nav-link" data-scroll-target="#bedrooms"><span class="toc-section-number">5.1.3</span>  Bedrooms</a></li>
-  <li><a href="#production" id="toc-production" class="nav-link" data-scroll-target="#production"><span class="toc-section-number">5.1.4</span>  Production</a></li>
+  <li><a href="#change-in-stock" id="toc-change-in-stock" class="nav-link" data-scroll-target="#change-in-stock"> <span class="header-section-number">5.1.1</span> Change in stock</a></li>
+  <li><a href="#age-of-stock" id="toc-age-of-stock" class="nav-link" data-scroll-target="#age-of-stock"> <span class="header-section-number">5.1.2</span> Age of stock</a></li>
+  <li><a href="#bedrooms" id="toc-bedrooms" class="nav-link" data-scroll-target="#bedrooms"> <span class="header-section-number">5.1.3</span> Bedrooms</a></li>
+  <li><a href="#production" id="toc-production" class="nav-link" data-scroll-target="#production"> <span class="header-section-number">5.1.4</span> Production</a></li>
   </ul></li>
-  <li><a href="#homeownership-rate" id="toc-homeownership-rate" class="nav-link" data-scroll-target="#homeownership-rate"><span class="toc-section-number">5.2</span>  Homeownership rate</a>
+  <li><a href="#homeownership-rate" id="toc-homeownership-rate" class="nav-link" data-scroll-target="#homeownership-rate"> <span class="header-section-number">5.2</span> Homeownership rate</a>
   <ul class="collapse">
-  <li><a href="#by-locality" id="toc-by-locality" class="nav-link" data-scroll-target="#by-locality"><span class="toc-section-number">5.2.1</span>  By locality</a></li>
-  <li><a href="#by-age" id="toc-by-age" class="nav-link" data-scroll-target="#by-age"><span class="toc-section-number">5.2.2</span>  By age</a></li>
-  <li><a href="#by-race-and-ethnicity" id="toc-by-race-and-ethnicity" class="nav-link" data-scroll-target="#by-race-and-ethnicity"><span class="toc-section-number">5.2.3</span>  By race and ethnicity</a></li>
+  <li><a href="#by-locality" id="toc-by-locality" class="nav-link" data-scroll-target="#by-locality"> <span class="header-section-number">5.2.1</span> By locality</a></li>
+  <li><a href="#by-age" id="toc-by-age" class="nav-link" data-scroll-target="#by-age"> <span class="header-section-number">5.2.2</span> By age</a></li>
+  <li><a href="#by-race-and-ethnicity" id="toc-by-race-and-ethnicity" class="nav-link" data-scroll-target="#by-race-and-ethnicity"> <span class="header-section-number">5.2.3</span> By race and ethnicity</a></li>
   </ul></li>
-  <li><a href="#for-sale-market" id="toc-for-sale-market" class="nav-link" data-scroll-target="#for-sale-market"><span class="toc-section-number">5.3</span>  For-sale market</a>
+  <li><a href="#for-sale-market" id="toc-for-sale-market" class="nav-link" data-scroll-target="#for-sale-market"> <span class="header-section-number">5.3</span> For-sale market</a>
   <ul class="collapse">
-  <li><a href="#closed-sales" id="toc-closed-sales" class="nav-link" data-scroll-target="#closed-sales"><span class="toc-section-number">5.3.1</span>  Closed sales</a></li>
-  <li><a href="#sales-price" id="toc-sales-price" class="nav-link" data-scroll-target="#sales-price"><span class="toc-section-number">5.3.2</span>  Sales price</a></li>
-  <li><a href="#supply-1" id="toc-supply-1" class="nav-link" data-scroll-target="#supply-1"><span class="toc-section-number">5.3.3</span>  Supply</a></li>
-  <li><a href="#starter-homes" id="toc-starter-homes" class="nav-link" data-scroll-target="#starter-homes"><span class="toc-section-number">5.3.4</span>  Starter homes</a></li>
+  <li><a href="#closed-sales" id="toc-closed-sales" class="nav-link" data-scroll-target="#closed-sales"> <span class="header-section-number">5.3.1</span> Closed sales</a></li>
+  <li><a href="#sales-price" id="toc-sales-price" class="nav-link" data-scroll-target="#sales-price"> <span class="header-section-number">5.3.2</span> Sales price</a></li>
+  <li><a href="#supply-1" id="toc-supply-1" class="nav-link" data-scroll-target="#supply-1"> <span class="header-section-number">5.3.3</span> Supply</a></li>
+  <li><a href="#starter-homes" id="toc-starter-homes" class="nav-link" data-scroll-target="#starter-homes"> <span class="header-section-number">5.3.4</span> Starter homes</a></li>
   </ul></li>
-  <li><a href="#new-construction-versus-resale" id="toc-new-construction-versus-resale" class="nav-link" data-scroll-target="#new-construction-versus-resale"><span class="toc-section-number">5.4</span>  New construction versus resale</a>
+  <li><a href="#new-construction-versus-resale" id="toc-new-construction-versus-resale" class="nav-link" data-scroll-target="#new-construction-versus-resale"> <span class="header-section-number">5.4</span> New construction versus resale</a>
   <ul class="collapse">
-  <li><a href="#sales-price-1" id="toc-sales-price-1" class="nav-link" data-scroll-target="#sales-price-1"><span class="toc-section-number">5.4.1</span>  Sales price</a></li>
-  <li><a href="#bedrooms-1" id="toc-bedrooms-1" class="nav-link" data-scroll-target="#bedrooms-1"><span class="toc-section-number">5.4.2</span>  Bedrooms</a></li>
-  <li><a href="#size" id="toc-size" class="nav-link" data-scroll-target="#size"><span class="toc-section-number">5.4.3</span>  Size</a></li>
+  <li><a href="#sales-price-1" id="toc-sales-price-1" class="nav-link" data-scroll-target="#sales-price-1"> <span class="header-section-number">5.4.1</span> Sales price</a></li>
+  <li><a href="#bedrooms-1" id="toc-bedrooms-1" class="nav-link" data-scroll-target="#bedrooms-1"> <span class="header-section-number">5.4.2</span> Bedrooms</a></li>
+  <li><a href="#size" id="toc-size" class="nav-link" data-scroll-target="#size"> <span class="header-section-number">5.4.3</span> Size</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -287,7 +282,6 @@ ul.task-list li input[type="checkbox"] {
 <div class="quarto-title-meta">
 
     
-  
     
   </div>
   
@@ -611,24 +605,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     button.classList.add('code-copy-button-checked');
     var currentTitle = button.getAttribute("title");
     button.setAttribute("title", "Copied!");
-    let tooltip;
-    if (window.bootstrap) {
-      button.setAttribute("data-bs-toggle", "tooltip");
-      button.setAttribute("data-bs-placement", "left");
-      button.setAttribute("data-bs-title", "Copied!");
-      tooltip = new bootstrap.Tooltip(button, 
-        { trigger: "manual", 
-          customClass: "code-copy-button-tooltip",
-          offset: [0, -8]});
-      tooltip.show();    
-    }
     setTimeout(function() {
-      if (tooltip) {
-        tooltip.hide();
-        button.removeAttribute("data-bs-title");
-        button.removeAttribute("data-bs-toggle");
-        button.removeAttribute("data-bs-placement");
-      }
       button.setAttribute("title", currentTitle);
       button.classList.remove('code-copy-button-checked');
     }, 1000);
@@ -656,50 +633,31 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   for (var i=0; i<noterefs.length; i++) {
     const ref = noterefs[i];
     tippyHover(ref, function() {
-      // use id or data attribute instead here
-      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      let href = ref.getAttribute('href');
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
       return note.innerHTML;
     });
   }
-  const findCites = (el) => {
-    const parentEl = el.parentElement;
-    if (parentEl) {
-      const cites = parentEl.dataset.cites;
-      if (cites) {
-        return {
-          el,
-          cites: cites.split(' ')
-        };
-      } else {
-        return findCites(el.parentElement)
-      }
-    } else {
-      return undefined;
-    }
-  };
   var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
   for (var i=0; i<bibliorefs.length; i++) {
     const ref = bibliorefs[i];
-    const citeInfo = findCites(ref);
-    if (citeInfo) {
-      tippyHover(citeInfo.el, function() {
-        var popup = window.document.createElement('div');
-        citeInfo.cites.forEach(function(cite) {
-          var citeDiv = window.document.createElement('div');
-          citeDiv.classList.add('hanging-indent');
-          citeDiv.classList.add('csl-entry');
-          var biblioDiv = window.document.getElementById('ref-' + cite);
-          if (biblioDiv) {
-            citeDiv.innerHTML = biblioDiv.innerHTML;
-          }
-          popup.appendChild(citeDiv);
-        });
-        return popup.innerHTML;
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
       });
-    }
+      return popup.innerHTML;
+    });
   }
 });
 </script>
