@@ -141,30 +141,25 @@ total_pop_plot <- ggplot(pha_pop_compare,
            tooltip = percent(perchange))) +
   geom_col() +
   geom_col_interactive(size = 2) +
-  scale_y_continuous(labels = percent_format(),
-                     breaks = c(0.02, 0.04, 0.06, 0.08)) +
+  scale_y_continuous(labels = percent_format()) +
   labs(title="Percent change in population by locality",
        subtitle="2016 to 2020",
        caption="**Source:** U.S. Census Bureau, Population Estimates Program.") +
   scale_fill_pha() +
-  theme_pha(base_size = 10) +
-  theme(legend.position = "none",
-        plot.subtitle = element_text(margin = margin(t = 5, b = 20, unit = "pt")))
+  theme_pha()
 
 if (knitr::is_html_output()) {
   
-  total_pop_plot_gg <- total_pop_plot
-  
-  girafe(ggobj = total_pop_plot_gg,
+  girafe(ggobj = total_pop_plot,
          height_svg = 4) 
   
 } else {
   
   total_pop_plot +
-    geom_text(vjust= 1.5,
-              color="white",
+    geom_text(vjust = 1.5,
+              color ="white",
               size = 4,
-              fontface="bold")
+              fontface ="bold")
   
   }
   
@@ -258,22 +253,32 @@ comp_chg_summary <- pha_comp_change |>
   filter(year >= 2016 & year != 2020) |> 
   mutate(year = as.character(year))
 
-ggplot(comp_chg_summary,
-       aes(x=year,
-           y=percent,
-           fill=component)) + 
-  geom_bar(stat="identity", position = "stack") +
+comp_chg_plot <- ggplot(comp_chg_summary,
+       aes(x = year,
+           y = percent,
+           fill = component,
+           data_id = percent,
+           tooltip = percent(percent))) + 
+  geom_col(position = "stack") +
+  geom_col_interactive(position = "stack", size = 2) +
+  scale_y_continuous(labels = percent_format()) +
   labs(title="Components of population change",
        subtitle = "Share of regional population growth by source",
-       caption = "Note: Data not available for 2020.\nSource: U.S. Census Bureau, Population Estimates Program.") +
-  theme(axis.title = element_blank(),
-        panel.background = element_blank(),
-        legend.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05)) +
-  scale_y_continuous(labels = percent_format())
-  #scale_fill_manual(values = viridis(3))
+       caption = "**Note:** Data not available for 2020.<br>**Source:** U.S. Census Bureau, Population Estimates Program.") +
+  scale_fill_pha() +
+  theme_pha() +
+  theme(legend.position = "right")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = comp_chg_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  comp_chg_plot
+  
+  }
 
 ```
 
