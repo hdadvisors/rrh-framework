@@ -295,29 +295,44 @@ forecasts <- pha_pop |>
   group_by(year, counttype) |> 
   summarise(value = sum(value))
 
-ggplot(forecasts,
-       aes(x=year,
-           y= value,
-           fill=counttype,
-           label=label_comma()(value))) +
-  geom_bar(stat="identity") +
-  geom_text(vjust= 1.5,
-            color="white",
-            size = 3,
-            fontface="bold") +
+forecasts_plot <- ggplot(forecasts,
+       aes(x = year,
+           y = value,
+           fill = counttype,
+           label = label_comma()(value),
+           data_id = value,
+           tooltip = label_comma()(value))) +
+  geom_col() +
+  geom_col_interactive() +
   scale_y_continuous(labels = label_comma(),
                      breaks = c(250000, 500000, 750000, 1000000, 1250000)) +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        panel.background = element_blank()) +
-  labs(title="Population projections",
-       subtitle="Regional population in 2020 and forecast to 2050",
-       fill="Estimate type",
-       caption="Source: University of Virginia Weldon Cooper Center for Public Service")
+  labs(title = "Population projections",
+       subtitle = "Regional population in 2020 and forecast to 2050",
+       fill = "Estimate type",
+       caption = "**Source:** University of Virginia Weldon Cooper Center for Public Service.") +
+  scale_fill_pha() +
+  theme_pha() +
+  theme(
+    legend.position = "right",
+    legend.title = element_text(hjust = 0)
+  )
 
 # Difference between 2050 and 2020 is 302,780. 29 percent increase.
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = forecasts_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  forecasts_plot +
+    geom_text(vjust = 1.5,
+              color ="white",
+              size = 3,
+              fontface ="bold")
+  
+  }
 
 ```
 
@@ -334,27 +349,36 @@ forecasts_locality <- pha_pop |>
   group_by(NAMELSAD, year, counttype) |> 
   summarise(value = sum(value))
 
-ggplot(forecasts_locality,
-       aes(x=year,
-           y= value,
-           fill=NAMELSAD)) +
-  geom_bar(stat="identity") +
+forecasts_locality_plot <- ggplot(forecasts_locality,
+       aes(x = year,
+           y = value,
+           fill = NAMELSAD,
+           data_id = value,
+           tooltip = label_comma()(value))) +
+  geom_col() +
+  geom_col_interactive(size = 2) +
   facet_wrap(~NAMELSAD) +
   scale_y_continuous(labels = label_comma()) +
-  theme(axis.title = element_blank(),
-        legend.position = "none",
-        panel.background = element_blank(),
-        axis.ticks = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05)) +
-  labs(title="Population projections by locality",
-       subtitle="Local population in 2020 and forecast to 2050",
-       caption="Source: University of Virginia\nWeldon Cooper Center for Public Service")
-  #scale_fill_manual(values = geo_colors)
+  labs(title = "Population projections by locality",
+       subtitle = "Local population in 2020 and forecast to 2050",
+       caption = "**Source:** University of Virginia Weldon Cooper Center for Public Service.") +
+  scale_fill_pha() +
+  theme_pha()
 
 # Chesterfield - 140,266 difference / 38 percent increase
 # Hanover - 30,134 difference / 27 percent increase
 # Henrico - 88,565 difference / 26 percent increase
 # Richmond - 43,815 difference / 19 percent increase
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = forecasts_locality_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  forecasts_locality_plot
+  
+  }
 
 ```
