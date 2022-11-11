@@ -141,22 +141,31 @@ total_pop_plot <- ggplot(pha_pop_compare,
            tooltip = percent(perchange))) +
   geom_col() +
   geom_col_interactive(size = 2) +
-  scale_y_continuous(labels = percent_format()) +
+  scale_y_continuous(labels = percent_format(),
+                     breaks = c(0.02, 0.04, 0.06, 0.08)) +
   labs(title="Percent change in population by locality",
        subtitle="2016 to 2020",
        caption="**Source:** U.S. Census Bureau, Population Estimates Program.") +
   scale_fill_pha() +
-  theme_pha() +
-  theme(legend.position = "none")
+  theme_pha(base_size = 10) +
+  theme(legend.position = "none",
+        plot.subtitle = element_text(margin = margin(t = 5, b = 20, unit = "pt")))
 
 if (knitr::is_html_output()) {
-  girafe(ggobj = total_pop_plot) 
+  
+  total_pop_plot_gg <- total_pop_plot
+  
+  girafe(ggobj = total_pop_plot_gg,
+         height_svg = 4) 
+  
 } else {
+  
   total_pop_plot +
     geom_text(vjust= 1.5,
               color="white",
               size = 4,
               fontface="bold")
+  
   }
   
 ```
