@@ -11,7 +11,9 @@ library(readxl)
 library(janitor)
 library(leaflet)
 library(scales)
-library(viridisLite)
+library(ggiraph)
+library(ggtext)
+library(hdatools)
 
 # rr includes Charles City, Goochland, New Kent, and Powhatan.
 
@@ -21,20 +23,17 @@ pha <- c("51085", "51760", "51087", "51041")
 
 # Set palette colors; may need to find a palette that better complements the PHA branding.
 
+rr_names <- c("Richmond city", "Hanover County", "Henrico County", "Chesterfield County",
+              "Powhatan County", "Goochland County", "New Kent County", "Charles City County")
+
 pha_names <- c("Richmond city", "Hanover County", "Henrico County", "Chesterfield County")
 
-geo_colors <- setNames(viridis(4), nm = pha_names)
-
-pal <-colorFactor(palette = c("#440154FF", "#31688EFF","#35B779FF", "#FDE725FF"),
-                  levels = c("Richmond City", "Hanover", "Henrico", "Chesterfield"))
-
 tenure <- c("Homeowner", "Renter")
-
-tenure_colors <-setNames(viridis(2), nm = tenure)
 
 years <- 2016:2020
 
 ```
+
 This chapter covers the changes in incomes and wages among households and occupations across the region. 
 
 ## Household incomes
@@ -85,7 +84,7 @@ b25118_data <- b25118_raw |>
     income == "$5,000 to $9,999" ~ "Less than $15,000",
     income == "$10,000 to $14,999" ~ "Less than $15,000",
     income == "$15,000 to $19,999" ~ "$15,000 to $24,999",
-    income == "$$20,000 to $24,999" ~ "$15,000 to $24,999",
+    income == "$20,000 to $24,999" ~ "$15,000 to $24,999",
     income == "$25,000 to $34,999" ~ "$25,000 to $49,999",
     income == "$35,000 to $49,999" ~ "$25,000 to $49,999",
     income == "$50,000 to $74,999" ~ "$50,000 to $74,999",
@@ -115,29 +114,45 @@ b25118_data <-read_rds("data/b25118_data.rds") |>
   mutate(change = `2020`-`2016`,
          pct_change = change/`2016`)
 
-ggplot(b25118_data, 
+hh_inc_plot <- ggplot(b25118_data, 
        aes(y = income,
            x = change,
-           fill = tenure)) +
+           fill = tenure,
+           data_id = change,
+           tooltip = label_comma()(change))) +
   geom_col(position = "dodge") +
-  facet_grid(~tenure) +
+  geom_col_interactive(position = "dodge", size = 2) +
+  #facet_grid(~tenure) +
   scale_x_continuous(labels = label_comma()) +
   scale_y_discrete(limits = c("Less than $15,000","$15,000 to $24,999",
                               "$25,000 to $49,999", "$50,000 to $74,999",
                               "$75,000 to $99,999", "$100,000 to $149,999",
-                              "$150,000 or more"),
-                   labels = function(x) str_wrap(x, width = 12)) +
+                              "$150,000 or more")) +
+                   #,labels = function(x) str_wrap(x, width = 12)
   labs(title = "Change households by tenure and income level",
        subtitle="2016 to 2020",
-       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25118.") +
-  theme(axis.title = element_blank(),
-        panel.background = element_blank(),
+       fill = element_blank(),
+       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25118.") +
+  scale_fill_pha() +
+  theme_pha() +
+  theme(legend.position = "right",
         panel.grid.major.y = element_blank(),
-        legend.position = "none",
-        panel.grid.major.x = element_line(color = "grey95",
+        panel.grid.major.x = element_line(color = "#e2e4e3",
                                           size = 0.05),
-        axis.ticks = element_blank()) +
-  scale_fill_manual(values = tenure_colors)
+        plot.title.position = "plot",
+        plot.caption.position = "plot"
+        )
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = hh_inc_plot,
+         height_svg = 4)
+  
+} else {
+  
+  hh_inc_plot
+  
+  }
 
 ```
 
