@@ -101,7 +101,9 @@ b25003_data <- b25003_raw |>
   group_by(NAME, tenure) |>
   mutate(diff = estimate - lag(estimate),
          diff = replace_na(diff, 0)) |>
-  mutate(run_diff = cumsum(diff))
+  mutate(run_diff = cumsum(diff)) |> 
+  group_by(NAME, year) |> 
+  mutate(pct = estimate/sum(estimate))
 
 write_rds(b25003_data, "data/b25003_data.rds")
 
@@ -659,7 +661,7 @@ b09020_data <- read_rds("data/b09020_data.rds") |>
 hh_seniors_plot <- ggplot(b09020_data,
        aes(y = reorder_within(relationship, change, family),
            x = change,
-           fill = relationship,
+           fill = family,
            data_id = change,
            tooltip = label_comma()(change))) +
   geom_col(position = "dodge") +
@@ -676,8 +678,8 @@ hh_seniors_plot <- ggplot(b09020_data,
   theme(strip.placement = "outside",
         strip.text.y = element_text(angle = 0),
         panel.grid.major.y = element_blank(),
-        panel.grid.major.x = element_line(color = "grey95",
-                                          linewidth = 0.05),
+        panel.grid.major.x = element_line(color = "#e2e4e3",
+                                          size = 0.05),
         plot.title.position = "plot",
         plot.caption.position = "plot"
         )
@@ -689,7 +691,7 @@ if (knitr::is_html_output()) {
   
 } else {
   
-  hh_child_plot
+  hh_seniors_plot
   
   }
 
@@ -755,26 +757,36 @@ b11013_data <- read_rds("data/b11013_data.rds") |>
   group_by(year, subfamily, children) |> 
   summarise(estimate = sum(estimate))
 
-ggplot(b11013_data,
+hh_subfam_plot <- ggplot(b11013_data,
        aes(x = year,
            y = estimate,
-           fill = children)) +
+           fill = children,
+           data_id = estimate,
+           tooltip = label_comma()(estimate))) +
   geom_col(position = "dodge") +
+  geom_col_interactive(position = "dodge", size = 2) +
   facet_wrap(~subfamily) +
   scale_y_continuous(labels = label_comma(),
                      breaks = c(0,2000,4000,6000),
                      limits = c(0,7000)) +
   labs(title = "Subfamilies by type and presence of own children",
        subtitle = "2016 to 2020",
-       caption = "Source: U.S. Census Bureau, American Community Survey, Table B11013.",
+       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B11013.",
        fill = element_blank()) +
-  theme(axis.title = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        legend.position = "bottom",
-        axis.ticks = element_blank())
+  scale_fill_pha(direction = -1) +
+  theme_pha() +
+  theme(legend.position = "bottom")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = hh_subfam_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  hh_subfam_plot
+  
+  }
 
 ```
 
@@ -886,7 +898,8 @@ multigen_raw <- bind_rows(multigen_2016, multigen_2017, multigen_2018,
 multigen_data <- multigen_raw |>
   group_by(YEAR, geography) |>
   summarise(pct = sum(PWGTP[MULTG == "Multiple generations"]) / sum(PWGTP)) |>
-  mutate(geography = fct_reorder(geography, pct, .desc = TRUE))
+  mutate(geography = fct_reorder(geography, pct, .desc = TRUE)) |> 
+  ungroup()
 
 write_rds(multigen_data, "data/multigen_data.rds")
 
@@ -898,30 +911,38 @@ write_rds(multigen_data, "data/multigen_data.rds")
 
 multigen_data <- read_rds("data/multigen_data.rds")
 
-ggplot(multigen_data,
+hh_multigen_plot <- ggplot(multigen_data,
        aes(x = YEAR,
            y = pct,
            color = geography,
            group = 1)) +
   geom_line(size = 1) +
+  geom_point_interactive(
+    aes(data_id = pct,
+        tooltip = label_percent(accuracy = 0.1)(pct)),
+    size = 0.5) +
   facet_wrap(~geography, nrow = 1) +
   scale_y_continuous(labels = label_percent(),
                      breaks = c((1:9)/100),
                      limits = c(0.005,0.09)) +
   labs(title = "Percent of population living in multiple generation households",
        subtitle = "2016 to 2020",
-       caption = "Source: U.S. Census Bureau, American Community Survey,\nPublic Use Microdata Sample.") +
-  theme(axis.title = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        axis.text.x = element_text(angle = 90),
-        axis.line.x = element_line(color = "grey50",
-                                   size = 0.1),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        legend.position = "none",
-        axis.ticks = element_blank())
+       caption = "**Source:** U.S. Census Bureau, American Community Survey, Public Use Microdata Sample.") +
+  scale_color_pha() +
+  theme_pha() +
+  theme(axis.text.x = element_text(angle = 90))
 
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = hh_multigen_plot,
+         height_svg = 4)
+  
+} else {
+  
+  hh_multigen_plot
+  
+  }
+  
 ```
 
 ## Adult children with parents
@@ -989,29 +1010,39 @@ b09021_data <- read_rds("data/b09021_data.rds") |>
             `2020` = sum(`2020`)) |> 
   mutate(pct_change = (`2020`-`2016`)/`2016`)
 
-ggplot(b09021_data,
+hh_adultchild_plot <- ggplot(b09021_data,
        aes(x = reorder(arrangement, pct_change),
            y = pct_change,
            fill = arrangement,
-           color = arrangement,
-           label = label_percent()(pct_change))) +
+           label = label_percent()(pct_change),
+           data_id = pct_change,
+           tooltip = label_percent(accuracy = 0.1)(pct_change))) +
   geom_col(position = "dodge") +
-  geom_text(aes(y = pct_change + sign(pct_change)/75,
-                label = label_percent(accuracy = 0.1)(pct_change)),
-            size = 4) +
+  geom_col_interactive(position = "dodge", size = 2) +
   scale_y_continuous(labels = label_percent(),
                      breaks = c(-0.075,-0.05, -0.025, 0, 0.025, 0.05, 0.075, 0.1, 0.125, 0.15, 0.175),
                      limits = c(-0.08,0.18)) + 
   scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) +
   labs(title = "Change in 18-34 year old population by living arrangement",
        subtitle="2016 to 2020",
-       caption = "Source: U.S. Census Bureau, American Community Survey, Table B09021.") +
-  theme(axis.title = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        legend.position = "none",
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        axis.ticks = element_blank())
+       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B09021.") +
+  scale_fill_pha() +
+  theme_pha()
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = hh_adultchild_plot,
+         height_svg = 4)
+  
+} else {
+  
+  hh_adultchild_plot +
+    geom_text(aes(y = pct_change + sign(pct_change)/75,
+                  color = arrangement,
+                  label = label_percent(accuracy = 0.1)(pct_change)),
+              size = 4) +
+    scale_color_pha()
+  
+  }
 
 ```

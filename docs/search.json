@@ -4,28 +4,14 @@
     "href": "index.html",
     "title": "Richmond Regional Housing Framework Data Update",
     "section": "",
-    "text": "About\nThis report is a data update for the Richmond Regional Housing Framework, which was released by the Partnership for Housing Affordability (PHA) in January 2020. It will support PHA’s ongoing efforts to educate both decision-makers and the public at large about the region’s housing needs and opportunities. Data in the report will also help PHA continue to monitor, change, and implement the policy solutions outlined in the Framework.\nThere are four parts in this report:"
+    "text": "This report is a data update for the Richmond Regional Housing Framework, which was released by the Partnership for Housing Affordability (PHA) in January 2020. It will support PHA’s ongoing efforts to educate both decision-makers and the public at large about the region’s housing needs and opportunities. Data in the report will also help PHA continue to monitor, change, and implement the policy solutions outlined in the Framework.\nThere are four parts in this report:\n\nDemographic and socioeconomic changes\nHousing supply and market changes\nGap analysis\nLocal summaries\n\n\n\n\nThis report is an interactive website with three main columns for navigation:\n\nTable of contents (left): Search bar and links to all chapters in the report.\nCurrent chapter (center): Main chapter content.\nChapter navigation (right): Quick links to subsections within the currently-viewed chapter.\n\nLinks to both the previous and next chapter are included at the bottom of each chapter page.\n\n\n\nAll comments, questions, and suggestions should be emailed to jonathan@hdadvisors.net and eric@hdadvisors.net.\nWhen applicable, please reference:\n\nThe chapter number (“Chapter 3”)\nThe section/subsection (“3.2.1”)\nThe figure/title number (“Figure 3.3”)\n\nClick here to generate an email in your inbox with the recipients auto-filled.\n\n\n\n\n\n2022-10-06\nCompleted local summaries for Charles City County, Goochland County, New Kent County, and Powhatan County.\nStill to come:\n\nAdditional details for the Town of Ashland\nStandardize colors across visualizations to match PHA brand palette\nMake selection of plots interactive\nAdd in dynamic links for all footnotes and citations\nPDF version of full report and locality summaries\n\n\n\n\n2022-09-15\nFirst complete draft. Completed PART 3 chapters and local summaries for main four localities.\nStill to come:\n\nLocal summaries for Charles City County, Goochland County, New Kent County, Powhatan County, and additional details for the Town of Ashland\nStandardize colors across visualizations to match PHA brand palette\nMake selection of plots interactive\nAdd in dynamic links for all footnotes and citations\nPDF version of full report and locality summaries\n\n\n\n\n2022-09-11\nThird partial draft. Completed PART 2 chapters. Add dynamic figure and table captions to local summary template.\n\n\n\n2022-09-06\nSecond partial draft. Migrate from Bookdown project to Quarto project.\n\n\n\n2022-08-30\nFirst partial draft. Test site rendering and hosting. PART 1 chapters fully drafted. Remaining chapters in production."
   },
   {
-    "objectID": "index.html#how-to-read-this-report",
-    "href": "index.html#how-to-read-this-report",
-    "title": "Richmond Regional Housing Framework Data Update",
-    "section": "How to read this report",
-    "text": "How to read this report\nThis report is an interactive website with three main columns for navigation:\n\nTable of contents (left): Search bar and links to all chapters in the report.\nCurrent chapter (center): Main chapter content.\nChapter navigation (right): Quick links to subsections within the currently-viewed chapter.\n\nLinks to both the previous and next chapter are included at the bottom of each chapter page."
-  },
-  {
-    "objectID": "index.html#how-to-provide-feedback-on-this-draft",
-    "href": "index.html#how-to-provide-feedback-on-this-draft",
-    "title": "Richmond Regional Housing Framework Data Update",
-    "section": "How to provide feedback on this draft",
-    "text": "How to provide feedback on this draft\nAll comments, questions, and suggestions should be emailed to jonathan@hdadvisors.net and eric@hdadvisors.net.\nWhen applicable, please reference:\n\nThe chapter number (“Chapter 3”)\nThe section/subsection (“3.2.1”)\nThe figure/title number (“Figure 3.3”)\n\nClick here to generate an email in your inbox with the recipients auto-filled."
-  },
-  {
-    "objectID": "index.html#changelog",
-    "href": "index.html#changelog",
-    "title": "Richmond Regional Housing Framework Data Update",
-    "section": "Changelog",
-    "text": "Changelog\n\nRelease 1.1\n2022-10-06\nCompleted local summaries for Charles City County, Goochland County, New Kent County, and Powhatan County.\nStill to come:\n\nAdditional details for the Town of Ashland\nStandardize colors across visualizations to match PHA brand palette\nMake selection of plots interactive\nAdd in dynamic links for all footnotes and citations\nPDF version of full report and locality summaries\n\n\n\nRelease 1.0\n2022-09-15\nFirst complete draft. Completed PART 3 chapters and local summaries for main four localities.\nStill to come:\n\nLocal summaries for Charles City County, Goochland County, New Kent County, Powhatan County, and additional details for the Town of Ashland\nStandardize colors across visualizations to match PHA brand palette\nMake selection of plots interactive\nAdd in dynamic links for all footnotes and citations\nPDF version of full report and locality summaries\n\n\n\nRelease 0.3\n2022-09-11\nThird partial draft. Completed PART 2 chapters. Add dynamic figure and table captions to local summary template.\n\n\nRelease 0.2\n2022-09-06\nSecond partial draft. Migrate from Bookdown project to Quarto project.\n\n\nRelease 0.1\n2022-08-30\nFirst partial draft. Test site rendering and hosting. PART 1 chapters fully drafted. Remaining chapters in production."
+    "objectID": "part-1-1.html",
+    "href": "part-1-1.html",
+    "title": "1  Population changes",
+    "section": "",
+    "text": "This chapter covers population changes across the Partnership for Housing Affordability’s main coverage area, including the City of Richmond and the counties of Chesterfield, Hanover, and Henrico."
   },
   {
     "objectID": "part-1-1.html#total-population-growth",
@@ -47,6 +33,13 @@
     "title": "1  Population changes",
     "section": "1.3 Population projections",
     "text": "1.3 Population projections\nBetween 2020 and 2050, the region is expected to grow by nearly a third (29 percent)—reaching 1,338,306 residents.\n\n\n\n\n\nFigure 1.3: Population projections\n\n\n\nOver the next 30 years, Chesterfield County will continue to lead growth across the region. By 2050, Chesterfield is expected to surpass half a million residents, growing by 38 percent from the 2020 Census estimates.\nPopulation growth trends will largely continue as they have with Hanover County experiencing the second greatest growth from their 2020 estimates (27 percent increase). Henrico County follows with a 26 percent increase (+88,565), while the City of Richmond will only increase by about a fifth (20 percent) over 30 years.\n\n\n\n\n\nFigure 1.4: Population projections by locality"
+  },
+  {
+    "objectID": "part-1-2.html",
+    "href": "part-1-2.html",
+    "title": "2  Household characteristics",
+    "section": "",
+    "text": "This chapter covers the household trends that influence housing demand across the Partnership for Housing Affordability’s coverage area, including, but not limited to householder age, household size, and multigenerational households."
   },
   {
     "objectID": "part-1-2.html#household-formation",
@@ -112,6 +105,13 @@
     "text": "2.9 Adult children with parents\nOver the past decade, a common stereotype has been that of adult millennial child continuing to live with their parents. While this trope is based in real economic challenges faced by young adults, such as increasing housing costs and student debt, its magnitude can often be overstated.\nToday, more than 75,800 adults 18 to 34 years old in the region—about one-in-three—live with their parents. This is more than any other arrangement. However, since 2016, the fastest growing living arrangement for young adults has been with an unmarried partner, followed by other nonrelatives (roommates). In fact, the share of young adults now living with a married spouse increased slightly more than the share still living with parents.\n\n\n\n\n\n\n\n\nFigure 2.9: Change in 18-34 year old population by living arrangement"
   },
   {
+    "objectID": "part-1-3.html",
+    "href": "part-1-3.html",
+    "title": "3  Incomes and wages",
+    "section": "",
+    "text": "This chapter covers the changes in incomes and wages among households and occupations across the region."
+  },
+  {
     "objectID": "part-1-3.html#household-incomes",
     "href": "part-1-3.html#household-incomes",
     "title": "3  Incomes and wages",
@@ -124,6 +124,13 @@
     "title": "3  Incomes and wages",
     "section": "3.2 Wages",
     "text": "3.2 Wages\n\n\n\n\n\n\nNote\n\n\n\nWage data in this section is sourced from the Occupational Employment and Wage Statistics (OEWS) program of the Bureau of Labor Statistics. OEWS is updated annually, most recently for 2021 data. This dataset provides a rich look into wage distribution by industry and occupation.\nHowever, OEWS is only available at the national, state, and metro levels. Therefore, the data below covers the full Richmond, Virginia Metropolitan Statistical Area (MSA) rather than the (smaller) PHA region.\n\n\n\n3.2.1 Wage change by percentile\nWhile regional wages increased across the board from May 2019 to May 2021, the largest percent increases in average wages were among jobs that paid at and below the median wage. In fact, the largest growth occurred in the lowest 10th percentile of wages, due in large part to state lawmakers adopting incremental increases to Virginia’s minimum wage in 2020. The first increase from $7.25 to $9.50 per hour took effect in 2021.\n\n\n\n\n\n\nNote\n\n\n\nToday, state minimum wage is $11.00 per hour. Under current law, it will increase again to $12.00 in 2023. Lawmakers must reenact the measure by July 2024 to initiative further increases to $15.00 per hour by 2026.\n\n\nAnother factor in this low-end wage growth is likely the increased pay offered by many businesses, especially in the food, retail, and accommodation sectors, to encourage workers to return during the COVID-19 recovery.\n\n\n\n\n\n\n\n\nFigure 3.5: Percent change in annual wage in Richmond, VA MSA\n\n\n\n\n\n\n3.2.2 Wage change by occupation\nOver this same period, wages in the region grew for four of the five most common occupation categories by total employment numbers. Workers in the Transportation and Material Moving sector saw the largest increases—from an average annual salary of $30,250 to $36,370 (over 20 percent).\nJobs in Food Preparation and Serving, Sales, and Business and Financial Operations sectors—totaling more than 162,000 workers in the region as of May 2021—also saw wage growth, but less than the 13.3 percent average increase. Meanwhile, wages among Office and Administrative Support positions remained nearly the same (-0.2 percent) from 2019 to 2021.\n\n\n\n\n\n\n\n\nFigure 3.6: Percent change in annual wage for top 5 most common occupation categories"
+  },
+  {
+    "objectID": "part-1-4.html",
+    "href": "part-1-4.html",
+    "title": "4  Special populations",
+    "section": "",
+    "text": "This chapter covers trends among populations that experience a disability that may impact their ability to access and maintain housing."
   },
   {
     "objectID": "part-1-4.html#independent-living-difficulty",
@@ -140,6 +147,13 @@
     "text": "4.2 Veterans with disabilities\nVeterans of military service have access to a range of Department of Veterans Administration (VA) benefits, including VA home loans. These benefits also include disability payments for veterans with service-connected disabilities.\nTo award disability benefits, the VA assigns each disabled veteran a rating from zero to 100 percent based on the severity of their disability or disabilities. A higher rating reflects more significant impairments, and accordingly, additional paid benefits to cover lost wages and extra healthcare services.\nFrom 2016 to 2020, the number of veterans in the region with a service-connected disability increased by more than 2,800. A significant majority of this growth occurred among veterans with disability rating of 70 percent or higher, or those with the most severe physical and/or mental health challenges.\nDespite the increased benefits level associated with the higher rating, these disabled veterans may be challenged to find accessible and affordable housing options without additional support.\n\n\n\n\n\n\n\n\nFigure 4.4: Net change in veterans with service-connected disability by disability rating"
   },
   {
+    "objectID": "part-2-1.html",
+    "href": "part-2-1.html",
+    "title": "5  Homeownership",
+    "section": "",
+    "text": "This chapter covers the trends in the homeownership market across the four main Partnership for Housing Affordability localities, including the City of Richmond and counties of Chesterfield, Hanover, and Henrico."
+  },
+  {
     "objectID": "part-2-1.html#supply",
     "href": "part-2-1.html#supply",
     "title": "5  Homeownership",
@@ -151,7 +165,7 @@
     "href": "part-2-1.html#homeownership-rate",
     "title": "5  Homeownership",
     "section": "5.2 Homeownership rate",
-    "text": "5.2 Homeownership rate\n\n5.2.1 By locality\nSince 2016, overall homeownership rates for localities in the region have increased slightly. This accounts for the net increase in homeowners (over 15,000) and relatively steady number of renters over this time period.\n\n\n\n\n\n\n\n\nHomeownership rate by locality\n\n\n\n\n\n\n5.2.2 By age\nDespite high rents, high debt, and low inventory, younger households (under 35) have made some progress toward homeownership since 2016. Their homeownership rate across the region increased from 30 to 35 percent. On the other hand, homeownership rates for middle-age and older households remained about the same from 2016 to 2020.\n\n\n\n\n\n\n\n\nHomeownership rate by age group\n\n\n\n\n\n\n5.2.3 By race and ethnicity\nAcross the region, the homeownership gap remains wide between white households and households of color. White households in the Richmond area are the only group with a homeownership rate above 70 percent. However, several other groups—including Asian, multiracial, and Black households—have seen slight increases in their homeownership rates since 2016. At the same time, homeownership rates have fallen slightly for Hispanic or Latino households and those of another race.\n\n\n\n\n\n\n\n\nHomeownership rate by race and ethnicity"
+    "text": "5.2 Homeownership rate\n\n5.2.1 By locality\nSince 2016, overall homeownership rates for localities in the region have increased slightly. This accounts for the net increase in homeowners (over 15,000) and relatively steady number of renters over this time period.\n\n\n\n\n\nFigure 5.1: Homeownership rate by locality\n\n\n\n\n\n\n5.2.2 By age\nDespite high rents, high debt, and low inventory, younger households (under 35) have made some progress toward homeownership since 2016. Their homeownership rate across the region increased from 30 to 35 percent. On the other hand, homeownership rates for middle-age and older households remained about the same from 2016 to 2020.\n\n\n\n\n\n\n\n\nHomeownership rate by age group\n\n\n\n\n\n\n5.2.3 By race and ethnicity\nAcross the region, the homeownership gap remains wide between white households and households of color. White households in the Richmond area are the only group with a homeownership rate above 70 percent. However, several other groups—including Asian, multiracial, and Black households—have seen slight increases in their homeownership rates since 2016. At the same time, homeownership rates have fallen slightly for Hispanic or Latino households and those of another race.\n\n\n\n\n\n\n\n\nHomeownership rate by race and ethnicity"
   },
   {
     "objectID": "part-2-1.html#for-sale-market",
@@ -166,6 +180,13 @@
     "title": "5  Homeownership",
     "section": "5.4 New construction versus resale",
     "text": "5.4 New construction versus resale\n\n5.4.1 Sales price\nThe affordability of resale homes compared to new construction has often made them the first rung on the homeownership ladder. But since the start of the pandemic, the median resale home price has risen above the $300,000 mark and in June 2022 reached a high of $371,250.\nDuring this timeframe, new construction median home prices have remained above $350,000 and throughout 2022 so far have stayed above $400,000. On average, there is a $89,127 difference between new construction and resale sales price—leaving new construction significantly out of reach for lower income households.\n\n\n\n\n\n\n\n\nMedian price of new construction and resale\n\n\n\n\n\n\n5.4.2 Bedrooms\nThe majority of home sales in the region have been for three- and four-bedroom homes — roughly three in four homes sold in the past five years. Nuances exist at either end of the bedroom spectrum.\nNew construction with one- to two-bedrooms has been increasing — going from six percent of sales in 2017 to nine percent in 2022 YTD. At the other end, new construction of five or more bedroom homes has increased as well with an increase of three percent (15 percent of sales in 2017 to 18 percent in 2022 YTD). For resale homes, the share of homes by bedroom has remained largely unchanged each year.\n\n\n\n\n\n\n\n\nShare of bedrooms by new construction and resales\n\n\n\n\n\n\n5.4.3 Size\nIn the past five years, there have been clear differences in new construction and resale sales by square footage. The majority of resale homes have been under 2,000 square feet, while new construction is overwhelmingly over 2,000 square feet. These differences have clear implications on home prices (i.e. more square footage means higher prices). But across the region, minimum requirements set out by localities in zoning ordinances impact these builder decisions.\nBuilding smaller homes is less profitable given the rising cost to develop a single detached home (e.g. rising land, infrastructure, and regulatory costs). In order to maximize profit, home builders need to increase square footage to recoup costs and meet development requirements.\n\n\n\n\n\n\n\n\nHome size by new construction and resales"
+  },
+  {
+    "objectID": "part-2-2.html",
+    "href": "part-2-2.html",
+    "title": "6  Rental homes",
+    "section": "",
+    "text": "This chapter covers trends in the rental housing market across the four main Partnership for Housing Affordability localities, including the City of Richmond and counties of Chesterfield, Hanover, and Henrico."
   },
   {
     "objectID": "part-2-2.html#supply",
@@ -189,6 +210,13 @@
     "text": "6.3 Rental vacancy\nFor much of the past two decades, vacancy rates have fluctuated seasonally as new people enter and leave the rental housing market. Across the region, submarkets have largely had vacancy rates below ten percent. In 2022, the regional average vacancy rate to-date was five percent.\nHowever, some submarkets in the region have lower than average vacancy rates; Hanover County (1 percent), Eastern Henrico (3 percent), Northside (3 percent), and East End (4 percent) have significantly lower vacancy rates.\n\n\n\n\n\nFigure 6.11: Vacancy rates by submarket"
   },
   {
+    "objectID": "part-2-3.html",
+    "href": "part-2-3.html",
+    "title": "7  Housing assistance",
+    "section": "",
+    "text": "This chapter covers the range of housing assistance in the region supported by federal, state, and local programs."
+  },
+  {
     "objectID": "part-2-3.html#affordable-rental-housing",
     "href": "part-2-3.html#affordable-rental-housing",
     "title": "7  Housing assistance",
@@ -210,6 +238,13 @@
     "text": "7.3 Affordable homeownership\nSince 2018, nonprofit developers in the region have averaged about 53 affordable homes sold to low-income buyers a year. Most of this production is attributable to Southside Community Development and project:HOMES.\n\n\n[1] 53.4\n\n\n\n\n\nFigure 7.10: Richmond region nonprofit homeownership production"
   },
   {
+    "objectID": "part-2-4.html",
+    "href": "part-2-4.html",
+    "title": "8  Assessment of naturally-occurring affordable housing",
+    "section": "",
+    "text": "This chapter covers trends in naturally-occurring affordable housing (NOAH), or market affordable housing."
+  },
+  {
     "objectID": "part-2-4.html#naturally-occurring-affordable-housing",
     "href": "part-2-4.html#naturally-occurring-affordable-housing",
     "title": "8  Assessment of naturally-occurring affordable housing",
@@ -222,6 +257,13 @@
     "title": "8  Assessment of naturally-occurring affordable housing",
     "section": "8.2 Manufactured home communities",
     "text": "8.2 Manufactured home communities\nManufactured home communities (MHCs) are also a valuable source of NOAH across the region, but are not reliably monitors as traditional multifamily rental housing. As a result, accurate data on supply and rents are more difficult to obtain.\n\n8.2.1 Supply\nIn 2016, the Manufactured Home Community Coalition of Virginia (MHCCV) conducted an assessment of all manufactured home communities across the Richmond, Virginia Metropolitan Statistical Area (MSA). That report found 4,735 homes across 54 MHCs in the greater region. Within the primary PHA area2 there are 24 different MHCs, which in all contained at least 2,742 individual manufactured homes.\n\n\n\n\n\n\nNote\n\n\n\nThis data includes homes that may be rented, as well as owned. Regardless, residents in MHCs rent the lot on which their home resides. This leaves many manufactured home community residents who own their homes in a precarious position should a community owner decide to sell or redevelop the property. Manufactured homes are not easily moved once installed, leaving many families forced to abandon their homes and seek new and more expensive housing elsewhere.\n\n\n\n\n\n\n\nFigure 8.11: Units in manufactured home communities by locality\n\n\n\n\nChesterfield County has the largest supply of homes in MHCs (1,543), which is about half the total number of subsidized rentals also in the county. Hanover and Richmond both have near 500 units in MHCs, while Henrico only has one MHC with 230 units.\n\n\n8.2.2 Locations\nThe majority of manufactured home community units are located along the Route 1 corridor. In areas where commercial and mixed-use development has accelerated, many of these properties are well-positioned for a change to a “higher and better” use. This redevelopment potential, while often in line with broader planning goals, is a threat to the long-term stability of MHCs.\n\n\n\n\n\n\n\n\nFigure 8.12: Map of manufactured housing communities\n\n\n\n\n\n\n\n\n\nNotable changes since 2020\n\n\n\nIn September 2020, project:HOMES, acquired a 52 unit manufactured home community called Bermuda Estates in Chesterfield County. Since acquiring the community, project:HOMES has made significant infrastructure improvements, replaced some units in disrepair, and constructed a community center. The nonprofit plans to continue investments and preserve the park as a high-quality, low-cost neighborhood.\nSuburban Village, Chesterfield County’s third largest MHC with almost 250 units, was purchased by Maryland-based Horizon Land Management in August 2021 for $22.5 million. The park was previously under the same local ownership since 1986. More than 35 potential buyers expressed interest.\nShady Hill Mobile Home Park, home to more than 100 families, was purchased by a Charlottesville-based development firm for $5.1 million in August 2022. While complete redevelopment is likely, exact plans and timing are not known."
+  },
+  {
+    "objectID": "part-3-1.html",
+    "href": "part-3-1.html",
+    "title": "9  Affordability of current housing supply",
+    "section": "",
+    "text": "This chapter is an analysis of existing housing costs versus the ability of households in the region to afford those housing costs."
   },
   {
     "objectID": "part-3-1.html#rental-housing-gap",
@@ -280,6 +322,13 @@
     "text": "10.5 Homelessness\n\n10.5.1 Point-in-Time counts\nFrom 2011 to 2019, the overall count of persons experiencing homelessness across the Greater Richmond Continuum of Care (GRCoC) had been in decline.2. But when the COVID-19 pandemic hit, the count jumped—going from 497 in 2019 to 834 in 2021, a 68 percent increase.\nThe Urban Institute recently highlighted Homeward’s (the region’s planning and coordinating organization for the GRCoC) efforts to address homelessness during the pandemic. Their response measures served as best practice examples in preventing high transmission rates among people experiencing homelessness as well as direct service staff.\nBut the challenges of reducing homelessness during the pandemic were laid bare. With an eviction moratorium, rental vacancy rates reached record lows—leaving many seeking rental options with little to none. In addition, providers have also referenced landlords setting high security deposits.\n\n\n\n\n\n\n\n\nFigure 10.11: Greater Richmond CoC Point-in-Time count\n\n\n\n\n\n\n10.5.2 Students experiencing homelessness\nThe McKinney-Vento Education for Homeless Children and Youth (EHCY) Program collects data on students experiencing homelessness, which often can paint a different picture of homelessness when compared to the Point-in-Time counts. In the region, school divisions have been seeing varying numbers, but between the 2018-2019 and 2019-2020 school years students experiencing homelessness have declined across all school divisions.\n\n\n\n\n\n\nDefining student homelessness\n\n\n\nHomeless children counted under the McKinney-Vento program are defined as “individuals who lack a fixed, regular, and adequate nighttime residence.” This includes children who are doubled-up with another households or living in motels, along with those living in shelters, vehicles, public areas, and other unsuitable places. This is more expansive than the definition used for PIT counts.\n\n\nThe most notable declines in student homelessness have been seen in the Richmond Public School system, where the number of students experiencing homelessness have declined by 40 percent from 2017-2018 to 2019-2020. Given the pandemic and virtual learning environments, upcoming McKinney-Vento data through the 2021-2022 school year may need require extra context.\n\n\n\n\n\nFigure 10.12: Enrolled students experiencing homelessness by school year"
   },
   {
+    "objectID": "part-4-1.html",
+    "href": "part-4-1.html",
+    "title": "11  Richmond City",
+    "section": "",
+    "text": "This chapter is a summary of the major changes to the City of Richmond’s population and housing market in the past five years."
+  },
+  {
     "objectID": "part-4-1.html#takeaways",
     "href": "part-4-1.html#takeaways",
     "title": "11  Richmond City",
@@ -306,6 +355,13 @@
     "title": "11  Richmond City",
     "section": "11.4 Gap analysis",
     "text": "11.4 Gap analysis\n\n11.4.1 Affordability of current housing stock\nBased on the 2020 median renter income estimate, the affordable rent for an average renting household is around $900. This was several hundred dollars below what the average asking rent for an apartment was in 2020. Although low-end wage growth has increased the purchasing power of working class households, extra take-home pay is likely to be used up for higher costs of goods—and accelerating rents.\n\n\n\n\n\nFigure 11.10: Richmond city: Average asking rent versus rent affordable to median renter income\n\n\n\n\nThe average renter in the city would also be very challenged to find an affordable home to purchase. This gap does not even factor in downpayment savings, credit worthiness, and other important factors.\n\n\n\n\n\nFigure 11.11: Richmond city: Income needed to afford median home price versus median renter income\n\n\n\n\nBased on HUD Comprehensive Housing Affordability Strategy (CHAS) data, there was a shortage of 17,834 rental homes for households making less than 80 percent AMI. This was a deficit increase of 300 homes from 2015 when the shortage was 17,534. The most severe shortage in the City of Richmond is among deeply affordable rentals for households at 30 percent AMI or less.\nBut there has been a growing shortage among higher income households between 31 and 80 percent AMI.\n\n\n\n\n\nFigure 11.12: Richmond city: Rental housing gap by AMI\n\n\n\n\n\n\n11.4.2 Impact of housing costs\nRising rents have continued to increase the number of renters with cost burden in the city, although there are possible signs of decelerating growth. Meanwhile, cost burden among homeowners is become much less common.\n\n\n\n\n\nFigure 11.13: Richmond city: Cumulative change in cost-burdened households by tenure\n\n\n\n\nFederal and state eviction protections during the pandemic significantly reduced the number of eviction filings and judgements processed by Richmond City District Court. However, these measures have now expired—along with the state’s rent relief program. This data does not include the summer months of 2022, when many observers have started to notice an increase in filings.\n\n\n\n\n\nFigure 11.14: Richmond city: Evictions filings and judgements"
+  },
+  {
+    "objectID": "part-4-2.html",
+    "href": "part-4-2.html",
+    "title": "12  Chesterfield County",
+    "section": "",
+    "text": "This chapter is a summary of the major changes to the Chesterfield County’s population and housing market in the past five years."
   },
   {
     "objectID": "part-4-2.html#takeaways",
@@ -336,6 +392,13 @@
     "text": "12.4 Gap analysis\n\n12.4.1 Affordability of current housing stock\nIn Chesterfield County, the median renter household income is just enough to afford the average market asking rent. In 2020, the rent affordable based on the median renter household income was $1,328, while the average asking rent was $1,265 — meaning that the typical renter could afford $63 more than the average asking rent.\nThis difference between affordable rent and asking rent has been shrinking in recent years. From a difference of $89 in 2016 to $63 in 2020.\n\n\n\n\n\nFigure 12.11: Chesterfield County: Average asking rent versus rent affordable to median renter income\n\n\n\n\nAlthough a typical renter can more easily find an affordable rental, if they are looking to move onto homeownership, they face a wider gap to cross.\nIn Chesterfield County, median renter household incomes have not been enough to afford the median sales price in the county from 2016 to 2020. In 2020, the gap between renter income and the income needed to afford the median priced home was $8,800. This is an increase of nearly $800 from the gap in 2016.\n\n\n\n\n\nFigure 12.12: Chesterfield County: Income needed to afford median home price versus median renter income\n\n\n\n\nAcross renter households with incomes below 80 percent AMI, the gap in affordable housing has increased by 204 units from 2015 to 2018 — for a total shortage of 7,569 rental units affordable to households making 80 percent AMI or less. This estimated gap is based on matching renter income to rental housing affordable to that income and should be considered with some caution.\nHousehold incomes matching housing costs does not necessarily reflect that a household is able to afford housing costs given the numerous other financial responsibilities held by individuals and families. Nonetheless, the estimated gap provides our closest assessment of a gap in housing at specific income-levels.\nFor Chesterfield County, the gap has increased most significantly for households between 51 and 80 percent AMI — suggesting a growing need for affordable housing for higher income households.\n\n\n\n\n\nFigure 12.13: Chesterfield County: Rental housing gap by AMI\n\n\n\n\n\n\n12.4.2 Impact of housing costs\nFrom 2015 to 2019, the number of cost burden homeowners has been in decline. By 2019, there was a total decline of 2,660 cost-burdened homeowners from 2015 estimates. But during this same timeframe, the number of cost-burdened renters has increased by 1,161. The disparate changes in cost burden in Chesterfield County speak to growing affordability issues for renters and greater stability for existing homeowners.\n\n\n\n\n\nFigure 12.14: Chesterfield County: Cumulative change in cost-burdened households by tenure\n\n\n\n\nPre-pandemic eviction filings were typically above 500 each month, while eviction judgements were made were nearly half of those filings. The pandemic protections signficantly decreased filings to nearly a third of pre-pandemic numbers. Eviction judgements remained low throughout much of 2021, but filings and judgements saw increases in the early part of 2022 — signalling the potential for greater renter instability as pandemic renter protections end.\n\n\n\n\n\nFigure 12.15: Chesterfield County: Evictions filings and judgements"
   },
   {
+    "objectID": "part-4-3.html",
+    "href": "part-4-3.html",
+    "title": "13  Henrico County",
+    "section": "",
+    "text": "This chapter is a summary of the major changes to the Henrico County’s population and housing market in the past five years."
+  },
+  {
     "objectID": "part-4-3.html#takeaways",
     "href": "part-4-3.html#takeaways",
     "title": "13  Henrico County",
@@ -362,6 +425,13 @@
     "title": "13  Henrico County",
     "section": "13.4 Gap analysis",
     "text": "13.4 Gap analysis\n\n13.4.1 Affordability of current housing stock\nIn 2020, the median renter income estimate required a rent of $1,202 to be considered affordable (not more than 30 percent of income). At this point in time, the average asking rent was $1,222 — only $20 more.\nThe difference between rent affordable to the typical renter and the average rent in the county has been narrowing since 2016 — when the difference was roughly $65.\nAlthough it may seem as Henrico County is becoming more and more affordable to renters, it is increasingly the trend that more and more higher income households are choosing to rent out of necessity or lifestyle preference. As rents continue to rise and wage increases slow, we may soon see that average rents are greater than the median renter household income in Henrico.\n\n\n\n\n\nFigure 13.10: Henrico County: Average asking rent versus rent affordable to median renter income\n\n\n\n\nAttaining homeownership has generally been harder with the median renter incomes. Before 2020, average renter incomes were not enough to afford the median-priced home in the county. As rates dropped in 2020, renters could compete more confidently in the market—but this is likely no longer the case as rates (and prices) have risen significantly.\n\n\n\n\n\nFigure 13.11: Henrico County: Median sales price versus maximum home price affordable to median renter income\n\n\n\n\nThe shortage of rental housing for households making 80 percent AMI and below has grown between 2015 and 2018 — from 12,030 in 2015 to 12,184 in 2018. This deficit increase by 154 rental homes was largely among rental housing between 31 to 80 percent AMI. However, below 30 percent AMI rental housing remains the largest need in the county.\n\n\n\n\n\nFigure 13.12: Henrico County: Rental housing gap by AMI\n\n\n\n\n\n\n13.4.2 Impact of housing costs\nFrom 2015 to 2019, the number of cost burdened homeowners has been on a steady decline — an overall decrease of 2,442 cost burdened homeowners. For renters, there has been an overall increase in cost-burdened renters; a net increase of 700 cost-burdened renters since 2015, a significant gain from when the runing difference was only 163 in 2018.\n\n\n\n\n\nFigure 13.13: Henrico County: Cumulative change in cost-burdened households by tenure\n\n\n\n\nPre-pandemic eviction filings in Henrico County averaged 933 each month, but since the pandemic eviction filings have dropped to an average of 271 each month. Eviction protections throughout the pandemic led to a 74 percent decrease in the average eviction judgements — from 361 to 93 per month.\nCompared to other localities in recent months, Henrico County eviction filings and judgements have remained low in recent months. But as eviction protections are lifted, Henrico County should be wary of any significant increases in filings.\n\n\n\n\n\nFigure 13.14: Henrico County: Evictions filings and judgements"
+  },
+  {
+    "objectID": "part-4-4.html",
+    "href": "part-4-4.html",
+    "title": "14  Hanover County",
+    "section": "",
+    "text": "This chapter is a summary of the major changes to the Hanover County’s population and housing market in the past five years."
   },
   {
     "objectID": "part-4-4.html#takeaways",
@@ -392,6 +462,13 @@
     "text": "14.4 Gap analysis\n\n14.4.1 Affordability of current housing stock\nIn 2020, median renter household income was $53,832. A household at this income would need an estimated rent of $1,345 to not be cost-burdened. In comparison to average asking rent in the county, the typical renter could afford the the average rent by more than $200. This could be a reflection of the growing number of higher income renters coming into the county as previously noted.\n\n\n\n\n\nFigure 14.11: Hanover County: Average asking rent versus rent affordable to median renter income\n\n\n\n\nAttaining homeownership has generally been harder with the median renter incomes. Before 2020, average renter incomes were only enough to support home prices that were tens of thousands below the median-priced home in the county. As rates dropped in 2020, renters could compete more confidently in the market—but this is likely no longer the case as rates (and prices) have risen significantly.\n\n\n\n\n\nFigure 14.12: Hanover County: Median sales price versus maximum home price affordable to median renter income\n\n\n\n\nIn spite of growing income among renters in the county, there was a shortage of 1,705 rental units for households making less than 80 percent AMI. This is a decrease from 2015 when the shortage was 1,840, but still represents a significant number of Hanover renters living in housing that is too expensive for them.\nThe deficit has decreased across all income levels below 80 percent AMI, but the below 30 percent AMI income group remains the most in need of new affordable rental options.\n\n\n\n\n\nFigure 14.13: Hanover County: Rental housing gap by AMI\n\n\n\n\n\n\n14.4.2 Impact of housing costs\nIn spite of the continuous increase in housing costs in Hanover County, there has been an overall decrease in the number of cost-burdened households from 2015 to 2019. As of 2019, there were 1,004 fewer cost-burdened homeowners and 393 fewer cost-burdened renters.\n\n\n\n\n\nFigure 14.14: Hanover County: Cumulative change in cost-burdened households by tenure\n\n\n\n\nWith fewer renters in the county, there have also been fewer eviction filings and judgements preceding the pandemic. Before the pandemic, Hanover County barely saw more than 75 eviction filings in a given month.\nDuring eviction protections of the pandemic, filings dropped below 20 a month, while eviction judgements dropped below 10. As new data is released, Hanover County should watch carefully for sudden increases.\n\n\n\n\n\nFigure 14.15: Hanover County: Evictions filings and judgements"
   },
   {
+    "objectID": "part-4-5.html",
+    "href": "part-4-5.html",
+    "title": "15  Town of Ashland",
+    "section": "",
+    "text": "This chapter is a summary of the major changes to the Town of Ashland’s population and housing market in the past five years. Although Ashland resides in Hanover County, the town sees some differences in population and housing trends from the rest of the county."
+  },
+  {
     "objectID": "part-4-5.html#takeaways",
     "href": "part-4-5.html#takeaways",
     "title": "15  Town of Ashland",
@@ -418,6 +495,13 @@
     "title": "15  Town of Ashland",
     "section": "15.4 Gap analysis",
     "text": "15.4 Gap analysis\n\n15.4.1 Affordability of current housing stock\nIn the Town of Ashland, renter median household incomes have been growing — allowing for the average renter to afford higher rents. In 2020, the typical Ashland renter household could afford a rent of $1,234 without being cost-burdened. This rent is $275 more than what the average asking rent in 2020 was.\nAlthough this suggests that renters in the town are more able to afford rental housing, it could also point to lower income renter households having to move elsewhere in order to afford housing.\n\n\n\n\n\nFigure 15.10: Town of Ashland: Rental housing gap\n\n\n\n\nIn spite of increasing incomes among renters in the town, the high price of homeownership continues to keep renters from moving to more permanent tenureship. In 2016. the gap between income needed to afford the median home price and the typical renter income was just over $17,000. By 2020, that gap had only decreased by about $2,000 — leaving the typical renter $15,241 away from being able to afford the median home price in 2020 ($305,000).\n\n\n\n\n\nFigure 15.11: Town of Ashland: Income needed to afford median home price versus median renter income\n\n\n\n\nIn contrast to other localities, homeowner cost burden has increased in Ashland. From 2015 to 2019, there has been an increase of 57 cost-burdened homeowner households — a 19 percent increase. However, the number of cost-burdened renter households decreased from 690 to 580 — a 16 percent decrease.\n\n\n\n\n\nFigure 15.12: Town of Ashland: Cost burden by tenure"
+  },
+  {
+    "objectID": "part-4-6.html",
+    "href": "part-4-6.html",
+    "title": "16  Charles City County",
+    "section": "",
+    "text": "This chapter is a summary of the major changes to the Charles City County’s population and housing market in the past five years."
   },
   {
     "objectID": "part-4-6.html#takeaways",
@@ -448,6 +532,13 @@
     "text": "16.4 Gap analysis\n\n16.4.1 Affordability of current housing stock\nFor the few hundred renters in the county, reaching homeownership has becoming more and more difficult in the county. In 2016, the income needed to afford the median home price was $34,539, while the median renter household income was $40,152. Since 2016, the ability of a renter to afford homeownership has quickly slipped away. By 2017, the median renter household was a few thousand dollars short of being able to afford homeownership. And by 2020, the gap between renter income and income needed had grown to nearly $17,000.\n\n\n\n\n\nFigure 16.9: Charles City County: Income needed to afford median home price versus median renter income\n\n\n\n\nIn spite of the low number of renters in the county, there is still a shortage of affordable rentals for households making less than 80 percent AMI. That shortage has shrunk since 2015, from 104 rental units to 83 in 2018. With the county’s declining population, a likely explanation is the departure of lower income renter households to other parts of the region.\n\n\n\n\n\nFigure 16.10: Charles City County: Rental housing gap by AMI\n\n\n\n\n\n\n16.4.2 Impact of housing costs\nFrom 2015 to 2019, there has been little change in the percent of households experiencing cost burden. Although there has been a slight decline in the number of cost-burdened homeowners, the share of cost-burdened homeowners has remained largely unchanged (24 percent in 2019). For renters, the number of cost-burdened renters has increased to 44 percent.\n\n\n\n\n\nFigure 16.11: Charles City County: Cost-burdened households by tenure\n\n\n\n\nMcKinney-Vento Act data provides an estimate of enrolled students who are experiencing homelessness. This data is contrast to HUD Point-in-Time (PIT) counts because it utilizes a different definition of homelessness. In Charles City County, the number of enrolled students has remained below 30 from the 2016-2017 to 2019-2020 school years. During the 2018-2019 school year, Charles City County had a lower count of 16, but experiences a slight increase to 22 in 2019-2020.\n\n\n\n\n\nFigure 16.12: Charles City CountyEnrolled students experiencing homelessness by school year"
   },
   {
+    "objectID": "part-4-7.html",
+    "href": "part-4-7.html",
+    "title": "17  Goochland County",
+    "section": "",
+    "text": "This chapter is a summary of the major changes to the Goochland County’s population and housing market in the past five years."
+  },
+  {
     "objectID": "part-4-7.html#takeaways",
     "href": "part-4-7.html#takeaways",
     "title": "17  Goochland County",
@@ -476,6 +567,13 @@
     "text": "17.4 Gap analysis\n\n17.4.1 Affordability of current housing stock\nWhen comparing renter income to the average asking rent in a year, Goochland County has seen a persistent gap between what is on the market and what is affordable to the typical renter. The gap between median renter household income and average asking rent in 2016 was $752. By 2020, that gap had increased by $10 — continuing to leave the typical renter hundreds of dollars short of affording the typical rent.\n\n\n\n\n\nFigure 17.10: Goochland County: Average asking rent versus rent affordable to median renter income\n\n\n\n\n. For renters to afford homeownership, the income needed to afford the the median priced home is a steep economic climb. In 2016, a household needed to make roughly $87,483 to afford the median sales price, but a renter’s median household income was only $40,915. By 2020, the gap had only narrowed slightly to $39,448.\n\n\n\n\n\nFigure 17.11: Goochland County: Income needed to afford median home price versus median renter income\n\n\n\n\nThe latest data from HUD shows that there was a shortage of 160 rental homes affordable to households making less than 80 percent AMI in 2018. This was a deficit decrease from 2015 when the shortage was 274. For Goochland County, the shortage among renters below 30 percent AMI has been declining slightly. But the major shortage exists among renters between 31 and 50 percent AMI.\n\n\n\n\n\nFigure 17.12: Goochland County: Rental housing gap by AMI\n\n\n\n\n\n\n17.4.2 Impact of housing costs\nCost burden in the county has declined in the county for both homeowners and renters. In 2015, 22 percent of homeowners were cost-burdened, but by 2019 that estimate had declined to 17 percent. Renters also saw declines — from roughly 32 percent to 27 percent during this same time period.\n\n\n\n\n\nFigure 17.13: Goochland County: Cost-burdened households by tenure\n\n\n\n\nMcKinney-Vento Act data shows small changes in the number of enrolled students experiencing homelessness. Although there was a decline from the 2016-2017 school year, the number of students experiencing homelessness increased in the most recent year of 2019-2020. In rural communities like Goochland County, homelessness can often be invisible and difficult to assess. In some cases, substandard housing is a just as critical issue for those extremely low-income individuals and households.\n\n\n\n\n\nFigure 17.14: Goochland CountyEnrolled students experiencing homelessness by school year"
   },
   {
+    "objectID": "part-4-8.html",
+    "href": "part-4-8.html",
+    "title": "18  New Kent County",
+    "section": "",
+    "text": "This chapter is a summary of the major changes to the New Kent County’s population and housing market in the past five years."
+  },
+  {
     "objectID": "part-4-8.html#takeaways",
     "href": "part-4-8.html#takeaways",
     "title": "18  New Kent County",
@@ -502,6 +600,13 @@
     "title": "18  New Kent County",
     "section": "18.4 Gap analysis",
     "text": "18.4 Gap analysis\n\n18.4.1 Affordability of current housing stock\nA lack of diverse rental options leave lower income households with few housing options in the county aside from renting a single-family home. To purchase a single-family home, the typical renter in the county would need to make at least $17,000 more than they did in 2020.\n\n\n\n\n\nFigure 18.10: New Kent County: Income needed to afford median home price versus median renter income\n\n\n\n\nIn spite of a low number of rental housing options in the county, there was still a shortage of 255 rental housing units for households making 80 percent AMI or less in 2018. This shortage is an increase from 2015 when the shortage was 135. The increase in deficit was most significant for households making between 51 and 80 percent AMI — an increase of 75 households from zero.\n\n\n\n\n\nFigure 18.11: New Kent County: Rental housing gap by AMI\n\n\n\n\n\n\n18.4.2 Impact of housing costs\nAlthough the number of renter households in the county has been declining, the share of cost-burdened renters has only increased. In 2019, 41 percent of renter households were cost-burdened compared to about 26 percent in 2015. For homeowners, the number of cost-burdened households has remained largely unchanged (1,352 in 2015 and 1,354 in 2019). But as new homeowners come into the county, the share of cost-burdened homeowners has declined from 22 to 20 percent.\n\n\n\n\n\nFigure 18.12: New Kent County: Cost-burdened households by tenure\n\n\n\n\nAvailable data from William and Mary’s Project HOPE shows that the number of enrolled students experiencing homelessness in the county has declined in recent years. The county’s McKinney-Vento Act data showed that there were 37 students experiencing homeless in the 2016-2017 school year. By the 2019-2020, that number had declined to 26.\n\n\n\n\n\nFigure 18.13: New Kent CountyEnrolled students experiencing homelessness by school year"
+  },
+  {
+    "objectID": "part-4-9.html",
+    "href": "part-4-9.html",
+    "title": "19  Powhatan County",
+    "section": "",
+    "text": "This chapter is a summary of the major changes to the Powhatan County’s population and housing market in the past five years."
   },
   {
     "objectID": "part-4-9.html#takeaways",

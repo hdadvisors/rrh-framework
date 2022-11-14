@@ -335,52 +335,15 @@ ggplot(pha_cbps,
 
 Since 2016, overall homeownership rates for localities in the region have increased slightly. This accounts for the net increase in homeowners (over 15,000) and relatively steady number of renters over this time period.
 
-```{r ho-rate-data, eval=FALSE}
+```{r}
+#| label: fig-ho-rate-plot
+#| fig.cap: "Homeownership rate by locality"
 
-b25003_vars <- load_variables(2020, "acs5") |> 
-  filter(str_sub(name, end = 7) %in% "B25003_")
-
-b25003_raw <- map_dfr(years, function(yr){
-   b25003_pull <- get_acs(
-    geography = "county",
-    state = "VA",
-    table = "B25003",
-    year = yr,
-    survey = "acs5"
-  ) |> 
-    mutate(year = yr)
-})
-
-b25003_vars_cleaned <- b25003_vars |> 
-  separate(label, into = c("est", "total", "tenure"), sep = "!!") |> 
-  select(variable = name, tenure) |> 
-  mutate(tenure = case_when(
-    tenure == "Owner occupied" ~ "Homeowner",
-    tenure == "Renter occupied" ~ "Renter"
-  )) |> 
-  drop_na()
-
-b25003_raw <- b25003_raw |> 
-  filter(GEOID %in% rr)
-
-b25003_data <- b25003_raw |> 
-  right_join(b25003_vars_cleaned, by = "variable") |> 
-  select(NAME, GEOID, year, tenure, estimate) |> 
-  mutate(NAME = str_remove_all(NAME, ", Virginia")) |>
-  group_by(NAME, year) |> 
-  mutate(pct = estimate/sum(estimate)) |> 
+b25003_owner <- read_rds("data/b25003_data.rds") |> 
+  filter(NAME %in% pha_names) |> 
   filter(tenure == "Homeowner")
 
-write_rds(b25003_data, "data/b25003_data.rds")
-
-```
-
-```{r ho-rate-plot, fig.cap="Homeownership rate by locality"}
-
-b25003_data <- read_rds("data/b25003_data.rds") |> 
-  filter(NAME %in% pha_names)
-
-ggplot(b25003_data,
+ggplot(b25003_owner,
        aes(x = NAME, 
            y = pct, 
            fill = NAME)) +
