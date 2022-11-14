@@ -52,6 +52,9 @@ knitr:
 
 format:
   html:
-    theme: lumen
+    theme:
+      - lumen
+      - rrh-framework.scss
+    mainfont: "Noto Sans"
   pdf:
     documentclass: scrreprt
