@@ -20,10 +20,11 @@ library(janitor)
 library(viridis)
 library(kableExtra)
 library(leaflet)
-library(optiRum)
+library(FinCal)
+library(hdatools)
+library(ggiraph)
+library(ggtext)
 
-tenure <- c("Homeowner", "Renter")
-tenure_colors <-setNames(viridis(2), nm = tenure)
 
 ```
 
@@ -121,23 +122,37 @@ population_data <- ashpop_clean |>
 #| label: fig-ash-pop
 #| fig-cap: "Town of Ashland: Total Population"
 
- ggplot(population_data,
-        aes(x = year,
-            y = value,
-            fill = value)) +
+pop_bar <- ggplot(population_data,
+                      aes(x = year,
+                          y = value,
+                          fill = value,
+                          data_id = value,
+                          tooltip = label_comma()(value))) +
   geom_col() +
-  scale_fill_continuous(viridis_pal()) +
-  labs(title = "Town of Ashland: Total Population",
+  geom_col_interactive(size = 2) +
+  scale_fill_gradientn(colours = c("#CAE3C2", "#74BA91", "#519B8D", "#2B4258")) +
+  theme_pha() +
+  labs(title = "Town of Aashland: Total Population",
        subtitle = "2010 to 2020",
-       caption = "Source: U.S. Census Bureau Decennial Census and American Community Survey.") +
+       caption = "**Source:** U.S. Census Bureau Decennial Census and American Community Survey.") +
   scale_y_continuous(labels = label_comma()) +
   theme(axis.title = element_blank(),
         legend.position = "none",
         panel.background = element_blank(),
         axis.ticks = element_blank(),
         panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+                                          size = 0.05)) +
+  theme(plot.title.position = "plot",
+        plot.caption.position = "plot")
 
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = pop_bar,
+         height_svg = 4)
+} else {
+  
+  pop_bar
+}
 
 ```
 Population projections produced by the University of Virginia's Weldon Cooper Center show that the town will continue to grow over the coming decades. By 2050, the Weldon Cooper Center expects Ashland to approach nearly 10,000 residents --- a 27 percent increase over 30 years.
@@ -155,28 +170,31 @@ forecast <- data.frame(year = years,
                        type = type)
 
 
-ggplot(forecast,
+forecast_plot <- ggplot(forecast,
        aes(x = year,
            y = estimate,
            fill = type,
-           label = label_comma()(estimate))) +
+          data_id = estimate,
+          tooltip = label_comma()(estimate))) +
   geom_col() +
-  geom_text(vjust= 1.5,
-            color="white",
-            size = 3,
-            fontface="bold") +
+  geom_col_interactive(size = 2) +
+  scale_fill_pha() +
+  theme_pha() +
   scale_y_continuous(labels = label_comma()) +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        panel.background = element_blank()) +
   labs(title="Town of Ashland: Population projections",
-       subtitle="Town Population in 2020 and forecast to 2050",
+       subtitle="Town population in 2020 and forecast to 2050",
        fill="Estimate type",
-       caption="Source: University of Virginia Weldon Cooper Center for Public Service")
+       caption="**Source:** University of Virginia Weldon Cooper Center for Public Service")
 
 
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = forecast_plot,
+         height_svg = 4)
+} else {
+  
+  forecast_plot
+}
   
 
 ```
@@ -250,23 +268,33 @@ b25007_data <- b25007_raw |>
 #| label: fig-hh-age-plot
 #| fig.cap: "Town of Ashland: Change in households by age and tenure"
 
-ggplot(b25007_data,
-       aes(y = change, x =tenure, fill = tenure)) +
+age_plot <- ggplot(b25007_data,
+       aes(y = change, 
+           x =tenure, 
+           fill = tenure,
+           data_id = change,
+           tooltip = change)) +
   geom_col(position = "dodge") +
+  geom_col_interactive(position = "dodge", size = 2) +
   facet_wrap(~age, nrow = 1) +
+  theme_pha() +
+  scale_fill_pha() +
   scale_y_continuous(labels = label_comma()) +
   labs(title="Change in households by age and tenure",
        subtitle="2016 to 2020",
        fill="Tenure",
-       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25007.") +
-  theme(axis.title = element_blank(),
-        axis.text.x = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        axis.ticks = element_blank()) +
-  scale_fill_manual(values = tenure_colors)
+       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25007.") 
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = age_plot,
+         height_svg = 4)
+} else {
+  
+  age_plot
+}
+  
+
 
 ```
 Households with children have only increased among renters in Hanover (+83) from 2016 to 2020 --- this is contrast to Hanover County as a whole, which is seeing an overall decrease in households with children. But the greatest household type to see growth in the town has been among nonfamily homeowner households (i.e. individuals living alone or with roommates) --- similarly to the county.
@@ -334,23 +362,34 @@ b25115_data <- b25115_raw |>
 #| label: fig-hh-child-plot
 #| fig.cap: "Town of Ashland: Change in households with children by tenure"
 
-ggplot(b25115_data,
-       aes(x = children, y = change, fill = tenure)) +
+ch_plot <- ggplot(b25115_data,
+       aes(x = children, 
+           y = change, 
+           fill = tenure,
+           data_id = change,
+           tooltip = label_comma()(change))) +
   geom_col(position = "dodge") + 
+  geom_col_interactive(position = "dodge", size = 2) +
+  theme_pha() + 
+  scale_fill_pha() +
   facet_wrap(~children, nrow = 1, scales = "free_x") +
-  scale_y_continuous(labels = label_comma()) +
-  labs(title = "Change in households with children by tenure",
+  scale_y_continuous(labels = label_number(style_positive = "plus", big.mark = ",")) +
+  labs(title = "Town of Ashland: Change in households with children by tenure",
        subtitle = "2016 to 2020",
-       fill = "Tenure",
-       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25115.") +
-  theme(axis.title = element_blank(),
-        axis.text.x = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        axis.ticks = element_blank()) +
-  scale_fill_manual(values = tenure_colors)
+       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25115.") 
+
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = ch_plot,
+         height_svg = 4)
+  
+} else {
+  
+  ch_plot
+  
+  }
+
 
 ```
 
@@ -418,28 +457,40 @@ While the senior population has grown overall in Ashland (+107), that growth has
 #| label: fig-hh-seniors-plot
 #| fig.cap: "Town of Ashland: Change in senior population by living arrangement"
 
-ggplot(b09020_data,
+snr_plot <- ggplot(b09020_data,
        aes(y = reorder_within(relationship, change, family),
            x = change,
-           fill = relationship)) +
+           fill = family,
+           data_id = change,
+           tooltip = change)) +
   geom_col(position = "dodge") +
+  geom_col_interactive(position = "dodge", size = 2) +
+  theme_pha() +
+  scale_fill_pha() +
   scale_y_reordered() +
   scale_x_continuous(labels = label_comma()) +
   facet_grid(rows = vars(family), scales = "free_y", space = "free", switch = "y") +
-  labs(title="Change in senior population by living arrangement",
+  #scale_y_discrete(labels = function(x) str_wrap(x, width = 10)) +
+  labs(title = "Town of Ashland: Change in senior population by living arrangement",
        subtitle="2016 to 2020",
        fill="Tenure",
-       caption = "Source: U.S. Census Bureau, American Community Survey, Table B09020.") +
-  theme(axis.title = element_blank(),
-        #axis.text.x = element_blank(),
-        panel.background = element_blank(),
+       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B09020.") +
+  theme(strip.placement = "outside",
         panel.grid.major.y = element_blank(),
-        legend.position = "none",
-        panel.grid.major.x = element_line(color = "grey95",
-                                          size = 0.05),
-        axis.ticks = element_blank(),
-        strip.placement = "outside",
-        strip.text.y = element_text(angle = 0))
+        panel.grid.major.x = element_line(color = "#e2e4e3",
+                                          size = 0.05))
+
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = snr_plot,
+         height_svg = 4)
+  
+} else {
+  
+  snr_plot
+  
+  }
 
 ```
 
@@ -494,24 +545,33 @@ b25119_cpi <- b25119_data |>
   select(year, tenure, dollars20, cdollars = estimate) |> 
   select(year, tenure, dollars20, cdollars)
 
-ggplot(b25119_cpi, 
+inc_plot <- ggplot(b25119_cpi, 
        aes(x = year,
            y = dollars20,
-           fill = tenure)) +
+           fill = tenure,
+           data_id = dollars20,
+           tooltip = dollar_format()(dollars20))) +
   geom_col() +
+  geom_col_interactive(size =2) +
+  theme_pha() +
+  scale_fill_pha() +
   facet_wrap(~tenure) +
   scale_y_continuous(labels = dollar_format(), limits = c(0, NA)) +
   labs(title = "Town of Ashland: Median houshold income by tenure", 
        color = "Tenure",
        subtitle = "2016 to 2020 | Adjusted to 2020 dollars",
-       caption = "Source: U.S. Census Bureau, American Community Survey") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        legend.position = "none")
+       caption = "**Source:** U.S. Census Bureau, American Community Survey")
 
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = inc_plot,
+         height_svg = 4)
+  
+} else {
+  
+  inc_plot
+  
+  }
 ```
 
 ## Housing supply and market changes
@@ -561,23 +621,35 @@ ashland_priceadj <- ashland_medsales %>%
 #| label: fig-ash-sales
 #| fig-cap: "Town of Ashland: Monthly median sales price"
 
-ggplot(ashland_priceadj,
-       aes(x = date, y = dollars, color = dollars)) +
+sales_plot <- ggplot(ashland_priceadj,
+       aes(x = date,
+           y = dollars,
+           color = dollars,
+           group = 1)) +
   geom_line(size = 1) +
-  scale_y_continuous(labels = label_dollar(), limits = c(0, NA)) +
-  scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
-  labs(title = "Monthly median sales price",
+  geom_point_interactive(
+    aes(data_id = dollars,
+        tooltip = label_dollar()(dollars)),
+    size = 0.5) + 
+  theme_pha() +
+  scale_color_gradientn(colours = c("#CAE3C2", "#74BA91", "#519B8D", "#2B4258")) +
+  scale_y_continuous(labels = label_dollar()) +
+  scale_x_date(date_labels = "%Y", date_breaks = "1 year") +
+  labs(title = "Town of Ashland: Median home sales price",
        subtitle = "January 2017 to July 2022",
-       caption = "Source: Central Virginia Regional Multiple Listing Service.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        legend.position = "none",
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05)) +
-  scale_color_continuous(type = "viridis", label = dollar_format()) + 
-  geom_smooth(method = "lm")
+       caption = "**Source:** Central Virginia Regional Multiple Listing Service.") +
+  geom_smooth(method = "lm", color = "#Be451c")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = sales_plot,
+         height_svg = 4)
+  
+} else {
+  
+  sales_plot
+  
+  }
 
 ```
 
@@ -601,22 +673,36 @@ rent <- read_csv("data/ashland_rent.csv") %>%
     rent == "rent_adj" ~ "Inflation-adjusted rent"
   ))
 
-ggplot(rent,
-       aes(x = period,
-           y = value, 
-           color = rent)) +
-  geom_line(stat = "identity", size = 1) + 
-  labs(title = "Town of Ashland: Average asking rent",
+rent_plot <- ggplot(rent,
+                    aes(x = period,
+                        y = value, 
+                        color = rent)) +
+  geom_line(size = 1) +
+  geom_point_interactive(
+    aes(data_id = value,
+        tooltip = label_dollar()(value)),
+    size = 0.5) + 
+  theme_pha() +
+  scale_color_pha() +
+  labs(title = "Town of Ashland: Average asking rent by submarket",
        subtitle = "2016 Q1 to 2022 Q3",
        color = "Dollar value") +
   scale_y_continuous(labels = label_dollar()) +
   scale_x_date(date_labels = "%Y", date_breaks = "2 years", limits = as.Date(c("2016-01-01", "2022-09-30"))) +
-  theme(axis.title = element_blank(),
-        panel.background = element_blank(),
-        axis.ticks = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+  theme(legend.position = "top")
+
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = rent_plot,
+         height_svg = 4)
+  
+} else {
+  
+  rent_plot
+  
+  }
+
 
 ```
 
@@ -665,7 +751,7 @@ b25119_data <- b25119_raw %>%
 
 ashland_rent <- read_csv("data/ashland_annual_rent.csv")
 
-rentgap <- b25119_data %>% 
+rent_gap <- b25119_data %>% 
   filter(tenure == "Renter") %>% 
   left_join(ashland_rent, by = "year") %>% 
   mutate(affordable_rent = (estimate/12)*.30) %>% 
@@ -678,22 +764,33 @@ rentgap <- b25119_data %>%
     label == "affordable_rent" ~ "Affordable rent"
   ))
 
-ggplot(rentgap,
+rentgap <- ggplot(rentgap,
        aes(x = year,
            y = rent,
-           fill = label)) +
-  geom_bar(stat = "identity", position = "dodge") +
+           fill = label,
+           data_id = rent, 
+           tooltip = dollar_format()(rent))) +
+  geom_col(position = "dodge") +
+  geom_col_interactive(position = "dodge", size =2) +
+  theme_pha() +
+  scale_fill_pha() +
   scale_y_continuous(labels = label_dollar()) +
   labs(title = "Town of Ashland: Average asking rent versus\nrent affordable to median renter income",
        subtitle = "2016 to 2020",
        fill = "Nominal rent",
-       caption = "Sources: U.S. Census Bureau, American Community Survey, Table B25119\nand CoStar Group Inc.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+       caption = "**Sources:** U.S. Census Bureau, American Community Survey, Table B25119\nand CoStar Group Inc.") +
+  theme(legend.position = "top")
 
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = rentgap,
+         height_svg = 4)
+  
+} else {
+  
+  rentgap
+  
+  }
 
 
 
@@ -720,7 +817,7 @@ slgap <- b25119_data %>%
   drop_na() |> 
   mutate(principal = price - (price*downpayment)) |> 
   mutate(loanamt = principal/(1-closingcosts)) |> 
-  mutate(mortgage = abs(PMT((annual_int/12), 360, loanamt)) + 250) |> 
+  mutate(mortgage = abs(pmt((annual_int/12), 360, loanamt, 0)) + 250) |> 
   mutate(inc_needed = ((mortgage*10)/2.8)*12) |> 
   select(year, inc_needed, estimate) %>% 
   pivot_longer(2:3,
@@ -731,23 +828,33 @@ slgap <- b25119_data %>%
     label == "inc_needed" ~ "Income needed to afford median home price"
   ))
   
-ggplot(slgap,
+slgap_plot <- ggplot(slgap,
        aes(x = year,
            y = dollars,
-           fill = str_wrap(label, 25))) +
-  geom_bar(stat = "identity", position = "dodge") +
-  scale_y_continuous(labels = label_dollar()) +
-  labs(title = "Town of Ashland: Income needed to afford median home price\nversus median renter income",
+           fill = str_wrap(label, 25),
+           data_id = dollars,
+           tooltip = dollar_format()(dollars))) +
+  geom_col(position = "dodge") +
+  geom_col_interactive(position = "dodge", size = 2) +
+  scale_y_continuous(labels = label_dollar()) + 
+  theme_pha() +
+  scale_fill_pha() +
+labs(title = "Town of Ashland: Income needed to afford median home price\nversus median renter income",
        subtitle = "2016 to 2020",
        fill = "Nominal income",
-       caption = "Sources: U.S. Census Bureau, American Community Survey, Table B25119\nand Central Virginia Regional Multiple Listing Service.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        legend.key.height=unit(1, "cm"))
-    
+       caption = "**Sources:** U.S. Census Bureau, American Community Survey, Table B25119\nand Central Virginia Regional Multiple Listing Service.") +
+  theme(legend.position = "top")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = slgap_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  slgap_plot
+  
+  }
 
 ```
 In contrast to other localities, homeowner cost burden has increased in Ashland. From 2015 to 2019, there has been an increase of 57 cost-burdened homeowner households --- a 19 percent increase. However, the number of cost-burdened renter households decreased from 690 to 580 --- a 16 percent decrease.
@@ -767,11 +874,16 @@ ashland_cb_cln <- ashland_cb %>%
   mutate(year = as.character(year)) %>% 
   filter(grouping == "Cost-burdened")
 
-ggplot(ashland_cb_cln,
+cb_plot <- ggplot(ashland_cb_cln,
        aes(x = year,
            y = estimate,
-           fill = factor(grouping, levels = c("Not computed", "Cost-burdened", "Not cost-burdened")))) +
-  geom_col(position = "stack") +
+           fill = tenure,
+           data_id = estimate,
+           tooltip = estimate)) +
+  geom_col() +
+  geom_col_interactive(size = 2) +
+  theme_pha() + 
+  scale_fill_pha() +
   facet_wrap(~tenure) +
   labs(title = "Town of Ashland: Cost burden by tenure",
        subtitle = "In 2015 and 2019",
@@ -779,6 +891,17 @@ ggplot(ashland_cb_cln,
   scale_y_continuous(labels = number_format(big.mark = ",")) +
   theme(axis.title = element_blank(),
         legend.position = "none")
+  
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = cb_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  cb_plot
+  
+  }
   
 
 ```

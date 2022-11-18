@@ -116,9 +116,7 @@ pop_change <- ggplot(change,
   labs(title = paste0(name,": Components of population change"), 
        subtitle = "2016 through 2021",
        caption = "**Note:** 2020 components of change data not available.\n**Source:** U.S. Census Bureau, Population Estimates Program.")  +
-  scale_y_continuous(labels = label_number(big.mark = ",", style_positive = "plus", style_negative = "minus")) +
-  theme(plot.title.position = "plot",
-        plot.caption.position = "plot")
+  scale_y_continuous(labels = label_number(big.mark = ",", style_positive = "plus", style_negative = "minus")) 
 
 
 if (knitr::is_html_output()) {
@@ -161,9 +159,7 @@ ch_plot <- ggplot(b25115,
   scale_y_continuous(labels = label_number(style_positive = "plus", big.mark = ",")) +
   labs(title = paste0(name, ": Change in households with children by tenure"),
        subtitle = "2016 to 2020",
-       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25115.") +
-  theme(plot.title.position = "plot",
-        plot.caption.position = "plot")
+       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25115.") 
 
 
 if (knitr::is_html_output()) {
@@ -207,17 +203,11 @@ snr_plot <- ggplot(b09020,
   labs(title = paste0(name, ": Change in senior population by living arrangement"),
        subtitle="2016 to 2020",
        fill="Tenure",
-       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B09020.") +
-  theme(panel.background = element_blank(),
+       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B09020.")  +
+  theme(strip.placement = "outside",
         panel.grid.major.y = element_blank(),
-        legend.position = "none",
-        panel.grid.major.x = element_line(color = "grey95",
-                                          size = 0.05),
-        axis.ticks = element_blank(),
-        strip.placement = "outside",
-        strip.text.y = element_text(angle = 0),
-        plot.title.position = "plot",
-        plot.caption.position = "plot")
+        panel.grid.major.x = element_line(color = "#e2e4e3",
+                                          size = 0.05))
 
 if (knitr::is_html_output()) {
   
@@ -260,15 +250,7 @@ inc_plot <- ggplot(b25119_cpi,
   labs(title = paste0(name, ": Median houshold income by tenure"), 
        color = "Tenure",
        subtitle = "2016 to 2020 | Adjusted to 2020 dollars",
-       caption = "**Source:** U.S. Census Bureau, American Community Survey") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        legend.position = "none",
-        plot.title.position = "plot",
-        plot.caption.position = "plot")
+       caption = "**Source:** U.S. Census Bureau, American Community Survey")
 
 if (knitr::is_html_output()) {
   
@@ -311,15 +293,8 @@ ind_plot <- ggplot(b18107,
   scale_fill_pha() +
   labs(title=paste0(name, ": Net change in individuals with\nindependent living difficulties by age"),
        subtitle="2016 to 2020",
-       caption="Source: U.S. Census Bureau, American Community Survey, Table B18107.") +
-  scale_y_continuous(labels = label_comma()) +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        legend.position = "none",
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+       caption="**Source:** U.S. Census Bureau, American Community Survey, Table B18107.") +
+  scale_y_continuous(labels = label_comma()) 
 
 if (knitr::is_html_output()) {
   
@@ -392,14 +367,7 @@ sales_plot <- ggplot(price_adj,
   scale_x_date(date_labels = "%Y", date_breaks = "1 year") +
   labs(title = paste0(name, ": Median home sales price"),
        subtitle = "January 2017 to July 2022",
-       caption = "Source: Central Virginia Regional Multiple Listing Service.") +
-  theme(axis.title = element_blank(),
-        panel.background = element_blank(),
-        axis.ticks = element_blank(),
-        legend.title = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05)) +
+       caption = "**Source:** Central Virginia Regional Multiple Listing Service.") +
   geom_smooth(method = "lm", color = "#Be451c")
 
 if (knitr::is_html_output()) {
@@ -457,7 +425,7 @@ b25003_data <- b25003_raw |>
   mutate(pct = (estimate/sum(estimate))) |> 
   filter(tenure == "Renter")
 
-ggplot(b25003_data,
+renter_plot <- ggplot(b25003_data,
        aes(x = year,
            y = pct,
            fill = pct,
@@ -470,19 +438,20 @@ ggplot(b25003_data,
   labs(title = "Percent of renter households in Powhatan County", 
        fill = "Percent of total households",
        subtitle = "From 2016 to 2020",
-       caption = "Source: U.S Census Bureau. American Community Survey 2016-2020 5-Year Estimates. Table B25003.")
+       caption = "**Source:** U.S Census Bureau. American Community Survey 2016-2020 5-Year Estimates. Table B25003.") +
+  scale_y_continuous(labels = percent_format())
 
-+
-  theme(axis.title = element_blank(),
-        legend.position = "none") +
-  scale_y_continuous(labels = percent_format()) +
-  labs(title = "Percent of renter households in Powhatan County", 
-       fill = "Percent of total households",
-       subtitle = "From 2016 to 2020",
-       caption = "Source: U.S Census Bureau. American Community Survey 2016-2020 5-Year Estimates. Table B25003.")  + 
-  geom_text(aes(label = percent(pct)),
-            color = "white",
-            vjust = 1)
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = renter_plot,
+         height_svg = 4)
+  
+} else {
+  
+  renter_plot
+  
+  }
 
 
 ```
@@ -583,22 +552,33 @@ slgap <- sale |>
     data == "inc_needed" ~ "Income needed to afford median home price"
   ))
 
-ggplot(slgap,
+slgap_plot <- ggplot(slgap,
        aes(x = year,
            y = value,
-           fill = str_wrap(data, 25))) +
-  geom_bar(stat = "identity", position = "dodge") +
-  scale_y_continuous(labels = label_dollar()) +
+           fill = str_wrap(data, 25),
+           data_id = value,
+           tooltip = dollar_format()(value))) +
+  geom_col(position = "dodge") +
+  geom_col_interactive(position = "dodge", size = 2) +
+  scale_y_continuous(labels = label_dollar()) + 
+  theme_pha() +
+  scale_fill_pha() +
   labs(title = paste0(name, ": Income needed to afford median home price\nversus median renter income"),
        subtitle = "2016 to 2020",
        fill = "Nominal income",
-       caption = "Sources: U.S. Census Bureau, American Community Survey, Table B25119\nand Central Virginia Regional Multiple Listing Service.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        legend.key.height=unit(1, "cm"))
+       caption = "**Sources:** U.S. Census Bureau, American Community Survey, Table B25119\nand Central Virginia Regional Multiple Listing Service.") +
+  theme(legend.position = "top")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = slgap_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  slgap_plot
+  
+  }
 
 
 ```
@@ -625,23 +605,33 @@ gap <- read_rds("data/tb_18_match.rds") |>
   )) |>
   filter(household_income != "80 percent AMI or greater")
 
-ggplot(gap,
+gap_plot <- ggplot(gap,
        aes(x = year, 
            y = estimate,
-           fill = gapcode)) +
-  geom_bar(stat = "identity") +
-  facet_grid(~household_income) +
+           fill = gapcode,
+           data_id = estimate,
+           tooltip = estimate)) +
+  geom_col() + 
+  geom_col_interactive(size = 2) + 
+  facet_grid(~household_income) + 
+  theme_pha() +
+  scale_fill_pha() + 
   scale_y_continuous(labels = label_comma()) +
   labs(title = paste0(name, ": Rental housing gap by AMI"),
        subtitle = "2015 to 2018",
-       caption = "Source: U.S. Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        legend.position = "bottom",
-        legend.title = element_blank())
+       caption = "**Source:** U.S. Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
+  theme(legend.position = "top")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = gap_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  gap_plot
+  
+  }
 
 ```
 
@@ -659,20 +649,35 @@ cb <- read_rds("data/cb_7.rds") |>
   summarise(estimate = sum(estimate)) |> 
   mutate(pct = estimate/sum(estimate))
 
-ggplot(cb,
-       aes(x = year, y = pct, fill = cb_group)) +
+cb_plot <- ggplot(cb,
+       aes(x = year, 
+           y = pct, 
+           fill = cb_group,
+           data_id = pct,
+           tooltip = percent_format(accuracy = 1)(pct))) +
   facet_wrap(~tenure) +
-  geom_col(position = position_fill(reverse = TRUE)) +
+  geom_col(position = position_fill(reverse = TRUE)) + 
+  theme_pha() +
+  scale_fill_manual(values = c("#f39152", "#a6cccc", "#e2e4e3")) +
+  geom_col_interactive(position = position_fill(reverse = TRUE), size = 2) +
   scale_y_continuous(labels = percent_format()) +
   labs(title = paste0(name, ": Share of cost-burdened households by tenure"),
        subtitle = "2015 to 2018",
        fill = "Cost burden",
-       caption = "Source: U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+       caption = "**Source:** U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
+  theme(legend.position = "top")
+
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = cb_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  cb_plot
+  
+  }
 
 ```
 
@@ -687,22 +692,30 @@ div <- 72
 mkv <- read_csv("data/mkv.csv") |> 
   subset(Division %in% div)
 
-ggplot(mkv,
+mkv_plot <- ggplot(mkv,
        aes(x = year,
            y = students,
-           fill = Name)) +
-  geom_bar(stat = "identity") +
-  facet_wrap(~Name) +
+           fill = students,
+           data_id = students, 
+           tooltip = students)) +
+  geom_col() + 
+  geom_col_interactive(size = 2) +
+  theme_pha() + 
+  facet_wrap(~Name) + 
+  scale_fill_gradientn(colours = c("#CAE3C2", "#74BA91", "#519B8D", "#2B4258")) +
   labs(title = "Enrolled students experiencing homelessness by school year",
        subtitle = "2016-2017 to 2019-2020",
-       caption = "William & Mary School of Education, Project HOME - Virginia.") +
-  theme(axis.title = element_blank(),
-        legend.position = "none",
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        axis.ticks = element_blank()) +
-  scale_y_continuous(labels = label_comma())
+       caption = "**Source:** William & Mary School of Education, Project HOME - Virginia.")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = mkv_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  mkv_plot
+  
+  }
 
 ```
