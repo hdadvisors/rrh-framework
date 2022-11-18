@@ -462,9 +462,17 @@ ggplot(b25003_data,
            y = pct,
            fill = pct,
            data_id = pct,
-           tooltip = percent()(pct))) +
+           tooltip = label_percent()(pct))) + 
   geom_col() +
-  geom_col_interactive
+  geom_col_interactive(size = 2) +
+  theme_pha() +
+  scale_fill_gradientn(colours = c("#CAE3C2", "#74BA91", "#519B8D", "#2B4258")) +
+  labs(title = "Percent of renter households in Powhatan County", 
+       fill = "Percent of total households",
+       subtitle = "From 2016 to 2020",
+       caption = "Source: U.S Census Bureau. American Community Survey 2016-2020 5-Year Estimates. Table B25003.")
+
++
   theme(axis.title = element_blank(),
         legend.position = "none") +
   scale_y_continuous(labels = percent_format()) +
