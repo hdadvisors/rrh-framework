@@ -310,7 +310,7 @@ if (knitr::is_html_output()) {
 
 ### Homeownership
 
-As with all other localities in the region, home prices in the county have followed seasonal trends. In January 2017, the median home price in the county was \$473,901 and by July 2022 reached \$534,441 --- a 13 percent increase. Goochland County saw some spikes in median home price during the pandemic, but clearly those spikes did not exceed previous trends in the county.
+As with all other localities in the region, home prices in the county have followed seasonal trends. In January 2017, the median home price in the county was \$476,293 and by September 2022 reached \$567,980 --- a 19 percent increase. Goochland County saw some spikes in median home price during the pandemic, but clearly those spikes did not exceed previous trends in the county.
 
 ```{r}
 #| label: fig-sales
@@ -339,7 +339,7 @@ cpi <- read_csv("data/CPIAUCSL.csv") |>
 
 price_adj <- price |> 
   left_join(cpi, by = "date") |> 
-  mutate(dollars = ((295.271/cpi)*med_price)) |> 
+  mutate(dollars = ((296.761/cpi)*med_price)) |> 
   select(date, med_price, dollars) |> 
   pivot_longer(2:3,
                names_to = "type",
@@ -361,7 +361,7 @@ sales_plot <- ggplot(price_adj,
   scale_y_continuous(labels = label_dollar()) +
   scale_x_date(date_labels = "%Y", date_breaks = "1 year") +
   labs(title = paste0(name, ": Median home sales price"),
-       subtitle = "January 2017 to July 2022",
+       subtitle = "January 2017 to September 2022",
        caption = "**Source:** Central Virginia Regional Multiple Listing Service.") +
   theme(axis.title = element_blank(),
         panel.background = element_blank(),

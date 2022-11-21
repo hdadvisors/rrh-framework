@@ -230,7 +230,6 @@ In Hanover County, there was a \$45,460 difference between median homeowner hous
 #| label: fig-income
 #| fig-cap: !expr "paste0(name, \": Median houshold income by tenure\")"
 
-# Add choice of income stat (probably median household income of some kind)
 
 b25119_cpi <-read_rds("data/b25119_cpi.rds") |> 
   filter(NAME == name)
@@ -390,7 +389,7 @@ cpi <- read_csv("data/CPIAUCSL.csv") |>
 
 price_adj <- price |> 
   left_join(cpi, by = "date") |> 
-  mutate(dollars = ((295.271/cpi)*med_price)) |> 
+  mutate(dollars = ((296.761/cpi)*med_price)) |> 
   select(date, med_price, dollars) |> 
   pivot_longer(2:3,
                names_to = "type",
@@ -412,7 +411,7 @@ sales_plot <- ggplot(price_adj,
   scale_y_continuous(labels = label_dollar()) +
   scale_x_date(date_labels = "%Y", date_breaks = "1 year") +
   labs(title = paste0(name, ": Median home sales price"),
-       subtitle = "January 2017 to July 2022",
+       subtitle = "January 2017 to September 2022",
        caption = "**Source:** Central Virginia Regional Multiple Listing Service.") +
   geom_smooth(method = "lm", color = "#Be451c")
 

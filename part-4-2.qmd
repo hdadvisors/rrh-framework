@@ -16,16 +16,17 @@ library(readxl)
 library(zoo)
 library(lubridate)
 library(janitor)
-library(optiRum)
+library(FinCal)
 library(viridis)
 library(kableExtra)
+library(ggiraph)
+library(hdatools)
+library(ggtext)
 
 years <- 2016:2020
 fips <- 51041
 name <- "Chesterfield County"
 costar_name <- "Chesterfield County"
-tenure <- c("Homeowner", "Renter")
-tenure_colors <-setNames(viridis(2), nm = tenure)
 
 
 ```
@@ -58,26 +59,34 @@ pop <- read_rds("data/rr_pop_data.rds") |>
 pop_bar <- ggplot(pop,
                       aes(x = year,
                           y = value,
-                          fill = value)) +
+                          fill = value,
+                          data_id = value,
+                          tooltip = label_comma()(value))) +
   geom_col() +
-  scale_fill_continuous(viridis_pal()) +
+  geom_col_interactive(size = 2) +
+  scale_fill_gradientn(colours = c("#CAE3C2", "#74BA91", "#519B8D", "#2B4258")) +
+  theme_pha() +
   labs(title = paste0(name, ": Total Population"),
        subtitle = "2010 to 2020",
-       caption = "Source: U.S. Census Bureau Decennial Census and American Community Survey.") +
+       caption = "**Source:** U.S. Census Bureau Decennial Census and American Community Survey.") +
   scale_y_continuous(labels = label_comma()) +
   theme(axis.title = element_blank(),
         legend.position = "none",
         panel.background = element_blank(),
         axis.ticks = element_blank(),
         panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+                                          size = 0.05)) +
+  theme(plot.title.position = "plot",
+        plot.caption.position = "plot")
 
-# 2010 to 2020 increase of 48,312 --- 15 percent increase
-# 2019 TO 2020 increase of 11,746 --- 3 percent increase
-# 2016 to 2020 increase of 26,069 --- 8 percent increase
-# 2020 value is 364,548
-
-pop_bar
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = pop_bar,
+         height_svg = 4)
+} else {
+  
+  pop_bar
+}
 
 ```
 
@@ -91,23 +100,34 @@ change <- read_rds("data/rr_comp_change.rds") |>
   filter(year %in% as.character(years) | year == "2021") |> 
   filter(NAMELSAD == name)
 
-ggplot(change,
+pop_change <- ggplot(change,
        aes(x = year,
            y = value,
-           fill = component)) +
+           fill = component,
+           data_id = value,
+           tooltip = value)) +
   geom_col() +
+  geom_col_interactive(size = 2) +
   facet_wrap(~component) +
+  theme_pha() +
+  scale_fill_pha() +
   labs(title = paste0(name,": Components of population change"), 
        subtitle = "2016 through 2021",
-       fill = "Component of change",
-       caption = "Note: 2020 components of change data not available.\nSource: U.S. Census Bureau, Population Estimates Program.") +
-  theme(axis.title = element_blank(),
-        legend.position = "none",
-        panel.background = element_blank(),
-        axis.ticks = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05)) +
-  scale_y_continuous(labels = label_number(big.mark = ",", style_positive = "plus", style_negative = "minus"))
+       caption = "**Note:** 2020 components of change data not available.\n**Source:** U.S. Census Bureau, Population Estimates Program.")  +
+  scale_y_continuous(labels = label_number(big.mark = ",", style_positive = "plus", style_negative = "minus")) 
+
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = pop_change,
+         height_svg = 4)
+  
+} else {
+  
+  pop_change
+  
+  }
+
 
 ```
 
@@ -124,23 +144,33 @@ The increasing number of homeowners in the county has been outpacing renters sin
 b25115 <- read_rds("data/b25115_data.rds") |> 
   filter(NAME == name)
 
-ggplot(b25115,
-       aes(x = children, y = change, fill = tenure)) +
+ch_plot <- ggplot(b25115,
+       aes(x = children, 
+           y = change, 
+           fill = tenure,
+           data_id = change,
+           tooltip = label_comma()(change))) +
   geom_col(position = "dodge") + 
+  geom_col_interactive(position = "dodge", size = 2) +
+  theme_pha() + 
+  scale_fill_pha() +
   facet_wrap(~children, nrow = 1, scales = "free_x") +
   scale_y_continuous(labels = label_number(style_positive = "plus", big.mark = ",")) +
   labs(title = paste0(name, ": Change in households with children by tenure"),
        subtitle = "2016 to 2020",
-       fill = "Tenure",
-       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25115.") +
-  theme(axis.title = element_blank(),
-        axis.text.x = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        axis.ticks = element_blank()) +
-  scale_fill_manual(values = tenure_colors)
+       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25115.") 
+
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = ch_plot,
+         height_svg = 4)
+  
+} else {
+  
+  ch_plot
+  
+  }
 
 ```
 
@@ -155,11 +185,16 @@ b09020 <- read_rds("data/b09020_data.rds") |>
   mutate(family = str_replace(family, "Group quarters", " "),
          family = fct_relevel(family, "Family", "Nonfamily", " "))
 
-ggplot(b09020,
+snr_plot <- ggplot(b09020,
        aes(y = reorder_within(relationship, change, family),
            x = change,
-           fill = relationship)) +
+           fill = family,
+           data_id = change,
+           tooltip = change)) +
   geom_col(position = "dodge") +
+  geom_col_interactive(position = "dodge", size = 2) +
+  theme_pha() +
+  scale_fill_pha() +
   scale_y_reordered() +
   scale_x_continuous(labels = label_comma()) +
   facet_grid(rows = vars(family), scales = "free_y", space = "free", switch = "y") +
@@ -167,18 +202,22 @@ ggplot(b09020,
   labs(title = paste0(name, ": Change in senior population by living arrangement"),
        subtitle="2016 to 2020",
        fill="Tenure",
-       caption = "Source: U.S. Census Bureau, American Community Survey, Table B09020.") +
-  theme(axis.title = element_blank(),
-        #axis.text.x = element_blank(),
-        panel.background = element_blank(),
+       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B09020.")  +
+  theme(strip.placement = "outside",
         panel.grid.major.y = element_blank(),
-        legend.position = "none",
-        panel.grid.major.x = element_line(color = "grey95",
-                                          size = 0.05),
-        axis.ticks = element_blank(),
-        strip.placement = "outside",
-        strip.text.y = element_text(angle = 0))
+        panel.grid.major.x = element_line(color = "#e2e4e3",
+                                          size = 0.05))
 
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = snr_plot,
+         height_svg = 4)
+  
+} else {
+  
+  snr_plot
+  
+  }
 ```
 
 ### Income and wages
@@ -194,27 +233,33 @@ Between 2016 and 2020, the median renter household income increased by 7 percent
 b25119_cpi <-read_rds("data/b25119_cpi.rds") |> 
   filter(NAME == name)
 
-ggplot(b25119_cpi, 
+inc_plot <- ggplot(b25119_cpi, 
        aes(x = year,
            y = dollars20,
-           fill = tenure)) +
+           fill = tenure,
+           data_id = dollars20,
+           tooltip = dollar_format()(dollars20))) +
   geom_col() +
+  geom_col_interactive(size =2) +
+  theme_pha() +
+  scale_fill_pha() +
   facet_wrap(~tenure) +
   scale_y_continuous(labels = dollar_format(), limits = c(0, NA)) +
   labs(title = paste0(name, ": Median houshold income by tenure"), 
        color = "Tenure",
        subtitle = "2016 to 2020 | Adjusted to 2020 dollars",
-       caption = "Source: U.S. Census Bureau, American Community Survey") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        legend.position = "none") +
-  scale_fill_manual(values = tenure_colors)
+       caption = "**Source:** U.S. Census Bureau, American Community Survey")
 
-# 7 percent increase for renters
-# 5 percent increase for homeowners
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = inc_plot,
+         height_svg = 4)
+  
+} else {
+  
+  inc_plot
+  
+  }
 
 ```
 

@@ -610,7 +610,7 @@ cpi <- read_csv("data/CPIAUCSL.csv") %>%
 
 ashland_priceadj <- ashland_medsales %>% 
   left_join(cpi, by = "date") %>% 
-  mutate(dollars = ((295.271/cpi)*med_price)) %>%  
+  mutate(dollars = ((296.761/cpi)*med_price)) %>%  
   mutate(year = year(date)) %>% 
   select(date, year, med_price, dollars, cpi) %>% 
   filter(year >= 2017)
@@ -636,7 +636,7 @@ sales_plot <- ggplot(ashland_priceadj,
   scale_y_continuous(labels = label_dollar()) +
   scale_x_date(date_labels = "%Y", date_breaks = "1 year") +
   labs(title = "Town of Ashland: Median home sales price",
-       subtitle = "January 2017 to July 2022",
+       subtitle = "January 2017 to September 2022",
        caption = "**Source:** Central Virginia Regional Multiple Listing Service.") +
   geom_smooth(method = "lm", color = "#Be451c")
 

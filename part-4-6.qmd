@@ -310,7 +310,7 @@ if (knitr::is_html_output()) {
 
 ### Homeownership
 
-From 2017 to June 2022, median home price in the county has been on a general increase. In January 2017 the median home price was \$142,000 and by July 2022 was \$200,000. Between this time, monthly median sales price have fluctuated seasonally. But home sales in the county have not typically numbered beyond ten closed sales during this time frame. In fact, it was only in August 2019 that Charles City County so a five year high of ten total sales. With low sales and lower median prices, the loss of population is generally reflected in the for-sale home market.
+From 2017 to September 2022, median home price in the county has been on a general increase. In January 2017 the median home price was \$172,975 and by August 2022 was \$240,926. Between this time, monthly median sales price have fluctuated seasonally. But home sales in the county have not typically numbered beyond ten closed sales during this time frame. In fact, it was only in August 2019 that Charles City County so a five year high of ten total sales. With low sales and lower median prices, the loss of population is generally reflected in the for-sale home market.
 
 ```{r}
 #| label: fig-sales
@@ -339,7 +339,7 @@ cpi <- read_csv("data/CPIAUCSL.csv") |>
 
 price_adj <- price |> 
   left_join(cpi, by = "date") |> 
-  mutate(dollars = ((295.271/cpi)*med_price)) |> 
+  mutate(dollars = ((296.761/cpi)*med_price)) |> 
   select(date, med_price, dollars) |> 
   pivot_longer(2:3,
                names_to = "type",
@@ -361,7 +361,7 @@ sales_plot <- ggplot(price_adj,
   scale_y_continuous(labels = label_dollar()) +
   scale_x_date(date_labels = "%Y", date_breaks = "1 year") +
   labs(title = paste0(name, ": Median home sales price"),
-       subtitle = "January 2017 to July 2022",
+       subtitle = "January 2017 to September 2022",
        caption = "**Source:** Central Virginia Regional Multiple Listing Service.") +
   geom_smooth(method = "lm", color = "#Be451c")
 

@@ -315,7 +315,7 @@ if (knitr::is_html_output()) {
 
 ### Homeownership
 
-Powhatan County median home price has been on the rise. From a low of \$282,084 in March 2017 to a high of \$519,559 in May 2022, median home price in the county has increased nearly 84 percent. Although the over \$500,000 median home price may represent a seasonal spike, median home price has generally been trending upward and likely to stay above \$500,000 in the coming years.
+Powhatan County median home price has been on the rise. From a low of \$283,507 in March 2017 to a high of \$522,181 in May 2022, median home price in the county has increased nearly 84 percent. Although the over \$500,000 median home price may represent a seasonal spike, median home price has generally been trending upward and likely to stay above \$500,000 in the coming years.
 
 ```{r}
 #| label: fig-sales
@@ -344,7 +344,7 @@ cpi <- read_csv("data/CPIAUCSL.csv") |>
 
 price_adj <- price |> 
   left_join(cpi, by = "date") |> 
-  mutate(dollars = ((295.271/cpi)*med_price)) |> 
+  mutate(dollars = ((296.761/cpi)*med_price)) |> 
   select(date, med_price, dollars) |> 
   pivot_longer(2:3,
                names_to = "type",
