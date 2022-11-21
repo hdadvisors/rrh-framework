@@ -411,26 +411,34 @@ sub_rent <- read_csv("data/rr_submarket_data.csv") |>
 
 # Issue with above is that rents are not inflation-adjusted. May need to revisit. I've requested from CoStar to allow for an inflation-adjusted average rent per unit pull, BUT who knows if they can add it. Might consider just having a table with most recent rents.
 
-ggplot(sub_rent,
+sub_plot <- ggplot(sub_rent,
        aes(x = period,
            y = rent, 
-           color = submarket)) +
-  geom_line(stat = "identity") + 
-  labs(title = paste0(name, ": Average asking rent by submarket"),
-       subtitle = "2000 Q1 to 2022 Q3 | Not adjusted for inflation",
+           color = submarket,
+           group = 1)) +
+  geom_line(size = 1) +
+  geom_point_interactive(
+    aes(data_id = rent,
+        tooltip = label_dollar()(rent)),
+    size = 0.5) + 
+  theme_pha() +
+  scale_color_pha() + 
+  labs(title = paste0(name, ": Average asking rent"),
+       subtitle = "2016 Q1 to 2022 Q3 | Not adjusted for inflation",
        color = "Submarket") +
-  scale_y_continuous(labels = label_dollar(), limits = c(0, NA), n.breaks = 7) +
-  scale_x_date(date_labels = "%Y", date_breaks = "2 years", limits = as.Date(c("2000-01-01", "2022-09-30"))) +
-  theme(axis.title = element_blank(),
-        panel.background = element_blank(),
-        axis.ticks = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+  scale_y_continuous(labels = label_dollar()) +
+  scale_x_date(date_labels = "%Y", date_breaks = "2 years", limits = as.Date(c("2016-01-01", "2022-09-30")))
 
-
-# Q1 2020 E - 964
-# Q1 2020 W - 1146
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = sub_plot,
+         height_svg = 4)
+  
+} else {
+  
+  sub_plot
+  
+  }
 ```
 
 ### Housing assistance
