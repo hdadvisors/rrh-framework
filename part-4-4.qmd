@@ -836,7 +836,7 @@ cb_diff <- ggplot(cb,
   labs(title = paste0(name, ": Cumulative change in cost-burdened households by tenure"),
        subtitle = "2015 to 2018",
        fill = "Tenure",
-       caption = "Source: U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
+       caption = "**Source:** U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
   theme(panel.background = element_blank(),
         panel.grid.major.y = element_line(color = "grey95",
                                           size = 0.05)) 

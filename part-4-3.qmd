@@ -505,22 +505,30 @@ noah <- read_csv("data/pha_noah_81722.csv") |>
   mutate(period_built = fct_relevel(period_built, "Before 1940"))
   
 
-ggplot(noah,
+noah_plot <- ggplot(noah,
        aes(x = period_built,
            y = avg_asking_unit,
-           fill = period_built)) +
-  geom_boxplot() +
+           fill= period_built,
+           data_id = avg_asking_unit,
+           tooltip = avg_asking_unit)) +
+  geom_boxplot(lwd= 1, flatten = 1) + 
+  geom_boxplot_interactive(lwd= 1, flatten = 1, size = 2) +
+  theme_pha() +
+  scale_fill_pha() +
   scale_y_continuous(labels = label_dollar()) +
-  labs(title = paste0(name, ": Distribution of average asking rents\nin NOAH properties by year built"),
-       caption = "Source: CoStar Group, Inc.") +
-  theme(legend.position = "none",
-        panel.background = element_blank(),
-        axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+  labs(title = paste0(name, ": Distribution of average asking rents in NOAH properties by year built"),
+       caption = "**Source:** CoStar Group, Inc.")
   
-# sum(noah$number_of_units)
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = noah_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  noah_plot
+  
+  }
 
 ```
 
@@ -564,21 +572,33 @@ rent_gap <- b25119_cpi_rent |>
     type == "rent_current" ~ "Current rent"
   ))
 
-ggplot(rent_gap,
+rentgap <- ggplot(rent_gap,
        aes(x = year,
            y = dollars,
-           fill = type)) +
-  geom_bar(stat = "identity", position = "dodge") +
+           fill = type,
+           data_id = dollars, 
+           tooltip = dollar_format()(dollars))) +
+  geom_col(position = "dodge") +
+  geom_col_interactive(position = "dodge", size =2) +
+  theme_pha() +
+  scale_fill_pha() +
   scale_y_continuous(labels = label_dollar()) +
-  labs(title = paste0(name, ": Average asking rent versus\nrent affordable to median renter income"),
+  labs(title = "Hanover County: Average asking rent versus\nrent affordable to median renter income",
        subtitle = "2016 to 2020",
        fill = "Nominal rent",
-       caption = "Sources: U.S. Census Bureau, American Community Survey, Table B25119\nand CoStar Group Inc.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+       caption = "**Sources:** U.S. Census Bureau, American Community Survey, Table B25119\nand CoStar Group Inc.") +
+  theme(legend.position = "top")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = rentgap,
+         height_svg = 4)
+  
+} else {
+  
+  rentgap
+  
+  }
 
 
 ```
@@ -601,25 +621,33 @@ price_afford <- costs_income_afford |>
     TRUE ~ "Maximum affordable home price"
   ))
 
-ggplot(price_afford,
+slgap_plot <- ggplot(price_afford,
        aes(x = year,
            y = value,
-           fill = type)) +
+           fill = str_wrap(type, 25),
+           data_id = value,
+           tooltip = dollar_format()(value))) +
   geom_col(position = "dodge") +
-  scale_x_continuous(n.breaks = 7) +
-  scale_y_continuous(labels = label_dollar()) +
-  labs(title = paste0(name, ": Median sales price versus\nmaximum home price affordable to median renter income"),
-       subtitle ="2016 to 2022 (ACS income data through 2020)",
-       caption = "Sources: U.S. Census Bureau, American Community Survey,\nTable B25119 and CVR MLS.") +
-  theme(axis.title = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        legend.position = "bottom",
-        legend.title = element_blank(),
-        axis.text.x = element_text(angle = 90, vjust = 0.5),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        axis.ticks = element_blank())
+  geom_col_interactive(position = "dodge", size = 2) +
+  scale_y_continuous(labels = label_dollar()) + 
+  theme_pha() +
+  scale_fill_pha() +
+labs(title = "Hanover County: Income needed to afford median home price\nversus median renter income",
+       subtitle = "2016 to 2020",
+       fill = "Nominal income",
+       caption = "**Sources:** U.S. Census Bureau, American Community Survey, Table B25119\nand Central Virginia Regional Multiple Listing Service.") +
+  theme(legend.position = "top")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = slgap_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  slgap_plot
+  
+  }
 
 
 ```
@@ -645,25 +673,33 @@ gap <- read_rds("data/tb_18_match.rds") |>
   )) |>
   filter(household_income != "80 percent AMI or greater")
 
-ggplot(gap,
+gap_plot <- ggplot(gap,
        aes(x = year, 
            y = estimate,
-           fill = gapcode)) +
-  geom_bar(stat = "identity") +
-  facet_grid(~household_income) +
+           fill = str_wrap(gapcode, 25),
+           data_id = estimate,
+           tooltip = estimate)) +
+  geom_col() + 
+  geom_col_interactive(size = 2) + 
+  facet_grid(~household_income) + 
+  theme_pha() +
+  scale_fill_pha() + 
   scale_y_continuous(labels = label_comma()) +
   labs(title = paste0(name, ": Rental housing gap by AMI"),
        subtitle = "2015 to 2018",
-       caption = "Source: U.S. Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        legend.position = "bottom",
-        legend.title = element_blank())
+       caption = "**Source:** U.S. Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
+  theme(legend.position = "top")
 
-
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = gap_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  gap_plot
+  
+  }
 
 ```
 
@@ -685,32 +721,48 @@ cb <- read_rds("data/cb_7.rds") |>
   drop_na() |> 
   mutate(run_diff = cumsum(change))
 
-ggplot(cb,
-       aes(x = year, y = run_diff, fill = tenure)) +
+cb_diff <- ggplot(cb,
+       aes(x = year, 
+           y = run_diff, 
+           fill = tenure,
+           data_id = run_diff,
+           tooltip = run_diff)) +
   geom_col(position = "dodge") +
+  geom_col_interactive(position = "dodge", size = 2) +
+  theme_pha() +
+  scale_fill_pha() +
   scale_y_continuous(labels = label_comma()) +
   labs(title = paste0(name, ": Cumulative change in cost-burdened households by tenure"),
-       subtitle = "2015 to 2019",
+       subtitle = "2015 to 2018",
        fill = "Tenure",
-       caption = "Source: U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
+       caption = "**Source:** U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
+  theme(panel.background = element_blank(),
         panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05)) +
-  scale_fill_manual(values = tenure_colors)
+                                          size = 0.05)) 
+
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = cb_diff,
+         height_svg = 4) 
+  
+} else {
+  
+  cb_diff
+  
+  }
 
 ```
 Pre-pandemic eviction filings in Henrico County averaged 933 each month, but since the pandemic eviction filings have dropped to an average of 271 each month. Eviction protections throughout the pandemic led to a 74 percent decrease in the average eviction judgements --- from 361 to 93 per month. 
 
-Compared to other localities in recent months, Henrico County eviction filings and judgements have remained low in recent months. But as eviction protections are lifted, Henrico County should be wary of any significant increases in filings.
+Compared to other localities in recent months, Henrico County eviction filings and judgements have remained relatively low, but filings in the county have been trending upwards.
 
 ```{r}
 #| label: fig-evictions
 #| fig-cap: !expr "paste0(name, \": Evictions filings and judgements\")"
 
 evictions <- read_csv("data/evictions_17_22.csv") |> 
-  pivot_longer(3:128,
+  pivot_longer(3:142,
                names_to = "data",
                values_to = "value") |> 
   mutate(type = case_when(
@@ -723,18 +775,22 @@ evictions <- read_csv("data/evictions_17_22.csv") |>
   mutate(type = fct_relevel(type, "Filings", "Eviction judgements")) |> 
   filter(Jurisdiction == "Henrico")
 
-eviction_colors <- setNames(c("#00BFC4", "#F8766D"),
+eviction_colors <- setNames(c("#f39152", "#be451c"),
                             nm = c("Filings", "Eviction judgements"))
 
-ggplot(evictions,
+evict_plot <- ggplot(evictions,
        aes(x = date,
            y = value,
-           fill = type)) +
+           fill = type,
+           data_id = value,
+           tooltip = value)) +
   geom_col(position = "dodge") +
+  geom_col_interactive(position = "dodge", size = 2) +
+  theme_pha() +
   scale_x_date(labels = label_date_short(), breaks = breaks_width("6 months")) +
   scale_y_continuous(labels = label_comma()) +
   labs(title = paste0(name, ": Evictions filings and judgements"),
-       subtitle = "January 2017 to March 2022",
+       subtitle = "January 2017 through October 2022",
        caption = "Source: RVA Eviction Lab") +
   scale_fill_manual(values = eviction_colors) +
   theme(legend.position = "bottom",
@@ -746,9 +802,16 @@ ggplot(evictions,
                                           size = 0.05),
         axis.ticks = element_blank())
 
-evictions <- evictions |> 
-  filter(year >= 2020, 
-         type == "Filings")
 
-#mean(evictions$value)
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = evict_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  evict_plot
+  
+}
+
 ```
