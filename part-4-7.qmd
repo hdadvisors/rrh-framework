@@ -517,7 +517,7 @@ When comparing renter income to the average asking rent in a year, Goochland Cou
 
 ```{r}
 #| label: fig-income-rent-gap
-#| fig-cap: !expr "paste0(name, \": Average asking rent versus<br>rent affordable to median renter income\")"
+#| fig-cap: !expr "paste0(name, \": Average asking rent versus rent affordable to median renter income\")"
 
 # Compare local median renter income to average asking rent
 
@@ -581,7 +581,7 @@ For renters to afford homeownership, the income needed to afford the the median 
 
 ```{r}
 #| label: fig-income-own-gap
-#| fig-cap: !expr "paste0(name, \": Income needed to afford median home price<br>versus median renter income\")"
+#| fig-cap: !expr "paste0(name, \": Income needed to afford median home price versus median renter income\")"
 
 # Compare local renter income versus local home prices
 

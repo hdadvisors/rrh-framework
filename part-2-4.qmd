@@ -31,11 +31,6 @@ pha <- c("51085", "51760", "51087", "51041")
 
 pha_names <- c("Richmond City", "Hanover", "Henrico", "Chesterfield")
 
-geo_colors <- setNames(viridis(4), nm = pha_names)
-
-pal <-colorFactor(palette = c("#440154FF", "#31688EFF","#35B779FF", "#FDE725FF"),
-                  levels = c("Richmond City", "Hanover", "Henrico", "Chesterfield"))
-
 ```
 This chapter covers trends in naturally-occurring affordable housing (NOAH), or market affordable housing.
 
@@ -74,7 +69,8 @@ Based on this criteria, NOAH properties are located all across the region, espec
 #| label: fig-noah-map
 #| fig.cap: "Map of NOAH properties in region"
 
-rr_basemap <- read_rds("data/rr_basemap.rds")
+rr_basemap <- read_rds("data/rr_basemap.rds") 
+  
 
 noah <- read_csv("data/pha_noah_81722.csv") |> 
   clean_names() |> 
@@ -95,7 +91,7 @@ if (knitr::is_html_output()) {
   
   noah_dropna_rent <- noah |> 
     filter(!is.na(avg_asking_unit))
-  
+
   ggplot() +
     rr_basemap +
     geom_sf(noah_dropna_rent, mapping = aes(color = avg_asking_unit)) +
@@ -143,20 +139,15 @@ ggplot(noah_cnt,
            fill = county_name,
            color = county_name,
            label = label_comma()(n))) +
+  theme_pha() +
   geom_col() +
   geom_text(aes(y = n + 500)) +
-  scale_color_manual(values = geo_colors) +
-  scale_fill_manual(values = geo_colors) +
+  scale_color_manual(values = c("#a6cccc", "#5bab8e", "#f39152", "#be451c")) +
+  scale_fill_manual(values = c("#a6cccc", "#5bab8e", "#f39152", "#be451c")) +
   scale_y_continuous(labels = label_comma()) +
   labs(title= "NOAH units by locality",
        subtitle = "Data through August 2022",
-       caption = "Source: CoStar Group, Inc.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        legend.position = "none",
-        panel.grid.major.y = element_line(color = "grey95",
-                          size = 0.05))
+       caption = "**Source:** CoStar Group, Inc.")
 
 
 ```
@@ -194,31 +185,22 @@ style_units <- ggplot(noah_style,
                           y = units,
                           fill = style)) +
                  geom_col() +
+  theme_pha() + 
+  scale_fill_pha() +
                  scale_y_continuous(labels = label_comma()) +
                  labs(subtitle = "Number of units") +
-                 theme(axis.title = element_blank(),
-                       axis.text.x = element_blank(),
-                       axis.ticks = element_blank(),
-                       panel.background = element_blank(),
-                       legend.position = "none",
-                       panel.grid.major.y = element_line(color = "grey95",
-                                         size = 0.05))
+  theme(axis.text.x = element_text(angle = 90, hjust = 0, vjust = 0))
 
 style_bldgs <- ggplot(noah_style,
                       aes(x = reorder(style, props),
                           y = props,
                           fill = style)) +
-                 geom_col() +
+                 geom_col() + 
+  theme_pha() + 
+  scale_fill_pha() +
                  scale_y_continuous(labels = label_comma()) +
-                 labs(subtitle = "Number of properties") +
-                 theme(axis.title = element_blank(),
-                       axis.text.x = element_blank(),
-                       axis.ticks = element_blank(),
-                       panel.background = element_blank(),
-                       legend.position = "right",
-                       legend.title = element_blank(),
-                       panel.grid.major.y = element_line(color = "grey95",
-                                         size = 0.05))
+                 labs(subtitle = "Number of properties")  +
+  theme(axis.text.x = element_text(angle = 90, hjust = 0, vjust = 0))
 
 
 style_units + style_bldgs +
@@ -307,6 +289,8 @@ ggplot(noah_age,
            y = number_of_units,
            fill = status)) +
   geom_col() +
+  theme_pha() +
+  scale_fill_pha() +
   facet_wrap(~county_name, nrow = 4, scales = "free_x") +
   scale_x_continuous(limits = c(1900, 2022),
                      breaks = c(1900, 1925, 1950, 1975, 2000, 2010, 2020)) +
@@ -314,17 +298,11 @@ ggplot(noah_age,
                      breaks = c(500,1000)) +
   labs(title= "NOAH units by year built or renovated",
        subtitle = "Data through August 2022",
-       caption = "Source: CoStar Group, Inc.") +
+       caption = "**Source:** CoStar Group, Inc.") +
   geom_hline(aes(yintercept = 0),
              color = "grey70",
              size = 0.05) +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        legend.position = "right",
-        legend.title = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                          size = 0.05))
+  theme(legend.position = "right")
 
 ```
 
@@ -353,22 +331,36 @@ noah_rent <- read_csv("data/pha_noah_rent_81722.csv") |>
   filter(between(period, as.Date("2014-03-31"), as.Date("2022-09-30"))) |> 
   mutate(period = as.yearqtr(period))
 
-ggplot(noah_rent,
-       aes(x = period, y = rent, color = type)) +
+noah_rent_plot <- ggplot(noah_rent,
+       aes(x = period, 
+           y = rent, 
+           color = type)) +
   geom_line(size = 1) +
+  geom_point_interactive(
+    aes(data_id = rent,
+        tooltip = label_dollar()(rent)),
+    size = 0.5) + 
+  theme_pha() +
+  scale_color_pha() + 
   scale_y_continuous(labels = label_dollar(),
                      n.breaks = 9) +
   scale_x_yearqtr(format = "%Y Q%q") +
   labs(title = "Average asking rent for market-affordable multifamily",
        subtitle = "2014 Q1 to 2022 Q3 (to-date)",
        color = "Rent value",
-       caption = "Source: CoStar Group, Inc.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+       caption = "**Source:** CoStar Group, Inc.") +
+  theme(legend.position = "top")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = noah_rent_plot,
+         height_svg = 4)
+  
+} else {
+  
+  noah_rent_plot
+  
+  }
 
 
 ```
@@ -417,24 +409,36 @@ The sale of NOAH properties and ensuing new ownership often leads to rent increa
 
 mf_sales <- read_rds("data/pha_mf_sales.rds")
 
-ggplot(mf_sales,
+mf_sales_plot <- ggplot(mf_sales,
        aes(x = period,
            y = sales,
-           fill = category)) +
+           fill = category,
+           data_id = sales,
+           tooltip = sales)) +
   geom_col(position = "dodge") +
+  geom_col_interactive(position = "dodge", size = 2) +
+  theme_pha() +
+  scale_fill_pha() +
   scale_x_yearqtr(format = "%Y Q%q",
                   breaks = seq(from = min(mf_sales$period), to = max(mf_sales$period), by = 0.25)) +
   labs(title = "Number of multifamily properties sold",
        subtitle = "2017 Q3 to 2022 Q3 (to-date)",
-       caption = "Source: CoStar Group, Inc.") +
-  theme(panel.background = element_blank(),
-        axis.title = element_blank(),
-        axis.ticks.y = element_blank(),
-        legend.title = element_blank(),
-        legend.position = "top",
-        axis.text.x = element_text(angle = 90, vjust = 0.5),
-        panel.grid.major.y = element_line(color = "grey95",
-                                  size = 0.05))
+       caption = "**Source:** CoStar Group, Inc.") +
+  theme(legend.position = "top",
+        axis.text.x = element_text(angle = 90, vjust = 0.5))
+
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = mf_sales_plot,
+         height_svg = 4)
+  
+} else {
+  
+  mf_sales_plot
+  
+  }
+
 
 ```
 
@@ -444,25 +448,35 @@ However, NOAH transactions represent a smaller share of total units sold---about
 #| label: fig-noah-sales-units
 #| fig.cap: "Number of multifamily units sold"
 
-ggplot(mf_sales,
+mf_unit_plot <- ggplot(mf_sales,
        aes(x = period,
            y = sold_units,
-           fill = category)) +
+           fill = category,
+           data_id = sales,
+           tooltip = sales)) +
   geom_col(position = "dodge") +
+  geom_col_interactive(position = "dodge", size = 2) +
+  theme_pha() +
+  scale_fill_pha() +
   scale_x_yearqtr(format = "%Y Q%q",
                   breaks = seq(from = min(mf_sales$period), to = max(mf_sales$period), by = 0.25)) +
   scale_y_continuous(labels = label_comma()) +
   labs(title = "Number of multifamily units sold",
        subtitle = "2017 Q3 to 2022 Q3 (to-date)",
-       caption = "Source: CoStar Group, Inc.") +
-  theme(panel.background = element_blank(),
-        axis.title = element_blank(),
-        axis.ticks.y = element_blank(),
-        legend.title = element_blank(),
-        legend.position = "top",
-        axis.text.x = element_text(angle = 90, vjust = 0.5),
-        panel.grid.major.y = element_line(color = "grey95",
-                                  size = 0.05))
+       caption = "**Source:** CoStar Group, Inc.") +
+  theme(legend.position = "top",
+        axis.text.x = element_text(angle = 90, vjust = 0.5))
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = mf_unit_plot,
+         height_svg = 4)
+  
+} else {
+  
+  mf_unit_plot
+  
+  }
 
 ```
 
@@ -472,26 +486,38 @@ Sales volume for NOAH properties has, on average, been a small fraction of total
 #| label: fig-noah-sales-vol
 #| fig.cap: "Volume of multifamily sales"
 
-ggplot(mf_sales,
+mf_sales_plot <- ggplot(mf_sales,
        aes(x = period,
            y = volume,
            color = category)) +
   geom_line(size = 1) +
+  geom_point_interactive(
+    aes(data_id = volume,
+        tooltip = label_dollar()(volume)),
+    size = 0.5) + 
+  theme_pha() +
+  scale_color_pha() + 
+    scale_y_continuous(labels = label_dollar(scale = 0.000001, suffix = "M")) +
   scale_x_yearqtr(format = "%Y Q%q",
                   breaks = seq(from = min(mf_sales$period), to = max(mf_sales$period), by = 0.25)) +
-  scale_y_continuous(labels = label_dollar(scale = 0.000001, suffix = "M")) +
   labs(title = "Volume of multifamily sales",
        subtitle = "2017 Q3 to 2022 Q3 (to-date)",
-       caption = "Source: CoStar Group, Inc.") +
-  theme(panel.background = element_blank(),
-        axis.title = element_blank(),
-        axis.ticks.y = element_blank(),
-        legend.title = element_blank(),
-        legend.position = "top",
-        legend.key = element_blank(),
-        axis.text.x = element_text(angle = 90, vjust = 0.5),
-        panel.grid.major.y = element_line(color = "grey95",
-                                  size = 0.05))
+       caption = "**Source:** CoStar Group, Inc.") +
+  theme(legend.position = "top",
+        axis.text.x = element_text(angle = 90, vjust = 0.5))
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = mf_sales_plot,
+         height_svg = 4)
+  
+} else {
+  
+  mf_sales_plot
+  
+  }
+
+
 
 ```
 
@@ -501,26 +527,36 @@ During this timeframe, NOAH properties had an average price per unit below that 
 #| label: fig-noah-price-unit
 #| fig.cap: "Average price per unit"
 
-ggplot(mf_sales,
+unit_price <- ggplot(mf_sales,
        aes(x = period,
            y = avg_price_unit,
-           color = category)) +
+           color = category))  +
   geom_line(size = 1) +
+  geom_point_interactive(
+    aes(data_id = avg_price_unit,
+        tooltip = label_dollar()(avg_price_unit)),
+    size = 0.5) + 
+  theme_pha() +
+  scale_color_pha() + 
   scale_x_yearqtr(format = "%Y Q%q",
                   breaks = seq(from = min(mf_sales$period), to = max(mf_sales$period), by = 0.25)) +
   scale_y_continuous(labels = label_dollar(scale = 0.001, suffix = "K")) +
   labs(title = "Average price per unit",
        subtitle = "2017 Q3 to 2022 Q3 (to-date)",
-       caption = "Source: CoStar Group, Inc.") +
-  theme(panel.background = element_blank(),
-        axis.title = element_blank(),
-        axis.ticks.y = element_blank(),
-        legend.title = element_blank(),
-        legend.position = "top",
-        legend.key = element_blank(),
-        axis.text.x = element_text(angle = 90, vjust = 0.5),
-        panel.grid.major.y = element_line(color = "grey95",
-                                  size = 0.05))
+       caption = "**Source:** CoStar Group, Inc.") +
+  theme(legend.position = "top",
+        axis.text.x = element_text(angle = 90, vjust = 0.5))
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = unit_price,
+         height_svg = 4)
+  
+} else {
+  
+  unit_price
+  
+  }
 
 ```
 
@@ -553,20 +589,31 @@ mhc_cnt <- mhccv |>
   summarise(units = sum(units),
             mhcs = n())
 
-ggplot(mhc_cnt,
+mhc_plot <- ggplot(mhc_cnt,
        aes(y = reorder(county, units),
            x = units, 
-           fill = county)) +
-  geom_col() +
+           fill = county,
+           data_id = units,
+           tooltip = label_comma()(units))) +
+  geom_col() + 
+  geom_col_interactive(size = 2) +
+  theme_pha() +
+  scale_fill_pha() +
   scale_x_continuous(labels = label_comma()) +
   labs(title = "Units in manufactured home communities by locality",
-       caption = "Source: Manufactured Home Community Coalition of Virginia.") +
-  theme(panel.background = element_blank(),
-        legend.position = "none",
-        axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.grid.major.x = element_line(color = "grey95",
-                                  size = 0.05))
+       caption = "**Source:** Manufactured Home Community Coalition of Virginia.") 
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = mhc_plot,
+         height_svg = 4)
+  
+} else {
+  
+  mhc_plot
+  
+  }
+
 
 
 ```

@@ -484,7 +484,7 @@ A lack of diverse rental options leave lower income households with few housing 
 
 ```{r}
 #| label: fig-income-own-gap
-#| fig-cap: !expr "paste0(name, \": Income needed to afford median home price<br>versus median renter income\")"
+#| fig-cap: !expr "paste0(name, \": Income needed to afford median home price versus median renter income\")"
 
 # Compare local renter income versus local home prices
 
