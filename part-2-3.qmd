@@ -15,13 +15,15 @@ library(htmlwidgets)
 library(scales)
 library(lubridate)
 library(tidytext)
-library(knitr)
 library(kableExtra)
 library(formattable)
 library(readxl)
 library(tigris)
 library(ggspatial)
 library(mapboxapi)
+library(ggiraph)
+library(ggtext)
+library(hdatools)
 
 ```
 
@@ -244,16 +246,15 @@ ggplot(subsidy,
   geom_col() +
   geom_text(aes(x = percent + 0.03),
             size = 4) +
+  theme_pha() +
+  scale_fill_pha() +
+  scale_color_pha() +
   scale_x_continuous(labels = percent_format(), n.breaks = 10) +
   labs(title = "Share of federally assisted units by subsidy type",
        subtitle = "Data as of July 2022",
-       caption = "Source: National Housing Preservation Database.") +
-  theme(panel.background = element_blank(),
-        axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        legend.position = "none",
-        panel.grid.major.x = element_line(color = "grey95",
-                                  size = 0.05))
+       caption = "**Source:** National Housing Preservation Database.") +
+  theme(panel.grid.major.y = element_blank()) +
+  add_zero_line("x")
 
 ```
 
@@ -318,23 +319,39 @@ Table totals do not add to 100 percent because units are percent of all 8,061 *u
 #| fig.cap: "Detailed subsidy type for units with multiple subsidies"
 #| eval: false
 
-ggplot(multiple,
+multi_plot <- ggplot(multiple,
        aes(y = reorder_within(detail, units, subsidy_name),
            x = units,
-           fill = subsidy_name)) +
+           fill = subsidy_name,
+           data_id = units,
+           tooltip = label_comma()(units))) +
   geom_col(position = "dodge") +
+  geom_col_interactive(position = "dodge", size = 2) +
+  theme_pha() +
+  scale_fill_pha() +
   facet_wrap(~subsidy_name, ncol = 2, nrow = 2, scales = "free_y") +
   scale_y_reordered() +
   scale_x_continuous(labels = label_comma()) +
   labs(title = "Detailed subsidy type for units with multiple subsidies",
        subtitle = "Data as of July 2022",
-       caption = "Source: National Housing Preservation Database.") +
-  theme(legend.position = "none",
-        panel.background = element_blank(),
-        axis.ticks = element_blank(),
-        axis.title = element_blank(),
-        panel.grid.major.x = element_line(color = "grey95",
-                                  size = 0.05))
+       caption = "**Source:** National Housing Preservation Database.") +
+  theme(panel.grid.major.y = element_blank(),
+        panel.grid.major.x = element_line(
+        color = "#cbcdcc",
+        size = 0.05
+        ))
+
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = multi_plot,
+         height_svg = 4)
+  
+} else {
+  
+  multi_plot
+  
+  }
 
 ```
 
@@ -413,22 +430,22 @@ subsidy_local <- nhpd_coded_rr |>
   summarise(units = sum(units)) |>
   filter(units > 1)
 
-ggplot(subsidy_local,
+local_plot <- ggplot(subsidy_local,
        aes(x = reorder(locality, units),
            y = units,
-           fill = reorder(subsidy_type, units))) +
-  geom_col() +
+           fill = reorder(subsidy_type, units),
+           data_id = units,
+           tooltip = label_comma()(units))) +
+  geom_col() + 
+  geom_col_interactive(size = 2) +
+  theme_pha() +
+  scale_fill_pha() +
   scale_y_continuous(labels = label_comma()) +
   labs(title = "Federally assisted units by subsidy type and locality",
        subtitle = "Data as of July 2022",
        fill = "Subsidy type",
-       caption = "Source: National Housing Preservation Database.") +
-  theme(legend.position = "right",
-        panel.background = element_blank(),
-        axis.ticks = element_blank(),
-        axis.title = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                  size = 0.05))
+       caption = "**Source:** National Housing Preservation Database.") +
+  theme(legend.position = "right")
 
 # ggplot(subsidy_local,
 #        aes(y = reorder_within(subsidy_type, units, locality),
@@ -447,6 +464,17 @@ ggplot(subsidy_local,
 #         axis.title = element_blank(),
 #         panel.grid.major.x = element_line(color = "grey95",
 #                                   size = 0.05))
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = local_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  local_plot
+  
+  }
 
 ```
 
@@ -513,26 +541,36 @@ change_region <- change_subsidy |>
   group_by(subsidy_name) |>
   summarise(units = sum(units))
 
-ggplot(change_region,
+chg_plot <- ggplot(change_region,
        aes(x = reorder(subsidy_name, units),
            y = units,
            fill = subsidy_name,
            color = subsidy_name,
-           label = label_comma()(units))) +
+           label = label_number(big.mark = ",", style_positive = "plus", style_negative = "minus")(units))) +
   geom_col() +
+  theme_pha() +
+  scale_fill_pha() +
+  scale_color_pha() +
   geom_text(aes(y = units + sign(units)/0.003)) +
   scale_y_continuous(labels = label_comma(),
                      limits = c(-1750, 3100),
                      n.breaks = 10) +
   labs(title = "Net change in subsidized rental unit contracts",
        subtitle = "January 2020 through August 2022",
-       caption = "Source: National Housing Preservation Database and Virginia Housing.") +
-  theme(legend.position = "none",
-        panel.background = element_blank(),
-        axis.ticks = element_blank(),
-        axis.title = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                  size = 0.05))
+       caption = "**Source:** National Housing Preservation Database and Virginia Housing.") +
+  scale_y_continuous(labels = label_number(big.mark = ",", style_positive = "plus", style_negative = "minus"))
+
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = chg_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  chg_plot
+  
+  }
 
 ```
 
@@ -564,23 +602,36 @@ change_locality <- change_subsidy |>
   filter(change_type == "Net change",
          locality != "Charles City County")
 
-ggplot(change_locality,
+lchg_plot <- ggplot(change_locality,
        aes(x = reorder(subsidy_name, units),
            y = units,
            fill = subsidy_name,
-           color = subsidy_name)) +
-  geom_col() +
+           color = subsidy_name,
+           data_id = units,
+           tooltip = label_number(big.mark = ",", style_positive = "plus", style_negative = "minus")(units))) +
+  geom_col() + 
+  geom_col_interactive(size = 1) +
+  theme_pha() +
+  scale_fill_pha() +
+  scale_color_pha() +
   facet_wrap(~locality) +
   scale_y_continuous(labels = label_comma()) +
   labs(title = "Net change in subsidized rental unit contracts by locality",
        subtitle = "January 2020 through August 2022",
        caption = "Sources: National Housing Preservation Database and Virginia Housing.") +
-  theme(legend.position = "none",
-        panel.background = element_blank(),
-        axis.ticks = element_blank(),
-        axis.title = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                  size = 0.05))
+  scale_y_continuous(labels = label_number(big.mark = ",", style_positive = "plus", style_negative = "minus")) +
+  add_zero_line("x")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = lchg_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  lchg_plot
+  
+  }
 
 ```
 
@@ -613,24 +664,32 @@ lihtc <- nhpd_coded_rr |>
          pct_cum = sum/sum(units),
          date = as.character(year(end_year)))
 
-ggplot(lihtc,
+lihtc_plot <- ggplot(lihtc,
        aes(x = date,
-           y = pct)) +
-  geom_col(fill = "#c77cff") +
+           y = pct,
+           fill = pct,
+           data_id = pct,
+           tooltip = percent_format()(pct))) +
+  geom_col() +
+  scale_fill_gradientn(colours = c("#CAE3C2", "#74BA91", "#519B8D", "#2B4258")) +
+  theme_pha() +
   scale_y_continuous(labels = label_percent(),
                      n.breaks = 6) +
   labs(title = "Percent of active LIHTC units by end of commitment period",
        subtitle = "Included properties with multiple subsidies",
-       caption = "Sources: National Housing Preservation Database and Virginia Housing.") +
-  theme(
-    axis.ticks = element_blank(),
-    axis.title = element_blank(),
-    panel.background = element_blank(),
-    panel.grid.major.y = element_line(color = "grey95",
-                                  size = 0.05)
-  )
+       caption = "**Sources:** National Housing Preservation Database and Virginia Housing.")
 
 
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = lihtc_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  lihtc_plot
+  
+  }
 
 
 
@@ -757,14 +816,19 @@ rrp <- read_csv("data/rrp_data.csv")|>
   filter(locality == "Hanover County" | locality == "Henrico County" | locality == "Richmond") |>
   mutate(date = mdy(date))
 
-ggplot(rrp,
+rrp_plot <- ggplot(rrp,
        aes(x = date,
            y = payments,
-           fill = locality)) +
+           fill = locality,
+           data_id = payments,
+           tooltip = label_comma()(payments))) +
   geom_col() +
+  geom_col_interactive(size = 1) +
+  theme_pha() +
+  scale_fill_manual(values = c("#a6cccc", "#f39152", "#be451c")) +
   facet_wrap(~locality) +
   labs(title = "Rent relief payments by locality",
-       caption = "Source: Virginia Department of Housing and Community Development") +
+       caption = "**Source:** Virginia Department of Housing and Community Development") +
   scale_x_date(date_labels = "%b %y",
                expand = c(0,0)) +
   scale_y_continuous(labels = label_comma()) +
@@ -778,6 +842,18 @@ ggplot(rrp,
     legend.position = "none")
 
 # https://crsreports.congress.gov/product/pdf/R/R46688
+  
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = rrp_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  rrp_plot
+  
+  }
+
 
 
 ```
@@ -788,25 +864,35 @@ Average payments per household across the three localities was well above \$4,00
 #| label: fig-rrp-payment
 #| fig.cap: "Average assistance by month and locality"
 
-ggplot(rrp,
+rrpay_plot <- ggplot(rrp,
        aes(x = date,
            y = avgpayment,
-           fill = locality)) +
+           fill = locality,
+           data_id = avgpayment,
+           tooltip = dollar_format()(avgpayment))) +
   geom_col() +
+  geom_col_interactive(size = 1) +
+  theme_pha() +
+  scale_fill_manual(values = c("#a6cccc", "#f39152", "#be451c")) +
   facet_wrap(~locality) +
   labs(title = "Average assistance by month and locality",
-       caption = "Source: Virginia Department of Housing and Community Development") +
+       caption = "**Source:** Virginia Department of Housing and Community Development") +
   scale_x_date(date_labels = "%b %y",
                expand = c(0,0)) +
   scale_y_continuous(labels = label_dollar()) +
-  theme(
-    axis.ticks = element_blank(),
-    axis.title = element_blank(),
-    axis.text.x = element_text(angle = 90, vjust = 1, hjust = 1),
-    panel.background = element_blank(),
-    panel.grid.major.y = element_line(color = "grey95",
-                                  size = 0.05),
-    legend.position = "none")
+  theme(axis.text.x = element_text(angle = 90, vjust = 1, hjust = 1))
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = rrpay_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  rrpay_plot
+  
+  }
+
 
 ```
 
@@ -842,21 +928,32 @@ mean(avg_ho$total)
 
 # Average home price each year?
 
-ggplot(ho_production,
+ho_plot <- ggplot(ho_production,
        aes(x = year,
            y = homes,
-           fill = reorder(organization, homes))) +
+           fill = reorder(organization, homes),
+           data_id = homes,
+           tooltip = homes)) +
   geom_col() +
+  geom_col_interactive(size = 1) +
+  theme_pha() +
+  scale_fill_pha() +
   labs(title = "Richmond region nonprofit homeownership production",
-       subtitle = "Numbers for 2022 are current through August",
-       caption = "Source: Survey of nonprofit organizations.") +
-  theme(legend.title = element_blank(),
-        legend.position = "bottom",
-        axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                  size = 0.05)) +
+       subtitle = "Numbers for 2022 are current through August 2022",
+       caption = "**Source:** Survey of nonprofit organizations.") +
+  theme(legend.position = "bottom") +
   guides(fill = guide_legend(nrow = 2))
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = ho_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  ho_plot
+  
+  }
+
 
 ```
