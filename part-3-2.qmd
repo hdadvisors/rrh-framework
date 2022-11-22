@@ -210,12 +210,9 @@ cb_diff <- ggplot(cb_locality,
        subtitle = "2015 to 2019",
        fill = "Tenure",
        caption = "**Source:** U.S Department of Housing and Urban Development,<br>Comprehensive Housing Affordability Strategy (CHAS), Table 7.") +
-<<<<<<< HEAD
-  theme(legend.position = "right")
-=======
   theme(legend.position = "right") +
   add_zero_line(axis = "y")
->>>>>>> 7da65e0fcd7eddcfaf6d6ff1b9a1ea85a707b7ac
+
 
 if (knitr::is_html_output()) {
   
