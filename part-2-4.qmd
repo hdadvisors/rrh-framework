@@ -10,12 +10,14 @@ library(htmlwidgets)
 library(janitor)
 library(sf)
 library(sp)
-library(viridis)
-library(plotly)
 library(scales)
 library(zoo)
 library(lubridate)
 library(patchwork)
+library(ggtext)
+library(ggiraph)
+library(cowplot)
+library(hdatools)
 
 # Utilize the same filters as the Chesterfield County Rental Market Analysis. I've changed the star rating to two or less, which coincides with CoStar's analysis.
 
@@ -67,11 +69,10 @@ Based on this criteria, NOAH properties are located all across the region, espec
 
 ```{r}
 #| label: fig-noah-map
-#| fig.cap: "Map of NOAH properties in region"
+#| fig.cap: "NOAH properties in Richmond region"
 
-rr_basemap <- read_rds("data/rr_basemap.rds") 
+rr_basemap <- read_rds("data/rr_basemap.rds")
   
-
 noah <- read_csv("data/pha_noah_81722.csv") |> 
   clean_names() |> 
   st_as_sf(coords = c("longitude", "latitude"), crs=4326, remove=FALSE) |> 
@@ -95,16 +96,22 @@ if (knitr::is_html_output()) {
   ggplot() +
     rr_basemap +
     geom_sf(noah_dropna_rent, mapping = aes(color = avg_asking_unit)) +
-    scale_color_continuous(type = "viridis", labels = label_dollar()) +
-    labs(title = "Map of NOAH properties in region",
+    scale_color_continuous(type = "viridis", labels = label_dollar(), trans = "reverse") +
+    scale_x_continuous(expand = expansion(mult = 0),
+                       limits = c(-8660000, -8585000)) +
+    scale_y_continuous(expand = expansion(mult = 0),
+                       limits = c(4466959, 4548000)) +
+    labs(title = "NOAH properties in Richmond region",
+         subtitle = "Rents as of August 2022",
          color = "Average asking rent",
-         caption = "Source: CoStar Group, Inc.") +
-    theme(panel.background = element_blank(),
+         caption = "**Source:** CoStar Group, Inc.") +
+    theme_pha() +
+    theme(panel.grid = element_blank(),
           axis.title = element_blank(),
-          axis.ticks = element_blank(),
           axis.text = element_blank(),
-          legend.key = element_blank(),
-          plot.caption = element_text(hjust = 0))
+          legend.position = "right",
+          legend.title = element_text(),
+          legend.key = element_blank())
     
   }
 
@@ -133,24 +140,39 @@ noah_cnt <- noah |>
   group_by(county_name) |> 
   summarise(n = sum(number_of_units))
 
-ggplot(noah_cnt,
+noah_cnt_plot <- ggplot(noah_cnt,
        aes(x = reorder(county_name, n),
            y = n,
            fill = county_name,
-           color = county_name,
-           label = label_comma()(n))) +
+           label = label_comma()(n),
+           data_id = n,
+           tooltip = label_comma()(n))) +
   theme_pha() +
   geom_col() +
-  geom_text(aes(y = n + 500)) +
-  scale_color_manual(values = c("#a6cccc", "#5bab8e", "#f39152", "#be451c")) +
-  scale_fill_manual(values = c("#a6cccc", "#5bab8e", "#f39152", "#be451c")) +
+  geom_col_interactive(size = 2) +
+  scale_color_manual(values = c("#5bab8e", "#a6cccc", "#f39152", "#be451c")) +
+  scale_fill_manual(values = c("#5bab8e", "#a6cccc", "#f39152", "#be451c")) +
   scale_y_continuous(labels = label_comma()) +
   labs(title= "NOAH units by locality",
        subtitle = "Data through August 2022",
-       caption = "**Source:** CoStar Group, Inc.")
+       caption = "**Source:** CoStar Group, Inc.") +
+  add_zero_line(axis = "y")
 
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = noah_cnt_plot,
+         height_svg = 4)
+  
+} else {
+  
+  noah_cnt_plot +
+    geom_text(aes(y = n + 500,
+                  color = county_name))
+  
+  }
 
 ```
+
 ### Building style
 
 CoStar places buildings into style categories based on the following definitions:
@@ -169,8 +191,7 @@ Roughly four out of five NOAH units are part of garden style properties, which a
 However, garden style properties have more than 210 units on average, while low-rise properties have just 12. As a result, there more than twice as many low-rise properties (273) than garden properties (95).
 
 ```{r}
-#| label: fig-noah-style
-#| fig.cap: "NOAH units by building style"
+#| label: noah-style
 
 noah_style <- noah |> 
   st_drop_geometry() |> 
@@ -181,36 +202,91 @@ noah_style <- noah |>
   mutate(avg = units/props)
 
 style_units <- ggplot(noah_style,
-                      aes(x = reorder(style, units),
-                          y = units,
-                          fill = style)) +
-                 geom_col() +
+    aes(x = reorder(style, units, decreasing = TRUE),
+        y = units,
+        fill = style,
+        data_id = units,
+        tooltip = label_comma()(units))) +
+  geom_col() +
+  geom_col_interactive(size = 2) +
   theme_pha() + 
   scale_fill_pha() +
-                 scale_y_continuous(labels = label_comma()) +
-                 labs(subtitle = "Number of units") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 0, vjust = 0))
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 16)) +
+  scale_y_continuous(labels = label_comma()) +
+  labs(subtitle = "Number of units",
+       caption = "**Source:** CoStar Group, Inc.") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0))
 
 style_bldgs <- ggplot(noah_style,
-                      aes(x = reorder(style, props),
-                          y = props,
-                          fill = style)) +
-                 geom_col() + 
+    aes(x = reorder(style, units, decreasing = TRUE),
+        y = props,
+        fill = style,
+        data_id = props,
+        tooltip = label_comma()(props))) +
+  geom_col() + 
+  geom_col_interactive(size = 2) +
   theme_pha() + 
   scale_fill_pha() +
-                 scale_y_continuous(labels = label_comma()) +
-                 labs(subtitle = "Number of properties")  +
-  theme(axis.text.x = element_text(angle = 90, hjust = 0, vjust = 0))
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 16)) +
+  scale_y_continuous(labels = label_comma()) +
+  labs(subtitle = "Number of properties",
+       caption = "**Source:** CoStar Group, Inc.")  +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0))
 
+```
+
+:::: {.content-visible when-format="html"}
+
+::: {.panel-tabset}
+
+#### Units
+
+```{r}
+#| label: fig-noah-style-units
+#| fig.cap: "NOAH units by building style"
+
+girafe(ggobj = style_units,
+         height_svg = 4)
+
+```
+
+#### Properties
+
+```{r}
+#| label: fig-noah-style-bldgs
+#| fig.cap: "NOAH properties by building style"
+
+girafe(ggobj = style_bldgs,
+         height_svg = 4)
+
+```
+
+:::
+
+::::
+
+::: {.content-visible when-format="pdf"}
+
+```{r}
+#| label: fig-noah-style
+#| fig.cap: "NOAH units and properties by building style"
+
+style_units <- style_units +
+  theme(plot.caption = element_blank())
+
+style_bldgs <- style_bldgs +
+  theme(plot.caption = element_blank())
 
 style_units + style_bldgs +
   plot_annotation(
     title = "NOAH units and properties by building style",
-    caption = "Source: CoStar Group, Inc."
+    caption = "**Source:** CoStar Group, Inc.",
+    theme = theme_pha()
   )
-  
 
 ```
+
+:::
 
 The map below shows NOAH properties by building style across the region. Most of the low-rise properties are within Richmond, reflecting the early 20th century small-scale apartment buildings found across many historic neighborhoods in the city---especially the Fan and Museum District.
 
@@ -218,7 +294,7 @@ Garden style properties, on the other hand, are more commonly found in the count
 
 ```{r}
 #| label: fig-noah-style-map
-#| fig.cap: "Map of NOAH properties by building style"
+#| fig.cap: "NOAH properties by building style"
 
 if (knitr::is_html_output()) {
   
@@ -230,25 +306,34 @@ if (knitr::is_html_output()) {
     burst = F,
     layer.name = "Building style"
   )
-  
+
   } else {
   
   noah_dropna_style <- noah |> 
-  filter(!is.na(style))  
+  filter(!is.na(style))
 
   ggplot() +
     rr_basemap +
-    geom_sf(noah_dropna_style, mapping = aes(color = style), show.legend = "point") +
-    labs(title = "Map of NOAH properties by building style",
+    geom_sf(noah_dropna_style,
+            mapping = aes(color = style),
+            alpha = 0.5,
+            show.legend = "point") +
+    scale_color_pha() +
+    scale_x_continuous(expand = expansion(mult = 0),
+                       limits = c(-8660000, -8585000)) +
+    scale_y_continuous(expand = expansion(mult = 0),
+                       limits = c(4466959, 4548000)) +
+    labs(title = "Building style of NOAH properties",
+         subtitle = "Data as of August 2022",
          color = "Building style",
-         caption = "Source: CoStar Group, Inc.") +
-    #fixed_plot_aspect(ratio = 0.8) +
-    theme(panel.background = element_blank(),
+         caption = "**Source:** CoStar Group, Inc.") +
+    theme_pha() +
+    theme(panel.grid = element_blank(),
           axis.title = element_blank(),
-          axis.ticks = element_blank(),
           axis.text = element_blank(),
-          legend.key = element_blank(),
-          plot.caption = element_text(hjust = 0))
+          legend.position = "right",
+          legend.title = element_text(),
+          legend.key = element_blank())
     
   }
 
@@ -282,27 +367,44 @@ noah_age <- noah |>
     is.na(year_renovated) ~ "Original",
     TRUE ~ "Renovated",
   )) |> 
-  filter(year > 1900)
+  filter(year > 1900) |> 
+  group_by(year, county_name, status) |> 
+  summarise(number_of_units = sum(number_of_units))
 
-ggplot(noah_age,
+noah_age_plot <- ggplot(noah_age,
        aes(x = year,
            y = number_of_units,
-           fill = status)) +
+           fill = status,
+           data_id = number_of_units,
+           tooltip = label_comma()(number_of_units))) +
   geom_col() +
+  geom_col_interactive(size = 2) +
   theme_pha() +
   scale_fill_pha() +
   facet_wrap(~county_name, nrow = 4, scales = "free_x") +
   scale_x_continuous(limits = c(1900, 2022),
                      breaks = c(1900, 1925, 1950, 1975, 2000, 2010, 2020)) +
   scale_y_continuous(labels = label_comma(),
-                     breaks = c(500,1000)) +
+                     breaks = c(500,1000),
+                     expand = expansion(mult = 0)) +
   labs(title= "NOAH units by year built or renovated",
        subtitle = "Data through August 2022",
        caption = "**Source:** CoStar Group, Inc.") +
-  geom_hline(aes(yintercept = 0),
-             color = "grey70",
-             size = 0.05) +
-  theme(legend.position = "right")
+  add_zero_line(axis = "y") +
+  theme(legend.position = "right",
+        axis.ticks.x = element_line(size = 0.5, color = "#4b4f50"),
+        plot.subtitle = element_markdown(margin = margin(t = 5, b = 0, unit = "pt")))
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = noah_age_plot,
+         height_svg = 4)
+  
+} else {
+  
+  noah_age_plot
+  
+  }
 
 ```
 
@@ -349,7 +451,8 @@ noah_rent_plot <- ggplot(noah_rent,
        subtitle = "2014 Q1 to 2022 Q3 (to-date)",
        color = "Rent value",
        caption = "**Source:** CoStar Group, Inc.") +
-  theme(legend.position = "top")
+  theme(legend.position = "top",
+        plot.subtitle = element_markdown(margin = margin(t = 5, b = 0, unit = "pt")))
 
 if (knitr::is_html_output()) {
   
@@ -362,8 +465,8 @@ if (knitr::is_html_output()) {
   
   }
 
-
 ```
+
 ### Sales
 
 ```{r}
@@ -425,8 +528,9 @@ mf_sales_plot <- ggplot(mf_sales,
        subtitle = "2017 Q3 to 2022 Q3 (to-date)",
        caption = "**Source:** CoStar Group, Inc.") +
   theme(legend.position = "top",
-        axis.text.x = element_text(angle = 90, vjust = 0.5))
-
+        axis.text.x = element_text(angle = 90, vjust = 0.5),
+        plot.subtitle = element_markdown(margin = margin(t = 5, b = 0, unit = "pt"))) +
+  add_zero_line(axis = "y")
 
 if (knitr::is_html_output()) {
   
@@ -465,7 +569,9 @@ mf_unit_plot <- ggplot(mf_sales,
        subtitle = "2017 Q3 to 2022 Q3 (to-date)",
        caption = "**Source:** CoStar Group, Inc.") +
   theme(legend.position = "top",
-        axis.text.x = element_text(angle = 90, vjust = 0.5))
+        axis.text.x = element_text(angle = 90, vjust = 0.5),
+        plot.subtitle = element_markdown(margin = margin(t = 5, b = 0, unit = "pt"))) +
+  add_zero_line(axis = "y")
 
 if (knitr::is_html_output()) {
   
@@ -504,7 +610,8 @@ mf_sales_plot <- ggplot(mf_sales,
        subtitle = "2017 Q3 to 2022 Q3 (to-date)",
        caption = "**Source:** CoStar Group, Inc.") +
   theme(legend.position = "top",
-        axis.text.x = element_text(angle = 90, vjust = 0.5))
+        axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+  add_zero_line(axis = "y")
 
 if (knitr::is_html_output()) {
   
@@ -545,7 +652,9 @@ unit_price <- ggplot(mf_sales,
        subtitle = "2017 Q3 to 2022 Q3 (to-date)",
        caption = "**Source:** CoStar Group, Inc.") +
   theme(legend.position = "top",
-        axis.text.x = element_text(angle = 90, vjust = 0.5))
+        axis.text.x = element_text(angle = 90, vjust = 0.5),
+        plot.subtitle = element_markdown(margin = margin(t = 5, b = 0, unit = "pt"))) +
+  add_zero_line(axis = "y")
 
 if (knitr::is_html_output()) {
   
@@ -601,7 +710,10 @@ mhc_plot <- ggplot(mhc_cnt,
   scale_fill_pha() +
   scale_x_continuous(labels = label_comma()) +
   labs(title = "Units in manufactured home communities by locality",
-       caption = "**Source:** Manufactured Home Community Coalition of Virginia.") 
+       caption = "**Source:** Manufactured Home Community Coalition of Virginia.") +
+  theme(plot.title = element_markdown(margin = margin(b = 20, unit = "pt"))) +
+  flip_gridlines() +
+  add_zero_line(axis = "x")
 
 if (knitr::is_html_output()) {
   
@@ -638,7 +750,7 @@ write_rds(pha_mhc, "data/pha_mhc.rds")
 
 ```{r}
 #| label: fig-mhc-map
-#| fig.cap: "Map of manufactured housing communities"
+#| fig.cap: "Manufactured housing communities in Richmond region"
 
 pha_mhc <- read_rds("data/pha_mhc.rds") |>
   filter(STATUS != "CLOSED") |> 
@@ -657,20 +769,25 @@ if (knitr::is_html_output()) {
   
   } else {
 
-
   ggplot() +
     rr_basemap +
     geom_sf(pha_mhc, mapping = aes(color = SIZE), show.legend = "point") +
-    labs(title = "Map of manufactured housing communities",
+    scale_color_pha() +
+    scale_x_continuous(expand = expansion(mult = 0),
+                       limits = c(-8660000, -8585000)) +
+    scale_y_continuous(expand = expansion(mult = 0),
+                       limits = c(4466959, 4548000)) +
+    labs(title = "Manufactured housing communities in Richmond region",
          color = "Units in park",
-         caption = "Source: Manufactured Home Community Coalition of Virginia.") +
-    #fixed_plot_aspect(ratio = 0.8) +
-    theme(panel.background = element_blank(),
+         caption = "**Source:** Manufactured Home Community Coalition of Virginia.") +
+    theme_pha() +
+    theme(plot.title = element_markdown(margin = margin(b = 10, unit = "pt")),
+          panel.grid = element_blank(),
           axis.title = element_blank(),
-          axis.ticks = element_blank(),
           axis.text = element_blank(),
-          legend.key = element_blank(),
-          plot.caption = element_text(hjust = 0))
+          legend.position = "right",
+          legend.title = element_text(),
+          legend.key = element_blank())
     
   }
 
