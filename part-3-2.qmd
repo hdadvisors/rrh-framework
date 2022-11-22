@@ -692,7 +692,7 @@ call_plot <- ggplot(call_vol,
   labs(title = "Housing Resource Line monthly call volume",
        subtitle = "September 2020 through October 2022",
        caption = "**Source:** Partnership for Housing Affordability.") +
-  add_axis_line(axis = "y")
+  add_zero_line(axis = "y")
 
 if (knitr::is_html_output()) {
   
@@ -731,9 +731,9 @@ top_plot <- ggplot(call_top,
   scale_x_continuous(labels = label_percent(),
                      expand = expansion(mult = c(0,0.05))) +
   theme_pha() + 
+  
   labs(title = "Housing Resource Line volume by call topic",
        subtitle = "September 2020 through October 2022",
-<<<<<<< HEAD
        caption = "Note: Does not include topics below 1 percent of call volume.<br>**Source:** Partnership for Housing Affordability.") +
   theme(axis.title = element_blank(),
         legend.position = "none",
@@ -742,12 +742,9 @@ top_plot <- ggplot(call_top,
         panel.grid.major.x = element_line(color = "grey95",
                                           size = 0.05),
         axis.ticks = element_blank()) +
-  scale_x_continuous(labels = label_percent())
-=======
-       caption = "**Note:** Does not include topics below 1 percent of call volume.<br>**Source:** Partnership for Housing Affordability.") +
+  scale_x_continuous(labels = label_percent()) +
   flip_gridlines() +
   add_zero_line(axis = "x")
->>>>>>> 7da65e0fcd7eddcfaf6d6ff1b9a1ea85a707b7ac
 
 if (knitr::is_html_output()) {
   

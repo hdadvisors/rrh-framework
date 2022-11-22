@@ -113,7 +113,8 @@ pop_change <- ggplot(change,
   labs(title = paste0(name,": Components of population change"), 
        subtitle = "2016 through 2021",
        caption = "**Note:** 2020 components of change data not available.<br>**Source:** U.S. Census Bureau, Population Estimates Program.")  +
-  scale_y_continuous(labels = label_number(big.mark = ",", style_positive = "plus", style_negative = "minus")) 
+  scale_y_continuous(labels = label_number(big.mark = ",", style_positive = "plus", style_negative = "minus")) +
+  add_zero_line(axis = "y")
 
 
 if (knitr::is_html_output()) {
@@ -161,7 +162,8 @@ ch_plot <- ggplot(b25115,
   scale_y_continuous(labels = label_number(style_positive = "plus", big.mark = ",")) +
   labs(title = paste0(name, ": Change in households with children by tenure"),
        subtitle = "2016 to 2020",
-       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25115.") 
+       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25115.") +
+  add_zero_line(axis = "y")
 
 
 if (knitr::is_html_output()) {
@@ -209,7 +211,8 @@ snr_plot <- ggplot(b09020,
   theme(strip.placement = "outside",
         panel.grid.major.y = element_blank(),
         panel.grid.major.x = element_line(color = "#e2e4e3",
-                                          size = 0.05))
+                                          size = 0.05)) +
+  add_zero_line(axis = "x")
 
 if (knitr::is_html_output()) {
   
@@ -302,7 +305,8 @@ ind_plot <- ggplot(b18107,
   labs(title=paste0(name, ": Net change in individuals with<br>independent living difficulties by age"),
        subtitle="2016 to 2020",
        caption="**Source:** U.S. Census Bureau, American Community Survey, Table B18107.") +
-  scale_y_continuous(labels = label_comma()) 
+  scale_y_continuous(labels = label_comma()) +
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   
@@ -693,7 +697,8 @@ labs(title = "Hanover County: Income needed to afford median home price<br>versu
        subtitle = "2016 to 2020",
        fill = "Nominal income",
        caption = "**Sources:** U.S. Census Bureau, American Community Survey, Table B25119<br>and Central Virginia Regional Multiple Listing Service.") +
-  theme(legend.position = "top")
+  theme(legend.position = "top") +
+  a
 
 if (knitr::is_html_output()) {
   
