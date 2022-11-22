@@ -775,10 +775,10 @@ rentgap <- ggplot(rentgap,
   theme_pha() +
   scale_fill_pha() +
   scale_y_continuous(labels = label_dollar()) +
-  labs(title = "Town of Ashland: Average asking rent versus\nrent affordable to median renter income",
+  labs(title = "Town of Ashland: Average asking rent versus<br>rent affordable to median renter income",
        subtitle = "2016 to 2020",
        fill = "Nominal rent",
-       caption = "**Sources:** U.S. Census Bureau, American Community Survey, Table B25119\nand CoStar Group Inc.") +
+       caption = "**Sources:** U.S. Census Bureau, American Community Survey, Table B25119<br>and CoStar Group Inc.") +
   theme(legend.position = "top")
 
 if (knitr::is_html_output()) {
@@ -839,10 +839,10 @@ slgap_plot <- ggplot(slgap,
   scale_y_continuous(labels = label_dollar()) + 
   theme_pha() +
   scale_fill_pha() +
-labs(title = "Town of Ashland: Income needed to afford median home price\nversus median renter income",
+labs(title = "Town of Ashland: Income needed to afford median home price<br>versus median renter income",
        subtitle = "2016 to 2020",
        fill = "Nominal income",
-       caption = "**Sources:** U.S. Census Bureau, American Community Survey, Table B25119\nand Central Virginia Regional Multiple Listing Service.") +
+       caption = "**Sources:** U.S. Census Bureau, American Community Survey, Table B25119<br>and Central Virginia Regional Multiple Listing Service.") +
   theme(legend.position = "top")
 
 if (knitr::is_html_output()) {

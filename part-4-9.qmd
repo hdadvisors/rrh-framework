@@ -115,7 +115,7 @@ pop_change <- ggplot(change,
   scale_fill_pha() +
   labs(title = paste0(name,": Components of population change"), 
        subtitle = "2016 through 2021",
-       caption = "**Note:** 2020 components of change data not available.\n**Source:** U.S. Census Bureau, Population Estimates Program.")  +
+       caption = "**Note:** 2020 components of change data not available.<br>**Source:** U.S. Census Bureau, Population Estimates Program.")  +
   scale_y_continuous(labels = label_number(big.mark = ",", style_positive = "plus", style_negative = "minus")) 
 
 
@@ -291,7 +291,7 @@ ind_plot <- ggplot(b18107,
   geom_col_interactive(size = 2) +
   theme_pha() +
   scale_fill_pha() +
-  labs(title=paste0(name, ": Net change in individuals with\nindependent living difficulties by age"),
+  labs(title=paste0(name, ": Net change in individuals with<br>independent living difficulties by age"),
        subtitle="2016 to 2020",
        caption="**Source:** U.S. Census Bureau, American Community Survey, Table B18107.") +
   scale_y_continuous(labels = label_comma()) 
@@ -513,7 +513,7 @@ With increasing renter household incomes in the county, the gap between income n
 
 ```{r}
 #| label: fig-income-own-gap
-#| fig-cap: !expr "paste0(name, \": Income needed to afford median home price\nversus median renter income\")"
+#| fig-cap: !expr "paste0(name, \": Income needed to afford median home price<br>versus median renter income\")"
 
 # Compare local renter income versus local home prices
 
@@ -563,10 +563,10 @@ slgap_plot <- ggplot(slgap,
   scale_y_continuous(labels = label_dollar()) + 
   theme_pha() +
   scale_fill_pha() +
-  labs(title = paste0(name, ": Income needed to afford median home price\nversus median renter income"),
+  labs(title = paste0(name, ": Income needed to afford median home price<br>versus median renter income"),
        subtitle = "2016 to 2020",
        fill = "Nominal income",
-       caption = "**Sources:** U.S. Census Bureau, American Community Survey, Table B25119\nand Central Virginia Regional Multiple Listing Service.") +
+       caption = "**Sources:** U.S. Census Bureau, American Community Survey, Table B25119<br>and Central Virginia Regional Multiple Listing Service.") +
   theme(legend.position = "top")
 
 if (knitr::is_html_output()) {
@@ -619,7 +619,7 @@ gap_plot <- ggplot(gap,
   scale_y_continuous(labels = label_comma()) +
   labs(title = paste0(name, ": Rental housing gap by AMI"),
        subtitle = "2015 to 2018",
-       caption = "**Source:** U.S. Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
+       caption = "**Source:** U.S. Department of Housing and Urban Development,<br>Comprehensive Housing Affordability Strategy (CHAS), Table 7.") +
   theme(legend.position = "top")
 
 if (knitr::is_html_output()) {
@@ -664,7 +664,7 @@ cb_plot <- ggplot(cb,
   labs(title = paste0(name, ": Share of cost-burdened households by tenure"),
        subtitle = "2015 to 2018",
        fill = "Cost burden",
-       caption = "**Source:** U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
+       caption = "**Source:** U.S Department of Housing and Urban Development,<br>Comprehensive Housing Affordability Strategy (CHAS), Table 7.") +
   theme(legend.position = "top")
 
 

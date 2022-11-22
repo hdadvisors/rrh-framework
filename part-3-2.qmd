@@ -212,7 +212,7 @@ cb_diff <- ggplot(cb_locality,
   labs(title = "Cumulative change in cost-burdened households by tenure",
        subtitle = "2015 to 2019",
        fill = "Tenure",
-       caption = "**Source:** U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
+       caption = "**Source:** U.S Department of Housing and Urban Development,<br>Comprehensive Housing Affordability Strategy (CHAS), Table 7.") +
   theme(legend.position = "right")
 
 if (knitr::is_html_output()) {
@@ -270,7 +270,7 @@ cb_inc_plot <- ggplot(cb_income,
   labs(title = "Cumulative change in cost-burdened households by income and tenure",
        subtitle = "2015 to 2019",
        fill = "Tenure",
-       caption = "**Source:** U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
+       caption = "**Source:** U.S Department of Housing and Urban Development,<br>Comprehensive Housing Affordability Strategy (CHAS), Table 7.") +
   theme(legend.position = "right",
         axis.text.x = element_text(angle = 90, hjust = 0, vjust = 0))
 
@@ -471,7 +471,7 @@ hh_plot <- ggplot(cb_hh_pha,
   scale_fill_pha() +
   labs(title = "Change in cost-burdened households by household type",
        subtitle = "2015 to 2019",
-       caption = "**Source:** U.S Department of Housing and Urban Development,\nComprehensive Housing Affordability Strategy (CHAS), Table 7.") +
+       caption = "**Source:** U.S Department of Housing and Urban Development,<br>Comprehensive Housing Affordability Strategy (CHAS), Table 7.") +
   scale_y_continuous(labels = label_number(big.mark = ",", style_positive = "plus", style_negative = "minus")) +
   scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) 
 
@@ -749,7 +749,7 @@ top_plot <- ggplot(call_top,
   theme_pha() + 
   labs(title = "Housing Resource Line volume by call topic",
        subtitle = "September 2020 through October 2022",
-       caption = "Note: Does not include topics below 1 percent of call volume.\n**Source:** Partnership for Housing Affordability.") +
+       caption = "Note: Does not include topics below 1 percent of call volume.<br>**Source:** Partnership for Housing Affordability.") +
   theme(axis.title = element_blank(),
         legend.position = "none",
         panel.background = element_blank(),
@@ -859,7 +859,7 @@ pit_plot <- ggplot(rva_pit,
   theme_pha() +
   labs(title = "Greater Richmond Continuum-of-Care Point-in-Time count",
        subtitle = "2007 to 2022",
-       caption = "**Sources:** U.S. Department of Housing and Urban Development, CoC Homeless Populations and\nSubpopulations Reports; Homeward 2022 Winter PIT Count Preliminary Data.") +
+       caption = "**Sources:** U.S. Department of Housing and Urban Development, CoC Homeless Populations and<br>Subpopulations Reports; Homeward 2022 Winter PIT Count Preliminary Data.") +
   scale_y_continuous(labels = label_comma()) +
   theme(axis.title = element_blank(),
         panel.background = element_blank(),

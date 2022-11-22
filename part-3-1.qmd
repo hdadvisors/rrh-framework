@@ -6,10 +6,14 @@
 library(tidyverse)
 library(tidycensus)
 library(janitor)
-library(optiRum)
+library(FinCal)
 library(scales)
 library(kableExtra)
 library(readxl)
+library(hdatools)
+library(ggtext)
+library(ggiraph)
+
 
 # rr includes Charles City, Goochland, New Kent, and Powhatan.
 
