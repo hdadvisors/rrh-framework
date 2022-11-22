@@ -8,12 +8,9 @@ library(httr)
 library(glue)
 library(readxl)
 library(janitor)
-library(ggplot2)
 library(stats)
 library(lubridate)
 library(scales)
-library(plotly)
-library(viridis)
 library(ggiraph)
 library(ggtext)
 library(hdatools)
@@ -213,7 +210,12 @@ cb_diff <- ggplot(cb_locality,
        subtitle = "2015 to 2019",
        fill = "Tenure",
        caption = "**Source:** U.S Department of Housing and Urban Development,<br>Comprehensive Housing Affordability Strategy (CHAS), Table 7.") +
+<<<<<<< HEAD
   theme(legend.position = "right")
+=======
+  theme(legend.position = "right") +
+  add_zero_line(axis = "y")
+>>>>>>> 7da65e0fcd7eddcfaf6d6ff1b9a1ea85a707b7ac
 
 if (knitr::is_html_output()) {
   
@@ -258,21 +260,22 @@ cb_inc_plot <- ggplot(cb_income,
            y = run_diff, 
            fill = tenure,
            data_id = run_diff,
-           tooltip = run_diff)) +
+           tooltip = label_comma()(run_diff))) +
   geom_col(position = "dodge") +
   geom_col_interactive(position = "dodge", size = 2) +
   theme_pha() +
   scale_fill_pha() +
   facet_wrap(~household_income, 
              nrow = 1, 
-             labeller = label_wrap_gen(width = 18, multi_line = TRUE)) +
+             labeller = label_wrap_gen(width = 12, multi_line = TRUE)) +
   scale_y_continuous(labels = label_comma()) +
   labs(title = "Cumulative change in cost-burdened households by income and tenure",
        subtitle = "2015 to 2019",
        fill = "Tenure",
        caption = "**Source:** U.S Department of Housing and Urban Development,<br>Comprehensive Housing Affordability Strategy (CHAS), Table 7.") +
   theme(legend.position = "right",
-        axis.text.x = element_text(angle = 90, hjust = 0, vjust = 0))
+        axis.text.x = element_text(angle = 90, hjust = 0, vjust = 0)) +
+  add_zero_line(axis = "y")
 
 if (knitr::is_html_output()) {
   
@@ -352,14 +355,16 @@ write_rds(b25074_data, "data/b25074_data.rds")
 #| label: fig-cb-income-acs-est
 #| fig.cap: "Renter households by income and cost burden"
 
-b25074_data <- read_rds("data/b25074_data.rds")
+b25074_data <- read_rds("data/b25074_data.rds") |> 
+  group_by(year, inc, cb_group) |> 
+  summarise(estimate = sum(estimate))
 
 renter_cb <- ggplot(b25074_data,
        aes(x = year, 
            y = estimate, 
            fill = cb_group,
            data_id = estimate,
-           tooltip = estimate)) +
+           tooltip = label_comma()(estimate))) +
   geom_col(position = "dodge") +
   geom_col_interactive(position = "dodge", size = 2) +
   theme_pha() +
@@ -369,15 +374,9 @@ renter_cb <- ggplot(b25074_data,
        subtitle = "2016 to 2020",
        caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25074.") +
   scale_y_continuous(labels = label_comma()) +
-  theme(axis.title = element_blank(),
-        axis.text.x = element_text(size = 8, angle = 90, vjust = 0.5),
-        legend.position = "bottom",
-        legend.title = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        axis.ticks = element_blank())
+  theme(axis.text.x = element_text(size = 8, angle = 90, vjust = 0.5),
+        legend.position = "bottom") +
+  add_zero_line(axis = "y")
 
 if (knitr::is_html_output()) {
   
@@ -408,29 +407,35 @@ b25074_yoy <- b25074_data |>
   mutate(yoy = sum - lag(sum)) |> 
   drop_na()
 
-rcb_yoy <- ggplot(b25074_yoy,
+acs_yoy_plot <- ggplot(b25074_yoy,
        aes(x = year, 
            y = yoy,
-           fill = yoy,
-           label = label_comma()(yoy))) +
-  geom_col() +
-  geom_text(aes(y = yoy - sign(yoy)/0.02,
-            label = label_comma()(yoy)),
-            color = "white") +
+           data_id = yoy,
+           tooltip = label_comma()(yoy))) +
+  geom_col(fill = "#5bab8e") +
+  geom_col_interactive(fill = "#5bab8e", size = 2) +
   theme_pha() + 
   scale_fill_gradientn(colours = c("#CAE3C2", "#74BA91", "#519B8D", "#2B4258")) +
   labs(title = "Year-over-year change in cost-burdened renter households",
        subtitle = "Household income below $75,000 only",
        caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25074.") +
-  scale_y_continuous(labels = label_number(big.mark = ",", style_positive = "plus", style_negative = "minus"))  +
-  theme(axis.title = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        axis.ticks = element_blank())
+  scale_y_continuous(labels = label_number(big.mark = ",", style_positive = "plus", style_negative = "minus")) +
+  add_zero_line(axis = "y")
 
-rcb_yoy
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = acs_yoy_plot,
+         height_svg = 4)
+  
+} else {
+  
+  acs_yoy_plot +
+    geom_text(aes(y = yoy - sign(yoy)/0.02,
+                  label = label_comma()(yoy)),
+              color = "white")
+  
+  }
+
 ```
 
 In summary, since the *total* number of renter households in the region has not changed significantly from 2016 to 2020, and because the supply of deeply affordable rental housing has not increased, the estimated decline in low-income cost-burdened renters is likely due to a combination of increasing average incomes "re-sorting" households into higher income categories, as well as pandemic data collection challenges.
@@ -473,8 +478,8 @@ hh_plot <- ggplot(cb_hh_pha,
        subtitle = "2015 to 2019",
        caption = "**Source:** U.S Department of Housing and Urban Development,<br>Comprehensive Housing Affordability Strategy (CHAS), Table 7.") +
   scale_y_continuous(labels = label_number(big.mark = ",", style_positive = "plus", style_negative = "minus")) +
-  scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) 
-
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) +
+  add_zero_line(axis = "y")
 
 if (knitr::is_html_output()) {
   
@@ -517,7 +522,7 @@ mortd_plot <- ggplot(mort_del,
   geom_line(size = 1) +
   geom_point_interactive(
     aes(data_id = estimate,
-        tooltip = percent_format()(estimate)),
+        tooltip = label_percent()(estimate)),
     size = 0.5) + 
   theme_pha() +
   scale_color_pha() + 
@@ -527,24 +532,18 @@ mortd_plot <- ggplot(mort_del,
        subtitle = "Mortgages 90 or more days delinquent: 2008 to 2021",
        color = "Locality",
        caption = "**Source:** Consumer Financial Protection Bureau, Mortgage Performance Trends.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        legend.title = element_blank(),
-        legend.key = element_blank(),
-        axis.line.x = element_line(color = "grey50",
-                                   size = 0.1),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05)) +
-  theme(legend.position = "right")
+  theme(legend.position = "right") +
+  add_zero_line(axis = "y")
 
 if (knitr::is_html_output()) {
   
   girafe(ggobj = mortd_plot,
          height_svg = 4)
+  
 } else {
   
   mortd_plot
+  
 }
 
 
@@ -583,7 +582,7 @@ evictions <- read_csv("data/evictions_17_22.csv") %>%
   mutate(year = year(date)) |>
   mutate(type = fct_relevel(type, "Filings", "Eviction judgements"))
 
-eviction_colors <- setNames(c("#f39152", "#be451c"),
+eviction_colors <- setNames(c("#a6cccc", "#be451c"),
                             nm = c("Filings", "Eviction judgements"))
 
 evict_plot <- ggplot(evictions,
@@ -591,18 +590,20 @@ evict_plot <- ggplot(evictions,
            y = value,
            fill = type,
            data_id = value,
-           tooltip = value)) +
+           tooltip = label_comma()(value))) +
   geom_col(position = "dodge") +
   geom_col_interactive(position = "dodge", size = 2) +
   facet_wrap(~Jurisdiction) +
   theme_pha() +
   scale_x_date(labels = label_date_short(), breaks = breaks_width("6 months")) +
-  scale_y_continuous(labels = label_comma()) +
+  scale_y_continuous(labels = label_comma(), expand = expansion(mult = 0)) +
   labs(title = "Evictions filings and judgements",
        subtitle = "January 2017 through October 2022",
        caption = "**Source:** RVA Eviction Lab, Through October 2022") +
   scale_fill_manual(values = eviction_colors) +
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(size = 7)) +
+  add_zero_line(axis = "y")
 
 
 if (knitr::is_html_output()) {
@@ -629,15 +630,12 @@ eviction_avg <- evictions |>
   summarise(avg = mean(value)) |>
   mutate(type = fct_relevel(type, "Filings", "Eviction judgements"))
 
-eviction_colors <- setNames(c("#f39152", "#be451c"),
-                            nm = c("Filings", "Eviction judgements"))
-
 evict_avg_plot <- ggplot(eviction_avg,
        aes(x = year,
            y = avg,
            fill = type,
            data_id = avg,
-           tooltip = avg)) +
+           tooltip = label_comma(accuracy = 1)(avg))) +
   geom_col(position = "dodge") +
   geom_col_interactive(position = "dodge", size = 2) +
   facet_wrap(~Jurisdiction) +
@@ -647,20 +645,14 @@ evict_avg_plot <- ggplot(eviction_avg,
        caption = "**Source:** RVA Eviction Lab, Through October 2022.") +
   scale_y_continuous(labels = label_comma()) +
   scale_fill_manual(values = eviction_colors) +
-  scale_x_discrete(limits = c(2017, 2018, 2019, 2020, 2021, 2022)) +
-  theme(legend.position = "bottom",
-        legend.title = element_blank(),
-        axis.title = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        axis.ticks = element_blank())
+  scale_x_discrete(limits = 2017 + 0:5) +
+  theme(legend.position = "bottom") +
+  add_zero_line(axis = "y")
 
 if (knitr::is_html_output()) {
   
   girafe(ggobj = evict_avg_plot,
-         height_svg = 4) 
+         height_svg = 4)
   
 } else {
   
@@ -703,13 +695,7 @@ call_plot <- ggplot(call_vol,
   labs(title = "Housing Resource Line monthly call volume",
        subtitle = "September 2020 through October 2022",
        caption = "**Source:** Partnership for Housing Affordability.") +
-  theme(legend.position = "none",
-        axis.title = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        axis.ticks = element_blank())
+  add_axis_line(axis = "y")
 
 if (knitr::is_html_output()) {
   
@@ -724,7 +710,7 @@ if (knitr::is_html_output()) {
 
 ```
 
-The majority of calls (56 percent) were for rental options (36 percent) and financial assistance (21 percent). The two other largest share of calls were for an option not listed (17 percent) and homelessness (12 percent).
+The majority of calls were for rental options (36 percent) and financial assistance (21 percent). The two other largest share of calls were for an option not listed (17 percent) and homelessness (12 percent).
 
 ```{r}
 #| label: fig-call-topic
@@ -741,14 +727,16 @@ call_top <- read_csv("data/hrl_need.csv") |>
 top_plot <- ggplot(call_top,
        aes(y = reorder(need, vol),
            x = percent,
-           fill = need,
            data_id = percent,
-           tooltip = percent_format()(percent))) +
-  geom_col() +
-  geom_col_interactive(size = 2) +
+           tooltip = label_percent(accuracy = 0.1)(percent))) +
+  geom_col(fill = "#5bab8e") +
+  geom_col_interactive(fill = "#5bab8e", size = 2) +
+  scale_x_continuous(labels = label_percent(),
+                     expand = expansion(mult = c(0,0.05))) +
   theme_pha() + 
   labs(title = "Housing Resource Line volume by call topic",
        subtitle = "September 2020 through October 2022",
+<<<<<<< HEAD
        caption = "Note: Does not include topics below 1 percent of call volume.<br>**Source:** Partnership for Housing Affordability.") +
   theme(axis.title = element_blank(),
         legend.position = "none",
@@ -758,11 +746,16 @@ top_plot <- ggplot(call_top,
                                           size = 0.05),
         axis.ticks = element_blank()) +
   scale_x_continuous(labels = label_percent())
+=======
+       caption = "**Note:** Does not include topics below 1 percent of call volume.<br>**Source:** Partnership for Housing Affordability.") +
+  flip_gridlines() +
+  add_zero_line(axis = "x")
+>>>>>>> 7da65e0fcd7eddcfaf6d6ff1b9a1ea85a707b7ac
 
 if (knitr::is_html_output()) {
   
   girafe(ggobj = top_plot,
-         height_svg = 4) 
+         height_svg = 4)
   
 } else {
   
@@ -861,13 +854,8 @@ pit_plot <- ggplot(rva_pit,
        subtitle = "2007 to 2022",
        caption = "**Sources:** U.S. Department of Housing and Urban Development, CoC Homeless Populations and<br>Subpopulations Reports; Homeward 2022 Winter PIT Count Preliminary Data.") +
   scale_y_continuous(labels = label_comma()) +
-  theme(axis.title = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        axis.ticks = element_blank())
-
+  add_zero_line(axis = "y")
+  
 if (knitr::is_html_output()) {
   
   girafe(ggobj = pit_plot,
@@ -910,22 +898,16 @@ mkv_plot <- ggplot(mkv,
            fill = Name,
            data_id = students,
            tooltip = label_comma()(students))) +
-  geom_col(stat = "identity") +
+  geom_col() +
   geom_col_interactive(size = 2) +
   facet_wrap(~Name) + 
   theme_pha() +
   scale_fill_pha() + 
   labs(title = "Enrolled students experiencing homelessness by school year",
        subtitle = "2016-2017 to 2019-2020",
-       caption = "**Source:** William & Mary School of Education, Project HOME - Virginia.") +
-  theme(axis.title = element_blank(),
-        legend.position = "none",
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        axis.ticks = element_blank()) +
-  scale_y_continuous(labels = label_comma())
+       caption = "**Source:** William & Mary School of Education, Project HOPE - Virginia.") +
+  scale_y_continuous(labels = label_comma()) +
+  add_zero_line(axis = "y")
 
 if (knitr::is_html_output()) {
   
@@ -937,6 +919,5 @@ if (knitr::is_html_output()) {
   mkv_plot
   
 }
-
 
 ```
