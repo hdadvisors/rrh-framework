@@ -106,7 +106,7 @@ write_rds(b25118_data, "data/b25118_data.rds")
 #| label: fig-hh-inc-plot
 #| fig.cap: "Change households by tenure and income level"
 
-b25118_data <-read_rds("data/b25118_data.rds") |> 
+b25118_data <- read_rds("data/b25118_data.rds") |> 
   filter(NAME %in% pha_names) |>
   group_by(tenure, income) |> 
   summarise(`2016` = sum(`2016`),
@@ -224,28 +224,39 @@ write_rds(b25119_cpi, "data/b25119_cpi.rds")
 #| label: fig-med-income-plot
 #| fig.cap: "Median houshold income by tenure and locality"
 
-b25119_cpi <-read_rds("data/b25119_cpi.rds") |> 
+b25119_cpi <- read_rds("data/b25119_cpi.rds") |> 
   filter(NAME %in% pha_names)
 
-ggplot(b25119_cpi, 
+med_inc_plot <- ggplot(b25119_cpi, 
        aes(x = year,
            y = dollars20,
            color = NAME)) +
   geom_line(stat = "identity", size = 1) +
+  geom_point_interactive(
+    aes(data_id = dollars20,
+        tooltip = label_dollar()(dollars20),
+        group = 1),
+    size = 0.5) +
   facet_wrap(~tenure) +
-  scale_color_manual(values = geo_colors) +
+  scale_color_pha() +
   scale_y_continuous(labels = dollar_format(), limits = c(0, NA)) +
   labs(title = "Median houshold income by tenure and locality",
        subtitle = "2016 to 2020 | 2020 inflation-adjusted dollars",
        color = "Locality",
-       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25119.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        legend.key = element_blank(),
-        axis.text.x = element_text(angle = 90, vjust = 0.5),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25119.") +
+  theme_pha() +
+  add_zero_line(axis = "y")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = med_inc_plot,
+         height_svg = 4)
+  
+} else {
+  
+  med_inc_plot
+  
+  }
 
 ```
 
@@ -344,27 +355,40 @@ b19013_data <- read_rds("data/b19013_data.rds") |>
   mutate(cv = ((as.numeric(moe)/1.645)/estimate)) |> 
   filter(cv < .15)
 
-ggplot(b19013_data,
+inc_race_plot <- ggplot(b19013_data,
        aes(x = year,
            y = dollars20/1000,
            color = race)) +
+  geom_line(stat = "identity", size = 1) +
+  geom_point_interactive(
+    aes(data_id = dollars20,
+        tooltip = label_dollar()(dollars20),
+        group = 1),
+    size = 0.5) +
   facet_wrap(~NAME, nrow = 1) +
-  geom_line(size = 1) +
+  scale_color_pha() +
   scale_y_continuous(labels = label_dollar(suffix = "k"),
                      limits = c(0, NA),
                      breaks = c(0, 25, 50, 75, 100, 125)) +
   labs(title = "Median household income by race and ethnicity",
        subtitle = "2016 to 2020 | 2020 inflation-adjusted dollars",
-       caption = "Note: Estimates with low reliability are omitted.\nSource: U.S. Census Bureau, American Community Survey, Table B19013.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        legend.position = "bottom",
+       caption = "**Note:** Estimates with low reliability are omitted.<br>**Source:** U.S. Census Bureau, American Community Survey, Table B19013.") +
+  theme_pha() +
+  theme(legend.position = "bottom",
         legend.key = element_blank(),
-        legend.title = element_blank(),
-        axis.text.x = element_text(angle = 90, vjust = 0.5),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+        axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+  add_zero_line(axis = "y")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = inc_race_plot,
+         height_svg = 4)
+  
+} else {
+  
+  inc_race_plot
+  
+  }
 
 ```
 
@@ -453,27 +477,40 @@ write_rds(b19125_b19202_cpi, "data/b19125_b19202_cpi.rds")
 b19125_b19202_cpi <-  read_rds("data/b19125_b19202_cpi.rds") |> 
   filter(NAME %in% pha_names)
 
-ggplot(b19125_b19202_cpi,
+inc_child_plot <- ggplot(b19125_b19202_cpi,
        aes(x = year,
            y = dollars20/1000,
            color = type)) +
   facet_wrap(~NAME, nrow = 1) +
-  geom_line(size = 1) +
+  geom_line(stat = "identity", size = 1) +
+  geom_point_interactive(
+    aes(data_id = dollars20,
+        tooltip = label_dollar()(dollars20),
+        group = 1),
+    size = 0.5) +
+  scale_color_pha() +
   scale_y_continuous(labels = label_dollar(suffix = "k"),
                      limits = c(0, NA),
                      breaks = c(0, 25, 50, 75, 100, 125)) +
   labs(title = "Median household income by family type",
        subtitle = "2016 to 2020 | 2020 inflation-adjusted dollars",
-       caption = "Source: U.S. Census Bureau, American Community Survey, Tables B19125 and B19202.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        legend.position = "bottom",
+       caption = "**Source:** U.S. Census Bureau, American Community Survey, Tables B19125 and B19202.") +
+  theme_pha() +
+  theme(legend.position = "bottom",
         legend.key = element_blank(),
-        legend.title = element_blank(),
-        axis.text.x = element_text(angle = 90, vjust = 0.5),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+        axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+  add_zero_line(axis = "y")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = inc_child_plot,
+         height_svg = 4)
+  
+} else {
+  
+  inc_child_plot
+  
+  }
 
 ```
 
@@ -553,25 +590,38 @@ write_rds(percentiles, "data/oews_pct.rds")
 
 oews_pct <- read_rds("data/oews_pct.rds")
 
-ggplot(oews_pct,
+wage_pct_plot <- ggplot(oews_pct,
        aes(x = pct_change,
            y = wage,
-           fill = wage)) +
+           fill = wage,
+           data_id = pct_change,
+           tooltip = label_percent()(pct_change))) +
   geom_col() +
-  geom_text(aes(label = label_percent(accuracy = 0.1)(pct_change),
-                color = wage),
-            nudge_x = 0.01) +
+  geom_col_interactive(size = 2) +
+  scale_x_continuous(labels = label_percent()) +
+  scale_fill_pha() +
   labs(title = "Percent change in annual wage by wage percentile",
        subtitle = "Richmond, VA MSA | May 2019 to May 2021",
-       caption = "Source: U.S. Bureau of Labor Statistics, Occupational Employment and Wage Statistics.") +
-  scale_x_continuous(labels = label_percent()) +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.y = element_blank(),
-        legend.position = "none",
-        panel.grid.major.x = element_line(color = "grey95",
-                                          size = 0.05))
+       caption = "**Source:** U.S. Bureau of Labor Statistics, Occupational Employment and Wage Statistics.") +
+  theme_pha() +
+  add_zero_line(axis = "x") +
+  flip_gridlines()
+
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = wage_pct_plot,
+         height_svg = 4)
+  
+} else {
+  
+  wage_pct_plot +
+    geom_text(aes(label = label_percent(accuracy = 0.1)(pct_change),
+                  color = wage),
+              nudge_x = 0.01) +
+    scale_color_pha()
+  
+  }
 
 ```
 
@@ -614,25 +664,37 @@ write_rds(oews_occ, "data/oews_occ.rds")
 
 oews_occ <- read_rds("data/oews_occ.rds")
 
-ggplot(oews_occ,
+wage_occ_plot <- ggplot(oews_occ,
        aes(x = pct_change,
            y = reorder(occ_title, pct_change),
-           fill = occ_title)) +
+           fill = occ_title,
+           data_id = pct_change,
+           tooltip = label_percent()(pct_change))) +
   geom_col() +
-  geom_text(aes(label = label_percent(accuracy = 0.1)(pct_change),
-                color = occ_title),
-            nudge_x = 0.01) +
-  labs(title = "Percent change in annual wage for\ntop 5 most common occupation categories",
-       subtitle = "Richmond, VA MSA | May 2019 to May 2021",
-       caption = "Source: U.S. Bureau of Labor Statistics, Occupational Employment and Wage Statistics.") +
+  geom_col_interactive(size = 2) +
   scale_x_continuous(labels = label_percent()) +
   scale_y_discrete(labels = function(x) str_wrap(x, width = 20)) +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.y = element_blank(),
-        legend.position = "none",
-        panel.grid.major.x = element_line(color = "grey95",
-                                          size = 0.05))
+  scale_fill_pha() +
+  labs(title = "Percent change in annual wage for<br>top 5 most common occupation categories",
+       subtitle = "Richmond, VA MSA | May 2019 to May 2021",
+       caption = "**Source:** U.S. Bureau of Labor Statistics, Occupational Employment and Wage Statistics.") +
+  theme_pha() +
+  add_zero_line(axis = "x") +
+  flip_gridlines()
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = wage_occ_plot,
+         height_svg = 4)
+  
+} else {
+  
+  wage_occ_plot +
+    geom_text(aes(label = label_percent(accuracy = 0.1)(pct_change),
+                  color = occ_title),
+              nudge_x = 0.01) +
+    scale_color_pha()
+  
+  }
 
 ```
