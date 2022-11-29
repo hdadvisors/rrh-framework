@@ -127,7 +127,7 @@ gap_plot <- ggplot(gap,
            y = estimate,
            fill = str_wrap(gapcode, 25),
            data_id = estimate,
-           tooltip = estimate)) +
+           tooltip = label_comma()(estimate))) +
   geom_col() + 
   geom_col_interactive(size = 2) + 
   facet_grid(~household_income) + 
@@ -288,9 +288,9 @@ cost_plot <- ggplot(costs_income_change,
            y = pct_chg,
            color = type)) +
   geom_line(size = 1) +
- geom_point_interactive(
+  geom_point_interactive(
     aes(data_id = pct_chg,
-        tooltip = percent_format()(pct_chg)),
+        tooltip = percent_format(accuracy = 0.1)(pct_chg)),
     size = 0.5) + 
   theme_pha() +
   scale_color_pha() + 
@@ -299,7 +299,7 @@ cost_plot <- ggplot(costs_income_change,
   labs(title = "Cumulative percent change in median renter income,<br>home prices, and average rent",
        subtitle ="2016 to 2022 (ACS income data through 2020)",
        color = "Percent change",
-       caption = "**Sources:** U.S. Census Bureau, American Community Survey, Table B25119,<br>Central Virginia MLS, and CoStar Group, Inc.") +
+       caption = "**Sources:** U.S. Census Bureau, American Community Survey, Table B25119;<br>Central Virginia MLS; CoStar Group, Inc.") +
   theme(legend.position = "bottom")
 
 if (knitr::is_html_output()) {
@@ -312,9 +312,6 @@ if (knitr::is_html_output()) {
   cost_plot
   
   }
-
-
-
 
 ```
 
@@ -363,7 +360,7 @@ rent_gap <- ggplot(rent_afford,
   scale_y_continuous(labels = label_dollar()) +
   labs(title = "Average rents versus affordable rents for median renter income",
        subtitle ="2016 to 2022 (ACS income data through 2020)",
-       caption = "Sources: U.S. Census Bureau, American Community Survey,<br>Table B25119 and CoStar Group, Inc.") +
+       caption = "**Sources:** U.S. Census Bureau, American Community Survey, Table B25119; CoStar Group, Inc.") +
   theme(legend.position = "bottom",
         axis.text.x = element_text(angle = 90, vjust = 0.5))
 
@@ -398,23 +395,38 @@ To determine the maximum principal amount, and the subsequent sales price, we as
 #| label: fig-int-rates
 #| fig-cap: "Average annual rates for 30-year fixed-rate mortgages"
 
-ggplot(costs_income_afford,
-       aes(x = year,
-           y = annual_int)) +
-  geom_line(size = 1,
-            color = "#be451c") +
-  geom_text(aes(label = label_percent()(annual_int)),
-            nudge_y = 0.004,
-            color = "#be451c",
-            size = 3) +
+int_rates_plot <- ggplot(costs_income_afford,
+                         aes(x = year,
+                             y = annual_int)) +
+  geom_line(size = 1, color = "#be451c") +
+  geom_point_interactive(aes(data_id = annual_int,
+                             tooltip = label_percent()(annual_int)),
+                             size = 0.5,
+                             color = "#be451c") +
   theme_pha() +
   scale_y_continuous(labels = label_percent(accuracy = 0.01),
                      limits = c(0,0.055),
                      n.breaks = 6) +
   scale_x_continuous(n.breaks = 7) +
-  labs(title = "Average annual rates for 30-year fixed-rate mortgages",
-       subtitle ="2022 rate current through August",
-       caption = "**Source:** Freddie Mac, Primary Mortgage Market Survey.") 
+  labs(title = "Mortgage interest rates on the rise",
+       subtitle ="Average annual rates for 30-year fixed-rate mortgages",
+       caption = "**Source:** Freddie Mac, Primary Mortgage Market Survey.<br>**Note:** 2022 through August.") +
+  add_zero_line(axis = "y")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = int_rates_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  int_rates_plot +
+    geom_text(aes(label = label_percent()(annual_int)),
+              nudge_y = 0.004,
+              color = "#be451c",
+              size = 3)
+  
+  }
 
 ```
 
@@ -546,60 +558,30 @@ Every occupation except for Business and Financial Operations supports an afford
 
 ```{r}
 #| label: fig-occ-rent
-#| fig.cap: "Affordable rent by median occupation wage versus average rents"
+#| fig.cap: "Affordable rent by occupation versus average rents"
 
-occ_locality_afford |> 
-  filter(type == "Occupation") |>
-  mutate(group = str_wrap(group, width = 16)) |> 
-
-job_rent <- ggplot(aes(x = reorder(group, rent, decreasing = T),
-           y = rent,
-           fill = group)) +
+job_rent <- ggplot(occ_locality_afford,
+                   aes(y = reorder(group, rent, decreasing = F),
+                       x = rent,
+                       fill = type,
+                       data_id = rent,
+                       tooltip = label_dollar()(rent))) +
   geom_col() +
   geom_col_interactive(size = 2) +
-  theme_pha() +
+  facet_grid(rows = vars(fct_rev(type)),
+             scales = "free_y",
+             switch = "y",
+             space = "free_y") +
   scale_fill_pha() +
-  geom_hline(yintercept = with(occ_locality_afford, rent[match("Chesterfield County", group)])) +
-  annotate(geom = "text",
-           label = "Chesterfield",
-           x = 5,
-           y = with(occ_locality_afford, rent[match("Chesterfield County", group)]),
-           vjust = -.5,
-           hjust = -.85) +
-  geom_hline(yintercept = with(occ_locality_afford, rent[match("Hanover County", group)])) +
-  annotate(geom = "text",
-           label = "Hanover",
-           x = 5,
-           y = with(occ_locality_afford, rent[match("Hanover County", group)]),
-           vjust = 1,
-           hjust = -1.25) +
-  geom_hline(yintercept = with(occ_locality_afford, rent[match("Henrico County", group)])) +
-  annotate(geom = "text",
-           label = "Henrico",
-           x = 5,
-           y = with(occ_locality_afford, rent[match("Henrico County", group)]),
-           vjust = 0.15,
-           hjust = -1.33) +
-  geom_hline(yintercept = with(occ_locality_afford, rent[match("Richmond city", group)])) +
-  annotate(geom = "text",
-           label = "Richmond",
-           x = 5,
-           y = with(occ_locality_afford, rent[match("Richmond city", group)]),
-           vjust = 1,
-           hjust = -1) +
-  coord_cartesian(clip = "off") +
-  #scale_x_discrete(expand = expand_scale(add = c(0.5,2))) +
-  scale_y_continuous(labels = label_dollar()) +
-  labs(title = "Affordable rent by median occupation wage versus average rents",
-       subtitle = "Lines show current average rents by locality as of August 2022",
-       caption = "**Sources:** U.S. Bureau of Labor Statistics, Occupational Employment and<br>Wage Statistics; CoStar Group, Inc.") +
-  theme(panel.background = element_blank(),
-        legend.position = "none",
-        axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        plot.margin = margin(10,80,10,10, unit = "pt"))
+  scale_x_continuous(labels = label_dollar(), expand = expansion(mult = 0)) +
+  scale_y_discrete(labels = function(x) str_wrap(x, width = 24)) +
+  labs(title = "Most workers cannot afford rent on their own",
+       subtitle = "Affordable rent by occupation versus average rents",
+       caption = "**Sources:** U.S. Bureau of Labor Statistics, Occupational Employment and Wage Statistics; CoStar Group, Inc.") +
+  theme_pha() +
+  add_zero_line(axis = "x") +
+  flip_gridlines() +
+  theme(strip.text.y = element_blank())
 
 if (knitr::is_html_output()) {
   
@@ -622,62 +604,30 @@ Similarly, all occupation categories other than Business and Financial Operation
 
 ```{r}
 #| label: fig-occ-price
-#| fig.cap: "Maximum home price by median occupation wage versus median sales prices"
+#| fig.cap: "Maximum affordable home price by occupation versus median sales prices"
 
-job_own <- occ_locality_afford |> 
-  filter(type == "Occupation") |>
-  mutate(group = str_wrap(group, width = 16)) |> 
-ggplot(aes(x = reorder(group, price, decreasing = T),
-           y = price,
-           fill = group,
-           data_id = price,
-           tooltip = dollar_format()(price))) +
-  geom_col() + 
+job_own <- ggplot(occ_locality_afford,
+                   aes(y = reorder(group, price, decreasing = F),
+                       x = price,
+                       fill = type,
+                       data_id = price,
+                       tooltip = label_dollar()(price))) +
+  geom_col() +
   geom_col_interactive(size = 2) +
-  theme_pha() +
+  facet_grid(rows = vars(fct_rev(type)),
+             scales = "free_y",
+             switch = "y",
+             space = "free_y") +
   scale_fill_pha() +
-  geom_hline(yintercept = with(occ_locality_afford, price[match("Chesterfield County", group)])) +
-  annotate(geom = "text",
-           label = "Chesterfield",
-           x = 5,
-           y = with(occ_locality_afford, price[match("Chesterfield County", group)]),
-           vjust = -0.3,
-           hjust = -.85) +
-  geom_hline(yintercept = with(occ_locality_afford, price[match("Hanover County", group)])) +
-  annotate(geom = "text",
-           label = "Hanover",
-           x = 5,
-           y = with(occ_locality_afford, price[match("Hanover County", group)]),
-           vjust = 0,
-           hjust = -1.24) +
-  geom_hline(yintercept = with(occ_locality_afford, price[match("Henrico County", group)])) +
-  annotate(geom = "text",
-           label = "Henrico",
-           x = 5,
-           y = with(occ_locality_afford, price[match("Henrico County", group)]),
-           vjust = -.25,
-           hjust = -1.33) +
-  geom_hline(yintercept = with(occ_locality_afford, price[match("Richmond city", group)])) +
-  annotate(geom = "text",
-           label = "Richmond",
-           x = 5,
-           y = with(occ_locality_afford, price[match("Richmond city", group)]),
-           vjust = 1.25,
-           hjust = -1) +
-  coord_cartesian(clip = "off") +
-  #scale_x_discrete(expand = expand_scale(add = c(0.5,2))) +
-  scale_y_continuous(labels = label_dollar(),
-                     limits = c(0, 500000)) +
-  labs(title = "Maximum home price by median occupation wage versus median sales prices",
-       subtitle = "Lines show median sales prices by locality as of August 2022",
-       caption = "**Sources:** U.S. Bureau of Labor Statistics, Occupational Employment and <br>Wage Statistics; CVR MLS.") +
-  theme(panel.background = element_blank(),
-        legend.position = "none",
-        axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        plot.margin = margin(10,80,10,10, unit = "pt"))
+  scale_x_continuous(labels = label_dollar(), expand = expansion(mult = 0)) +
+  scale_y_discrete(labels = function(x) str_wrap(x, width = 24)) +
+  labs(title = "Most workers cannot buy a home on their own",
+       subtitle = "Maximum affordable home price by occupation versus median sales prices",
+       caption = "**Sources:** U.S. Bureau of Labor Statistics, Occupational Employment and Wage Statistics; CVR MLS.") +
+  theme_pha() +
+  add_zero_line(axis = "x") +
+  flip_gridlines() +
+  theme(strip.text.y = element_blank())
 
 if (knitr::is_html_output()) {
   
