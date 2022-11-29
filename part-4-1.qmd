@@ -623,7 +623,7 @@ rentgap <- ggplot(rent_gap,
   theme_pha() +
   scale_fill_pha() +
   scale_y_continuous(labels = label_dollar()) +
-  labs(title = "Hanover County: Average asking rent versus<br>rent affordable to median renter income",
+  labs(title = paste0(name, ": Average asking rent versus<br>rent affordable to median renter income"),
        subtitle = "2016 to 2020",
        fill = "Nominal rent",
        caption = "**Sources:** U.S. Census Bureau, American Community Survey, Table B25119<br>and CoStar Group Inc.") +
@@ -669,7 +669,7 @@ sale <- rr_sales_annual |>
   drop_na() |> 
   mutate(principal = price - (price*downpayment)) |> 
   mutate(loanamt = principal/(1-closingcosts)) |> 
-  mutate(mortgage = abs(PMT((annual_int/12), 360, loanamt)) + 250) |> 
+  mutate(mortgage = abs(pmt((annual_int/12), 360, loanamt, 0)) + 250) |> 
   mutate(inc_needed = ((mortgage*10)/2.8)*12) |> 
   select(year, inc_needed, cdollars)
 
@@ -682,10 +682,10 @@ slgap <- sale |>
     data == "inc_needed" ~ "Income needed to afford median home price"
   ))
 
-slgap_plot <- ggplot(price_afford,
+slgap_plot <- ggplot(slgap,
        aes(x = year,
            y = value,
-           fill = str_wrap(type, 25),
+           fill = str_wrap(data, 25),
            data_id = value,
            tooltip = dollar_format()(value))) +
   geom_col(position = "dodge") +
@@ -693,12 +693,12 @@ slgap_plot <- ggplot(price_afford,
   scale_y_continuous(labels = label_dollar()) + 
   theme_pha() +
   scale_fill_pha() +
-labs(title = "Hanover County: Income needed to afford median home price<br>versus median renter income",
+labs(title = paste0(name, ": Income needed to afford median home price<br>versus median renter income"),
        subtitle = "2016 to 2020",
        fill = "Nominal income",
        caption = "**Sources:** U.S. Census Bureau, American Community Survey, Table B25119<br>and Central Virginia Regional Multiple Listing Service.") +
-  theme(legend.position = "top") +
-  a
+  theme(legend.position = "bottom") +
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   
@@ -710,7 +710,6 @@ if (knitr::is_html_output()) {
   slgap_plot
   
   }
-
 
 ```
 

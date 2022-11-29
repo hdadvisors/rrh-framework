@@ -545,12 +545,12 @@ rent_gap <- b25119_cpi_rent |>
     type == "rent_current" ~ "Current rent"
   ))
 
-slgap_plot <- ggplot(slgap,
+slgap_plot <- ggplot(rent_gap,
        aes(x = year,
-           y = value,
-           fill = str_wrap(data, 25),
-           data_id = value,
-           tooltip = dollar_format()(value))) +
+           y = dollars,
+           fill = str_wrap(type, 25),
+           data_id = dollars,
+           tooltip = label_dollar()(dollars))) +
   geom_col(position = "dodge") +
   geom_col_interactive(position = "dodge", size = 2) +
   scale_y_continuous(labels = label_dollar()) + 

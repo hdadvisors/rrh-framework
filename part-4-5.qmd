@@ -764,7 +764,7 @@ rent_gap <- b25119_data %>%
     label == "affordable_rent" ~ "Affordable rent"
   ))
 
-rentgap <- ggplot(rentgap,
+rentgap <- ggplot(rent_gap,
        aes(x = year,
            y = rent,
            fill = label,

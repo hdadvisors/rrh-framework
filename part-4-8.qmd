@@ -410,7 +410,7 @@ b25003_vars_cleaned <- b25003_vars |>
 b25003_raw <- b25003_raw |> 
   filter(GEOID %in% fips)
 
-renter_plot <- b25003_data <- b25003_raw |> 
+b25003_data <- b25003_raw |> 
   right_join(b25003_vars_cleaned, by = "variable") |> 
   select(NAME, GEOID, year, tenure, estimate) |> 
   mutate(NAME = str_remove_all(NAME, ", Virginia")) |>
@@ -418,7 +418,7 @@ renter_plot <- b25003_data <- b25003_raw |>
   mutate(pct = (estimate/sum(estimate))) |> 
   filter(tenure == "Renter")
 
-ggplot(b25003_data,
+renter_plot <- ggplot(b25003_data,
        aes(x = year,
            y = pct,
            fill = pct,
@@ -444,7 +444,6 @@ if (knitr::is_html_output()) {
   renter_plot
   
   }
-
 
 ```
 
