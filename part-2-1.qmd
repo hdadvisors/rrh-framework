@@ -12,15 +12,13 @@ library(lubridate)
 library(tigris)
 library(scales)
 library(plotly)
+library(ggiraph)
+library(ggtext)
+library(hdatools)
 
-# rr includes Charles City, Goochland, New Kent, and Powhatan.
-
-rr <- c("51760", "51085", "51087", "51041",
-        "51145", "51075", "51127", "51036")
+rr <- c("51085", "51760", "51075", "51145", "51087", "51127", "51036", "51041")
 
 pha <- c("51085", "51760", "51087", "51041")
-
-# Set palette colors; may need to find a palette that better complements the PHA branding.
 
 rr_names <- c("Richmond city", "Hanover County", "Henrico County", "Chesterfield County",
               "Powhatan County", "Goochland County", "New Kent County", "Charles City County")
@@ -32,6 +30,7 @@ rr_df <- data.frame(GEOID = rr, NAME = rr_names)
 years <- 2016:2020
 
 ```
+
 This chapter covers the trends in the homeownership market across the four main Partnership for Housing Affordability localities, including the City of Richmond and counties of Chesterfield, Hanover, and Henrico.
 
 ## Supply
@@ -101,7 +100,9 @@ write_rds(b25127_data, "data/b25127_data.rds")
 
 ```
 
-```{r oo-structure-plot, fig.cap="Change in owner-occupied housing units by structure type"}
+```{r}
+#| label: fig-oo-structure-plot
+#| fig.cap: "Change in owner-occupied housing units by structure type"
 
 b25127_str <-  read_rds("data/b25127_data.rds") |> 
   filter(tenure == "Homeowner") |>
@@ -109,22 +110,33 @@ b25127_str <-  read_rds("data/b25127_data.rds") |>
   group_by(structure) |> 
   summarise(change = sum(change))
 
-ggplot(b25127_str,
+oo_structure_plot <- ggplot(b25127_str,
        aes(x = structure,
            y = change,
-           fill = structure)) +
-  geom_col() + 
+           fill = structure,
+           data_id = change,
+           tooltip = label_comma()(change))) +
+  geom_col() +
+  geom_col_interactive(size = 2) +
+  scale_y_continuous(labels = label_comma()) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 16)) +
+  scale_fill_pha() +
   labs(title = "Change in owner-occupied housing units by structure type",
        subtitle = "2016 to 2020",
-       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25127.") +
-  theme(panel.background = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        legend.position = "none") +
-  scale_y_continuous(labels = label_comma()) +
-  scale_x_discrete(labels = function(x) str_wrap(x, width = 16))
+       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25127.") +
+  theme_pha() +
+  add_zero_line("y")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = oo_structure_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  oo_structure_plot
+  
+  }
 
 ```
 
@@ -132,7 +144,9 @@ ggplot(b25127_str,
 
 Between 2016 and 2020, almost all additions to the homeowner-occupied housing stock in the region were, intuitively, homes built in the past decade. However, there have also been thousands of net additions among homes built before 1940 and between 1980 and 2009. These homes were most likely previously occupied by renters and have now been reconverted into homeownership opportunities.
 
-```{r oo-age-plot, fig.cap="Change in owner-occupied housing units by year built"}
+```{r}
+#| label: fig-oo-age-plot
+#| fig.cap: "Change in owner-occupied housing units by year built"
 
 b25127_age <-  read_rds("data/b25127_data.rds") |> 
   filter(tenure == "Homeowner") |>
@@ -140,24 +154,33 @@ b25127_age <-  read_rds("data/b25127_data.rds") |>
   group_by(yrbuilt) |> 
   summarise(change = sum(change))
 
-ggplot(b25127_age,
+oo_age_plot <- ggplot(b25127_age,
        aes(x = yrbuilt,
            y = change,
-           fill = yrbuilt)) +
+           fill = yrbuilt,
+           data_id = change,
+           tooltip = label_comma()(change))) +
   geom_col() + 
+  geom_col_interactive(size = 2) +
+  scale_y_continuous(labels = label_comma()) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 16)) +
+  scale_fill_pha() +
   labs(title = "Change in owner-occupied housing units by year built",
        subtitle = "2016 to 2020",
-       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25127.") +
-  theme(panel.background = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        legend.position = "none") +
-  scale_y_continuous(labels = label_comma()) +
-  scale_x_discrete(labels = function(x) str_wrap(x, width = 16))
+       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25127.") +
+  theme_pha() +
+  add_zero_line("y")
 
-
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = oo_age_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  oo_age_plot
+  
+  }
 
 ```
 
@@ -213,7 +236,9 @@ write_rds(b25042_data, "data/b25042_data.rds")
 
 ```
 
-```{r oo-beds-plot, fig.cap="Change in owner-occupied housing units by number of bedrooms"}
+```{r}
+#| label: fig-oo-beds-plot
+#| fig.cap: "Change in owner-occupied housing units by number of bedrooms"
 
 b25042_data <-  read_rds("data/b25042_data.rds") |> 
   filter(tenure == "Homeowner") |>
@@ -221,22 +246,33 @@ b25042_data <-  read_rds("data/b25042_data.rds") |>
   group_by(br) |> 
   summarise(change = sum(change))
 
-ggplot(b25042_data,
+oo_beds_plot <- ggplot(b25042_data,
        aes(x = br,
            y = change,
-           fill = br)) +
+           fill = br,
+           data_id = change,
+           tooltip = label_comma()(change))) +
   geom_col() + 
+  geom_col_interactive() +
+  scale_y_continuous(labels = label_comma()) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 16)) +
+  scale_fill_pha() +
   labs(title = "Change in owner-occupied housing units by number of bedrooms",
        subtitle = "2016 to 2020",
-       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25042.") +
-  theme(panel.background = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        legend.position = "none") +
-  scale_y_continuous(labels = label_comma()) +
-  scale_x_discrete(labels = function(x) str_wrap(x, width = 16))
+       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25042.") +
+  theme_pha() +
+  add_zero_line("y")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = oo_beds_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  oo_beds_plot
+  
+  }
 
 ```
 
@@ -306,26 +342,38 @@ write_rds(rr_cbps, "data/rr_cbps.rds")
 
 ```
 
-```{r bps-plot, fig.cap="Single-family building permits"}
+```{r}
+#| label: fig-bps-plot
+#| fig.cap: "Single-family building permits"
 
 pha_cbps <- read_rds("data/rr_cbps.rds") |> 
   filter(NAME %in% pha_names,
          type == "1-unit")
 
-ggplot(pha_cbps,
-       aes(x = year, y = units, fill = NAME)) +
-  geom_bar(stat = "identity") +
+bps_plot <- ggplot(pha_cbps,
+       aes(x = year, y = units, fill = NAME,
+           data_id = units, tooltip = label_comma()(units))) +
+  geom_col() +
+  geom_col_interactive(size = 2) +
   facet_wrap(~NAME) +
   scale_y_continuous(labels = label_comma()) +
+  scale_fill_pha() +
   labs(title = "Single-family building permits",
        subtitle = "2000 to 2020",
-       caption = "U.S. Census Bureau, Building Permits Survey.") +
-  theme(panel.background = element_blank(),
-        axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        legend.position = "none",
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+       caption = "**Source:** U.S. Census Bureau, Building Permits Survey.") +
+  theme_pha() +
+  add_zero_line("y")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = bps_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  bps_plot
+  
+  }
 
 ```
 
@@ -343,24 +391,35 @@ b25003_owner <- read_rds("data/b25003_data.rds") |>
   filter(NAME %in% pha_names) |> 
   filter(tenure == "Homeowner")
 
-ggplot(b25003_owner,
-       aes(x = NAME, 
+ho_locality_plot <- ggplot(b25003_owner,
+       aes(x = year, 
            y = pct, 
-           fill = NAME)) +
-  facet_wrap(~year, nrow = 1) +
+           fill = NAME,
+           data_id = pct,
+           tooltip = label_percent(accuracy = 0.1)(pct))) +
+  facet_wrap(~NAME, nrow = 1) +
   geom_col(position = "dodge") + 
+  geom_col_interactive(position = "dodge", size = 2) +
   scale_y_continuous(labels = label_percent()) +
+  scale_fill_pha() +
   labs(title = "Homeownership rate by locality",
        subtitle = "2016 to 2020",
        fill = "Locality",
-       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25003.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        axis.text.x = element_blank())
+       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25003.") +
+  theme_pha() +
+  add_zero_line("y") +
+  theme(axis.text.x = element_text(angle = 90))
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = ho_locality_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  ho_locality_plot
+  
+  }
 
 ```
 
@@ -409,7 +468,9 @@ b25007_vars_cleaned <- b25007_vars |>
 
 ```
 
-```{r ho-age-plot, fig.cap="Homeownership rate by age group"}
+```{r}
+#| label: fig-ho-age-plot
+#| fig.cap: "Homeownership rate by age group"
 
 b25007_data <- read_rds("data/b25007_data.rds") |> 
   filter(NAME %in% pha_names) |> 
@@ -433,24 +494,35 @@ b25007_data <- read_rds("data/b25007_data.rds") |>
   mutate(pct = estimate/sum(estimate)) |> 
   filter(tenure == "Homeowner")
 
-ggplot(b25007_data,
-       aes(x = age, 
+ho_age_plot <- ggplot(b25007_data,
+       aes(x = year, 
            y = pct, 
-           fill = age)) +
-  facet_wrap(~year, nrow = 1) +
+           fill = age,
+           data_id = pct,
+           tooltip = label_percent(accuracy = 0.1)(pct))) +
+  facet_wrap(~age, nrow = 1) +
   geom_col(position = "dodge") + 
-  scale_y_continuous(labels = label_percent(), limits = c(0, .9), expand = c(0,0)) +
+  geom_col_interactive(position = "dodge", size = 2) +
+  scale_y_continuous(labels = label_percent()) +
+  scale_fill_pha() +
   labs(title = "Homeownership rate by age group",
-       fill = "Age group",
        subtitle = "2016 to 2020",
-       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25007.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        axis.text.x = element_blank())
+       fill = "Locality",
+       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25007.") +
+  theme_pha() +
+  add_zero_line("y") +
+  theme(axis.text.x = element_text(angle = 90))
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = ho_age_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  ho_age_plot
+  
+  }
 
 ```
 
@@ -537,7 +609,9 @@ write_rds(b25003_race_data, "data/b25003_race_data.rds")
 
 ```
 
-```{r ho-race-plot, fig.cap="Homeownership rate by race and ethnicity"}
+```{r}
+#| label: fig-ho-race-plot
+#| fig.cap: "Homeownership rate by race and ethnicity"
 
 b25003_race_data <- read_rds("data/b25003_race_data.rds") |> 
   filter(locality %in% pha_names) |> 
@@ -545,26 +619,39 @@ b25003_race_data <- read_rds("data/b25003_race_data.rds") |>
   summarise(estimate = sum(estimate)) |> 
   group_by(year, race) |> 
   mutate(pct = estimate/sum(estimate)) |> 
-  filter(tenure == "Homeowner")
+  filter(tenure == "Homeowner") |> 
+  ungroup() |> 
+  mutate(race = fct_reorder(str_wrap(race, width = 12), pct, .desc = TRUE))
 
-ggplot(b25003_race_data,
-       aes(x = reorder(race, -pct), 
+ho_race_plot <- ggplot(b25003_race_data,
+       aes(x = year, 
            y = pct, 
-           fill = reorder(race, -pct))) +
-   facet_wrap(~year, nrow = 1) + 
+           fill = race,
+           data_id = pct,
+           tooltip = label_percent(accuracy = 0.1)(pct))) +
+  facet_wrap(~race, nrow = 1) +
   geom_col(position = "dodge") + 
+  geom_col_interactive(position = "dodge", size = 2) +
   scale_y_continuous(labels = label_percent()) +
+  scale_fill_pha() +
   labs(title = "Homeownership rate by race and ethnicity",
-       fill = "Race or ethnicity",
        subtitle = "2016 to 2020",
-       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25003.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        axis.text.x = element_blank())
+       fill = "Locality",
+       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25003.") +
+  theme_pha() +
+  add_zero_line("y") +
+  theme(axis.text.x = element_text(angle = 90))
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = ho_race_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  ho_race_plot
+  
+  }
 
 ```
 
@@ -621,52 +708,74 @@ write_rds(pha_sales, "data/pha_sales.rds")
 
 ```
 
-```{r sales-plot, fig.cap="Monthly home sales by locality"}
+```{r}
+#| label: fig-sales-plot
+#| fig.cap: "Monthly home sales by locality"
 
 pha_sales <- read_rds("data/pha_sales.rds")
 
-ggplot(pha_sales,
-       aes(x = date, y = sales, fill = geography)) +
+sales_plot <- ggplot(pha_sales,
+       aes(x = date, y = sales, fill = geography,
+           data_id = sales, tooltip = sales)) +
   geom_col() +
+  geom_col_interactive(size = 2) +
   facet_wrap(~geography) +
   scale_y_continuous(labels = label_comma()) +
   scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
+  scale_fill_pha() +
   labs(title = "Monthly home sales by locality",
        subtitle = "January 2017 to August 2022",
-       caption = "Source: Central Virginia Regional Multiple Listing Service.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        legend.position = "none",
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+       caption = "**Source:** Central Virginia Regional Multiple Listing Service.") +
+  theme_pha() +
+  add_zero_line("y")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = sales_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  sales_plot
+  
+  }
 
 ```
 
 Chesterfield County continued to lead the region in home sales---hitting a monthly peak in June 2021, with a total of 809 sales. In nearly all localities except for Chesterfield County, the average monthly home sales has largely remained the same. Only in Chesterfield County was there a more than 10 percent increase in average monthly home sales between 2019 and 2021.
 
-```{r sales-avg-plot, fig.cap="Average monthly home sales by locality"}
+```{r}
+#| label: fig-sales-avg-plot
+#| fig.cap: "Average monthly home sales by locality"
 
 avg_sales <- pha_sales |> 
   group_by(year, geography) |> 
   summarise(average = mean(sales))
 
-ggplot(avg_sales,
-       aes(x = year, y = average, fill = geography)) +
+avg_sales_plot <- ggplot(avg_sales,
+       aes(x = year, y = average, fill = geography,
+           data_id = average, tooltip = label_comma(accuracy = 1)(average))) +
   geom_col() +
+  geom_col_interactive(size = 2) +
   facet_wrap(~geography) +
   scale_y_continuous(labels = label_comma()) +
+  scale_fill_pha() +
   labs(title = "Average monthly home sales by locality",
        subtitle = "2017 to 2022 YTD",
-       caption = "Source: Central Virginia Regional Multiple Listing Service.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        legend.position = "none",
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+       caption = "**Source:** Central Virginia Regional Multiple Listing Service.") +
+  theme_pha() +
+  add_zero_line("y")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = avg_sales_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  avg_sales_plot
+  
+  }
 
 ```
 
@@ -735,26 +844,37 @@ write_rds(pha_price_adj, "data/pha_price.rds")
 
 ```
 
-```{r sales-price-plot, fig.cap="Monthly median sales price by locality"}
+```{r}
+#| label: fig-sales-price-plot
+#| fig.cap: "Monthly median sales price by locality"
 
 pha_price <- read_rds("data/pha_price.rds")
 
-ggplot(pha_price,
+price_plot <- ggplot(pha_price,
        aes(x = date, y = dollars, color = geography)) +
   geom_line(size = 1) +
+  geom_point_interactive(aes(data_id = dollars, tooltip = label_dollar()(dollars)),
+                         size = 0.5) +
   facet_wrap(~geography) +
   scale_y_continuous(labels = label_dollar()) +
   scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
+  scale_color_pha() +
   labs(title = "Monthly median sales price by locality",
        subtitle = "January 2017 to July 2022",
-       caption = "Source: Central Virginia Regional Multiple Listing Service.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        legend.position = "none",
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+       caption = "**Source:** Central Virginia Regional Multiple Listing Service.") +
+  theme_pha() +
+  add_zero_line("y")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = price_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  price_plot
+  
+  }
 
 ```
 
@@ -785,28 +905,36 @@ pha_supply <- pha_supply |>
 
 ```
 
-```{r supply-plot, fig.cap="Months of supply"}
+```{r}
+#| label: fig-supply-plot
+#| fig.cap: "Months of supply"
 
-ggplot(pha_supply,
+supply_plot <- ggplot(pha_supply,
        aes(x = date,
            y = months_sup)) +
-  geom_line(size = 1,
-            color = "#C77CFF") +
+  geom_line(size = 1, color = "#5bab8e") +
+  geom_point_interactive(aes(data_id = months_sup, tooltip = months_sup),
+                         size = 0.5, color = "#5bab8e") +
   scale_y_continuous(labels = label_number(suffix = " months"),
                      limits = c(0,4.5),
                      expand = c(0,0)) +
   scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
   labs(title = "Months of supply",
        subtitle = "January 2017 to June 2022",
-       caption = "Source: Central Virginia Regional Multiple Listing Service.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        axis.line.x = element_line(color = "grey50",
-                                   size = 0.1))
+       caption = "**Source:** Central Virginia Regional Multiple Listing Service.") +
+  theme_pha() +
+  add_zero_line("y")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = supply_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  supply_plot
+  
+  }
 
 ```
 
@@ -830,25 +958,37 @@ st_homes <- read_csv("data/var_starterhomes.csv") |>
 
 ```
 
-```{r starter-plot, fig.cap="Share of sold homes affordable to 80% AMI"}
+```{r}
+#| label: fig-starter-plot
+#| fig.cap: "Share of sold homes affordable to 80% AMI"
 
-ggplot(st_homes,
-       aes(x = FY, y = starter_homes_pct, fill = County_Name)) +
+st_homes_plot <- ggplot(st_homes,
+       aes(x = FY, y = starter_homes_pct, fill = County_Name,
+           data_id = starter_homes_pct,
+           tooltip = label_percent(accuracy = 1)(starter_homes_pct))) +
   geom_col() +
+  geom_col_interactive(size = 2) +
   facet_wrap(~County_Name) +
   scale_y_continuous(labels = label_percent(),
                      limits = c(0,.75)) +
+  scale_fill_pha() +
   labs(title = "Share of sold homes affordable to 80% AMI",
        subtitle = "2013 to 2021",
-       caption = "Source: Virginia REALTORS.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        legend.position = "none",
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+       caption = "**Source:** Virginia REALTORS.") +
+  theme_pha() +
+  add_zero_line("y")
 
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = st_homes_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  st_homes_plot
+  
+  }
+  
 ```
 
 ## New construction versus resale
@@ -893,26 +1033,37 @@ write_rds(pha_price_comp, "data/pha_price_comp.rds")
 
 ```
 
-```{r comp-price-plot, fig.cap="Median price of new construction and resale"}
+```{r}
+#| label: fig-comp-price-plot
+#| fig.cap: "Median price of new construction and resale"
 
 pha_price_comp <-  read_rds("data/pha_price_comp.rds")
 
-ggplot(pha_price_comp,
+price_comp_plot <- ggplot(pha_price_comp,
        aes(x = date, y = med_price, color = type)) +
   geom_line(size = 1) +
+  geom_point_interactive(aes(data_id = med_price, tooltip = label_dollar()(med_price)),
+                         size = 0.5) +
   scale_y_continuous(labels = label_dollar()) +
   scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
+  scale_color_pha() +
   labs(title = "Median price of new construction and resale",
        subtitle = "January 2017 to August 2022",
-       caption = "Source: Central Virginia Regional Multiple Listing Service.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        legend.position = "bottom",
-        legend.key = element_blank(),
-        legend.title = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+       caption = "**Source:** Central Virginia Regional Multiple Listing Service.") +
+  theme_pha() +
+  theme(legend.position = "right") +
+  add_zero_line("y")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = price_comp_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  price_comp_plot
+  
+  }  
 
 ```
 
@@ -978,26 +1129,38 @@ write_rds(pha_br_comp, "data/pha_br_comp.rds")
 
 ```
 
-```{r comp-br-plot, fig.cap="Share of bedrooms by new construction and resales"}
+```{r}
+#| label: comp-br-plot
+#| fig.cap: "Share of bedrooms by new construction and resales"
 
 pha_br_comp <- read_rds("data/pha_br_comp.rds")
 
-ggplot(pha_br_comp,
-       aes(x = year, y = percent, fill = br)) +
-  geom_bar(stat = "identity", position = "stack") +
+br_comp_plot <- ggplot(pha_br_comp,
+       aes(x = year, y = percent, fill = br,
+           data_id = percent, tooltip = label_percent(accuracy = 0.1)(percent))) +
+  geom_col(position = "stack") +
+  geom_col_interactive(position = "stack", size = 2) +
   facet_wrap(~type) +
   scale_y_continuous(labels = label_percent()) +
+  scale_fill_pha() +
   labs(title = "Share of bedrooms by new construction and resales",
        subtitle = "2017 to 2022 YTD",
        fill = "Bedrooms",
-       caption = "Source: Central Virginia Regional Multiple Listing Service.") +
-  theme(axis.title = element_blank(),
-        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.2),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+       caption = "**Source:** Central Virginia Regional Multiple Listing Service.") +
+  theme_pha() +
+  theme(legend.position = "right") +
+  add_zero_line("y")
 
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = br_comp_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  br_comp_plot
+  
+  }
 
 ```
 
@@ -1071,27 +1234,41 @@ write_rds(pha_sf_comp, "data/pha_sf_comp.rds")
 
 ```
 
-```{r comp-sf-plot, fig.cap="Home size by new construction and resales"}
+```{r}
+#| label: fig-comp-sf-plot
+#| fig.cap: "Home size by new construction and resales"
 
 pha_sf_comp <-  read_rds("data/pha_sf_comp.rds")
 
-ggplot(pha_sf_comp,
+sf_comp_plot <- ggplot(pha_sf_comp,
        aes(x = year, y = percent,
            fill = factor(sf, levels = c("Less than 1,000 SF", "1,000-1,999 SF",
-                                        "2,000-2,999 SF", "3,000+ SF")))) +
-  geom_bar(stat = "identity", position = "stack") +
+                                        "2,000-2,999 SF", "3,000+ SF")),
+           data_id = percent,
+           tooltip = label_percent(accuracy = 0.1)(percent))) +
+  geom_col(position = "stack") +
+  geom_col_interactive(position = "stack", size = 2) +
   facet_wrap(~type) +
   scale_y_continuous(labels = label_percent()) +
+  scale_fill_pha() +
   labs(title = "Home size by new construction and resales",
        subtitle = "2017 to 2022 YTD",
        fill = "Square footage",
-       caption = "Source: Central Virginia Regional Multiple Listing Service.") +
-  theme(axis.title = element_blank(),
-        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.2),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+       caption = "**Source:** Central Virginia Regional Multiple Listing Service.") +
+  theme_pha() +
+  theme(legend.position = "right") +
+  add_zero_line("y")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = sf_comp_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  sf_comp_plot
+  
+  }
 
 ```
 
