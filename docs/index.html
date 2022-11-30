@@ -82,7 +82,10 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
-    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
+      <a href="./" class="sidebar-logo-link">
+      <img src="./img/pha_logo.jpg" alt="" class="sidebar-logo py-0 d-lg-inline d-none">
+      </a>
     <div class="sidebar-title mb-0 py-0">
       <a href="./">Richmond Regional Housing Framework Data Update</a> 
         <div class="sidebar-tools-main">
@@ -246,7 +249,10 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#about" id="toc-about" class="nav-link active" data-scroll-target="#about">About</a></li>
+  <li><a href="#about" id="toc-about" class="nav-link active" data-scroll-target="#about">About</a>
+  <ul class="collapse">
+  <li><a href="#how-to-read-this-report" id="toc-how-to-read-this-report" class="nav-link" data-scroll-target="#how-to-read-this-report">How to read this report</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -291,7 +297,6 @@ ul.task-list li input[type="checkbox"] {
 <li>Gap analysis</li>
 <li>Local summaries</li>
 </ol>
-<div>
 <section id="how-to-read-this-report" class="level2 unnumbered">
 <h2 class="unnumbered anchored" data-anchor-id="how-to-read-this-report">How to read this report</h2>
 <p>This report is an interactive website with three main columns for navigation:</p>
@@ -302,62 +307,43 @@ ul.task-list li input[type="checkbox"] {
 </ol>
 <p>Links to both the previous and next chapter are included at the bottom of each chapter page.</p>
 </section>
-<section id="how-to-provide-feedback-on-this-draft" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="how-to-provide-feedback-on-this-draft">How to provide feedback on this draft</h2>
-<p>All comments, questions, and suggestions should be emailed to <a href="mailto:jonathan@hdadvisors.net" class="email">jonathan@hdadvisors.net</a> and <a href="mailto:eric@hdadvisors.net" class="email">eric@hdadvisors.net</a>.</p>
-<p>When applicable, please reference:</p>
-<ul>
-<li>The chapter number (“Chapter 3”)</li>
-<li>The section/subsection (“3.2.1”)</li>
-<li>The figure/title number (“Figure 3.3”)</li>
-</ul>
-<p><a href="mailto:jonathan@hdadvisors.net,eric@hdadvisors.net">Click here</a> to generate an email in your inbox with the recipients auto-filled.</p>
-</section>
-<section id="changelog" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="changelog">Changelog</h2>
-<section id="release-1.1" class="level3 unnumbered">
-<h3 class="unnumbered anchored" data-anchor-id="release-1.1">Release 1.1</h3>
-<p><em>2022-10-06</em></p>
-<p>Completed local summaries for Charles City County, Goochland County, New Kent County, and Powhatan County.</p>
-<p>Still to come:</p>
-<ul>
-<li>Additional details for the Town of Ashland</li>
-<li>Standardize colors across visualizations to match PHA brand palette</li>
-<li>Make selection of plots interactive</li>
-<li>Add in dynamic links for all footnotes and citations</li>
-<li>PDF version of full report and locality summaries</li>
-</ul>
-</section>
-<section id="release-1.0" class="level3 unnumbered">
-<h3 class="unnumbered anchored" data-anchor-id="release-1.0">Release 1.0</h3>
-<p><em>2022-09-15</em></p>
-<p>First complete draft. Completed PART 3 chapters and local summaries for main four localities.</p>
-<p>Still to come:</p>
-<ul>
-<li>Local summaries for Charles City County, Goochland County, New Kent County, Powhatan County, and additional details for the Town of Ashland</li>
-<li>Standardize colors across visualizations to match PHA brand palette</li>
-<li>Make selection of plots interactive</li>
-<li>Add in dynamic links for all footnotes and citations</li>
-<li>PDF version of full report and locality summaries</li>
-</ul>
-</section>
-<section id="release-0.3" class="level3 unnumbered">
-<h3 class="unnumbered anchored" data-anchor-id="release-0.3">Release 0.3</h3>
-<p><em>2022-09-11</em></p>
-<p>Third partial draft. Completed PART 2 chapters. Add dynamic figure and table captions to local summary template.</p>
-</section>
-<section id="release-0.2" class="level3 unnumbered">
-<h3 class="unnumbered anchored" data-anchor-id="release-0.2">Release 0.2</h3>
-<p><em>2022-09-06</em></p>
-<p>Second partial draft. Migrate from Bookdown project to Quarto project.</p>
-</section>
-<section id="release-0.1" class="level3 unnumbered">
-<h3 class="unnumbered anchored" data-anchor-id="release-0.1">Release 0.1</h3>
-<p><em>2022-08-30</em></p>
-<p>First partial draft. Test site rendering and hosting. PART 1 chapters fully drafted. Remaining chapters in production.</p>
-</section>
-</section>
-</div>
+<!-- ## How to provide feedback on this draft {.unnumbered} -->
+<!-- All comments, questions, and suggestions should be emailed to [jonathan\@hdadvisors.net](mailto:jonathan@hdadvisors.net){.email} and [eric\@hdadvisors.net](mailto:eric@hdadvisors.net){.email}. -->
+<!-- When applicable, please reference: -->
+<!-- -   The chapter number ("Chapter 3") -->
+<!-- -   The section/subsection ("3.2.1") -->
+<!-- -   The figure/title number ("Figure 3.3") -->
+<!-- [Click here](mailto:jonathan@hdadvisors.net,eric@hdadvisors.net) to generate an email in your inbox with the recipients auto-filled. -->
+<!-- ## Changelog {.unnumbered} -->
+<!-- ### Release 1.1 {.unnumbered} -->
+<!-- *2022-10-06* -->
+<!-- Completed local summaries for Charles City County, Goochland County, New Kent County, and Powhatan County. -->
+<!-- Still to come: -->
+<!-- -   Additional details for the Town of Ashland -->
+<!-- -   Standardize colors across visualizations to match PHA brand palette -->
+<!-- -   Make selection of plots interactive -->
+<!-- -   Add in dynamic links for all footnotes and citations -->
+<!-- -   PDF version of full report and locality summaries -->
+<!-- ### Release 1.0 {.unnumbered} -->
+<!-- *2022-09-15* -->
+<!-- First complete draft. Completed PART 3 chapters and local summaries for main four localities. -->
+<!-- Still to come: -->
+<!-- -   Local summaries for Charles City County, Goochland County, New Kent County, Powhatan County, and additional details for the Town of Ashland -->
+<!-- -   Standardize colors across visualizations to match PHA brand palette -->
+<!-- -   Make selection of plots interactive -->
+<!-- -   Add in dynamic links for all footnotes and citations -->
+<!-- -   PDF version of full report and locality summaries -->
+<!-- ### Release 0.3 {.unnumbered} -->
+<!-- *2022-09-11* -->
+
+<!-- Third partial draft. Completed PART 2 chapters. Add dynamic figure and table captions to local summary template. -->
+<!-- ### Release 0.2 {.unnumbered} -->
+<!-- *2022-09-06* -->
+<!-- Second partial draft. Migrate from Bookdown project to Quarto project. -->
+<!-- ### Release 0.1 {.unnumbered} -->
+<!-- *2022-08-30* -->
+<!-- First partial draft. Test site rendering and hosting. PART 1 chapters fully drafted. Remaining chapters in production. -->
+<!-- ::: -->
 
 
 </section>

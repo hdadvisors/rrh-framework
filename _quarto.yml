@@ -14,6 +14,9 @@ book:
       url: https://www.hdadvisors.net
 #  downloads: pdf
   date: today
+  sidebar: 
+    logo: "img/pha_logo.jpg"
+    search: true
   chapters:
     - index.qmd
     - part: "PART 1: Demographic and socioeconomic changes"
@@ -56,5 +59,6 @@ format:
       - lumen
       - rrh-framework.scss
     mainfont: "Noto Sans"
+    fontsize: "100%"
   pdf:
     documentclass: scrreprt

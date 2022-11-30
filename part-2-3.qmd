@@ -237,15 +237,14 @@ subsidy <- nhpd_clean_rr |>
   summarise(units = sum(units)) |>
   mutate(percent = units/sum(units))
 
-ggplot(subsidy,
+subsidy_plot <- ggplot(subsidy,
        aes(y = reorder(subsidy_type, units),
            x = percent,
            fill = subsidy_type,
-           color = subsidy_type,
-           label = label_comma()(units))) +
-  geom_col() +
-  geom_text(aes(x = percent + 0.03),
-            size = 4) +
+           label = label_comma()(units),
+           data_id = percent,
+           tooltip = label_comma()(units))) +
+  geom_col_interactive(size = 2) +
   theme_pha() +
   scale_fill_pha() +
   scale_color_pha() +
@@ -253,8 +252,23 @@ ggplot(subsidy,
   labs(title = "Share of federally assisted units by subsidy type",
        subtitle = "Data as of July 2022",
        caption = "**Source:** National Housing Preservation Database.") +
-  theme(panel.grid.major.y = element_blank()) +
+  flip_gridlines() +
   add_zero_line("x")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = subsidy_plot,
+         height_svg = 4)
+  
+} else {
+  
+  subsidy_plot +
+    geom_text(aes(x = percent + 0.03,
+                  color = subsidy_type),
+              size = 4) +
+    scale_color_pha()
+  
+  }
 
 ```
 
@@ -340,7 +354,6 @@ multi_plot <- ggplot(multiple,
         color = "#cbcdcc",
         size = 0.05
         ))
-
 
 if (knitr::is_html_output()) {
   
@@ -545,20 +558,22 @@ chg_plot <- ggplot(change_region,
        aes(x = reorder(subsidy_name, units),
            y = units,
            fill = subsidy_name,
-           color = subsidy_name,
-           label = label_number(big.mark = ",", style_positive = "plus", style_negative = "minus")(units))) +
-  geom_col() +
+           label = label_number(big.mark = ",", style_positive = "plus",
+                                style_negative = "minus")(units),
+           data_id = units,
+           tooltip = label_number(big.mark = ",", style_positive = "plus",
+                                style_negative = "minus")(units))) +
+  geom_col_interactive(size = 2) +
   theme_pha() +
   scale_fill_pha() +
-  scale_color_pha() +
-  geom_text(aes(y = units + sign(units)/0.003)) +
   scale_y_continuous(labels = label_comma(),
                      limits = c(-1750, 3100),
                      n.breaks = 10) +
   labs(title = "Net change in subsidized rental unit contracts",
        subtitle = "January 2020 through August 2022",
        caption = "**Source:** National Housing Preservation Database and Virginia Housing.") +
-  scale_y_continuous(labels = label_number(big.mark = ",", style_positive = "plus", style_negative = "minus"))
+  scale_y_continuous(labels = label_number(big.mark = ",", style_positive = "plus", style_negative = "minus")) +
+  add_zero_line("y")
 
 
 if (knitr::is_html_output()) {
@@ -568,7 +583,10 @@ if (knitr::is_html_output()) {
   
 } else {
   
-  chg_plot
+  chg_plot +
+    geom_text(aes(y = units + sign(units)/0.003,
+                  color = subsidy_name)) +
+    scale_color_pha()
   
   }
 
@@ -606,21 +624,20 @@ lchg_plot <- ggplot(change_locality,
        aes(x = reorder(subsidy_name, units),
            y = units,
            fill = subsidy_name,
-           color = subsidy_name,
            data_id = units,
-           tooltip = label_number(big.mark = ",", style_positive = "plus", style_negative = "minus")(units))) +
+           tooltip = label_number(big.mark = ",", style_positive = "plus",
+                                  style_negative = "minus")(units))) +
   geom_col() + 
   geom_col_interactive(size = 1) +
   theme_pha() +
   scale_fill_pha() +
-  scale_color_pha() +
   facet_wrap(~locality) +
   scale_y_continuous(labels = label_comma()) +
   labs(title = "Net change in subsidized rental unit contracts by locality",
        subtitle = "January 2020 through August 2022",
-       caption = "Sources: National Housing Preservation Database and Virginia Housing.") +
+       caption = "**Sources:** National Housing Preservation Database and Virginia Housing.") +
   scale_y_continuous(labels = label_number(big.mark = ",", style_positive = "plus", style_negative = "minus")) +
-  add_zero_line("x")
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   
@@ -669,16 +686,16 @@ lihtc_plot <- ggplot(lihtc,
            y = pct,
            fill = pct,
            data_id = pct,
-           tooltip = percent_format()(pct))) +
-  geom_col() +
+           tooltip = percent_format(accuracy = 0.1)(pct))) +
+  geom_col_interactive(size = 2) +
   scale_fill_gradientn(colours = c("#CAE3C2", "#74BA91", "#519B8D", "#2B4258")) +
   theme_pha() +
   scale_y_continuous(labels = label_percent(),
                      n.breaks = 6) +
   labs(title = "Percent of active LIHTC units by end of commitment period",
        subtitle = "Included properties with multiple subsidies",
-       caption = "**Sources:** National Housing Preservation Database and Virginia Housing.")
-
+       caption = "**Sources:** National Housing Preservation Database and Virginia Housing.") +
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   
@@ -828,18 +845,13 @@ rrp_plot <- ggplot(rrp,
   scale_fill_manual(values = c("#a6cccc", "#f39152", "#be451c")) +
   facet_wrap(~locality) +
   labs(title = "Rent relief payments by locality",
+       subtitle = "Through June 2022",
        caption = "**Source:** Virginia Department of Housing and Community Development") +
   scale_x_date(date_labels = "%b %y",
                expand = c(0,0)) +
   scale_y_continuous(labels = label_comma()) +
-  theme(
-    axis.ticks = element_blank(),
-    axis.title = element_blank(),
-    axis.text.x = element_text(angle = 90, vjust = 1, hjust = 1),
-    panel.background = element_blank(),
-    panel.grid.major.y = element_line(color = "grey95",
-                                  size = 0.05),
-    legend.position = "none")
+  theme(axis.text.x = element_text(angle = 90, vjust = 1, hjust = 1)) +
+  add_zero_line("y")
 
 # https://crsreports.congress.gov/product/pdf/R/R46688
   
@@ -853,8 +865,6 @@ if (knitr::is_html_output()) {
   rrp_plot
   
   }
-
-
 
 ```
 
@@ -876,11 +886,13 @@ rrpay_plot <- ggplot(rrp,
   scale_fill_manual(values = c("#a6cccc", "#f39152", "#be451c")) +
   facet_wrap(~locality) +
   labs(title = "Average assistance by month and locality",
+       subtitle = "Through June 2022",
        caption = "**Source:** Virginia Department of Housing and Community Development") +
   scale_x_date(date_labels = "%b %y",
                expand = c(0,0)) +
   scale_y_continuous(labels = label_dollar()) +
-  theme(axis.text.x = element_text(angle = 90, vjust = 1, hjust = 1))
+  theme(axis.text.x = element_text(angle = 90, vjust = 1, hjust = 1)) +
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   
@@ -920,7 +932,7 @@ avg_ho <- ho_production %>%
   group_by(year) %>% 
   summarise(total = sum(homes))
 
-mean(avg_ho$total)
+# mean(avg_ho$total)
 
 # MWCLT, BHC, project:HOMES, Southside, Habitat - WAITING ON DATA
 
