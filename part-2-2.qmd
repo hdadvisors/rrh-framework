@@ -14,9 +14,11 @@ library(tigris)
 library(ggthemes)
 library(sf)
 library(sp)
-library(plotly)
 library(scales)
 library(viridis)
+library(ggiraph)
+library(ggtext)
+library(hdatools)
 
 # rr includes Charles City, Goochland, New Kent, and Powhatan.
 
@@ -68,25 +70,37 @@ ro_structure_percent <- b25127_data |>
   group_by(year) |> 
   mutate(pct = estimate/sum(estimate))
 
-ggplot(ro_structure_percent,
+ro_structure_plot <- ggplot(ro_structure_percent,
        aes(x = structure,
            y = pct,
            fill = year,
-           label = label_percent(accuracy = 0.1)(pct))) +
+           label = label_percent(accuracy = 0.1)(pct),
+           data_id = pct,
+           tooltip = label_percent(accuracy = 0.1)(pct))) +
   geom_col(position = "dodge") +
-  geom_text(vjust = 1.5,
-            color = "white",
-            position = position_dodge(width = 0.9)) +
+  geom_col_interactive(position = "dodge", size = 2) +
+  scale_y_continuous(labels = label_percent()) +
+  scale_fill_pha() +
   labs(title = "Change in share of renter-occupied housing units by structure type",
        subtitle = "2016 to 2020",
-      caption = "Source: U.S. Census Bureau, American Community Survey, Table B25127.") +
-  theme(panel.background = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        legend.title = element_blank()) +
-  scale_y_continuous(labels = label_percent())
+       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25127.") +
+  theme_pha() +
+  add_zero_line("y") +
+  theme(legend.position = "right")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = ro_structure_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  ro_structure_plot +
+    geom_text(vjust = 1.5,
+              color = "white",
+              position = position_dodge(width = 0.9))
+  
+  }
 
 ```
 
@@ -104,23 +118,33 @@ ro_structure <- b25127_data |>
   group_by(NAME, structure) |> 
   summarise(change = sum(change))
 
-ggplot(ro_structure,
+ro_str_local_plot <- ggplot(ro_structure,
        aes(x = structure,
            y = change,
-           fill = NAME)) +
+           fill = NAME,
+           data_id = change,
+           tooltip = label_comma()(change))) +
   facet_wrap(~NAME) +
-  geom_col(position = "dodge") +
+  geom_col_interactive(position = "dodge", size = 2) +
+  scale_y_continuous(labels = label_comma()) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) +
+  scale_fill_pha() +
   labs(title = "Change in renter-occupied housing units by structure type",
        subtitle = "2016 to 2020",
-      caption = "Source: U.S. Census Bureau, American Community Survey, Table B25127.") +
-  theme(panel.background = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        legend.position = "none") +
-  scale_y_continuous(labels = label_comma()) +
-  scale_x_discrete(labels = function(x) str_wrap(x, width = 10))
+      caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25127.") +
+  theme_pha() +
+  add_zero_line("y")
+  
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = ro_str_local_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  ro_str_local_plot
+  
+  }
 
 ```
 
@@ -154,23 +178,33 @@ ro_yrblt <- b25127_data |>
   group_by(NAME, yrbuilt) |> 
   summarise(change = sum(change))
   
-ggplot(ro_yrblt,
+ro_age_plot <- ggplot(ro_yrblt,
        aes(x = yrbuilt,
            y = change,
-           fill = NAME)) +
+           fill = NAME,
+           data_id = change,
+           tooltip = label_comma()(change))) +
   facet_wrap(~NAME) +
-  geom_col(position = "dodge") +
+  geom_col_interactive(position = "dodge", size = 2) +
+  scale_y_continuous(labels = label_comma()) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) +
+  scale_fill_pha() +
   labs(title = "Change in renter-occupied housing units by year built",
        subtitle = "2016 to 2020",
-      caption = "Source: U.S. Census Bureau, American Community Survey, Table B25127.") +
-  theme(panel.background = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        legend.position = "none") +
-  scale_y_continuous(labels = label_comma()) +
-  scale_x_discrete(labels = function(x) str_wrap(x, width = 10))
+       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25127.") +
+  theme_pha() +
+  add_zero_line("y")
+  
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = ro_age_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  ro_age_plot
+  
+  }
 
 ```
 
@@ -192,22 +226,33 @@ b25042_data <- read_rds("data/b25042_data.rds") |>
   group_by(br) |> 
   summarise(change = sum(change))
 
-ggplot(b25042_data,
+ro_bed_plot <- ggplot(b25042_data,
        aes(x = br,
            y = change,
-           fill = br)) +
-  geom_col() + 
+           fill = br,
+           data_id = change,
+           tooltip = label_comma()(change))) +
+  geom_col_interactive(size = 2) + 
+  scale_y_continuous(labels = label_comma()) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 16)) +
+  scale_fill_pha() +
   labs(title = "Change in renter-occupied housing units by number of bedrooms",
        subtitle = "2016 to 2020",
-       caption = "Source: U.S. Census Bureau, American Community Survey, Table B25042.") +
-  theme(panel.background = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05),
-        axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        legend.position = "none") +
-  scale_y_continuous(labels = label_comma()) +
-  scale_x_discrete(labels = function(x) str_wrap(x, width = 16))
+       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25042.") +
+  theme_pha() +
+  add_zero_line("y")
+  
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = ro_bed_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  ro_bed_plot
+  
+  }
 
 ```
 
@@ -231,21 +276,19 @@ pha_cbps <- read_rds("data/rr_cbps.rds") |>
   group_by(NAME, year, type) |> 
   summarise(units = sum(units))
 
-ggplot(pha_cbps,
-       aes(x = year, y = units, fill = type)) +
-  geom_col() +
+bps_plot <- ggplot(pha_cbps,
+       aes(x = year, y = units, fill = type,
+           data_id = units, tooltip = label_comma()(units))) +
+  geom_col_interactive(size = 2) +
   facet_wrap(~NAME) +
   scale_y_continuous(labels = label_comma()) +
+  scale_fill_pha() +
   labs(title = "Multifamily building permits",
        subtitle = "2000 to 2020",
-       fill = str_wrap("Units per building", width = 10),
-       caption = "U.S. Census Bureau, Building Permits Survey.") +
-  theme(panel.background = element_blank(),
-        axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        legend.title = element_text(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+       caption = "**Source:** U.S. Census Bureau, Building Permits Survey.") +
+  theme_pha() +
+  add_zero_line("y") +
+  theme(legend.position = "right")
 
 ```
 
@@ -284,22 +327,32 @@ pha_rent_avg <- pha_rent |>
   filter(between(period, as.Date("2019-03-31"), as.Date("2022-06-30"))) |> 
   mutate(period = as.yearqtr(period))
 
-ggplot(pha_rent_avg,
+rent_avg_plot <- ggplot(pha_rent_avg,
        aes(x = period, y = rent, color = type)) +
   geom_line(size = 1) +
+  geom_point_interactive(aes(data_id = rent, tooltip = label_dollar()(rent)),
+                         size = 0.5) +
   scale_y_continuous(labels = label_dollar(),
                      n.breaks = 9) +
   scale_x_yearqtr(format = "%Y Q%q") +
+  scale_color_pha() +
   labs(title = "Average asking rent",
        subtitle = "2019 Q1 to 2022 Q2",
        color = "Rent value",
-       caption = "Source: CoStar Group, Inc.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+       caption = "**Source:** CoStar Group, Inc.") +
+  theme_pha() +
+  theme(legend.position = "right")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = rent_avg_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  rent_avg_plot
+  
+  }
 
 ```
 
@@ -314,26 +367,35 @@ pha_rent_chg <- pha_rent |>
   filter(between(period, as.Date("2019-03-31"), as.Date("2022-06-30"))) |> 
   mutate(period = as.yearqtr(period))
 
-ggplot(pha_rent_chg,
+rent_chg_plot <- ggplot(pha_rent_chg,
        aes(x = period,
            y = rent,
-           fill = type)) +
-  geom_col() +
+           fill = type,
+           data_id = rent,
+           tooltip = label_dollar()(rent))) +
+  geom_col_interactive(size = 2) +
   facet_wrap(~type) +
   scale_y_continuous(labels = label_dollar(),
                      n.breaks = 9) +
   scale_x_yearqtr(format = "%Y Q%q") +
+  scale_fill_pha() +
   labs(title = "Quarterly change in average asking rent",
        subtitle = "2019 Q1 to 2022 Q2",
-       caption = "Source: CoStar Group, Inc.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        legend.position = "none",
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+       caption = "**Source:** CoStar Group, Inc.") +
+  theme_pha() +
+  add_zero_line("y")
   
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = rent_chg_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  rent_chg_plot
+  
+  }
+
 ```
 
 ### Rents by submarket
@@ -364,29 +426,35 @@ rr_sub_rent <- read_csv("data/rr_submarket_data.csv") |>
 
 # Issue with above is that rents are not inflation-adjusted. May need to revisit. I've requested from CoStar to allow for an inflation-adjusted average rent per unit pull, BUT who knows if they can add it. Might consider just having a table with most recent rents.
 
-ggplot(rr_sub_rent,
+sub_rent_plot <- ggplot(rr_sub_rent,
        aes(x = period,
            y = rent, 
            color = submarket)) +
   geom_line(size = 1) + 
+  geom_point_interactive(aes(data_id = rent, tooltip = label_dollar()(rent)),
+                         size = 0.5) +
+  facet_wrap(~locality) +
   scale_x_yearqtr(format = "%Y") +
   scale_y_continuous(labels = label_dollar(),
                      n.breaks = 7) +
+  scale_color_manual(values = submarkets) +
   labs(title = "Average asking rent by submarket",
        subtitle = "2010 Q1 to 2022 Q2",
-       caption = "Source: CoStar Group, Inc.") +
-  facet_wrap(~locality) +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        axis.text.x = element_text(angle = 90),
-        legend.title = element_blank(),
-        legend.key = element_blank(),
-        legend.justification = "top",
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05)) +
-  scale_color_manual(values = submarkets)
+       caption = "**Source:** CoStar Group, Inc.") +
+  theme_pha() +
+  theme(legend.position = "right",
+        axis.text.x = element_text(angle = 90))
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = sub_rent_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  sub_rent_plot
+  
+  }
   
 ```
 
@@ -423,23 +491,31 @@ pha_rent_br <- read_csv("data/pha_rent_br.csv") |>
   filter(between(period, as.Date("2010-03-31"), as.Date("2022-06-30"))) |> 
   mutate(period = as.yearqtr(period))
   
-ggplot(pha_rent_br,
+rent_br_plot <- ggplot(pha_rent_br,
        aes(x = period, y = rent, color = br)) +
   geom_line(size = 1) +
+  geom_point_interactive(aes(data_id = rent, tooltip = label_dollar()(rent)),
+                         size = 0.5) +
   scale_y_continuous(labels = label_dollar(),
                      n.breaks = 9) +
   scale_x_yearqtr(format = "%Y Q%q") +
+  scale_color_pha() +
   labs(title = "Average asking rent by bedroom",
        subtitle = "2019 Q1 to 2022 Q2 (inflation-adjusted)",
-       caption = "Source: CoStar Group, Inc.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        legend.title = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+       caption = "**Source:** CoStar Group, Inc.") +
+  theme_pha() +
+  theme(legend.position = "right")
 
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = rent_br_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  rent_br_plot
+  
+  }
 
 ```
 
@@ -495,22 +571,31 @@ pha_built_rent <- map_dfr(pha_built, pha_built_clean) |>
   filter(between(period, as.Date("2012-03-31"), as.Date("2022-06-30"))) |> 
   mutate(period = as.yearqtr(period))
 
-ggplot(pha_built_rent,
+built_rent_plot <- ggplot(pha_built_rent,
        aes(x = period, y = rent, color = built)) +
   geom_line(size = 1) +
+  geom_point_interactive(aes(data_id = rent, tooltip = label_dollar()(rent)),
+                         size = 0.5) +
   scale_y_continuous(labels = label_dollar(),
                      n.breaks = 9) +
   scale_x_yearqtr(format = "%Y Q%q") +
+  scale_color_pha() +
   labs(title = "Average asking rent by age of unit",
        subtitle = "2012 Q1 to 2022 Q2 (inflation-adjusted)",
-       caption = "Source: CoStar Group, Inc.") +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        legend.title = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+       caption = "**Source:** CoStar Group, Inc.") +
+  theme_pha() +
+  theme(legend.position = "right")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = built_rent_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  built_rent_plot
+  
+  }
 
 ```
 
@@ -552,5 +637,37 @@ ggplot(rr_sub_vacancy,
         panel.grid.major.y = element_line(color = "grey95",
                                           size = 0.05)) +
   scale_color_manual(values = submarkets)
+
+sub_vacancy_plot <- ggplot(rr_sub_vacancy,
+       aes(x = period,
+           y = vacancy_rate, 
+           color = submarket)) +
+  geom_line(size = 1) + 
+  geom_point_interactive(aes(data_id = vacancy_rate,
+                             tooltip = label_percent(accuracy = 0.1)(vacancy_rate)),
+                         size = 0.5) +
+  facet_wrap(~locality) +
+  scale_x_yearqtr(format = "%Y") +
+  scale_y_continuous(labels = label_percent(),
+                     n.breaks = 7) +
+  scale_color_manual(values = submarkets) +
+  labs(title = "Vacancy rates by submarket",
+       subtitle = "2010 Q1 to 2022 Q2",
+       caption = "**Source:** CoStar Group, Inc.<br>**Note:** Outlier values above 15% omitted.") +
+  theme_pha() +
+  theme(legend.position = "right",
+        axis.text.x = element_text(angle = 90)) +
+  add_zero_line("y")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = sub_vacancy_plot,
+         height_svg = 4) 
+  
+} else {
+  
+  sub_vacancy_plot
+  
+  }
 
 ```
