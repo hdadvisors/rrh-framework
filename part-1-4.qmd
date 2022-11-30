@@ -5,11 +5,12 @@
 
 library(tidyverse)
 library(tidycensus)
-library(ggplot2)
 library(sf)
 library(leaflet)
 library(scales)
-library(viridisLite)
+library(ggtext)
+library(ggiraph)
+library(hdatools)
 
 # rr includes Charles City, Goochland, New Kent, and Powhatan.
 
@@ -17,21 +18,10 @@ rr <- c("51085", "51760", "51075", "51145", "51087", "51127", "51036", "51041")
 
 pha <- c("51085", "51760", "51087", "51041")
 
-# Set palette colors; may need to find a palette that better complements the PHA branding.
-
 rr_names <- c("Richmond city", "Hanover County", "Henrico County", "Chesterfield County",
               "Powhatan County", "Goochland County", "New Kent County", "Charles City County")
 
 pha_names <- c("Richmond city", "Hanover County", "Henrico County", "Chesterfield County")
-
-geo_colors <- setNames(viridis(4), nm = pha_names)
-
-pal <-colorFactor(palette = c("#440154FF", "#31688EFF","#35B779FF", "#FDE725FF"),
-                  levels = c("Richmond City", "Hanover", "Henrico", "Chesterfield"))
-
-tenure <- c("Homeowner", "Renter")
-
-tenure_colors <-setNames(viridis(2), nm = tenure)
 
 years <- 2016:2020
 
@@ -107,22 +97,31 @@ b18107_data <- read_rds("data/b18107_data.rds") |>
   group_by(age) |> 
   summarise(change = sum(change))
 
-ggplot(b18107_data,
+ind_liv_age_plot <- ggplot(b18107_data,
        aes(x = age,
            y = change,
-           fill = age)) +
-  geom_col() +
-  labs(title="Net change in individuals with independent living difficulties by age",
-       subtitle="2016 to 2020",
-       caption="Source: U.S. Census Bureau, American Community Survey, Table B18107.") +
+           fill = age,
+           data_id = change,
+           tooltip = label_comma()(change))) +
+  geom_col_interactive(size = 2) +
   scale_y_continuous(labels = label_comma()) +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        legend.position = "none",
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+  scale_fill_pha() +
+  labs(title = "Net change in individuals with independent living difficulties by age",
+       subtitle = "2016 to 2020",
+       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B18107.") +
+  theme_pha() +
+  add_zero_line("y")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = ind_liv_age_plot,
+         height_svg = 4)
+  
+} else {
+  
+  ind_liv_age_plot
+  
+  }
 
 ```
 
@@ -192,25 +191,35 @@ indliv_tenure <- read_rds("data/indliv_data.rds") |>
   mutate(pct = est/sum(est)) |> 
   mutate(TEN = fct_relevel(TEN, "Owner-occupied", "Renter-occupied", "Group quarters", "No payment provided"))
 
-ggplot(indliv_tenure,
+ind_liv_tenure_plot <- ggplot(indliv_tenure,
        aes(x = TEN,
            y = pct,
-           fill = TEN)) +
+           fill = TEN,
+           data_id = pct,
+           tooltip = label_percent(accuracy = 0.1)(pct))) +
   facet_wrap(~geography, nrow = 1) +
-  geom_col() +
+  geom_col_interactive(size = 2) +
   scale_x_discrete() +
   scale_y_continuous(labels = label_percent()) +
-  labs(title = "Percent of persons with independent living difficulties\nby household tenure",
+  scale_fill_pha() +
+  labs(title = "Percent of persons with independent living difficulties<br>by household tenure",
        subtitle = "Includes persons in group quarters",
-       caption = "Source: U.S. Census Bureau, American Community Survey,\nPublic Use Microdata Sample, 2016-2020 5-year estimates.") +
+       caption = "**Source:** U.S. Census Bureau, American Community Survey,<br>Public Use Microdata Sample, 2016-2020 5-year estimates.") +
+  theme_pha() +
+  add_zero_line("y") +
   theme(legend.position = "bottom",
-        legend.title = element_blank(),
-        axis.text.x = element_blank(),
-        axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+        axis.text.x = element_blank())
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = ind_liv_tenure_plot,
+         height_svg = 4)
+  
+} else {
+  
+  ind_liv_tenure_plot
+  
+  }
 
 ```
 
@@ -228,25 +237,35 @@ indliv_size <- read_rds("data/indliv_data.rds") |>
   mutate(pct = est/sum(est)) |> 
   mutate(NP = fct_relevel(NP, "Living alone"))
 
-ggplot(indliv_size,
+ind_liv_size_plot <- ggplot(indliv_size,
        aes(x = NP,
            y = pct,
-           fill = NP)) +
+           fill = NP,
+           data_id = pct,
+           tooltip = label_percent(accuracy = 0.1)(pct))) +
   facet_wrap(~geography, nrow = 1) +
-  geom_col() +
+  geom_col_interactive(size = 2) +
   scale_x_discrete() +
   scale_y_continuous(labels = label_percent()) +
-  labs(title = "Percent of persons with independent living difficulties\nby household size",
+  scale_fill_pha() +
+  labs(title = "Percent of persons with independent living difficulties<br>by household size",
        subtitle = "Persons in group quarters are counted as living alone",
-       caption = "Source: U.S. Census Bureau, American Community Survey,\nPublic Use Microdata Sample, 2016-2020 5-year estimates.") +
+       caption = "**Source:** U.S. Census Bureau, American Community Survey,<br>Public Use Microdata Sample, 2016-2020 5-year estimates.") +
+  theme_pha() +
+  add_zero_line("y") +
   theme(legend.position = "bottom",
-        legend.title = element_blank(),
-        axis.text.x = element_blank(),
-        axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+        axis.text.x = element_blank())
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = ind_liv_size_plot,
+         height_svg = 4)
+  
+} else {
+  
+  ind_liv_size_plot
+  
+  }
 
 ```
 
@@ -310,22 +329,32 @@ b21100_data <- read_rds("data/b21100_data.rds") |>
   group_by(rating) |> 
   summarise(change = sum(change))
  
-ggplot(b21100_data,
+vets_plot <- ggplot(b21100_data,
        aes(x = rating,
            y = change,
-           fill = rating)) +
-  geom_col() +
-  labs(title="Net change in veterans with service-connected disability by disability rating",
-       subtitle="2016 to 2020",
-       caption="Source: U.S. Census Bureau, American Community Survey, Table B21100.") +
+           fill = rating,
+           data_id = change,
+           tooltip = label_comma()(change))) +
+  geom_col_interactive(size = 2) +
   scale_x_discrete(labels = function(x) str_wrap(x, width = 15)) +
   scale_y_continuous(labels = label_comma()) +
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        legend.position = "none",
-        panel.background = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05))
+  scale_fill_pha() +
+  labs(title = "Net change in veterans with service-connected disability by disability rating",
+       subtitle = "2016 to 2020",
+       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B21100.") +
+  theme_pha() +
+  add_zero_line("y")
+
+if (knitr::is_html_output()) {
+  
+  girafe(ggobj = vets_plot,
+         height_svg = 4)
+  
+} else {
+  
+  vets_plot
+  
+  }
+
 
 ```

@@ -135,13 +135,9 @@ hh_inc_plot <- ggplot(b25118_data,
        caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25118.") +
   scale_fill_pha() +
   theme_pha() +
-  theme(legend.position = "right",
-        panel.grid.major.y = element_blank(),
-        panel.grid.major.x = element_line(color = "#e2e4e3",
-                                          size = 0.05),
-        plot.title.position = "plot",
-        plot.caption.position = "plot"
-        )
+  theme(legend.position = "right") +
+  flip_gridlines() +
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   

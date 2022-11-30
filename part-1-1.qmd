@@ -146,7 +146,8 @@ total_pop_plot <- ggplot(pha_pop_compare,
        subtitle="2016 to 2020",
        caption="**Source:** U.S. Census Bureau, Population Estimates Program.") +
   scale_fill_pha() +
-  theme_pha()
+  theme_pha() +
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   
@@ -267,7 +268,8 @@ comp_chg_plot <- ggplot(comp_chg_summary,
        caption = "**Note:** Data not available for 2020.<br>**Source:** U.S. Census Bureau, Population Estimates Program.") +
   scale_fill_pha() +
   theme_pha() +
-  theme(legend.position = "right")
+  theme(legend.position = "right") +
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   
@@ -315,7 +317,8 @@ forecasts_plot <- ggplot(forecasts,
   theme(
     legend.position = "right",
     legend.title = element_text(hjust = 0)
-  )
+  ) +
+  add_zero_line("y")
 
 # Difference between 2050 and 2020 is 302,780. 29 percent increase.
 

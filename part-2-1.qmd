@@ -1130,7 +1130,7 @@ write_rds(pha_br_comp, "data/pha_br_comp.rds")
 ```
 
 ```{r}
-#| label: comp-br-plot
+#| label: fig-comp-br-plot
 #| fig.cap: "Share of bedrooms by new construction and resales"
 
 pha_br_comp <- read_rds("data/pha_br_comp.rds")

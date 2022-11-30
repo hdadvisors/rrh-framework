@@ -137,7 +137,8 @@ hh_form_plot <- ggplot(b25003_data,
        caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25003.") +
   scale_y_continuous(labels = label_comma()) +
   scale_fill_pha() +
-  theme_pha()
+  theme_pha() +
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   
@@ -247,7 +248,8 @@ hh_age_plot <- ggplot(b25007_data,
   scale_fill_pha() +
   theme_pha() +
   theme(axis.text.x = element_blank(),
-        legend.position = "right")
+        legend.position = "right") +
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   
@@ -345,7 +347,8 @@ hh_type_plot <- ggplot(b11001_data,
   scale_y_continuous(labels = label_comma()) +
   scale_x_discrete(labels = function(x) str_wrap(x, width = 16)) +
   scale_fill_pha(direction = -1) +
-  theme_pha()
+  theme_pha() +
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   
@@ -449,7 +452,8 @@ hh_size_plot <- ggplot(b25009_data,
   theme_pha() +
   theme(axis.text.x = element_blank(),
         legend.position = "right"
-        )
+        ) +
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   
@@ -562,7 +566,8 @@ hh_child_plot <- ggplot(b25115_data,
   theme_pha() +
   theme(axis.text.x = element_blank(),
         legend.position = "right"
-        )
+        ) +
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   
@@ -682,7 +687,8 @@ hh_seniors_plot <- ggplot(b09020_data,
                                           size = 0.05),
         plot.title.position = "plot",
         plot.caption.position = "plot"
-        )
+        ) +
+  add_zero_line("x")
 
 if (knitr::is_html_output()) {
   
@@ -775,7 +781,8 @@ hh_subfam_plot <- ggplot(b11013_data,
        fill = element_blank()) +
   scale_fill_pha(direction = -1) +
   theme_pha() +
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom") +
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   
@@ -1027,7 +1034,8 @@ hh_adultchild_plot <- ggplot(b09021_data,
        subtitle="2016 to 2020",
        caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B09021.") +
   scale_fill_pha() +
-  theme_pha()
+  theme_pha() +
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   
