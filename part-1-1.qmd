@@ -14,6 +14,7 @@ library(sp)
 library(scales)
 library(ggiraph)
 library(hdatools)
+library(htmlwidgets)
 
 rr <- c("51085", "51760", "51075", "51145", "51087", "51127", "51036", "51041")
 
@@ -149,10 +150,15 @@ total_pop_plot <- ggplot(pha_pop_compare,
   theme_pha() +
   add_zero_line("y")
 
+total_pop_widget <- girafe(ggobj = total_pop_plot,
+                           height_svg = 4)
+
+htmlwidgets::saveWidget(total_pop_widget, "total_pop.html",
+                        selfcontained = TRUE)
+
 if (knitr::is_html_output()) {
   
-  girafe(ggobj = total_pop_plot,
-         height_svg = 4) 
+  total_pop_widget
   
 } else {
   
