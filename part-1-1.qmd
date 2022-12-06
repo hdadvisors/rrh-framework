@@ -153,8 +153,9 @@ total_pop_plot <- ggplot(pha_pop_compare,
 total_pop_widget <- girafe(ggobj = total_pop_plot,
                            height_svg = 4)
 
-htmlwidgets::saveWidget(total_pop_widget, "total_pop.html",
-                        selfcontained = TRUE)
+# htmlwidgets::saveWidget(total_pop_widget, "total_pop.html")
+
+htmltools::save_html(total_pop_widget, "widgets/total_pop.html")
 
 if (knitr::is_html_output()) {
   
