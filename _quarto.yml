@@ -62,3 +62,4 @@ format:
     fontsize: "100%"
   pdf:
     documentclass: scrreprt
+    mainfont: "Noto Sans"
