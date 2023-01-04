@@ -414,8 +414,7 @@ sub_rent <- read_csv("data/rr_submarket_data.csv") |>
 sub_plot <- ggplot(sub_rent,
        aes(x = period,
            y = rent, 
-           color = submarket,
-           group = 1)) +
+           color = submarket)) +
   geom_line(size = 1) +
   geom_point_interactive(
     aes(data_id = rent,
