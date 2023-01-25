@@ -291,8 +291,8 @@ ind_plot <- ggplot(b18107,
   labs(title = paste0(name, ": Net change in individuals with<br>independent living difficulties by age"),
        subtitle = "2016 to 2020",
        caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B18107.") +
-  scale_y_continuous(labels = label_comma()) 
-
+  scale_y_continuous(labels = label_comma()) +
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   
@@ -437,7 +437,7 @@ renter_plot <- ggplot(b25003_data,
   labs(title = "New Kent County: Percent of renter households", 
        fill = "Percent of total households",
        subtitle = "2016 to 2020",
-       caption = "Source: U.S Census Bureau, American Community Survey, Table B25003.") +
+       caption = "**Source:** U.S Census Bureau, American Community Survey, Table B25003.") +
   add_zero_line("y")
 
 if (knitr::is_html_output()) {
@@ -638,7 +638,7 @@ cb_plot <- ggplot(cb,
   scale_fill_manual(values = c("#f39152", "#a6cccc", "#e2e4e3")) +
   geom_col_interactive(position = position_fill(reverse = TRUE), size = 2) +
   scale_y_continuous(labels = percent_format()) +
-  labs(title = paste0(name, ": Share of cost-burdened households by tenure"),
+  labs(title = paste0(name, ":<br>Share of cost-burdened households by tenure"),
        subtitle = "2015 to 2019",
        fill = "Cost burden",
        caption = "**Source:** U.S Department of Housing and Urban Development,<br>Comprehensive Housing Affordability Strategy (CHAS), Table 7.") +
@@ -682,7 +682,8 @@ mkv_plot <- ggplot(mkv,
   scale_fill_gradientn(colours = c("#CAE3C2", "#74BA91", "#519B8D", "#2B4258")) +
   labs(title = "Enrolled students experiencing homelessness by school year",
        subtitle = "2016-2017 to 2019-2020",
-       caption = "**Source:** William & Mary School of Education, Project HOME - Virginia.")
+       caption = "**Source:** William & Mary School of Education, Project HOME - Virginia.") +
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   

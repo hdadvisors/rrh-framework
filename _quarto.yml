@@ -12,7 +12,7 @@ book:
   author:
     - name: HDAdvisors
       url: https://www.hdadvisors.net
-#  downloads: pdf
+  downloads: pdf
   date: today
   sidebar: 
     logo: "img/pha_logo.jpg"
@@ -63,3 +63,8 @@ format:
   pdf:
     documentclass: scrreprt
     mainfont: "Noto Sans"
+    fig-pos: "H"
+    include-in-header:
+      text: |
+        \usepackage{float}
+        \raggedbottom

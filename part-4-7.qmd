@@ -498,7 +498,7 @@ ro_plot <- ggplot(ro_structure_percent,
   scale_fill_pha() +
   labs(title = "Goochland County: Change in share of<br>renter-occupied housing units by structure type",
        subtitle = "2016 to 2020",
-      caption = "Source: U.S. Census Bureau, American Community Survey, Table B25127.") +
+      caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25127.") +
   theme(legend.position = "top") +
   scale_y_continuous(labels = label_percent()) +
   add_zero_line("y")
@@ -641,7 +641,8 @@ slgap_plot <- ggplot(slgap,
        subtitle = "2016 to 2020",
        fill = "Nominal income",
        caption = "**Sources:** U.S. Census Bureau, American Community Survey, Table B25119<br>and Central Virginia Regional Multiple Listing Service.") +
-  theme(legend.position = "top")
+  theme(legend.position = "top") +
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   
@@ -692,7 +693,8 @@ gap_plot <- ggplot(gap,
   labs(title = paste0(name, ": Rental housing gap by AMI"),
        subtitle = "2015 to 2019",
        caption = "**Source:** U.S. Department of Housing and Urban Development,<br>Comprehensive Housing Affordability Strategy (CHAS), Table 7.") +
-  theme(legend.position = "top")
+  theme(legend.position = "top") +
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   
@@ -737,7 +739,8 @@ cb_plot <- ggplot(cb,
        subtitle = "2015 to 2018",
        fill = "Cost burden",
        caption = "**Source:** U.S Department of Housing and Urban Development,<br>Comprehensive Housing Affordability Strategy (CHAS), Table 7.") +
-  theme(legend.position = "top")
+  theme(legend.position = "top") +
+  add_zero_line("y")
 
 
 if (knitr::is_html_output()) {
@@ -776,7 +779,8 @@ mkv_plot <- ggplot(mkv,
   scale_fill_gradientn(colours = c("#CAE3C2", "#74BA91", "#519B8D", "#2B4258")) +
   labs(title = "Enrolled students experiencing homelessness by school year",
        subtitle = "2016-2017 to 2019-2020",
-       caption = "**Source:** William & Mary School of Education, Project HOME - Virginia.")
+       caption = "**Source:** William & Mary School of Education, Project HOME - Virginia.") +
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   

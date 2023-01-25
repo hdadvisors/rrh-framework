@@ -204,7 +204,7 @@ snr_plot <- ggplot(b09020,
         panel.grid.major.y = element_blank(),
         panel.grid.major.x = element_line(color = "#e2e4e3",
                                           size = 0.05)) +
-  add_zero_line("y")
+  add_zero_line("x")
 
 
 if (knitr::is_html_output()) {
@@ -296,7 +296,8 @@ ind_plot <- ggplot(b18107,
   labs(title=paste0(name, ": Net change in individuals with<br>independent living difficulties by age"),
        subtitle="2016 to 2020",
        caption="**Source:** U.S. Census Bureau, American Community Survey, Table B18107.") +
-  scale_y_continuous(labels = label_comma()) 
+  scale_y_continuous(labels = label_comma()) +
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   
@@ -624,7 +625,8 @@ cb_plot <- ggplot(cb,
        subtitle = "2015 to 2019",
        fill = "Cost burden",
        caption = "**Source:** U.S Department of Housing and Urban Development,<br>Comprehensive Housing Affordability Strategy (CHAS), Table 7.") +
-  theme(legend.position = "top")
+  theme(legend.position = "top") +
+  add_zero_line("y")
 
 
 if (knitr::is_html_output()) {

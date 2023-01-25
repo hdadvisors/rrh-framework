@@ -822,12 +822,12 @@ slgap <- b25119_ashland %>%
   mutate(loanamt = principal/(1-closingcosts)) |> 
   mutate(mortgage = abs(pmt((annual_int/12), 360, loanamt, 0)) + 250) |> 
   mutate(inc_needed = ((mortgage*10)/2.8)*12) |> 
-  select(year, inc_needed, estimate) %>% 
+  select(year, inc_needed, cdollars) %>% 
   pivot_longer(2:3,
                names_to = "label",
                values_to = "dollars") |> 
   mutate(label = case_when(
-    label == "estimate" ~ "Renter median household income",
+    label == "cdollars" ~ "Renter median household income",
     label == "inc_needed" ~ "Income needed to afford median home price"
   ))
   
