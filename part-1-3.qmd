@@ -668,8 +668,8 @@ wage_occ_plot <- ggplot(oews_occ,
            tooltip = label_percent()(pct_change))) +
   geom_col() +
   geom_col_interactive(size = 2) +
-  scale_x_continuous(labels = label_percent()) +
-  scale_y_discrete(labels = function(x) str_wrap(x, width = 20)) +
+  scale_x_continuous(labels = label_percent(), limits = c(-0.005, 0.23)) +
+  scale_y_discrete(labels = function(x) str_wrap(x, width = 30)) +
   scale_fill_pha() +
   labs(title = "Percent change in annual wage for<br>top 5 most common occupation categories",
        subtitle = "Richmond, VA MSA | May 2019 to May 2021",
@@ -688,7 +688,7 @@ if (knitr::is_html_output()) {
   wage_occ_plot +
     geom_text(aes(label = label_percent(accuracy = 0.1)(pct_change),
                   color = occ_title),
-              nudge_x = 0.01) +
+              nudge_x = 0.015) +
     scale_color_pha()
   
   }

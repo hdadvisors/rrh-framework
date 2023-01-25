@@ -266,7 +266,7 @@ cb_inc_plot <- ggplot(cb_income,
              nrow = 1, 
              labeller = label_wrap_gen(width = 12, multi_line = TRUE)) +
   scale_y_continuous(labels = label_comma()) +
-  labs(title = "Cumulative change in cost-burdened households by income and tenure",
+  labs(title = "Cumulative change in cost-burdened households<br>by income and tenure",
        subtitle = "2015 to 2019",
        fill = "Tenure",
        caption = "**Source:** U.S Department of Housing and Urban Development,<br>Comprehensive Housing Affordability Strategy (CHAS), Table 7.") +

@@ -257,7 +257,7 @@ oo_beds_plot <- ggplot(b25042_data,
   scale_y_continuous(labels = label_comma()) +
   scale_x_discrete(labels = function(x) str_wrap(x, width = 16)) +
   scale_fill_pha() +
-  labs(title = "Change in owner-occupied housing units by number of bedrooms",
+  labs(title = "Change in owner-occupied housing units<br>by number of bedrooms",
        subtitle = "2016 to 2020",
        caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25042.") +
   theme_pha() +

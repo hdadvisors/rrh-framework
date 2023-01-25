@@ -56,7 +56,7 @@ The gradual population growth that Ashland was seeing throughout the last decade
 
 ```{r}
 #| label: pop-data
-#| echo: false
+#| eval: false
 
 ashland_pop <- get_estimates(
   geography = "place",
@@ -116,11 +116,15 @@ census_clean <- ashland_20 |>
 population_data <- ashpop_clean |> 
   bind_rows(census_clean)
 
+write_rds(population_data, "data/population_data.rds")
+
 ```
 
 ```{r}
 #| label: fig-ash-pop
 #| fig-cap: "Town of Ashland: Total Population"
+
+population_data <- read_rds("data/population_data.rds")
 
 pop_bar <- ggplot(population_data,
                       aes(x = year,
@@ -132,7 +136,7 @@ pop_bar <- ggplot(population_data,
   geom_col_interactive(size = 2) +
   scale_fill_gradientn(colours = c("#CAE3C2", "#74BA91", "#519B8D", "#2B4258")) +
   theme_pha() +
-  labs(title = "Town of Aashland: Total Population",
+  labs(title = "Town of Ashland: Total population",
        subtitle = "2010 to 2020",
        caption = "**Source:** U.S. Census Bureau Decennial Census and American Community Survey.") +
   scale_y_continuous(labels = label_comma()) +
@@ -143,7 +147,8 @@ pop_bar <- ggplot(population_data,
         panel.grid.major.y = element_line(color = "grey95",
                                           size = 0.05)) +
   theme(plot.title.position = "plot",
-        plot.caption.position = "plot")
+        plot.caption.position = "plot")  +
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   
@@ -184,7 +189,8 @@ forecast_plot <- ggplot(forecast,
   labs(title="Town of Ashland: Population projections",
        subtitle="Town population in 2020 and forecast to 2050",
        fill="Estimate type",
-       caption="**Source:** University of Virginia Weldon Cooper Center for Public Service")
+       caption="**Source:** University of Virginia Weldon Cooper Center for Public Service")  +
+  add_zero_line("y")
 
 
 if (knitr::is_html_output()) {
@@ -206,6 +212,7 @@ From 2016 to 2020, Ashland has seen most of its household growth among homeowner
 
 ```{r}
 #| label: hh-age-data
+#| eval: false
 
 years <- 2016:2020
 
@@ -235,7 +242,7 @@ b25007_vars_cleaned <- b25007_vars |>
     tenure == "Renter occupied:" ~ "Renter"
   ))
 
-b25007_data <- b25007_raw |>
+b25007_ashland <- b25007_raw |>
   right_join(b25007_vars_cleaned, by = "variable") |>
   select(NAME, GEOID, year, tenure, age, estimate, moe) |>
   mutate(NAME = str_remove_all(NAME, "town, Virginia")) |>
@@ -262,13 +269,17 @@ b25007_data <- b25007_raw |>
   group_by(tenure, age) |> 
   summarise(change = sum(change))
 
+write_rds(b25007_ashland, "data/b25007_ashland.rds")
+
 ```
 
 ```{r}
 #| label: fig-hh-age-plot
 #| fig.cap: "Town of Ashland: Change in households by age and tenure"
 
-age_plot <- ggplot(b25007_data,
+b25007_ashland <- read_rds("data/b25007_ashland.rds")
+
+age_plot <- ggplot(b25007_ashland,
        aes(y = change, 
            x =tenure, 
            fill = tenure,
@@ -280,10 +291,11 @@ age_plot <- ggplot(b25007_data,
   theme_pha() +
   scale_fill_pha() +
   scale_y_continuous(labels = label_comma()) +
-  labs(title="Change in households by age and tenure",
+  labs(title="Town of Ashland: Change in households by age and tenure",
        subtitle="2016 to 2020",
        fill="Tenure",
-       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25007.") 
+       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25007.")  +
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   
@@ -294,12 +306,13 @@ if (knitr::is_html_output()) {
   age_plot
 }
   
-
-
 ```
+
 Households with children have only increased among renters in Hanover (+83) from 2016 to 2020 --- this is contrast to Hanover County as a whole, which is seeing an overall decrease in households with children. But the greatest household type to see growth in the town has been among nonfamily homeowner households (i.e. individuals living alone or with roommates) --- similarly to the county.
+
 ```{r}
 #| label: hh-child-data
+#| eval: false
 
 years <- 2016:2020
 
@@ -317,7 +330,6 @@ b25115_raw <- map_dfr(years, function(yr){
     mutate(year = yr)
 }) %>% 
   filter(NAME == "Ashland town, Virginia")
-
 
 b25115_vars_cleaned <- b25115_vars |>
   separate(label, into = c("est", "total", "tenure", "family", "type", "rel", "children"), sep = "!!") |>
@@ -346,7 +358,7 @@ b25115_vars_cleaned <- b25115_vars |>
   select(variable, tenure, family, type, children) |>
   drop_na()
 
-b25115_data <- b25115_raw |>
+b25115_ashland <- b25115_raw |>
   right_join(b25115_vars_cleaned, by = "variable") |>
   select(GEOID, year, tenure, type, children, estimate) |>
   pivot_wider(names_from = year,
@@ -356,14 +368,18 @@ b25115_data <- b25115_raw |>
   group_by(tenure, children) |>
   summarise(change = sum(change)) 
 
+write_rds(b25115_ashland, "data/b25115_ashland.rds")
+
 ```
 
 ```{r}
 #| label: fig-hh-child-plot
 #| fig.cap: "Town of Ashland: Change in households with children by tenure"
 
-ch_plot <- ggplot(b25115_data,
-       aes(x = children, 
+b25115_ashland <- read_rds("data/b25115_ashland.rds")
+
+ch_plot <- ggplot(b25115_ashland,
+       aes(x = tenure, 
            y = change, 
            fill = tenure,
            data_id = change,
@@ -374,10 +390,10 @@ ch_plot <- ggplot(b25115_data,
   scale_fill_pha() +
   facet_wrap(~children, nrow = 1, scales = "free_x") +
   scale_y_continuous(labels = label_number(style_positive = "plus", big.mark = ",")) +
-  labs(title = "Town of Ashland: Change in households with children by tenure",
+  labs(title = "Town of Ashland: Change in households<br>with children by tenure",
        subtitle = "2016 to 2020",
-       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25115.") 
-
+       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25115.")  +
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   
@@ -390,12 +406,11 @@ if (knitr::is_html_output()) {
   
   }
 
-
 ```
 
 ```{r}
 #| label: hh-seniors-data
-
+#| eval: false
 
 years <- 2016:2020
 
@@ -435,7 +450,7 @@ b09020_vars_cleaned <- b09020_vars |>
   mutate(across(.fns = ~str_remove_all(.x, ":"))) |>
   select(1,3,4)
 
-b09020_data <- b09020_raw |>
+b09020_ashland <- b09020_raw |>
   right_join(b09020_vars_cleaned, by = "variable") |>
   select(GEOID, year, family, relationship, estimate) |>
   group_by(year, family, relationship) |> 
@@ -450,14 +465,19 @@ b09020_data <- b09020_raw |>
   mutate(family = str_replace(family, "Group quarters", " "),
          family = fct_relevel(family, "Family", "Nonfamily", " "))
 
+write_rds(b09020_ashland, "data/b09020_ashland.rds")
+
 ```
+
 While the senior population has grown overall in Ashland (+107), that growth has been largely among seniors who live with other relatives (+225) or with a spouse (+52). Seniors who are head of households has declined in the town (-87), as well as the number of seniors living in group quarters (-69). Unlike the rest of the county, Ashland is not seeing major increases in seniors living alone.
 
 ```{r}
 #| label: fig-hh-seniors-plot
 #| fig.cap: "Town of Ashland: Change in senior population by living arrangement"
 
-snr_plot <- ggplot(b09020_data,
+b09020_ashland <- read_rds("data/b09020_ashland.rds")
+
+snr_plot <- ggplot(b09020_ashland,
        aes(y = reorder_within(relationship, change, family),
            x = change,
            fill = family,
@@ -471,14 +491,15 @@ snr_plot <- ggplot(b09020_data,
   scale_x_continuous(labels = label_comma()) +
   facet_grid(rows = vars(family), scales = "free_y", space = "free", switch = "y") +
   #scale_y_discrete(labels = function(x) str_wrap(x, width = 10)) +
-  labs(title = "Town of Ashland: Change in senior population by living arrangement",
+  labs(title = "Town of Ashland: Change in senior population<br>by living arrangement",
        subtitle="2016 to 2020",
        fill="Tenure",
        caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B09020.") +
   theme(strip.placement = "outside",
         panel.grid.major.y = element_blank(),
         panel.grid.major.x = element_line(color = "#e2e4e3",
-                                          size = 0.05))
+                                          size = 0.05))  +
+  add_zero_line("x")
 
 
 if (knitr::is_html_output()) {
@@ -499,8 +520,8 @@ if (knitr::is_html_output()) {
 Household incomes have also shifted in Ashland. Although there still remains an income gap between the average homeowner and renter households, the gap has been narrowing in recent years. In 2016, there was an over \$22,000 difference between homeowner and renter median household incomes. But by 2020, that difference had declined to only \$6,364, as homeowner incomes declined and renter incomes increased. 
 
 ```{r}
-#| label: fig-med-inc
-#| fig-cap: "Town of Ashland: Median household income by tenure"
+#| label: hh-inc-data
+#| eval: false
 
 years <- 2016:2020
 
@@ -539,13 +560,24 @@ cpi <- cpi |>
          priceindex = Index) |> 
   transform(year = as.numeric(year))
 
-b25119_cpi <- b25119_data |> 
+b25119_ashland <- b25119_data |> 
   left_join(cpi, by = 'year') |> 
   transform(dollars20 = ((381.2/priceindex)*estimate)) |> 
   select(year, tenure, dollars20, cdollars = estimate) |> 
   select(year, tenure, dollars20, cdollars)
 
-inc_plot <- ggplot(b25119_cpi, 
+write_rds(b25119_ashland, "data/b25119_ashland.rds")
+
+```
+
+
+```{r}
+#| label: fig-med-inc
+#| fig-cap: "Town of Ashland: Median household income by tenure"
+
+b25119_ashland <- read_rds("data/b25119_ashland.rds")
+
+inc_plot <- ggplot(b25119_ashland, 
        aes(x = year,
            y = dollars20,
            fill = tenure,
@@ -560,7 +592,8 @@ inc_plot <- ggplot(b25119_cpi,
   labs(title = "Town of Ashland: Median houshold income by tenure", 
        color = "Tenure",
        subtitle = "2016 to 2020 | Adjusted to 2020 dollars",
-       caption = "**Source:** U.S. Census Bureau, American Community Survey")
+       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25119.")  +
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   
@@ -684,13 +717,13 @@ rent_plot <- ggplot(rent,
     size = 0.5) + 
   theme_pha() +
   scale_color_pha() +
-  labs(title = "Town of Ashland: Average asking rent by submarket",
+  labs(title = "Town of Ashland: Average asking rent",
        subtitle = "2016 Q1 to 2022 Q3",
-       color = "Dollar value") +
+       color = "Dollar value",
+       caption = "**Source:** CoStar Group, Inc.") +
   scale_y_continuous(labels = label_dollar()) +
   scale_x_date(date_labels = "%Y", date_breaks = "2 years", limits = as.Date(c("2016-01-01", "2022-09-30"))) +
   theme(legend.position = "top")
-
 
 if (knitr::is_html_output()) {
   
@@ -718,43 +751,12 @@ Although this suggests that renters in the town are more able to afford rental h
 #| label: fig-ash-gap
 #| fig-cap: "Town of Ashland: Rental housing gap"
 
-years <- 2016:2020
-
-b25119_vars <- load_variables(2020, "acs5") %>% 
- filter(str_sub(name, end = 6) %in% "B25119")
-
-b25119_raw <- map_dfr(years, function(yr){
-  b25119_pull <- get_acs(
-    geography = "place",
-    state = "VA",
-    table = "B25119",
-    year = yr,
-    survey = "acs5",
-    cache_table = TRUE
-  ) |> 
-    mutate(year = yr)
-  }) %>% 
-  filter(NAME == "Ashland town, Virginia")
-
-b25119_vars_cleaned <- b25119_vars %>% 
-  separate(label, into = c("est", "lab", "total", "tenure"), sep = "!!") %>% 
-  select(variable = name, tenure) %>% 
-  drop_na() %>% 
-  mutate(tenure = case_when(
-    tenure == "Owner occupied (dollars)" ~ "Homeowner",
-    tenure == "Renter occupied (dollars)" ~ "Renter"
-  ))
-
-b25119_data <- b25119_raw %>% 
-  right_join(b25119_vars_cleaned, by = "variable") %>% 
-  select(year, tenure, estimate)
-
 ashland_rent <- read_csv("data/ashland_annual_rent.csv")
 
-rent_gap <- b25119_data %>% 
+rent_gap <- b25119_ashland %>% 
   filter(tenure == "Renter") %>% 
   left_join(ashland_rent, by = "year") %>% 
-  mutate(affordable_rent = (estimate/12)*.30) %>% 
+  mutate(affordable_rent = (cdollars/12)*.30) %>% 
   select(year, rent, affordable_rent) %>% 
   pivot_longer(2:3, 
                names_to = "label",
@@ -779,7 +781,8 @@ rentgap <- ggplot(rent_gap,
        subtitle = "2016 to 2020",
        fill = "Nominal rent",
        caption = "**Sources:** U.S. Census Bureau, American Community Survey, Table B25119<br>and CoStar Group Inc.") +
-  theme(legend.position = "top")
+  theme(legend.position = "top")  +
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   
@@ -793,10 +796,10 @@ if (knitr::is_html_output()) {
   }
 
 
-
 ```
 
 In spite of increasing incomes among renters in the town, the high price of homeownership continues to keep renters from moving to more permanent tenureship. In 2016. the gap between income needed to afford the median home price and the typical renter income was just over \$17,000. By 2020, that gap had only decreased by about \$2,000 --- leaving the typical renter \$15,241 away from being able to afford the median home price in 2020 (\$305,000).
+
 ```{r}
 #| label: fig-sales-gap
 #| fig-cap: "Town of Ashland: Income needed to afford median home price versus median renter income"
@@ -810,7 +813,7 @@ downpayment <- 0.05 # 5% downpayment
 closingcosts <- 0.015 # 1.5% closing costs
 utilities <- 250 # Assume $250/month for utilities
 
-slgap <- b25119_data %>% 
+slgap <- b25119_ashland %>% 
   filter(tenure == "Renter") %>% 
   left_join(ashland_medsales, by = "year") %>% 
   left_join(int_annual, by = "year") |> 
@@ -843,7 +846,8 @@ labs(title = "Town of Ashland: Income needed to afford median home price<br>vers
        subtitle = "2016 to 2020",
        fill = "Nominal income",
        caption = "**Sources:** U.S. Census Bureau, American Community Survey, Table B25119<br>and Central Virginia Regional Multiple Listing Service.") +
-  theme(legend.position = "top")
+  theme(legend.position = "top")  +
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   
@@ -860,7 +864,7 @@ if (knitr::is_html_output()) {
 In contrast to other localities, homeowner cost burden has increased in Ashland. From 2015 to 2019, there has been an increase of 57 cost-burdened homeowner households --- a 19 percent increase. However, the number of cost-burdened renter households decreased from 690 to 580 --- a 16 percent decrease.
 ```{r}
 #| label: fig-ash-cb
-#| fig-cap: "Town of Ashland: Cost burden by tenure"
+#| fig-cap: "Town of Ashland: Cost burdened households by tenure"
 
 ashland_cb <- read_csv("data/ashland_cb.csv")
 
@@ -885,12 +889,13 @@ cb_plot <- ggplot(ashland_cb_cln,
   theme_pha() + 
   scale_fill_pha() +
   facet_wrap(~tenure) +
-  labs(title = "Town of Ashland: Cost burden by tenure",
-       subtitle = "In 2015 and 2019",
+  labs(title = "Town of Ashland: Cost burdened households by tenure",
+       subtitle = "2015 and 2019",
        fill = "Cost burden") +
   scale_y_continuous(labels = number_format(big.mark = ",")) +
   theme(axis.title = element_blank(),
-        legend.position = "none")
+        legend.position = "none")  +
+  add_zero_line("y")
   
 if (knitr::is_html_output()) {
   

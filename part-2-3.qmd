@@ -248,7 +248,7 @@ subsidy_plot <- ggplot(subsidy,
   theme_pha() +
   scale_fill_pha() +
   scale_color_pha() +
-  scale_x_continuous(labels = percent_format(), n.breaks = 10) +
+  scale_x_continuous(labels = percent_format(), n.breaks = 10, limits = c(0, 0.59)) +
   labs(title = "Share of federally assisted units by subsidy type",
        subtitle = "Data as of July 2022",
        caption = "**Source:** National Housing Preservation Database.") +
@@ -441,7 +441,8 @@ subsidy_local <- nhpd_coded_rr |>
   summarise(units = max(known_total_units)) |>
   group_by(locality, subsidy_type) |>
   summarise(units = sum(units)) |>
-  filter(units > 1)
+  filter(units > 1) |> 
+  mutate(locality = str_wrap(locality, 12))
 
 local_plot <- ggplot(subsidy_local,
        aes(x = reorder(locality, units),
@@ -816,7 +817,7 @@ Through DHCD, a total of 32,029 payments were made to households across Richmond
 
 #### All data not available
 
-Chesterfield County rent relief data has not been received yet.
+Data for Chesterfield County's separately-administered rent relief program was not available. 
 
 :::
 

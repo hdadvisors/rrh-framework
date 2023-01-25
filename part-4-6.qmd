@@ -65,7 +65,7 @@ pop_bar <- ggplot(pop,
   geom_col_interactive(size = 2) +
   scale_fill_gradientn(colours = c("#CAE3C2", "#74BA91", "#519B8D", "#2B4258")) +
   theme_pha() +
-  labs(title = paste0(name, ": Total Population"),
+  labs(title = paste0(name, ": Total population"),
        subtitle = "2010 to 2020",
        caption = "**Source:** U.S. Census Bureau Decennial Census and American Community Survey.") +
   scale_y_continuous(labels = label_comma()) +
@@ -74,7 +74,8 @@ pop_bar <- ggplot(pop,
         panel.background = element_blank(),
         axis.ticks = element_blank(),
         panel.grid.major.y = element_line(color = "grey95",
-                                          size = 0.05)) 
+                                          size = 0.05)) +
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   
@@ -109,10 +110,10 @@ pop_change <- ggplot(change,
   theme_pha() +
   scale_fill_pha() +
   labs(title = paste0(name,": Components of population change"), 
-       subtitle = "2016 through 2021",
+       subtitle = "2016 to 2021",
        caption = "**Note:** 2020 components of change data not available.<br>**Source:** U.S. Census Bureau, Population Estimates Program.")  +
-  scale_y_continuous(labels = label_number(big.mark = ",", style_positive = "plus", style_negative = "minus")) 
-
+  scale_y_continuous(labels = label_number(big.mark = ",", style_positive = "plus", style_negative = "minus")) +
+  add_zero_line("y") 
 
 if (knitr::is_html_output()) {
   
@@ -141,7 +142,7 @@ b25115 <- read_rds("data/b25115_data.rds") |>
   filter(NAME == name)
 
 ch_plot <- ggplot(b25115,
-       aes(x = children, 
+       aes(x = tenure, 
            y = change, 
            fill = tenure,
            data_id = change,
@@ -152,9 +153,10 @@ ch_plot <- ggplot(b25115,
   scale_fill_pha() +
   facet_wrap(~children, nrow = 1, scales = "free_x") +
   scale_y_continuous(labels = label_number(style_positive = "plus", big.mark = ",")) +
-  labs(title = paste0(name, ": Change in households with children by tenure"),
+  labs(title = paste0(name, ": Change in households<br>with children by tenure"),
        subtitle = "2016 to 2020",
-       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25115.") 
+       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25115.") +
+  add_zero_line("y")
 
 
 if (knitr::is_html_output()) {
@@ -194,14 +196,15 @@ snr_plot <- ggplot(b09020,
   scale_x_continuous(labels = label_comma()) +
   facet_grid(rows = vars(family), scales = "free_y", space = "free", switch = "y") +
   #scale_y_discrete(labels = function(x) str_wrap(x, width = 10)) +
-  labs(title = paste0(name, ": Change in senior population by living arrangement"),
+  labs(title = paste0(name, ": Change in senior population<br>by living arrangement"),
        subtitle="2016 to 2020",
        fill="Tenure",
        caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B09020.") +
   theme(strip.placement = "outside",
         panel.grid.major.y = element_blank(),
         panel.grid.major.x = element_line(color = "#e2e4e3",
-                                          size = 0.05))
+                                          size = 0.05)) +
+  add_zero_line("y")
 
 
 if (knitr::is_html_output()) {
@@ -247,7 +250,8 @@ inc_plot <- ggplot(b25119_cpi,
   labs(title = paste0(name, ": Median houshold income by tenure"), 
        color = "Tenure",
        subtitle = "2016 to 2020 | Adjusted to 2020 dollars",
-       caption = "**Source:** U.S. Census Bureau, American Community Survey")
+       caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B25119.") +
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   
@@ -385,7 +389,7 @@ Less than one in five households in the county are renters as of 2020 (15.6 perc
 
 ```{r}
 #| label: fig-renters
-#| fig-cap: "Renter households in Charles City County"
+#| fig-cap: "Charles City County: Percent of renter households"
 
 b25003_vars <- load_variables(2020, "acs5") |> 
   filter(str_sub(name, end = 7) %in% "B25003_")
@@ -431,11 +435,12 @@ renter_plot <- ggplot(b25003_data,
   geom_col_interactive(size = 2) +
   theme_pha() +
   scale_fill_gradientn(colours = c("#CAE3C2", "#74BA91", "#519B8D", "#2B4258")) +
-  labs(title = "Percent of renter households in Charles City County", 
+  labs(title = "Charles City County: Percent of renter households", 
        fill = "Percent of total households",
-       subtitle = "From 2016 to 2020",
-       caption = "**Source:** U.S Census Bureau. American Community Survey 2016-2020 5-Year Estimates. Table B25003.") +
-  scale_y_continuous(labels = percent_format())
+       subtitle = "2016 to 2020",
+       caption = "**Source:** U.S Census Bureau, American Community Survey, Table B25003.") +
+  scale_y_continuous(labels = percent_format()) +
+  add_zero_line("y")
 
 
 if (knitr::is_html_output()) {
@@ -515,11 +520,12 @@ slgap_plot <- ggplot(slgap,
   scale_y_continuous(labels = label_dollar()) + 
   theme_pha() +
   scale_fill_pha() +
-  labs(title = paste0(name, ": Income needed to afford median home price<br>versus median renter income"),
+  labs(title = paste0(name, ": Income needed to afford median<br>home price versus median renter income"),
        subtitle = "2016 to 2020",
        fill = "Nominal income",
        caption = "**Sources:** U.S. Census Bureau, American Community Survey, Table B25119<br>and Central Virginia Regional Multiple Listing Service.") +
-  theme(legend.position = "top")
+  theme(legend.position = "top") +
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   
@@ -570,9 +576,10 @@ gap_plot <- ggplot(gap,
   scale_fill_pha() + 
   scale_y_continuous(labels = label_comma()) +
   labs(title = paste0(name, ": Rental housing gap by AMI"),
-       subtitle = "2015 to 2018",
+       subtitle = "2015 to 2019",
        caption = "**Source:** U.S. Department of Housing and Urban Development,<br>Comprehensive Housing Affordability Strategy (CHAS), Table 7.") +
-  theme(legend.position = "top")
+  theme(legend.position = "top") +
+  add_zero_line("y")
 
 if (knitr::is_html_output()) {
   
@@ -613,8 +620,8 @@ cb_plot <- ggplot(cb,
   scale_fill_manual(values = c("#f39152", "#a6cccc", "#e2e4e3")) +
   geom_col_interactive(position = position_fill(reverse = TRUE), size = 2) +
   scale_y_continuous(labels = percent_format()) +
-  labs(title = paste0(name, ": Share of cost-burdened households by tenure"),
-       subtitle = "2015 to 2018",
+  labs(title = paste0(name, ":<br>Share of cost-burdened households by tenure"),
+       subtitle = "2015 to 2019",
        fill = "Cost burden",
        caption = "**Source:** U.S Department of Housing and Urban Development,<br>Comprehensive Housing Affordability Strategy (CHAS), Table 7.") +
   theme(legend.position = "top")

@@ -358,7 +358,7 @@ rent_gap <- ggplot(rent_afford,
   facet_wrap(~locality, nrow = 1) +
   scale_x_continuous(n.breaks = 7) +
   scale_y_continuous(labels = label_dollar()) +
-  labs(title = "Average rents versus affordable rents for median renter income",
+  labs(title = "Average rents versus affordable rents<br>for median renter income",
        subtitle ="2016 to 2022 (ACS income data through 2020)",
        caption = "**Sources:** U.S. Census Bureau, American Community Survey, Table B25119; CoStar Group, Inc.") +
   theme(legend.position = "bottom",
@@ -535,7 +535,7 @@ jobs_plot <- occ_locality_afford |>
   theme_pha() +
   scale_fill_pha() +
   scale_y_continuous(labels = label_dollar()) +
-  labs(title = "Median annual salaries for the five most common occupation categories",
+  labs(title = "Median annual salaries for the<br>five most common occupation categories",
        subtitle = "Richmond, VA MSA | May 2021",
        caption = "**Source:** U.S. Bureau of Labor Statistics, Occupational Employment and Wage Statistics.") 
 
@@ -577,7 +577,7 @@ job_rent <- ggplot(occ_locality_afford,
   scale_y_discrete(labels = function(x) str_wrap(x, width = 24)) +
   labs(title = "Most workers cannot afford rent on their own",
        subtitle = "Affordable rent by occupation versus average rents",
-       caption = "**Sources:** U.S. Bureau of Labor Statistics, Occupational Employment and Wage Statistics; CoStar Group, Inc.") +
+       caption = "**Sources:** U.S. Bureau of Labor Statistics, Occupational Employment and Wage Statistics;<br>CoStar Group, Inc.") +
   theme_pha() +
   add_zero_line(axis = "x") +
   flip_gridlines() +
@@ -622,8 +622,8 @@ job_own <- ggplot(occ_locality_afford,
   scale_x_continuous(labels = label_dollar(), expand = expansion(mult = 0)) +
   scale_y_discrete(labels = function(x) str_wrap(x, width = 24)) +
   labs(title = "Most workers cannot buy a home on their own",
-       subtitle = "Maximum affordable home price by occupation versus median sales prices",
-       caption = "**Sources:** U.S. Bureau of Labor Statistics, Occupational Employment and Wage Statistics; CVR MLS.") +
+       subtitle = "Maximum affordable home price by occupation<br>versus median sales prices",
+       caption = "**Sources:** U.S. Bureau of Labor Statistics, Occupational Employment and Wage Statistics;<br>CVR MLS.") +
   theme_pha() +
   add_zero_line(axis = "x") +
   flip_gridlines() +

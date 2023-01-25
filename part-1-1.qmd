@@ -153,14 +153,6 @@ total_pop_plot <- ggplot(pha_pop_compare,
 total_pop_widget <- girafe(ggobj = total_pop_plot,
                            height_svg = 4)
 
-# Export widget via htmlwidgets
-
-htmlwidgets::saveWidget(total_pop_widget, "widgets/htmlwidgets/total_pop.html", selfcontained = TRUE)
-
-# Export widget via htmltools
-
-htmltools::save_html(total_pop_widget, "widgets/htmltools/total_pop.html")
-
 if (knitr::is_html_output()) {
   
   total_pop_widget
@@ -176,6 +168,21 @@ if (knitr::is_html_output()) {
   }
   
 ```
+
+```{r}
+#| label: widgets
+#| eval: false
+
+# Export widget via htmlwidgets
+
+htmlwidgets::saveWidget(total_pop_widget, "widgets/htmlwidgets/total_pop.html", selfcontained = TRUE)
+
+# Export widget via htmltools
+
+htmltools::save_html(total_pop_widget, "widgets/htmltools/total_pop.html")
+
+```
+
 
 ## Components of population change
 
@@ -377,7 +384,8 @@ forecasts_locality_plot <- ggplot(forecasts_locality,
        subtitle = "Local population in 2020 and forecast to 2050",
        caption = "**Source:** University of Virginia Weldon Cooper Center for Public Service.") +
   scale_fill_pha() +
-  theme_pha()
+  theme_pha() +
+  add_zero_line("y")
 
 # Chesterfield - 140,266 difference / 38 percent increase
 # Hanover - 30,134 difference / 27 percent increase

@@ -239,7 +239,7 @@ hh_age_plot <- ggplot(b25007_data,
            tooltip = label_comma()(change))) +
   geom_col(position = "dodge") +
   geom_col_interactive(position = "dodge", size = 2) +
-  facet_wrap(~age, nrow = 1) +
+  facet_wrap(~age, nrow = 1, labeller = labeller(age = label_wrap_gen(width = 12))) +
   scale_y_continuous(labels = label_comma(),
                      breaks = c(-2500,0,2500,5000,7500,10000,12500,15000)) +
   labs(title = "Change in households by age and tenure",
@@ -440,7 +440,7 @@ hh_size_plot <- ggplot(b25009_data,
            tooltip = label_comma()(change))) +
   geom_col(position = "dodge") + 
   geom_col_interactive(position = "dodge", size = 2) +
-  facet_wrap(~size, nrow = 1, labeller = label_wrap_gen(width = 18, multi_line = TRUE)) +
+  facet_wrap(~size, nrow = 1, labeller = labeller(size = label_wrap_gen(width = 12))) +
   scale_y_continuous(labels = label_comma(),
                      breaks = c(-2000,0,2000,4000,6000,8000),
                      limits = c(-2000,8050)) +

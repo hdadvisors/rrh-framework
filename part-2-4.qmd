@@ -119,7 +119,9 @@ if (knitr::is_html_output()) {
 
 The large share of NOAH is located in the City of Richmond (11,253 units or 45 percent of all NOAH units). This is no doubt due to the large amount of older multifamily properties within city limits --- most of which is located in smaller buildings. Henrico County has the second largest share of NOAH in the region with 8,983 units, followed by Chesterfield County at 3,667 and Hanover County below 500 units.
 
-:::{.callout-caution}
+:::{.callout-warning}
+
+### Additional context for NOAH
 
 It is important to consider that the City of Richmond contains much of the region's older housing stock. This includes many older apartment buildings that are anywhere from two to twenty units in size. While they may fall under the NOAH classification set out in this analysis, their rents may actually be higher due to the overwhelming demand for rental housing among young professionals and students in the city.
 

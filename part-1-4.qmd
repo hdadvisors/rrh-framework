@@ -106,7 +106,7 @@ ind_liv_age_plot <- ggplot(b18107_data,
   geom_col_interactive(size = 2) +
   scale_y_continuous(labels = label_comma()) +
   scale_fill_pha() +
-  labs(title = "Net change in individuals with independent living difficulties by age",
+  labs(title = "Net change in individuals with<br>independent living difficulties by age",
        subtitle = "2016 to 2020",
        caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B18107.") +
   theme_pha() +
@@ -339,7 +339,7 @@ vets_plot <- ggplot(b21100_data,
   scale_x_discrete(labels = function(x) str_wrap(x, width = 15)) +
   scale_y_continuous(labels = label_comma()) +
   scale_fill_pha() +
-  labs(title = "Net change in veterans with service-connected disability by disability rating",
+  labs(title = "Net change in veterans with<br>service-connected disability by disability rating",
        subtitle = "2016 to 2020",
        caption = "**Source:** U.S. Census Bureau, American Community Survey, Table B21100.") +
   theme_pha() +
